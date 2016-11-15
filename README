@@ -1,0 +1,36 @@
+-*- mode: org -*-
+
+[[http://www.gnu.org/software/guix/][GNU Guix]] (IPA: /ɡiːks/) is a purely functional package manager, and
+associated free software distribution, for the [[http://www.gnu.org/gnu/gnu.html][GNU system]].
+
+This repository contains Guix packages and system definitions for
+software and systems specifically related to the [[https://www.gov.uk/government/organisations/government-digital-service][Government Digital
+Service]].
+
+* Getting started
+
+To generate and run the end to end test container, you'll need to have
+a working GNU Guix installation.
+
+To run the end to end test container, run:
+
+  make check-system
+
+* Hacking
+
+When developing locally, you may find it useful to use a local copy of
+GNU Guix, this can be done by setting the $GDS_GNU_GUIX_PATH
+environment variable, for example:
+
+  export GDS_GNU_GUIX_PATH="../gnu-guix"
+
+This will be quite slow, as it builds the whole package again when any
+changes are made, for quicker development, you can setup
+$XDG_CONFIG_HOME/.local/guix/latest to link to the local copy of Guix
+that you which to use. This will be done in the pre-inst-env script
+with the value of $GDS_GUIX_CUSTOM_XDG_CONFIG_HOME if it is set, for
+example:
+
+  # Where $HOME/govuk/.config/guix/latest is the copy of Guix you wish
+  # to use
+  export GDS_GUIX_CUSTOM_XDG_CONFIG_HOME="$HOME/govuk/.config"
