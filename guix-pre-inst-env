@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export GUIX_PACKAGE_PATH="$PWD/.guix-package-path${GUIX_PACKAGE_PATH:+:}$GUIX_PACKAGE_PATH"
+
+guix environment \
+     --fallback \
+     --pure \
+     --ad-hoc bash coreutils less guix@0.11.0-gds guile \
+     bash -- <<EOF
+export GDS_GUIX_PATH="$GDS_GUIX_PATH"
+
+bash ./pre-inst-env $@
+EOF
