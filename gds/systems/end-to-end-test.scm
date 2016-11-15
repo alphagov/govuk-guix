@@ -24,7 +24,8 @@
     (mongodb . 57017)
     (publishing-api . 53039)
     (content-store . 53000)
-    (draft-content-store . 53001)))
+    (draft-content-store . 53001)
+    (specialist-publisher . 53064)))
 
 (define end-to-end-test-os
   (operating-system
@@ -45,6 +46,7 @@
         (publishing-api-service)
         (content-store-service)
         (draft-content-store-service)
+        (specialist-publisher-service)
         (govuk-content-schemas-service)
         (postgresql-service #:port (number->string (port-for 'postgresql)))
         (mongodb-service #:port (port-for 'mongodb))

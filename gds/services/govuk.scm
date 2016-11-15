@@ -37,7 +37,8 @@
 
             publishing-api-service
             content-store-service
-            draft-content-store-service))
+            draft-content-store-service
+            specialist-publisher-service))
 
 (define ports
   (make-parameter
@@ -45,7 +46,8 @@
      (mongodb . 27017)
      (publishing-api . 3039)
      (content-store . 3000)
-     (draft-content-store . 3001))))
+     (draft-content-store . 3001)
+     (specialist-publisher . 3064))))
 
 (define govuk-content-schemas-service-type
   (shepherd-service-type
@@ -414,3 +416,21 @@ db.createUser(
    #:root-directory root-directory
    #:database-connection-configs database-connection-configs
    rest))
+
+(define* (specialist-publisher-service
+          #:optional #:key
+          (name 'specialist-publisher)
+          (package specialist-publisher)
+          (requirements '(publishing-api))
+          (ports (ports))
+          (root-directory "/var/lib/specialist-publisher")
+          (database-connection-configs '()))
+  (rails-app-service
+   (rails-app-config
+    (name name)
+    (package package)
+    (requirements requirements)
+    (ports ports)
+    (root-directory root-directory)
+    (database-connection-configs
+     database-connection-configs))))
