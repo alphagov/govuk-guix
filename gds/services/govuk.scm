@@ -352,7 +352,7 @@ db.createUser(
           (name 'publishing-api)
           (package publishing-api)
           (requirements '(content-store postgres))
-          (ports ports)
+          (ports (ports))
           (root-directory "/var/lib/publishing-api")
           (database-connection-configs
            (list
@@ -365,7 +365,7 @@ db.createUser(
     (name name)
     (package package)
     (requirements requirements)
-    (ports (ports))
+    (ports ports)
     (root-directory root-directory)
     (database-connection-configs
      database-connection-configs))))
@@ -375,7 +375,7 @@ db.createUser(
           (name 'content-store)
           (package content-store)
           (requirements '(mongodb))
-          (ports ports)
+          (ports (ports))
           (root-directory "/var/lib/content-store")
           (database-connection-configs
            (list
@@ -388,7 +388,7 @@ db.createUser(
     (name name)
     (package package)
     (requirements requirements)
-    (ports (ports))
+    (ports ports)
     (root-directory root-directory)
     (database-connection-configs
      database-connection-configs))))
