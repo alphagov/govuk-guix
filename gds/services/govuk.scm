@@ -44,7 +44,8 @@
    `((postgresql . 5432)
      (mongodb . 27017)
      (publishing-api . 3039)
-     (content-store . 3000))))
+     (content-store . 3000)
+     (draft-content-store . 3001))))
 
 (define govuk-content-schemas-service-type
   (shepherd-service-type

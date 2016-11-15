@@ -23,7 +23,8 @@
   `((postgresql . 55432)
     (mongodb . 57017)
     (publishing-api . 53039)
-    (content-store . 53000)))
+    (content-store . 53000)
+    (draft-content-store . 53001)))
 
 (define end-to-end-test-os
   (operating-system
