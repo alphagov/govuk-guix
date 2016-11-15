@@ -225,6 +225,8 @@ db.createUser(
               database-config->environment-variable
               database-connection-configs)
              `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
+               ("GOVUK_WEBSITE_ROOT" . "placeholder")
+               ("GOVUK_ASSET_ROOT" . "placeholder")
                ("RAILS_ENV" . "production")
                ("SECRET_KEY_BASE" . "t0a")
                ("BUNDLE_PATH" .
