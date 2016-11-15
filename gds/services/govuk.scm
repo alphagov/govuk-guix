@@ -284,6 +284,8 @@ db.createUser(
              #$package
              (negate
               (cut member <> '("." ".." "tmp" "log" ".bundle" "spec" "doc")))))
+           ;; If the Gemfile is patched, the Gemfile.lock needs to be writable
+           (chmod (string-append #$root-directory "/Gemfile.lock") #o777)
            (for-each
             (lambda (file)
               (mkdir-p file)
