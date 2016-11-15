@@ -8,6 +8,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages node)
   #:use-module (guix build-system gnu)
   #:use-module (guix git-download))
 
@@ -42,6 +43,7 @@
        ("tzdata" ,tzdata)
        ("coreutils" ,coreutils) ;; just for ls
        ("libxslt" ,libxslt)
+       ("node" ,node)
        ))
     (arguments
      `(#:modules ((srfi srfi-1)
