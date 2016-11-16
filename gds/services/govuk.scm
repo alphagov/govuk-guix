@@ -38,7 +38,8 @@
             publishing-api-service
             content-store-service
             draft-content-store-service
-            specialist-publisher-service))
+            specialist-publisher-service
+            publishing-e2e-tests-service))
 
 (define ports
   (make-parameter
@@ -97,6 +98,12 @@
   (user mongodb-connection-config-user)
   (port mongodb-connection-config-port)
   (database mongodb-connection-config-database))
+
+(define-record-type* <publishing-e2e-tests-config>
+  publishing-e2e-tests-config make-publishing-e2e-tests-config
+  publishing-e2e-tests-config?
+  (package publishing-e2e-tests-config-package)
+  (ports publishing-e2e-tests-config-ports))
 
 (define (make-database-setup-thunk config)
   (cond
@@ -350,6 +357,85 @@ db.createUser(
   (service
    (make-rails-app-service-type config)
    config))
+
+(define* make-publishing-e2e-tests-start-script
+  (match-lambda
+    (($ <publishing-e2e-tests-config> package ports)
+     (let*
+         ((bundle-path-base "/tmp/guix/")
+          (bundle-path
+           (string-append bundle-path-base "publishing-e2e-tests-FAKE_HASH/BUNDLE_PATH"))
+          (bundle-bin-path
+           (string-append bundle-path "/bin"))
+          (environment-variables
+           `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
+             ("GOVUK_WEBSITE_ROOT" . "placeholder")
+             ("GOVUK_ASSET_ROOT" . "placeholder")
+             ("RAILS_ENV" . "production")
+             ("SECRET_KEY_BASE" . "t0a")
+             ("BUNDLE_PATH" . ,bundle-path)
+             ("BUNDLE_APP_CONFIG" .
+              "/var/lib/publishing-e2e-tests/.bundle")
+             ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))
+       (program-file
+        (string-append "start-publishing-e2e-tests")
+        (with-imported-modules '((guix build utils)
+                                 (ice-9 popen))
+          #~(let ((user (getpwnam "nobody"))
+                  (bundle (string-append #$package "/bin/bundle"))
+                  (rspec (string-append #$bundle-bin-path "/rspec")))
+              (use-modules (guix build utils)
+                           (ice-9 popen))
+
+              (mkdir-p "/var/lib/publishing-e2e-tests")
+              (chown "/var/lib/publishing-e2e-tests"
+                     (passwd:uid user) (passwd:gid user))
+
+              (mkdir-p #$bundle-path-base)
+              (chmod #$bundle-path-base #o777)
+
+              ;; Start the service
+              (setgid (passwd:gid user))
+              (setuid (passwd:uid user))
+              (for-each
+               (lambda (env-var)
+                 (setenv (car env-var) (cdr env-var)))
+               '#$environment-variables)
+              (chdir #$package)
+              (system* bundle "install")
+              (system* bundle "exec" "rspec"))))))))
+
+(define (publishing-e2e-tests-service config)
+  (let* ((start-script
+          (make-publishing-e2e-tests-start-script config)))
+    (list
+     (shepherd-service
+      (provision (list 'publishing-e2e-tests))
+      (documentation "publishing-e2e-tests")
+      (requirement '(specialist-publisher))
+      (respawn? #f)
+      (start #~(make-forkexec-constructor #$start-script))
+      (stop #~(make-kill-destructor))))))
+
+(define publishing-e2e-tests-service-type
+  (service-type
+   (name 'publishing-e2e-tests-service)
+   (extensions
+    (list (service-extension shepherd-root-service-type
+                             publishing-e2e-tests-service)))))
+
+(define* (publishing-e2e-tests-service
+          #:optional #:key
+          (package publishing-e2e-tests)
+          (ports (ports)))
+  (let
+      ((config
+        (publishing-e2e-tests-config
+         (package package)
+         (ports ports))))
+    (service
+     publishing-e2e-tests-service-type
+     config)))
 
 (define (port-for service)
   (assq-ref (ports) service))
