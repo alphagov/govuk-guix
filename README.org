@@ -14,21 +14,29 @@ a working GNU Guix installation.
 
 To run the end to end test container, run:
 
+#+BEGIN_SRC shell
   make check-system
+#+END_SRC
 
 To specify a particular commit-ish (commit, tag or branch), you can set the
 appropriate environment variable for the package. This has the form
 GDS_GUIX_${PACKAGE_NAME}_COMMIT_ISH where ${PACKAGE_NAME} is the name of the
 package in upper case, with any dashes replaced by underscores. For example:
 
-  GDS_GUIX_GOVUK_CONTENT_SCHEMAS_COMMIT_ISH="master" GDS_GUIX_PUBLISHING_API_COMMIT_ISH="master" ./guix-pre-inst-env guix system container gds/systems/end-to-end-test.scm
+#+BEGIN_SRC shell
+  GDS_GUIX_GOVUK_CONTENT_SCHEMAS_COMMIT_ISH="master" \
+  GDS_GUIX_PUBLISHING_API_COMMIT_ISH="master" \
+  ./guix-pre-inst-env guix system container gds/systems/end-to-end-test.scm
+#+END_SRC
 
 When used, bundler will install gems just prior to the respective service being
 started. They will be installed in to /tmp/guix . To speed up running the
 container repeatedly, you can share this location with the host to make it
 persistent by using --share, for example:
 
+#+BEGIN_SRC shell
   ./guix-pre-inst-env guix system container gds/systems/end-to-end-test.scm --share=/tmp/guix
+#+END_SRC
 
 * Hacking
 
@@ -36,7 +44,9 @@ When developing locally, you may find it useful to use a local copy of
 GNU Guix, this can be done by setting the $GDS_GNU_GUIX_PATH
 environment variable, for example:
 
+#+BEGIN_SRC shell
   export GDS_GNU_GUIX_PATH="../gnu-guix"
+#+END_SRC
 
 This will be quite slow, as it builds the whole package again when any
 changes are made, for quicker development, you can setup
@@ -45,6 +55,9 @@ that you which to use. This will be done in the pre-inst-env script
 with the value of $GDS_GUIX_CUSTOM_XDG_CONFIG_HOME if it is set, for
 example:
 
+#+BEGIN_SRC shell
   # Where $HOME/govuk/.config/guix/latest is the copy of Guix you wish
   # to use
+
   export GDS_GUIX_CUSTOM_XDG_CONFIG_HOME="$HOME/govuk/.config"
+#+END_SRC
