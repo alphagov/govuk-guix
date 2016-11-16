@@ -66,8 +66,6 @@
                         (search-path-as-string->list (getenv "PATH")));)
                       ":")))
                (copy-recursively "." out)
-               (patch-shebang
-                (string-append out "/startup.sh"))
                ;; Guix has QT 5.6, which does not work with capybara-webkit
                (substitute* (string-append out "/Gemfile")
                  (("gem [\"']capybara-webkit[\"']")
