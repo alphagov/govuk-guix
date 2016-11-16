@@ -5,9 +5,10 @@ export GUIX_PACKAGE_PATH="$PWD/.guix-package-path${GUIX_PACKAGE_PATH:+:}$GUIX_PA
 guix environment \
      --fallback \
      --pure \
-     --ad-hoc bash coreutils less guix@0.11.0-gds guile \
+     --ad-hoc bash coreutils less nss-certs guix@0.11.0-gds guile \
      bash -- <<EOF
 export GDS_GUIX_PATH="$GDS_GUIX_PATH"
+export SSL_CERT_DIR="$GUIX_ENVIRONMENT/etc/ssl/certs"
 
 bash ./pre-inst-env $@
 EOF
