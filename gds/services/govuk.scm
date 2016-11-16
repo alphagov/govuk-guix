@@ -71,7 +71,9 @@
              #f))
    (respawn? #f)))))
 
-(define* (govuk-content-schemas-service #:optional (package govuk-content-schemas))
+(define* (govuk-content-schemas-service
+          #:optional #:key
+          (package govuk-content-schemas))
   (service govuk-content-schemas-service-type package))
 
 
