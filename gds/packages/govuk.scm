@@ -112,24 +112,24 @@
    "publishing-api" ;; TODO: Pass archive details to make-govuk-package
    (github-archive
     #:repository "publishing-api"
-    #:commit-ish "a35bd59c2020569f8318d4e7fd73c88a5af6f796"
-    #:hash (base32 "1k69ljrj5mw18alx81vzd089xcwlzca97wxwn8fvqqanxb246iq7"))))
+    #:commit-ish "release_607"
+    #:hash (base32 "1gz4njkbfdmv1qxb0d28wlzkmp421sxid5m7dh42vknjkp0prdqy"))))
 
 (define-public content-store
   (make-govuk-package
    "content-store"
    (github-archive
     #:repository "content-store"
-    #:commit-ish "a92c2b81d43e8f03aad146f5e6532395a5209737"
-    #:hash (base32 "115f8i788ydgzz66kd9xkwxma2pp6s2mnwv6k6877zs11n6n8h7m"))))
+    #:commit-ish "release_585"
+    #:hash (base32 "0i42za14jn0wrsninahymg9w3sddfnll8fbxmirrvcqcbxx55ydc"))))
 
 (define-public specialist-publisher
   (make-govuk-package
    "specialist-publisher"
    (github-archive
     #:repository "specialist-publisher"
-    #:commit-ish "464e216577d597a6195a287d233269a700b517d1"
-    #:hash (base32 "0ymyd7d9rr60sxl702swyyg9lf8fq5k5zkh8k5msppf7laf3g7cb"))))
+    #:commit-ish "release_725"
+    #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9"))))
 
 (define-public publishing-e2e-tests
   (let
