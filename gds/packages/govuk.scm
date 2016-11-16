@@ -131,6 +131,42 @@
     #:commit-ish "464e216577d597a6195a287d233269a700b517d1"
     #:hash (base32 "0ymyd7d9rr60sxl702swyyg9lf8fq5k5zkh8k5msppf7laf3g7cb"))))
 
+(define-public publishing-e2e-tests
+  (let
+      ((govuk-package
+        (make-govuk-package
+         "publishing-e2e-tests"
+         (github-archive
+          #:user-or-org "kevindew"
+          #:repository "publishing-e2e-tests"
+          #:commit-ish "da2c5e759fd4ff4bae62b7a41a80cee40cf136cb"
+          #:hash (base32 "1arrlch7681yjs6v4qyn9wnwsxzpar1lsca0qfm8zdizl6nfi0l1")))))
+    (package
+      (inherit govuk-package)
+      (arguments
+       (substitute-keyword-arguments (package-arguments govuk-package)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-before 'install 'add-bundle
+               (lambda* (#:key inputs outputs #:allow-other-keys)
+                 (let*
+                     ((out (assoc-ref outputs "out"))
+                      (gemfile (string-append out "/Gemfile"))
+                      (ruby
+                       (string-append (assoc-ref inputs "ruby")
+                                      "/bin/ruby")))
+                   (define* (bundle ruby-path #:optional (port #f))
+                     (format port "#!~A
+ENV[\"BUNDLE_GEMFILE\"] ||= \"~A\"
+
+load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
+
+                   (mkdir-p (string-append out "/bin"))
+                   (call-with-output-file (string-append out "/bin/bundle")
+                     (lambda (port)
+                       (bundle ruby port)))
+                   (chmod (string-append out "/bin/bundle") #o544))
+                 #t)))))))))
 
 (define-public govuk-content-schemas
   (package
