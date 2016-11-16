@@ -1,5 +1,7 @@
 (define-module (gds packages govuk)
+  #:use-module (ice-9 regex)
   #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages certs)
@@ -9,25 +11,19 @@
   #:use-module (gnu packages xml)
   #:use-module (gnu packages base)
   #:use-module (gnu packages node)
+  #:use-module (guix packages)
   #:use-module (guix build-system gnu)
+  #:use-module (guix download)
+  #:use-module (guix store)
   #:use-module (guix git-download))
 
 (define (make-govuk-package
          name
-         treeish
-         hash)
+         source)
   (package
     (name name)
     (version "0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url (string-append
-                   "https://github.com/alphagov/" name ".git"))
-             (commit treeish)))
-       (file-name (string-append name "-" version "-checkout"))
-       (sha256 hash)))
+    (source source)
     (build-system gnu-build-system)
     (inputs
      `(("bash" ,bash)))
@@ -90,38 +86,61 @@
     (license #f)
     (home-page #f)))
 
+(define* (github-archive
+          #:optional #:key
+          repository
+          (commit-ish (default-commit-ish))
+          (user-or-org "alphagov")
+          (url (if repository
+                (string-append
+                 "https://github.com/"
+                 user-or-org "/"
+                 repository "/archive/"
+                 commit-ish ".tar.gz")
+                #f))
+          (hash-algo 'sha256)
+          (hash #f))
+  (if (not url)
+      (error "Either repository, or the full url must be specified"))
+  (origin
+    (method url-fetch)
+    (uri url)
+    (sha256 hash)))
+
 (define-public publishing-api
-  (make-govuk-package "publishing-api"
-                      "a35bd59c2020569f8318d4e7fd73c88a5af6f796"
-                      (base32
-                       "0vr9bih705jhxb10p2z95jv94b7yj5wmn2c8xgvdh70j1ifi3dqc")))
+  (make-govuk-package
+   "publishing-api" ;; TODO: Pass archive details to make-govuk-package
+   (github-archive
+    #:repository "publishing-api"
+    #:commit-ish "a35bd59c2020569f8318d4e7fd73c88a5af6f796"
+    #:hash (base32 "1k69ljrj5mw18alx81vzd089xcwlzca97wxwn8fvqqanxb246iq7"))))
 
 (define-public content-store
-  (make-govuk-package "content-store"
-                      "a92c2b81d43e8f03aad146f5e6532395a5209737"
-                      (base32
-                       "1xz2qhy9ci2796csl2zs6p7vb065n594bcawnl4i80w5fp6pps4j")))
+  (make-govuk-package
+   "content-store"
+   (github-archive
+    #:repository "content-store"
+    #:commit-ish "a92c2b81d43e8f03aad146f5e6532395a5209737"
+    #:hash (base32 "115f8i788ydgzz66kd9xkwxma2pp6s2mnwv6k6877zs11n6n8h7m"))))
 
 (define-public specialist-publisher
-  (make-govuk-package "specialist-publisher"
-                      "464e216577d597a6195a287d233269a700b517d1"
-                      (base32
-                       "1pcxzp1s55rmbyry07pzwksb5h8qfrh4wadk4h7j6b7mp2wmy2s1")))
+  (make-govuk-package
+   "specialist-publisher"
+   (github-archive
+    #:repository "specialist-publisher"
+    #:commit-ish "464e216577d597a6195a287d233269a700b517d1"
+    #:hash (base32 "0ymyd7d9rr60sxl702swyyg9lf8fq5k5zkh8k5msppf7laf3g7cb"))))
+
 
 (define-public govuk-content-schemas
   (package
     (name "govuk-content-schemas")
     (version "0")
     (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/alphagov/govuk-content-schemas.git")
-             (commit "master")))
-       (file-name (string-append "govuk-content-schemas-master-checkout"))
-       (sha256
-        (base32
-         "0q2gdlgx4kc3pj70vrw4ajcbb8hphx5slc8mbhs5g2lyw5d2ah9r"))))
+     (github-archive
+      #:repository "govuk-content-schemas"
+      #:commit-ish "release_416"
+      #:hash (base32 "03is44yfnq5xs08d80cw4rhw4psm6v09ki4cascx3k3rllcs8a6p")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
