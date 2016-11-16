@@ -16,6 +16,20 @@ To run the end to end test container, run:
 
   make check-system
 
+To specify a particular commit-ish (commit, tag or branch), you can set the
+appropriate environment variable for the package. This has the form
+GDS_GUIX_${PACKAGE_NAME}_COMMIT_ISH where ${PACKAGE_NAME} is the name of the
+package in upper case, with any dashes replaced by underscores. For example:
+
+  GDS_GUIX_GOVUK_CONTENT_SCHEMAS_COMMIT_ISH="master" GDS_GUIX_PUBLISHING_API_COMMIT_ISH="master" ./guix-pre-inst-env guix system container gds/systems/end-to-end-test.scm
+
+When used, bundler will install gems just prior to the respective service being
+started. They will be installed in to /tmp/guix . To speed up running the
+container repeatedly, you can share this location with the host to make it
+persistent by using --share, for example:
+
+  ./guix-pre-inst-env guix system container gds/systems/end-to-end-test.scm --share=/tmp/guix
+
 * Hacking
 
 When developing locally, you may find it useful to use a local copy of
