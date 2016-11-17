@@ -15,7 +15,8 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix download)
   #:use-module (guix store)
-  #:use-module (guix git-download))
+  #:use-module (guix git-download)
+  #:use-module (gds packages third-party))
 
 (define (make-govuk-package
          name
@@ -40,6 +41,7 @@
        ("coreutils" ,coreutils) ;; just for ls
        ("libxslt" ,libxslt)
        ("node" ,node)
+       ("phantomjs" ,phantomjs)
        ))
     (arguments
      `(#:modules ((srfi srfi-1)
