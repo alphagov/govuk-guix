@@ -167,8 +167,8 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
                    (call-with-output-file (string-append out "/bin/bundle")
                      (lambda (port)
                        (bundle ruby port)))
-                   (chmod (string-append out "/bin/bundle") #o544))
-                 #t)))))))))
+                   (chmod (string-append out "/bin/bundle") #o544)
+                   #t))))))))))
 
 (define-public govuk-content-schemas
   (package
