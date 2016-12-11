@@ -166,7 +166,8 @@
    (syslog-service)
    (urandom-seed-service)
    (nscd-service)
-   (guix-service)))
+   (guix-service)
+   pretend-loopback-service))
 
 (define govuk-ports
   `((publishing-api . 53039)

@@ -15,7 +15,9 @@
             /usr/bin/env-service
 
             /usr/share/zoneinfo-service-type
-            /usr/share/zoneinfo-service))
+            /usr/share/zoneinfo-service
+
+            pretend-loopback-service))
 
 (define /usr/bin/env-service-type
   (shepherd-service-type
@@ -65,3 +67,15 @@
 
 (define* (/usr/share/zoneinfo-service #:optional (package tzdata))
   (service (/usr/share/zoneinfo-service-type package) package))
+
+(define pretend-loopback-service
+  (service
+   (shepherd-service-type
+    'dummy-loopback-service
+    (const
+     (shepherd-service
+      (documentation "Pretend loopback service, just provides 'loopback")
+      (provision '(loopback))
+      (start #~(const #t))
+      (stop #~(const #t)))))
+   '()))
