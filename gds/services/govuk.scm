@@ -1057,6 +1057,28 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
           default-maslow-database-connection-configs)))
 
 ;;;
+;;; Need API
+;;;
+
+(define default-need-api-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "need-api")
+    (password (random-base16-string 30))
+    (database "govuk_needs_development"))))
+
+(define need-api-service-type
+  (make-rails-app-using-signon-service-type
+   'need-api
+   #:requirements '(publishing-api)))
+
+(define need-api-service
+  (service
+   need-api-service-type
+   (cons* (plek-config) (rails-app-config) need-api
+          default-need-api-database-connection-configs)))
+
+;;;
 ;;; Static service
 ;;;
 

@@ -298,6 +298,17 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
      #:commit-ish "release_180"
      #:hash (base32 "0zxcxznhp95sss85lrx4gdipwb75jhd3y9wsd01nrd1nl12hr0jx")))))
 
+(define-public need-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1hg85n9qf4710a93fkqfcpa8avj3q972ppk5w0is9sb0zi7kih5m")))
+   (make-govuk-package
+    "need-api"
+    (github-archive
+     #:repository "govuk_need_api"
+     #:commit-ish "release_133"
+     #:hash (base32 "0yrwyky6af8i3l2gl0z0qvcv6f9cgp9kjmyva1bjnkpdszx67qmc")))))
+
 (define-public govuk-content-schemas
   (package
     (name "govuk-content-schemas")

@@ -175,6 +175,7 @@
     (content-store . 53000)
     (draft-content-store . 53001)
     (specialist-publisher . 53064)
+    (need-api . 53052)
     (maslow . 53053)
     (specialist-frontend . 53065)
     (signon . 53016)
@@ -367,6 +368,7 @@
        (set-random-rails-secret-token
         specialist-publisher-service)
        maslow-service
+       need-api-service
        specialist-frontend-service
        static-service
        govuk-content-schemas-service
