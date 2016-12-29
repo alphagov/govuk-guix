@@ -555,3 +555,13 @@
    (list (service-startup-config) (plek-config) (rails-app-config)
          static)))
 
+(define draft-static-service-type
+  (make-rails-app-service-type 'draft-static))
+
+(define draft-static-service
+  (service
+   draft-static-service-type
+   (list (service-startup-config
+          (environment-variables
+           '(("DRAFT_ENVIRONMENT" . "true"))))
+         (plek-config) (rails-app-config) static)))
