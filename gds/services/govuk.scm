@@ -474,6 +474,12 @@
 ;;; Router API
 ;;;
 
+(define-record-type* <router-api-config>
+  router-api-config make-router-api-config
+  router-api-config?
+  (router-nodes router-api-config-router-nodes
+                (default '())))
+
 (define router-api-service-type
   (make-rails-app-using-signon-service-type
    'router-api
