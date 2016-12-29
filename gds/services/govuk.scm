@@ -577,3 +577,92 @@
           (environment-variables
            '(("DRAFT_ENVIRONMENT" . "true"))))
          (plek-config) (rails-app-config) static)))
+
+;;;
+;;; Service Lists
+;;;
+
+(define publishing-application-services
+  (list
+   ;; collections-publisher-service
+   ;; contacts-admin-service
+   ;; content-tagger-service
+   ;; local-links-manager-service
+   ;; manuals-publisher-service
+   maslow-service
+   ;; panopticon-service
+   ;; policy-publisher-service
+   ;; publisher-service
+   ;; service-manual-publisher-service
+   ;; short-url-manager-service
+   specialist-publisher-service
+   ;; travel-advice-publisher-service
+   ;; whitehall-service
+   ))
+
+(define api-services
+  (list
+   ;; business-support-api-service
+   content-store-service
+   draft-content-store-service
+   ;; email-alert-api-service
+   ;; email-alert-service-service
+   ;; content-api-service
+   need-api-service
+   ;; imminence-service
+   publishing-api-service
+   ;; rummager-service
+   ;; asset-manager-service
+   router-api-service
+   draft-router-api-service
+   ;; support-api-service
+   ;; hmrc-manuals-api-service
+   ;; mapit-service
+   ;; metadata-api-service
+   ))
+
+(define supporting-application-services
+  (list
+   ;; bouncer-service
+   ;; authenticating-proxy-service
+   ;; search-admin-service
+   signon-service
+   ;; support-service
+   ;; transition-service
+   ;; release-service
+   router-service
+   draft-router-service))
+
+(define frontend-services
+  (list
+   ;; business-support-finder-service
+   ;; calculators-service
+   ;; calendars-service
+   ;; collections-service
+   ;; contacts-frontend-service
+   ;; design-principles-service
+   ;; email-alert-frontend-service
+   ;; feedback-service
+   ;; finder-frontend-service
+   ;; frontend-service
+   ;; government-frontend-service
+   ;; info-frontend-service
+   ;; licence-finder-service
+   ;; manuals-frontend-service
+   ;; multipage-frontend-service
+   ;; smart-answers-service
+   ;; service-manual-frontend-service
+   specialist-frontend-service
+   static-service))
+
+(define draft-frontend-services
+  (list
+   ;; draft-collections-service
+   ;; draft-contacts-service
+   ;; draft-email-alert-service
+   ;; draft-government-frontend-service
+   ;; draft-manuals-frontend-service
+   ;; draft-multipage-frontend-service
+   ;; draft-service-manual-frontend-service
+   draft-static-service
+   ;; draft-specialist-frontend-service))
