@@ -11,4 +11,5 @@
   service-startup-config?
   (environment-variables service-startup-config-environment-variables
                          (default '()))
-  (pre-startup-script service-startup-config-pre-startup-script))
+  (pre-startup-scripts service-startup-config-pre-startup-scripts
+                       (default '())))
