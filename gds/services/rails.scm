@@ -322,10 +322,17 @@
     (list
      (service-extension shepherd-root-service-type
                         (lambda (parameters)
-                          (apply generic-rails-app-shepherd-services name requirements parameters)))
+                          (apply
+                           generic-rails-app-shepherd-services
+                           name
+                           requirements
+                           parameters)))
      (service-extension activation-service-type
                         (lambda (parameters)
-                          (apply generic-rails-app-activation name parameters)))
+                          (apply
+                           generic-rails-app-activation
+                           name
+                           parameters)))
      (service-extension account-service-type
                         (const
                          (generic-rails-app-service-account
