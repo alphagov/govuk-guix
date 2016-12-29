@@ -969,9 +969,7 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
           environment-variables
           (concatenate
            (map database-connection-config->environment-variables
-                database-connection-configs)))))
-       (database-connection-thunks
-        (map make-database-setup-thunk database-connection-configs)))
+                database-connection-configs))))))
     (program-file
      (string-append "start-router")
      (with-imported-modules '((guix build utils)
@@ -979,10 +977,6 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
        #~(let ((user (getpwnam "nobody")))
            (use-modules (guix build utils)
                         (ice-9 popen))
-
-           (for-each
-            (lambda (t) (t))
-            (list #$@database-connection-thunks))
 
            ;; Start the service
            (setgid (passwd:gid user))
