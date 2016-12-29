@@ -37,25 +37,6 @@
             signon-config-rails-app-config
             signon-config-applications
 
-            postgresql-connection-config
-            postgresql-connection-config?
-            postgresql-connection-config-port
-            postgresql-connection-config-database
-
-            mongodb-connection-config
-            mongodb-connection-config?
-            mongodb-connection-config-port
-            mongodb-connection-config-database
-
-            mysql-connection-config
-            mysql-connection-config?
-            mysql-connection-config-port
-            mysql-connection-config-database
-
-            redis-connection-config
-            redis-connection-config?
-            redis-connection-config-port
-
             router-config
             router-config?
             router-config-public-port
@@ -64,8 +45,6 @@
             router-api-config
             router-api-config?
             router-api-nodes
-
-            database-connection-config?
 
             publishing-api-service
             content-store-service
