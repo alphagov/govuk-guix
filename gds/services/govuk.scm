@@ -552,4 +552,6 @@
 (define static-service
   (service
    static-service-type
-   (list (plek-config) (rails-app-config) static)))
+   (list (service-startup-config) (plek-config) (rails-app-config)
+         static)))
+
