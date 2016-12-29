@@ -114,6 +114,13 @@
 
 
 
+;; Just specify #f for the fields without defaults
+(define default-shepherd-service
+  (shepherd-service
+   (provision #f)
+   (start #f)))
+
+
 (define (make-rails-app-using-signon-service-type name . rest)
   (let ((base-service-type
          (apply make-rails-app-service-type name rest)))
@@ -255,14 +262,15 @@
    (uid "uid")))
 
 (define publishing-api-service-type
-  (make-rails-app-service-type
-   'publishing-api
-   #:requirements '(content-store draft-content-store)))
+  (make-rails-app-service-type 'publishing-api))
 
 (define publishing-api-service
   (service
    publishing-api-service-type
-   (cons* (plek-config) (rails-app-config) publishing-api
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(content-store draft-content-store)))
+          (plek-config) (rails-app-config) publishing-api
           default-publishing-api-signon-application
           (sidekiq-config)
           default-publishing-api-database-connection-configs)))
@@ -279,14 +287,15 @@
     (database "content-store"))))
 
 (define content-store-service-type
-  (make-rails-app-using-signon-service-type
-   'content-store
-   #:requirements '(mongodb)))
+  (make-rails-app-using-signon-service-type 'content-store))
 
 (define content-store-service
   (service
    content-store-service-type
-   (cons* (plek-config) (rails-app-config) content-store
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(mongodb)))
+          (plek-config) (rails-app-config) content-store
           default-content-store-database-connection-configs)))
 
 (define default-draft-content-store-database-connection-configs
@@ -325,14 +334,15 @@
      (run-command "rake" "permissions:grant[David Heath]")))))
 
 (define specialist-publisher-service-type
-  (make-rails-app-using-signon-service-type
-   'specialist-publisher
-   #:requirements '(publishing-api)))
+  (make-rails-app-using-signon-service-type 'specialist-publisher))
 
 (define specialist-publisher-service
   (service
    specialist-publisher-service-type
-   (cons* (plek-config) (rails-app-config) specialist-publisher
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(publishing-api)))
+          (plek-config) (rails-app-config) specialist-publisher
           default-specialist-publisher-service-startup-config
           default-specialist-publisher-database-connection-configs)))
 
@@ -341,14 +351,15 @@
 ;;;
 
 (define specialist-frontend-service-type
-  (make-rails-app-using-signon-service-type
-   'specialist-frontend
-   #:requirements '(content-store)))
+  (make-rails-app-using-signon-service-type 'specialist-frontend))
 
 (define specialist-frontend-service
   (service
    specialist-frontend-service-type
-   (list (plek-config) (rails-app-config) specialist-frontend)))
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(content-store)))
+         (plek-config) (rails-app-config) specialist-frontend)))
 
 ;;;
 ;;; Router
@@ -491,26 +502,28 @@
                 (default '())))
 
 (define router-api-service-type
-  (make-rails-app-using-signon-service-type
-   'router-api
-   #:requirements '(router)))
+  (make-rails-app-using-signon-service-type 'router-api))
 
 (define router-api-service
   (service
    router-api-service-type
-   (cons* (plek-config) (rails-app-config) router-api
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(router)))
+          (plek-config) (rails-app-config) router-api
           (router-api-config)
           default-router-database-connection-configs)))
 
 (define draft-router-api-service-type
-  (make-rails-app-using-signon-service-type
-   'draft-router-api
-   #:requirements '(draft-router)))
+  (make-rails-app-using-signon-service-type 'draft-router-api))
 
 (define draft-router-api-service
   (service
    draft-router-api-service-type
-   (cons* (plek-config) (rails-app-config) router-api
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(draft-router)))
+          (plek-config) (rails-app-config) router-api
           (router-api-config)
           default-draft-router-database-connection-configs)))
 
@@ -526,14 +539,15 @@
     (database "maslow"))))
 
 (define maslow-service-type
-  (make-rails-app-using-signon-service-type
-   'maslow
-   #:requirements '(publishing-api)))
+  (make-rails-app-using-signon-service-type 'maslow))
 
 (define maslow-service
   (service
    maslow-service-type
-   (cons* (plek-config) (rails-app-config) maslow
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(publishing-api)))
+          (plek-config) (rails-app-config) maslow
           default-maslow-database-connection-configs)))
 
 ;;;
@@ -548,14 +562,15 @@
     (database "govuk_needs_development"))))
 
 (define need-api-service-type
-  (make-rails-app-using-signon-service-type
-   'need-api
-   #:requirements '(publishing-api)))
+  (make-rails-app-using-signon-service-type 'need-api))
 
 (define need-api-service
   (service
    need-api-service-type
-   (cons* (plek-config) (rails-app-config) need-api
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (requirement '(publishing-api)))
+          (plek-config) (rails-app-config) need-api
           default-need-api-database-connection-configs)))
 
 ;;;

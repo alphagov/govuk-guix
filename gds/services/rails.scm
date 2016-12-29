@@ -267,7 +267,6 @@
 
 (define (generic-rails-app-shepherd-services
          name
-         requirements
          rails-app-config
          package
          .
@@ -282,10 +281,10 @@
           rails-app-config
           rest)))
      (shepherd-service
+      (inherit (find shepherd-service? rest))
       (provision (list name))
       (documentation
        (simple-format #f "~A rails app" name))
-      (requirement requirements)
       (respawn? #f)
       (start #~(make-forkexec-constructor #$start-script))
       (stop #~(make-kill-destructor))))
@@ -302,10 +301,10 @@
                  rails-app-config
                  rest)))
             (shepherd-service
+             (inherit (find shepherd-service? rest))
              (provision (list (symbol-append name '-sidekiq)))
              (documentation
               (simple-format #f "~A sidekiq service" name))
-             (requirement requirements)
              (respawn? #f)
              (start #~(make-forkexec-constructor #$sidekiq-start-script))
              (stop #~(make-kill-destructor)))))
@@ -321,9 +320,7 @@
     (home-directory "/var/empty")
     (shell #~(string-append #$shadow "/sbin/nologin")))))
 
-(define* (make-rails-app-service-type name
-                                      #:optional #:key
-                                      (requirements '()))
+(define (make-rails-app-service-type name)
   (service-type
    (name name)
    (extensions
@@ -333,7 +330,6 @@
                           (apply
                            generic-rails-app-shepherd-services
                            name
-                           requirements
                            parameters)))
      (service-extension activation-service-type
                         (lambda (parameters)
