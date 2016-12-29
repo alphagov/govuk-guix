@@ -93,12 +93,12 @@
 
 (define (generic-rails-app-start-script
          name
-         package
-         rails-app-config
          .
          rest)
   (let*
-      ((string-name (symbol->string name))
+      ((rails-app-config (find rails-app-config? rest))
+       (package (find package? rest))
+       (string-name (symbol->string name))
        (string-port
         (number->string (rails-app-config-port rails-app-config)))
        (root-directory
@@ -180,8 +180,6 @@
 
 (define (generic-rails-app-activation
          name
-         rails-app-config
-         package
          .
          rest)
   (let*
