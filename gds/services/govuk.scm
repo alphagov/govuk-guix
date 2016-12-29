@@ -52,7 +52,17 @@
             draft-content-store-service
             specialist-publisher-service
             publishing-e2e-tests-service
-            draft-content-store-service))
+            router-service
+            draft-router-service
+            router-api-service
+            draft-router-api-service
+            maslow-service
+            need-api-service
+
+            signon-service-type
+            signon-service
+
+            static-service))
 
 (define ports
   (make-parameter
