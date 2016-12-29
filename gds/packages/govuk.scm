@@ -97,7 +97,7 @@
 (define* (github-archive
           #:optional #:key
           repository
-          (commit-ish (default-commit-ish))
+          commit-ish
           (user-or-org "alphagov")
           (url (if repository
                 (string-append
