@@ -98,10 +98,6 @@
   (service govuk-content-schemas-service-type govuk-content-schemas))
 
 
-(define-record-type* <service-startup-config>
-  service-startup-config make-service-startup-config
-  service-startup-config?
-  (pre-startup-script service-startup-config-pre-startup-script))
 
 
 (define (make-rails-app-using-signon-service-type name . rest)
