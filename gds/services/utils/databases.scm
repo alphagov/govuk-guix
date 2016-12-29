@@ -18,21 +18,25 @@
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
   #:use-module (gds packages mongodb)
-  #:export (postgresql-connection-config
+  #:export (<postgresql-connection-config>
+            postgresql-connection-config
             postgresql-connection-config?
             postgresql-connection-config-port
             postgresql-connection-config-database
 
+            <mongodb-connection-config>
             mongodb-connection-config
             mongodb-connection-config?
             mongodb-connection-config-port
             mongodb-connection-config-database
 
+            <mysql-connection-config>
             mysql-connection-config
             mysql-connection-config?
             mysql-connection-config-port
             mysql-connection-config-database
 
+            <redis-connection-config>
             redis-connection-config
             redis-connection-config?
             redis-connection-config-port
