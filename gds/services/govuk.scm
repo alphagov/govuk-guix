@@ -53,9 +53,13 @@
             specialist-publisher-service
             publishing-e2e-tests-service
             router-service
+            router-service-type
             draft-router-service
+            draft-router-service-type
             router-api-service
+            router-api-service-type
             draft-router-api-service
+            draft-router-api-service-type
             maslow-service
             need-api-service
 
