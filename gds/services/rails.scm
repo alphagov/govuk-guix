@@ -22,6 +22,7 @@
 
             update-rails-app-config-environment
             update-rails-app-config-with-random-secret-key-base
+            update-rails-app-config-with-random-secret-token
 
             rails-app-config->environment-variables
 
@@ -48,6 +49,13 @@
   (rails-app-config
    (inherit config)
    (environment environment)))
+
+(define (update-rails-app-config-with-random-secret-token config)
+  (rails-app-config
+   (inherit config)
+   (secret-token
+    (or (rails-app-config-secret-token config)
+        (random-base16-string 30)))))
 
 (define (update-rails-app-config-with-random-secret-key-base config)
   (rails-app-config
