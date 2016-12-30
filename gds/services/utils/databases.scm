@@ -40,6 +40,7 @@
             redis-connection-config
             redis-connection-config?
             redis-connection-config-port
+            redis-connection-config-namespace
 
             database-connection-config?
             database-connection-config->environment-variables))
@@ -85,7 +86,9 @@
   (port redis-connection-config-port
         (default 6379))
   (db-number redis-connection-config-db-number
-             (default 0)))
+             (default 0))
+  (namespace redis-connection-config-namespace
+             (default #f)))
 
 (define (database-connection-config? config)
   (or (postgresql-connection-config? config)
@@ -121,7 +124,7 @@
           host
           port
           database))))
-    (($ <redis-connection-config> host port db-number)
+    (($ <redis-connection-config> host port db-number namespace)
      `(("REDIS_URL" .
         ,(simple-format
           #f
@@ -130,7 +133,8 @@
           port
           db-number))
        ("REDIS_HOST" . ,host)
-       ("REDIS_PORT" . ,(number->string port))))
+       ("REDIS_PORT" . ,(number->string port))
+       ,@(if namespace `("REDIS_NAMESPACE" . ,namespace))))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
