@@ -180,7 +180,7 @@
                   (primitive-exit 1)))
               (waitpid pid))))))))
 
-(define (make-postgresql-ensure-user-exists-gexp user)
+(define (postgresql-ensure-user-exists-gexp user)
   #~(lambda (port)
       (simple-format port "
 DO
@@ -197,12 +197,12 @@ END
 $body$;
 " #$user #$user)))
 
-(define (make-postgresql-create-database-gexp database owner)
+(define (postgresql-create-database-gexp database owner)
   #~(lambda (port)
       (simple-format port "
 CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 
-(define (make-psql-import-gexp database-connection file)
+(define (postgresql-import-gexp database-connection file)
   (match-lambda
     (($ <postgresql-connection-config> host user port database)
      (with-imported-modules '((ice-9 popen))
