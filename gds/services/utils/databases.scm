@@ -224,46 +224,6 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   (primitive-exit 1)))
               (waitpid pid))))))))
 
-(define postgresql-create-user-and-database
-  (match-lambda
-    (($ <postgresql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (let
-               ((pid (primitive-fork))
-                (postgres-user (getpwnam "postgres"))
-                (psql (string-append #$postgresql "/bin/psql")))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid postgres-user))
-                  (setuid (passwd:uid postgres-user))
-                  (let ((p (open-pipe* OPEN_WRITE psql "-a" "-p" (number->string #$port))))
-                    (display "\nChecking if user exists:\n")
-                    (simple-format p "
-DO
-$body$
-BEGIN
-   IF NOT EXISTS (
-      SELECT *
-      FROM   pg_catalog.pg_user
-      WHERE  usename = '~A') THEN
-
-      CREATE ROLE \"~A\" LOGIN CREATEDB;
-   END IF;
-END
-$body$;
-" #$user #$user)
-                    (display "\nChecking if the database exists:\n")
-                    (simple-format p "
-CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$user)
-                    (close-pipe p))
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (waitpid pid))))))))
 
 (define mongodb-create-user-and-database
   (match-lambda
