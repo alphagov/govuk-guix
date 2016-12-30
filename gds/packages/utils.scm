@@ -65,3 +65,20 @@ production:
           w: majority
 " clients-or-sessions clients-or-sessions clients-or-sessions)))
          #t))))
+
+(define-public replace-redis.yml
+  (lambda ()
+    `(lambda* (#:key outputs #:allow-other-keys)
+       (let ((location
+              (string-append
+               (assoc-ref outputs "out")
+               "/config/redis.yml")))
+         (delete-file location)
+         (call-with-output-file location
+           (lambda (port)
+             (simple-format port "
+host: <%= ENV['REDIS_HOST'] %>
+port: <%= ENV['REDIS_PORT'] %>
+namespace: <%= ENV['REDIS_NAMESPACE'] %>
+")))
+         #t))))
