@@ -224,6 +224,15 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   (primitive-exit 1)))
               (waitpid pid))))))))
 
+(define (postgresql-create-user-and-database-for-database-connection
+         database-connection)
+  (run-with-psql-port
+   database-connection
+   (match database-connection
+     (($ <postgresql-connection-config> host user port database)
+      (list
+       (postgresql-ensure-user-exists-gexp user)
+       (postgresql-create-database-gexp database user))))))
 
 (define mongodb-create-user-and-database
   (match-lambda
