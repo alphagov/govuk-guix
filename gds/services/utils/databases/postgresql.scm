@@ -1,11 +1,19 @@
 (define-module (gds services utils databases postgresql)
+  #:use-module (ice-9 match)
   #:use-module (guix gexp)
   #:use-module (guix records)
+  #:use-module (gnu packages databases)
   #:export (<postgresql-connection-config>
             postgresql-connection-config
             postgresql-connection-config?
             postgresql-connection-config-port
-            postgresql-connection-config-database))
+            postgresql-connection-config-database
+
+            run-with-psql-port
+            postgresql-ensure-user-exists-gexp
+            postgresql-create-database-gexp
+            postgresql-import-gexp
+            postgresql-create-user-and-database-for-database-connection))
 
 (define-record-type* <postgresql-connection-config>
   postgresql-connection-config make-postgresql-connection-config
@@ -17,8 +25,8 @@
         (default 5432))
   (database postgresql-connection-config-database))
 
-(define (run-with-psql-port database-connection . operations)
-  (match-lambda
+(define (run-with-psql-port database-connection operations)
+  (match database-connection
     (($ <postgresql-connection-config> host user port database)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
@@ -36,12 +44,12 @@
                   (let ((p (open-pipe* OPEN_WRITE psql "-a" "-p" (number->string #$port))))
                     (for-each
                      (lambda (o) (o p))
-                     '#$operations)
+                     (list #$@operations))
                     (close-pipe p))
                   (primitive-exit 0))
                 (lambda ()
                   (primitive-exit 1)))
-              (waitpid pid))))))))
+              (zero? (cdr (waitpid pid))))))))))
 
 (define (postgresql-ensure-user-exists-gexp user)
   #~(lambda (port)
