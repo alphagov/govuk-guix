@@ -123,15 +123,12 @@
                     "ruby")))
        (service-startup-config
         (find service-startup-config? rest))
-       (pre-startup-scripts
-        (if service-startup-config
-            (let ((pre-startup-script
-                   (service-startup-config-pre-startup-script
-                    service-startup-config)))
-              (if (list? pre-startup-script)
-                  pre-startup-script
-                  (list pre-startup-script)))
-            '()))
+       (run-pre-startup-scripts
+        (run-pre-startup-scripts-gexp
+         (if service-startup-config
+             (service-startup-config-pre-startup-scripts
+              service-startup-config)
+             '())))
        (database-connection-configs
         (filter database-connection-config? rest))
        (run-rake-db-setup?
@@ -166,26 +163,13 @@
            (setgid (passwd:gid user))
            (setuid (passwd:uid user))
            (and
-            ;; Run the root-pre-startup-scripts before switching user
-            (let run ((scripts
-                       (list #$@run-root-pre-startup-scripts)))
-              (if (null? scripts)
-                  #t
-                  (and ;; Stop if any script fails
-                   ((car scripts))
-                   (run (cdr scripts)))))
-            (begin
-              ;; Start the service
-              (setgid (passwd:gid user))
-              (setuid (passwd:uid user))
-              #t)
             (let run ((scripts
                        (list #$@run-pre-startup-scripts)))
               (if (null? scripts)
                   #t
                   (and ;; Stop if any script fails
                    ((car scripts))
-                   (run (cdr scripts)))))
+                   (run (cdr scripts))))
             (zero? (system* rails "server" "--daemon" "-p" #$string-port))))))))
 
 (define (gemrc ruby)
