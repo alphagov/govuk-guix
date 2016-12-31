@@ -78,18 +78,19 @@
 
 (define (generic-rails-app-service-environment-variables
          name root-directory . parameters)
-    (apply
-     append
-     `(("PATH" . ,(simple-format #f "~A/bin" root-directory)))
-     (map
-      (lambda (parameter)
-        (cond
-         ((rails-app-config? parameter)
-          (rails-app-config->environment-variables parameter))
-         ((database-connection-config? parameter)
-          (database-connection-config->environment-variables parameter))
-         (else '())))
-      parameters)))
+  `(("PATH" . ,(simple-format #f "~A/bin" root-directory))
+    ,@(let ((rails-app-config
+             (find rails-app-config? parameters)))
+        (if rails-app-config
+            (rails-app-config->environment-variables
+             rails-app-config)
+            '()))
+    ,@(concatenate
+       (map
+        database-connection-config->environment-variables
+        (filter
+         database-connection-config?
+         parameters)))))
 
 (define (generic-rails-app-start-script
          name
