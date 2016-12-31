@@ -106,20 +106,6 @@
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
 
-(define (make-database-setup-thunk config)
-  (cond
-   ((postgresql-connection-config? config)
-    (postgresql-create-user-and-database config))
-   ((mongodb-connection-config? config)
-    (mongodb-create-user-and-database config))
-   ((mysql-connection-config? config)
-    (mysql-create-user-and-database config))
-   ((redis-connection-config? config)
-    #~(lambda () #t))
-   (else
-    (error
-     "make-database-setup: Unknown database configuration ~A"
-     config))))
 
 (define mongodb-create-user-and-database
   (match-lambda
