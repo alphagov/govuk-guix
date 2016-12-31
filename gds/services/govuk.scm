@@ -151,18 +151,16 @@
     (make-rails-app-service-type 'signon))
    (compose list)
    (extend (lambda (parameters applications)
-             (match parameters
-               ((plek-config rails-app-config package config rest ...)
-                (cons*
-                 plek-config
-                 rails-app-config
-                 package
-                 (signon-config
-                  (inherit config)
-                  (applications (append
-                                 (signon-config-applications config)
-                                 applications)))
-                 rest)))))))
+             (map
+              (lambda (parameter)
+                (if (signon-config? parameter)
+                    (signon-config
+                     (inherit parameter)
+                     (applications (append
+                                    (signon-config-applications parameter)
+                                    applications)))
+                    parameter))
+              parameters)))))
 
 (define default-signon-database-connection-configs
   (list
