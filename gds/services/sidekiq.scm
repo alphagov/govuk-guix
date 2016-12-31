@@ -19,13 +19,13 @@
 
 (define (generic-sidekiq-start-script
          name
-         package
-         service-startup-config
-         sidekiq-config
          .
          rest)
   (let*
-      ((string-name (symbol->string name))
+      ((package (find package? rest))
+       (service-startup-config (find service-startup-config? rest))
+       (sidekiq-config (find sidekiq-config? rest))
+       (string-name (symbol->string name))
        (root-directory
         (string-append "/var/lib/" string-name))
        (config-file (sidekiq-config-file sidekiq-config))
