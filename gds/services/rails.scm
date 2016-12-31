@@ -263,48 +263,52 @@
 
 (define (generic-rails-app-shepherd-services
          name
-         rails-app-config
-         package
          .
          rest)
-  (cons
-   (let
-       ((start-script
-         (apply
-          generic-rails-app-start-script
-          name
-          package
-          rails-app-config
-          rest)))
-     (shepherd-service
-      (inherit (find shepherd-service? rest))
-      (provision (list name))
-      (documentation
-       (simple-format #f "~A rails app" name))
-      (respawn? #f)
-      (start #~(make-forkexec-constructor #$start-script))
-      (stop #~(make-kill-destructor))))
-   (let ((sidekiq-config (find sidekiq-config? rest)))
-     (if sidekiq-config
-         (list
-          (let
-              ((sidekiq-start-script
-                (apply
-                 generic-sidekiq-start-script
-                 name
-                 package
-                 sidekiq-config
-                 rails-app-config
-                 rest)))
-            (shepherd-service
-             (inherit (find shepherd-service? rest))
-             (provision (list (symbol-append name '-sidekiq)))
-             (documentation
-              (simple-format #f "~A sidekiq service" name))
-             (respawn? #f)
-             (start #~(make-forkexec-constructor #$sidekiq-start-script))
-             (stop #~(make-kill-destructor)))))
-         '()))))
+  (let
+      ((package (find package? rest))
+       (ss (find shepherd-service? rest))
+       (rails-app-config (find rails-app-config? rest)))
+    (cons
+     (let
+         ((start-script
+           (apply
+            generic-rails-app-start-script
+            name
+            package
+            rails-app-config
+            rest)))
+       (shepherd-service
+        (inherit ss)
+        (documentation
+         (simple-format #f "~A rails app" name))
+        (respawn? #f)
+        (start #~(make-forkexec-constructor #$start-script))
+        (stop #~(make-kill-destructor))))
+     (let ((sidekiq-config (find sidekiq-config? rest)))
+       (if sidekiq-config
+           (list
+            (let
+                ((sidekiq-start-script
+                  (apply
+                   generic-sidekiq-start-script
+                   name
+                   package
+                   sidekiq-config
+                   rails-app-config
+                   rest)))
+              (shepherd-service
+               (inherit ss)
+               (provision (list
+                           (symbol-append
+                            (first (shepherd-service-provision ss))
+                            '-sidekiq)))
+               (documentation
+                (simple-format #f "~A sidekiq service" name))
+               (respawn? #f)
+               (start #~(make-forkexec-constructor #$sidekiq-start-script))
+               (stop #~(make-kill-destructor)))))
+           '())))))
 
 (define (generic-rails-app-service-account
          username)
