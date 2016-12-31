@@ -326,10 +326,9 @@
 (define default-specialist-publisher-service-startup-config
   (service-startup-config
    (pre-startup-scripts
-    (list
-     (run-command "rake" "db:seed")
-     (run-command "rake" "publishing_api:publish_finders")
-     (run-command "rake" "permissions:grant[David Heath]")))))
+    `((db-seed . ,(run-command "rake" "db:seed"))
+      (publish-finders . ,(run-command "rake" "publishing_api:publish_finders"))
+      (grant-permissions . ,(run-command "rake" "permissions:grant[David Heath]"))))))
 
 (define specialist-publisher-service-type
   (make-rails-app-using-signon-service-type 'specialist-publisher))
