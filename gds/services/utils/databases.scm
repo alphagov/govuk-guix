@@ -18,6 +18,9 @@
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
   #:use-module (gds packages mongodb)
+  #:use-module (gds services)
+  #:use-module (gds services utils databases postgresql)
+  #:use-module (gds services utils databases mysql)
   #:export (<mongodb-connection-config>
             mongodb-connection-config
             mongodb-connection-config?
@@ -31,8 +34,8 @@
             redis-connection-config-namespace
 
             database-connection-config?
-            database-connection-config->environment-variables))
-
+            database-connection-config->environment-variables
+            setup-blank-databases-on-service-startup))
 
 (define-record-type* <mongodb-connection-config>
   mongodb-connection-config make-mongodb-connection-config
@@ -108,6 +111,46 @@
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
 
+(define (setup-blank-databases-on-service-startup s)
+  (let
+      ((parameters (service-parameters s)))
+    (if (not (list? parameters))
+        s
+        (let* ((ssc (find service-startup-config? parameters))
+               (database-connection-configs
+                (filter database-connection-config? parameters)))
+          (display "setup-blank-databases-on-service-startup\n")
+          (service
+           (service-kind s)
+           (map
+            (lambda (parameter)
+              (if (service-startup-config? parameter)
+                  (service-startup-config-add-pre-startup-scripts
+                   parameter
+                   (concatenate
+                    (map
+                     (lambda (config)
+                       (display "config: ")(display config)(display "\n")
+                       (cond
+                        ((postgresql-connection-config? config)
+                         `((postgresql
+                            .
+                            ,(postgresql-create-user-and-database-for-database-connection
+                              config))))
+                        ((mysql-connection-config? config)
+                         `((mysql
+                            .
+                            ,(mysql-create-user-and-database-for-database-connection
+                              config))))
+                        ((mongodb-connection-config? config)
+                         '()) ;; TODO
+                        ((redis-connection-config? config)
+                         '()) ;; redis does not require any setup
+                        (else
+                         (error "Unrecognised database config"))))
+                     database-connection-configs)))
+                  parameter))
+            parameters))))))
 
 (define mongodb-create-user-and-database
   (match-lambda
