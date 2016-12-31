@@ -42,7 +42,7 @@
      (display "plek-config-service-ports: ")
      (display (plek-config-service-ports plek-config))
      (display "\n")
-     (error "Missing port for " service))))
+     (error "Port missing from plek-config for" service))))
 
 (define (service-symbol->environment-variable-string service)
   (string-map
