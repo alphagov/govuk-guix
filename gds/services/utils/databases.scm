@@ -101,7 +101,9 @@
           db-number))
        ("REDIS_HOST" . ,host)
        ("REDIS_PORT" . ,(number->string port))
-       ,@(if namespace `("REDIS_NAMESPACE" . ,namespace))))
+       ,@(if namespace
+             `("REDIS_NAMESPACE" . ,namespace)
+             '())))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
