@@ -92,6 +92,19 @@
          database-connection-config?
          parameters)))))
 
+(define (run-pre-startup-scripts-gexp pre-startup-scripts)
+  (map
+   (match-lambda
+     ((key . script)
+      #~(lambda ()
+          (simple-format #t "Running pre-startup-script ~A\n" '#$key)
+          (if (#$script)
+              #t
+              (begin
+                (simple-format #t "pre-startup-script ~A failed\n" '#$key)
+                #f)))))
+   pre-startup-scripts))
+
 (define (generic-rails-app-start-script
          name
          .
