@@ -1,6 +1,11 @@
 (define-module (gds services govuk plek)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (guix records)
+  #:use-module (gnu services)
+  #:use-module (gnu services shepherd)
+  #:use-module (gds services)
+  #:use-module (gds services rails)
   #:export (<plek-config>
             plek-config
             plek-config?
@@ -13,7 +18,10 @@
             plek-config-service-uri-function
 
             plek-config->environment-variables
-            make-custom-plek-config))
+            make-custom-plek-config
+            filter-plek-config-service-ports
+            update-service-extension-parameters-for-plek-config
+            extend-service-type-with-plek))
 
 (define-record-type* <plek-config>
   plek-config make-plek-config
@@ -109,3 +117,57 @@
          "_URI")
         ((plek-config-service-uri-function plek-config) service port))))
     (plek-config-service-ports plek-config))))
+
+(define (filter-plek-config-service-ports pc services)
+  (plek-config
+   (inherit pc)
+   (service-ports
+    (lset-difference
+     eq?
+     (plek-config-service-ports pc)
+     services))))
+
+(define (update-service-extension-parameters-for-plek-config
+         service-name
+         parameters)
+  (let
+      ((plek-config (find plek-config? parameters))
+       (shepherd-service (find
+                          shepherd-service?
+                          parameters)))
+    (map
+     (lambda (parameter)
+       (cond
+        ((service-startup-config? parameter)
+         (service-startup-config-with-additional-environment-variables
+          parameter
+          (plek-config->environment-variables
+           (filter-plek-config-service-ports
+            plek-config
+            (shepherd-service-requirement shepherd-service)))))
+        ((rails-app-config? parameter)
+         (rails-app-config
+          (inherit parameter)
+          (port (service-port-from-plek-config
+                 plek-config
+                 service-name))))
+        (else
+         parameter)))
+     parameters)))
+
+(define (extend-service-type-with-plek type)
+  (service-type
+   (inherit type)
+   (extensions
+    (map
+     (lambda (se)
+       (service-extension
+        (service-extension-target se)
+        (lambda (parameters)
+          (apply
+           (service-extension-compute se)
+           (list
+            (update-service-extension-parameters-for-plek-config
+             (service-type-name type)
+             parameters))))))
+     (service-type-extensions type)))))
