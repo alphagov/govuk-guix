@@ -29,15 +29,14 @@
     test-and-value-pairs)))
 
 (define-public (update-service-parameters s test-and-function-pairs)
-  (define (update-parameter parameter)
+  (define (update-parameter initial-parameter)
     (fold
-     (lambda (test+function parameter)
-       (match test+function
-         ((test . function)
-          (if (test parameter)
-              (function parameter)
-               parameter))))
-     parameter
+     (match-lambda*
+       (((test . function) parameter)
+        (if (test parameter)
+            (function parameter)
+            parameter)))
+     initial-parameter
      test-and-function-pairs))
 
   (service
