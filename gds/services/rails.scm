@@ -323,6 +323,10 @@
                            (symbol-append
                             (first (shepherd-service-provision ss))
                             '-sidekiq)))
+               (requirement
+                (cons
+                 (first (shepherd-service-provision ss))
+                 (shepherd-service-requirement ss)))
                (documentation
                 (simple-format #f "~A sidekiq service" name))
                (respawn? #f)
