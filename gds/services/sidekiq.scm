@@ -19,19 +19,14 @@
 
 (define (generic-sidekiq-start-script
          name
-         .
-         rest)
+         package
+         sidekiq-config
+         environment-variables)
   (let*
-      ((package (find package? rest))
-       (service-startup-config (find service-startup-config? rest))
-       (sidekiq-config (find sidekiq-config? rest))
-       (string-name (symbol->string name))
+      ((string-name (symbol->string name))
        (root-directory
         (string-append "/var/lib/" string-name))
-       (config-file (sidekiq-config-file sidekiq-config))
-       (environment-variables
-        (service-startup-config-environment-variables
-         service-startup-config)))
+       (config-file (sidekiq-config-file sidekiq-config)))
     (program-file
      (string-append "start-" string-name "-sidekiq")
      (with-imported-modules '((guix build utils)
