@@ -178,7 +178,12 @@
 (define signon-service
   (service
    signon-service-type
-   (cons* (plek-config) (rails-app-config) signonotron2
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(signon))
+           (requirement '(mysql)))
+          (service-startup-config)
+          (plek-config) (rails-app-config) signonotron2
           (signon-config) (sidekiq-config) default-signon-database-connection-configs)))
 
 ;;
