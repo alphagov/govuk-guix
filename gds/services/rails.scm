@@ -310,13 +310,15 @@
            (list
             (let
                 ((sidekiq-start-script
-                  (apply
-                   generic-sidekiq-start-script
+                  (generic-sidekiq-start-script
                    name
                    package
                    sidekiq-config
-                   rails-app-config
-                   rest)))
+                   (apply
+                    generic-rails-app-service-environment-variables
+                    root-directory
+                    rails-app-config
+                    rest))))
               (shepherd-service
                (inherit ss)
                (provision (list
