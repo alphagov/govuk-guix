@@ -196,7 +196,7 @@
         (append
          environment-variables
          `(("SECRET_KEY_BASE" . "t0a")
-           ("CAPYBARA_SAVE_PATH" . "/tmp/guix/")
+           ("CAPYBARA_SAVE_PATH" . "/var/lib/publishing-e2e-tests/")
            ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas")))))
     (program-file
      (string-append "start-publishing-e2e-tests")
