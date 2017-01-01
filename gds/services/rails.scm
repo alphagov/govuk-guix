@@ -287,6 +287,8 @@
          rest)
   (let
       ((package (find package? rest))
+       (root-directory
+        (string-append "/var/lib/" (symbol->string name)))
        (ss (find shepherd-service? rest))
        (rails-app-config (find rails-app-config? rest)))
     (cons
