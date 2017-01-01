@@ -201,9 +201,11 @@
     (program-file
      (string-append "start-publishing-e2e-tests")
      (with-imported-modules '((guix build utils)
+                              (gnu services herd)
                               (ice-9 popen))
        #~(let ((bundle (string-append #$package "/bin/bundle")))
            (use-modules (guix build utils)
+                        (gnu services herd)
                         (ice-9 popen))
 
            (mkdir-p "/var/lib/publishing-e2e-tests")
@@ -213,8 +215,11 @@
               (setenv (car env-var) (cdr env-var)))
             '#$environment-variables)
            (chdir #$package)
-           (and
-            (zero? (system* bundle "exec" "rspec"))))))))
+           (let
+               ((result
+                 (zero? (system* bundle "exec" "rspec" "--format" "html" "--out" "/var/lib/publishing-e2e-tests/test-results.html"))))
+             (stop-service 'root)
+             result))))))
 
 (define publishing-e2e-tests-service-type
   (service-type
