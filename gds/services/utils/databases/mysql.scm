@@ -45,15 +45,10 @@
                 (lambda ()
                   (setgid (passwd:gid root))
                   (setuid (passwd:uid root))
-                  (let ((p (open-pipe* OPEN_WRITE
-                                       (string-join
-                                        command
-                                        " ")
-                                       (number->string
-                                        #$port))))
+                  (let ((p (apply open-pipe* OPEN_WRITE command)))
                     (for-each
                      (lambda (o) (o p))
-                     '#$operations)
+                     (list #$@operations))
                     (close-pipe p))
                   (primitive-exit 0))
                 (lambda ()
