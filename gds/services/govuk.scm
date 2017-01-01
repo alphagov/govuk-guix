@@ -267,7 +267,7 @@
    (uid "uid")))
 
 (define publishing-api-service-type
-  (make-rails-app-service-type 'publishing-api))
+  (make-rails-app-using-plek-service-type 'publishing-api))
 
 (define publishing-api-service
   (service
@@ -292,7 +292,7 @@
     (database "content-store"))))
 
 (define content-store-service-type
-  (make-rails-app-using-signon-service-type 'content-store))
+  (make-rails-app-using-plek-and-signon-service-type 'content-store))
 
 (define content-store-service
   (service
@@ -311,7 +311,7 @@
     (database "draft-content-store"))))
 
 (define draft-content-store-service-type
-  (make-rails-app-service-type 'draft-content-store))
+  (make-rails-app-using-plek-service-type 'draft-content-store))
 
 (define draft-content-store-service
   (service
@@ -338,7 +338,7 @@
       (grant-permissions . ,(run-command "rake" "permissions:grant[David Heath]"))))))
 
 (define specialist-publisher-service-type
-  (make-rails-app-using-signon-service-type 'specialist-publisher))
+  (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
 
 (define specialist-publisher-service
   (service
@@ -355,7 +355,7 @@
 ;;;
 
 (define specialist-frontend-service-type
-  (make-rails-app-using-signon-service-type 'specialist-frontend))
+  (make-rails-app-using-plek-and-signon-service-type 'specialist-frontend))
 
 (define specialist-frontend-service
   (service
@@ -506,7 +506,7 @@
                 (default '())))
 
 (define router-api-service-type
-  (make-rails-app-using-signon-service-type 'router-api))
+  (make-rails-app-using-plek-and-signon-service-type 'router-api))
 
 (define router-api-service
   (service
@@ -519,7 +519,7 @@
           default-router-database-connection-configs)))
 
 (define draft-router-api-service-type
-  (make-rails-app-using-signon-service-type 'draft-router-api))
+  (make-rails-app-using-plek-and-signon-service-type 'draft-router-api))
 
 (define draft-router-api-service
   (service
@@ -543,7 +543,7 @@
     (database "maslow"))))
 
 (define maslow-service-type
-  (make-rails-app-using-signon-service-type 'maslow))
+  (make-rails-app-using-plek-and-signon-service-type 'maslow))
 
 (define maslow-service
   (service
@@ -566,7 +566,7 @@
     (database "govuk_needs_development"))))
 
 (define need-api-service-type
-  (make-rails-app-using-signon-service-type 'need-api))
+  (make-rails-app-using-plek-and-signon-service-type 'need-api))
 
 (define need-api-service
   (service
@@ -582,7 +582,7 @@
 ;;;
 
 (define static-service-type
-  (make-rails-app-service-type 'static))
+  (make-rails-app-using-plek-service-type 'static))
 
 (define static-service
   (service
@@ -591,7 +591,7 @@
          static)))
 
 (define draft-static-service-type
-  (make-rails-app-service-type 'draft-static))
+  (make-rails-app-using-plek-service-type 'draft-static))
 
 (define draft-static-service
   (service
