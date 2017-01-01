@@ -161,15 +161,24 @@
      #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))))
 
 (define-public signonotron2
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1f14g354y6xiy86vl5dwjz7yfq92cg15pwviw21c4awch04b0hm9")))
-   (make-govuk-package
-    "signonotron2"
-    (github-archive
-     #:repository "signonotron2"
-     #:commit-ish "release_689"
-     #:hash (base32 "0idacqj1232hcsfzlf3yyx78s2qsvrr67ii2hf907ghjrjw7f9dz")))))
+  (let ((pkg
+         (package-with-bundler
+          (bundle-package
+           (hash (base32 "1fb4fzzv701lrcalq28ffbzgmg4j2svl9h9mglshbkawb18wygnf")))
+          (make-govuk-package
+           "signonotron2"
+           (github-archive
+            #:repository "signonotron2"
+            #:commit-ish "release_689"
+            #:hash (base32 "0idacqj1232hcsfzlf3yyx78s2qsvrr67ii2hf907ghjrjw7f9dz"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+               ,(use-blank-database.yml)))))))))
 
 (define-public static
   (package-with-bundler
