@@ -151,7 +151,7 @@
 (define signon-service-type
   (service-type
    (inherit
-    (make-rails-app-service-type 'signon))
+    (make-rails-app-using-plek-service-type 'signon))
    (compose list)
    (extend (lambda (parameters applications)
              (map
