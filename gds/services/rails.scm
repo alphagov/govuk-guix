@@ -31,7 +31,9 @@
             generic-rails-app-activation
             generic-rails-app-shepherd-services
             generic-rails-app-service-account
-            make-rails-app-service-type))
+            make-rails-app-service-type
+
+            rails-run-db:setup))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -374,3 +376,21 @@
                         (const
                          (generic-rails-app-service-account
                           (symbol->string name))))))))
+
+(define (rails-run-db:setup s)
+  (let
+      ((parameters (service-parameters s)))
+    (if (not (list? parameters))
+        s
+        (service
+         (service-kind s)
+         (map
+          (lambda (parameter)
+            (if (service-startup-config? parameter)
+                (service-startup-config-add-pre-startup-scripts
+                 (find service-startup-config? parameters)
+                 `((rails-db:setup
+                    .
+                    ,(run-command "rake" "db:setup"))))
+                parameter))
+          parameters)))))
