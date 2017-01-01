@@ -397,13 +397,6 @@
     (password (random-base16-string 30))
     (database "specialist_publisher"))))
 
-(define default-specialist-publisher-service-startup-config
-  (service-startup-config
-   (pre-startup-scripts
-    `((db-seed . ,(run-command "rake" "db:seed"))
-      (publish-finders . ,(run-command "rake" "publishing_api:publish_finders"))
-      (grant-permissions . ,(run-command "rake" "permissions:grant[David Heath]"))))))
-
 (define specialist-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
 
@@ -415,7 +408,7 @@
            (provision '(specialist-publisher))
            (requirement '(publishing-api)))
           (plek-config) (rails-app-config) specialist-publisher
-          default-specialist-publisher-service-startup-config
+          (service-startup-config)
           default-specialist-publisher-database-connection-configs)))
 
 ;;;
