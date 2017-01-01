@@ -303,7 +303,12 @@
         (documentation
          (simple-format #f "~A rails app" name))
         (respawn? #f)
-        (start #~(make-forkexec-constructor #$start-script))
+        (start #~(make-forkexec-constructor
+                  #$start-script
+                  #:pid-file (string-append
+                              #$root-directory
+                              "/tmp/pids/server.pid")
+                  #:pid-file-timeout 60))
         (stop #~(make-kill-destructor))))
      (let ((sidekiq-config (find sidekiq-config? rest)))
        (if sidekiq-config
