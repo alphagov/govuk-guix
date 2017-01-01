@@ -118,7 +118,7 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0chz3xwgn9nbs1q8919r8mbcn73ca96jxk4aaf72nk4a28lc3qv4")))
+    (hash (base32 "0a2w0yx7zh5wc7y34ldahbghy2hdbcp91ky7z84i1kkf0sk1h9l4")))
    (make-govuk-package
     "publishing-api" ;; TODO: Pass archive details to make-govuk-package
     (github-archive
@@ -152,7 +152,7 @@
 (define-public specialist-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1f32hnh59wq9h6sf6aswsar566axqk269sp2czg3lh8wgvxjp4zl")))
+    (hash (base32 "0f3kjqq52bhpl2a5sy2j422kkg2gawjd09kykwr6ipiqadlj4z8r")))
    (make-govuk-package
     "specialist-frontend"
     (github-archive
@@ -194,7 +194,7 @@
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0a77i21cmjwvk2dqkx80fv8vkm7s2spsvaqh21nrz14c7gzrr6hz")))
+    (hash (base32 "1b15pz35acpzwykvl34b7ygcsizxjwzg67p1n4lbz0dcc9vjhrky")))
    (make-govuk-package
     "router-api"
     (github-archive
@@ -263,8 +263,8 @@
          "publishing-e2e-tests"
          (github-archive
           #:repository "publishing-e2e-tests"
-          #:commit-ish "make-capybara-save-path-configurable"
-          #:hash (base32 "07zfd47b3aqh0hhcdi4h7bazrzb6q9b2ar6bis3apnxx2bbakzs3")))))
+          #:commit-ish "44058ef1421b81a9c4c11f5a7dba40d0404de29a"
+          #:hash (base32 "1xlgs4a7k49h54nv19ax3cd4a17jv74g13zn05hbrv041css3my9")))))
     (package-with-bundler
      (bundle-package
       (hash
@@ -283,7 +283,7 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "0g1y50vds1rc2qgis6b8wbydmfmja9wgr5s6hw8hra1z7nm3m3hs")))
+          (hash (base32 "086iy66h29y3djmmpmqjs5vfnvs3yw09iwbgphii2h24bk0msv2p")))
          (make-govuk-package
           "maslow"
           (github-archive
@@ -309,8 +309,8 @@
           "need-api"
           (github-archive
            #:repository "govuk_need_api"
-           #:commit-ish "release_133"
-           #:hash (base32 "0yrwyky6af8i3l2gl0z0qvcv6f9cgp9kjmyva1bjnkpdszx67qmc"))))))
+           #:commit-ish "release_138"
+           #:hash (base32 "0swfglpjp9077xfxxm0zj7mmqj1dxrpfk71j9w59palg4gqzzn14"))))))
     (package
       (inherit pkg)
       (arguments
