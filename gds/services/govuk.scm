@@ -274,7 +274,11 @@
    publishing-api-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(publishing-api))
            (requirement '(content-store draft-content-store)))
+          (service-startup-config
+           (environment-variables
+            '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))
           (plek-config) (rails-app-config) publishing-api
           default-publishing-api-signon-application
           (sidekiq-config)
@@ -299,7 +303,9 @@
    content-store-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(content-store))
            (requirement '(mongodb)))
+          (service-startup-config)
           (plek-config) (rails-app-config) content-store
           default-content-store-database-connection-configs)))
 
@@ -316,7 +322,12 @@
 (define draft-content-store-service
   (service
    draft-content-store-service-type
-   (cons* (plek-config) (rails-app-config) content-store
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-content-store))
+           (requirement '(mongodb)))
+          (service-startup-config)
+          (plek-config) (rails-app-config) content-store
           default-draft-content-store-database-connection-configs)))
 
 ;;;
