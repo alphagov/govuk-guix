@@ -148,7 +148,6 @@
        (environment-variables
         (apply
          generic-rails-app-service-environment-variables
-         string-name
          root-directory
          rails-app-config
          rest)))
@@ -210,7 +209,6 @@
        (environment-variables
         (apply
          generic-rails-app-service-environment-variables
-         string-name
          root-directory
          rails-app-config
          rest)))
