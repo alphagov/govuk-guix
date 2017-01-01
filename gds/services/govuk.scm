@@ -50,7 +50,11 @@
             publishing-api-service
             content-store-service
             draft-content-store-service
+
+            specialist-publisher-service-type
             specialist-publisher-service
+
+            specialist-frontend-service
             publishing-e2e-tests-service
             router-service
             router-service-type
