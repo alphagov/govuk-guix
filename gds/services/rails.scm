@@ -85,6 +85,12 @@
             (rails-app-config->environment-variables
              rails-app-config)
             '()))
+    ,@(let ((service-startup-config
+             (find service-startup-config? parameters)))
+        (if service-startup-config
+            (service-startup-config-environment-variables
+             service-startup-config)
+            '()))
     ,@(concatenate
        (map
         database-connection-config->environment-variables
