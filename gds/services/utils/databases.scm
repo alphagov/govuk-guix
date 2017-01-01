@@ -119,7 +119,6 @@
         (let* ((ssc (find service-startup-config? parameters))
                (database-connection-configs
                 (filter database-connection-config? parameters)))
-          (display "setup-blank-databases-on-service-startup\n")
           (service
            (service-kind s)
            (map
@@ -130,7 +129,6 @@
                    (concatenate
                     (map
                      (lambda (config)
-                       (display "config: ")(display config)(display "\n")
                        (cond
                         ((postgresql-connection-config? config)
                          `((postgresql
