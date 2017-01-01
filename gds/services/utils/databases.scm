@@ -146,7 +146,8 @@
                          '()) ;; redis does not require any setup
                         (else
                          (error "Unrecognised database config"))))
-                     database-connection-configs)))
+                     database-connection-configs))
+                   #:run-as-root #t)
                   parameter))
             parameters))))))
 
