@@ -6,6 +6,7 @@
             service-startup-config?
             service-startup-config-environment-variables
             service-startup-config-pre-startup-scripts
+            service-startup-config-root-pre-startup-scripts
 
             service-startup-config-with-additional-environment-variables
             service-startup-config-add-pre-startup-scripts))
@@ -16,7 +17,9 @@
   (environment-variables service-startup-config-environment-variables
                          (default '()))
   (pre-startup-scripts service-startup-config-pre-startup-scripts
-                       (default '())))
+                       (default '()))
+  (root-pre-startup-scripts service-startup-config-root-pre-startup-scripts
+                            (default '())))
 
 (define (service-startup-config-with-additional-environment-variables
          ssc
@@ -28,19 +31,32 @@
      environment-variables
      (service-startup-config-environment-variables ssc)))))
 
-(define (service-startup-config-add-pre-startup-scripts
-         ssc
-         scripts)
-  (service-startup-config
-   (inherit ssc)
-   (pre-startup-scripts
-    (append
-     (let
-         ((new-keys
-           (map car scripts)))
-       (filter
-        (match-lambda
-          ((key . value)
-           (not (memq key new-keys))))
-        (service-startup-config-pre-startup-scripts ssc)))
-     scripts))))
+(define* (service-startup-config-add-pre-startup-scripts
+          ssc
+          scripts
+          #:optional #:key (run-as-root #f))
+  (define (filter-out-replaced-scripts old-scripts)
+    (let
+        ((new-keys
+          (map car scripts)))
+      (filter
+       (match-lambda
+         ((key . value)
+          (not (memq key new-keys))))
+       old-scripts)))
+
+  (if run-as-root
+      (service-startup-config
+       (inherit ssc)
+       (root-pre-startup-scripts
+        (append
+         (filter-out-replaced-scripts
+          (service-startup-config-root-pre-startup-scripts ssc))
+         scripts)))
+      (service-startup-config
+       (inherit ssc)
+       (pre-startup-scripts
+        (append
+         (filter-out-replaced-scripts
+          (service-startup-config-pre-startup-scripts ssc))
+         scripts)))))
