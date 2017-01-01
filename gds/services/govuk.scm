@@ -202,18 +202,12 @@
      (string-append "start-publishing-e2e-tests")
      (with-imported-modules '((guix build utils)
                               (ice-9 popen))
-       #~(let ((user (getpwnam "nobody"))
-               (bundle (string-append #$package "/bin/bundle")))
+       #~(let ((bundle (string-append #$package "/bin/bundle")))
            (use-modules (guix build utils)
                         (ice-9 popen))
 
            (mkdir-p "/var/lib/publishing-e2e-tests")
-           (chown "/var/lib/publishing-e2e-tests"
-                  (passwd:uid user) (passwd:gid user))
 
-           ;; Start the service
-           (setgid (passwd:gid user))
-           (setuid (passwd:uid user))
            (for-each
             (lambda (env-var)
               (setenv (car env-var) (cdr env-var)))
