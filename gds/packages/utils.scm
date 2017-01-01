@@ -82,3 +82,38 @@ port: <%= ENV['REDIS_PORT'] %>
 namespace: <%= ENV['REDIS_NAMESPACE'] %>
 ")))
          #t))))
+
+(define-public replace-database.yml
+  (lambda ()
+    `(lambda* (#:key outputs #:allow-other-keys)
+       (let ((location
+              (string-append
+               (assoc-ref outputs "out")
+               "/config/database.yml")))
+         (delete-file location)
+         (call-with-output-file location
+           (lambda (port)
+             (simple-format port "
+development:
+  url: <%= ENV['DATABASE_URL'] %>
+
+test:
+  url: <%= ENV['DATABASE_URL'] %>
+
+production:
+  url: <%= ENV['DATABASE_URL'] %>
+")))
+         #t))))
+
+(define-public use-blank-database.yml
+  (lambda ()
+    `(lambda* (#:key outputs #:allow-other-keys)
+       (let ((location
+              (string-append
+               (assoc-ref outputs "out")
+               "/config/database.yml")))
+         (delete-file location)
+         (call-with-output-file location
+           (lambda (port)
+             (simple-format port "")))
+         #t))))
