@@ -77,7 +77,7 @@
 ;;;
 
 (define (generic-rails-app-service-environment-variables
-         name root-directory . parameters)
+         root-directory . parameters)
   `(("PATH" . ,(simple-format #f "~A/bin" root-directory))
     ,@(let ((rails-app-config
              (find rails-app-config? parameters)))
