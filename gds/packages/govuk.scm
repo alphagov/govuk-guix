@@ -120,7 +120,7 @@
    (bundle-package
     (hash (base32 "0a2w0yx7zh5wc7y34ldahbghy2hdbcp91ky7z84i1kkf0sk1h9l4")))
    (make-govuk-package
-    "publishing-api" ;; TODO: Pass archive details to make-govuk-package
+    "publishing-api"
     (github-archive
      #:repository "publishing-api"
      #:commit-ish "release_654"
