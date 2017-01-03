@@ -257,6 +257,10 @@
                              str)))
                      out))))
 
+             ;; Change file permissions to be writable by all
+             (for-each (lambda (f) (chmod f #o666))
+                       (find-files "/var/lib/publishing-e2e-tests"))
+
              (stop-service 'root)
              result))))))
 
