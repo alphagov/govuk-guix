@@ -213,11 +213,19 @@
      (string-append "start-publishing-e2e-tests")
      (with-imported-modules '((guix build utils)
                               (gnu services herd)
-                              (ice-9 popen))
-       #~(let ((bundle (string-append #$package "/bin/bundle")))
+                              (srfi srfi-26)
+                              (ice-9 popen)
+                              (ice-9 rw)
+                              (ice-9 rdelim))
+       #~(let ((bundle (string-append #$package "/bin/bundle"))
+               (test-results.html
+                "/var/lib/publishing-e2e-tests/test-results.html"))
            (use-modules (guix build utils)
                         (gnu services herd)
-                        (ice-9 popen))
+                        (srfi srfi-26)
+                        (ice-9 popen)
+                        (ice-9 rw)
+                        (ice-9 rdelim))
 
            (mkdir-p "/var/lib/publishing-e2e-tests")
 
@@ -228,7 +236,27 @@
            (chdir #$package)
            (let
                ((result
-                 (zero? (system* bundle "exec" "rspec" "--format" "html" "--out" "/var/lib/publishing-e2e-tests/test-results.html"))))
+                 (zero? (system* bundle "exec" "rspec" "--format" "html" "--out" test-results.html))))
+
+             ;; Links to pages and screenshots are absolute, so turn
+             ;; them in to relative links so that they work outside of
+             ;; the container
+             (let ((substring "file:///var/lib/publishing-e2e-tests/"))
+               (with-atomic-file-replacement test-results.html
+                 (lambda (in out)
+                   (write-string/partial
+                     (let filter ((str (read-string in)))
+                       (let ((index (string-contains str substring)))
+                         (if index
+                             (filter
+                              (string-replace
+                               str
+                               ""
+                               index
+                               (+ index (string-length substring))))
+                             str)))
+                     out))))
+
              (stop-service 'root)
              result))))))
 
