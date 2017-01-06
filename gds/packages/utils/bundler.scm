@@ -195,6 +195,15 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                           "--local"
                           "--deployment"
                           "--jobs=4"))))))
+           (add-after 'bundle-install 'patch-tzinfo-data-source
+             (lambda* (#:key inputs #:allow-other-keys)
+               (substitute* (find-files "vendor/bundle/ruby"
+                                        "zoneinfo_data_source.rb")
+                 (("DEFAULT_SEARCH_PATH = .*$")
+                  (string-append
+                   "DEFAULT_SEARCH_PATH = ['"
+                   (assoc-ref inputs "tzdata") "/share/zoneinfo"
+                   "'].freeze")))))
            (add-after 'install 'wrap-bin-files-for-bundler
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((out (assoc-ref outputs "out"))

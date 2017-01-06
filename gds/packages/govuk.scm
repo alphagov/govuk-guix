@@ -41,6 +41,7 @@
     (inputs
      `(("bash" ,bash)
        ("ruby" ,ruby)
+       ("tzdata" ,tzdata)
        ("gnu-make" ,gnu-make)
        ("gcc-toolchain" ,gcc-toolchain-5)
        ("linux-libre-headers" ,linux-libre-headers)
