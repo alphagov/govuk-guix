@@ -141,6 +141,14 @@
     #:commit-ish "release_688"
     #:hash (base32 "1xqqcs4bncb8lkk4x0h90a4v1sfvmzr6x6b4sa24v8ap8707bbsa"))))
 
+(define-public static
+  (make-govuk-package
+   "static"
+   (github-archive
+    #:repository "static"
+    #:commit-ish "release_2431"
+    #:hash (base32 "14l7523zhb07vxql8i87v9wmzcw6g2328k8zaiqp2s8x8i2iwrs2"))))
+
 (define-public publishing-e2e-tests
   (let
       ((govuk-package
