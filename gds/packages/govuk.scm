@@ -218,7 +218,7 @@
 
 (define-public router
   (let
-      ((release "release_140"))
+      ((release "release_144"))
     (package
       (name "router")
       (version release)
@@ -226,7 +226,7 @@
        (github-archive
         #:repository "router"
         #:commit-ish release
-        #:hash (base32 "0v4r3vglqyrl6nrh24n7dxvh80vysgximgccqgyfxvmwlqrx26m7")))
+        #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
       (build-system gnu-build-system)
       (native-inputs
        `(("go" ,go)))
