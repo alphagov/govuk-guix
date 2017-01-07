@@ -641,7 +641,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(maslow))
-           (requirement '(publishing-api)))
+           (requirement '(publishing-api need-api signon)))
           (service-startup-config)
           (plek-config) (rails-app-config) maslow
           default-maslow-database-connection-configs)))
