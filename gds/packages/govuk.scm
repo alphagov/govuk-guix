@@ -114,60 +114,82 @@
     (sha256 hash)))
 
 (define-public publishing-api
-  (make-govuk-package
-   "publishing-api" ;; TODO: Pass archive details to make-govuk-package
-   (github-archive
-    #:repository "publishing-api"
-    #:commit-ish "release_607"
-    #:hash (base32 "1gz4njkbfdmv1qxb0d28wlzkmp421sxid5m7dh42vknjkp0prdqy"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1mdcrhn96an5j9dbn2d3gli7a4b555zabihc93v4snzcjmfzin1k")))
+   (make-govuk-package
+    "publishing-api" ;; TODO: Pass archive details to make-govuk-package
+    (github-archive
+     #:repository "publishing-api"
+     #:commit-ish "release_607"
+     #:hash (base32 "1gz4njkbfdmv1qxb0d28wlzkmp421sxid5m7dh42vknjkp0prdqy")))))
 
 (define-public content-store
-  (make-govuk-package
-   "content-store"
-   (github-archive
-    #:repository "content-store"
-    #:commit-ish "release_585"
-    #:hash (base32 "0i42za14jn0wrsninahymg9w3sddfnll8fbxmirrvcqcbxx55ydc"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0938azjd7k7j4f7w6r8ydwd25bzjn39vxnn8k1vxnjwnn5pgcyff")))
+   (make-govuk-package
+    "content-store"
+    (github-archive
+     #:repository "content-store"
+     #:commit-ish "release_585"
+     #:hash (base32 "0i42za14jn0wrsninahymg9w3sddfnll8fbxmirrvcqcbxx55ydc")))))
 
 (define-public specialist-publisher
-  (make-govuk-package
-   "specialist-publisher"
-   (github-archive
-    #:repository "specialist-publisher"
-    #:commit-ish "release_725"
-    #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1ys7ahlw216hr6p80kbaxmwzrdyv60fh3a6qbzgsz76fvq2drakd"))
+    (without '("development" "test")))
+   (make-govuk-package
+    "specialist-publisher"
+    (github-archive
+     #:repository "specialist-publisher"
+     #:commit-ish "release_725"
+     #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9")))))
 
 (define-public specialist-frontend
-  (make-govuk-package
-   "specialist-frontend"
-   (github-archive
-    #:repository "specialist-frontend"
-    #:commit-ish "release_174"
-    #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1f32hnh59wq9h6sf6aswsar566axqk269sp2czg3lh8wgvxjp4zl")))
+   (make-govuk-package
+    "specialist-frontend"
+    (github-archive
+     #:repository "specialist-frontend"
+     #:commit-ish "release_174"
+     #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))))
 
 (define-public signonotron2
-  (make-govuk-package
-   "signonotron2"
-   (github-archive
-    #:repository "signonotron2"
-    #:commit-ish "release_688"
-    #:hash (base32 "1xqqcs4bncb8lkk4x0h90a4v1sfvmzr6x6b4sa24v8ap8707bbsa"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1f14g354y6xiy86vl5dwjz7yfq92cg15pwviw21c4awch04b0hm9")))
+   (make-govuk-package
+    "signonotron2"
+    (github-archive
+     #:repository "signonotron2"
+     #:commit-ish "release_688"
+     #:hash (base32 "1xqqcs4bncb8lkk4x0h90a4v1sfvmzr6x6b4sa24v8ap8707bbsa")))))
 
 (define-public static
-  (make-govuk-package
-   "static"
-   (github-archive
-    #:repository "static"
-    #:commit-ish "release_2431"
-    #:hash (base32 "14l7523zhb07vxql8i87v9wmzcw6g2328k8zaiqp2s8x8i2iwrs2"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "01x4z3f1mls4m0wx8hn8h5cqkabii7gzcwg52ys3sd41g1rms9jg")))
+   (make-govuk-package
+    "static"
+    (github-archive
+     #:repository "static"
+     #:commit-ish "release_2431"
+     #:hash (base32 "14l7523zhb07vxql8i87v9wmzcw6g2328k8zaiqp2s8x8i2iwrs2")))))
 
 (define-public router-api
-  (make-govuk-package
-   "router-api"
-   (github-archive
-    #:repository "router-api"
-    #:commit-ish "release_106"
-    #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d"))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0a77i21cmjwvk2dqkx80fv8vkm7s2spsvaqh21nrz14c7gzrr6hz")))
+   (make-govuk-package
+    "router-api"
+    (github-archive
+     #:repository "router-api"
+     #:commit-ish "release_106"
+     #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d")))))
 
 (define-public router
   (let
@@ -229,36 +251,50 @@
         (make-govuk-package
          "publishing-e2e-tests"
          (github-archive
-          #:user-or-org "kevindew"
           #:repository "publishing-e2e-tests"
           #:commit-ish "da2c5e759fd4ff4bae62b7a41a80cee40cf136cb"
           #:hash (base32 "1arrlch7681yjs6v4qyn9wnwsxzpar1lsca0qfm8zdizl6nfi0l1")))))
-    (package
-      (inherit govuk-package)
-      (arguments
-       (substitute-keyword-arguments (package-arguments govuk-package)
-         ((#:phases phases)
-          `(modify-phases ,phases
-             (add-before 'install 'add-bundle
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (let*
-                     ((out (assoc-ref outputs "out"))
-                      (gemfile (string-append out "/Gemfile"))
-                      (ruby
-                       (string-append (assoc-ref inputs "ruby")
-                                      "/bin/ruby")))
-                   (define* (bundle ruby-path #:optional (port #f))
-                     (format port "#!~A
+    (package-with-bundler
+     (bundle-package
+      (hash
+       (base32 "03ydsia5ipqclrs5yx8wldgi4m881hmvndwjsrb5s751fsbf8gmj")))
+     (package
+       (inherit govuk-package)
+       (arguments
+        (substitute-keyword-arguments (package-arguments govuk-package)
+          ((#:phases phases)
+           `(modify-phases ,phases
+              (add-before 'install 'add-bundle
+                (lambda* (#:key inputs outputs #:allow-other-keys)
+                  (let*
+                      ((out (assoc-ref outputs "out"))
+                       (gemfile (string-append out "/Gemfile"))
+                       (ruby
+                        (string-append (assoc-ref inputs "ruby")
+                                       "/bin/ruby")))
+                    (define* (bundle ruby-path #:optional (port #f))
+                      (format port "#!~A
 ENV[\"BUNDLE_GEMFILE\"] ||= \"~A\"
 
 load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
 
-                   (mkdir-p (string-append out "/bin"))
-                   (call-with-output-file (string-append out "/bin/bundle")
-                     (lambda (port)
-                       (bundle ruby port)))
-                   (chmod (string-append out "/bin/bundle") #o544)
-                   #t))))))))))
+                    (mkdir-p (string-append out "/bin"))
+                    (call-with-output-file (string-append out "/bin/bundle")
+                      (lambda (port)
+                        (bundle ruby port)))
+                    (chmod (string-append out "/bin/bundle") #o544)
+                    #t)))))))))))
+
+(define-public maslow
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0g1y50vds1rc2qgis6b8wbydmfmja9wgr5s6hw8hra1z7nm3m3hs")))
+   (make-govuk-package
+    "maslow"
+    (github-archive
+     #:repository "maslow"
+     #:commit-ish "release_178"
+     #:hash (base32 "1jyganvji06lkvs86fam7glvrn5gcx2jl9r6108ysbzdr2wfzs6j")))))
 
 (define-public govuk-content-schemas
   (package
