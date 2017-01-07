@@ -55,14 +55,19 @@
             router-api-config?
             router-api-nodes
 
+            publishing-api-service-type
             publishing-api-service
+            content-store-service-type
             content-store-service
+            draft-content-store-service-type
             draft-content-store-service
 
             specialist-publisher-service-type
             specialist-publisher-service
 
+            specialist-frontend-service-type
             specialist-frontend-service
+            publishing-e2e-tests-service-type
             publishing-e2e-tests-service
             router-service
             router-service-type
@@ -73,10 +78,13 @@
             draft-router-api-service
             draft-router-api-service-type
             maslow-service
+            maslow-service-type
             need-api-service
+            need-api-service-type
 
             signon-service-type
             signon-service
+            static-service-type
             static-service
 
             publishing-application-services
