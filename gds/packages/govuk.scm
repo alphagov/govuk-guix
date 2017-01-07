@@ -11,6 +11,8 @@
   #:use-module (gnu packages xml)
   #:use-module (gnu packages base)
   #:use-module (gnu packages node)
+  #:use-module (gnu packages golang)
+  #:use-module (gnu packages rsync)
   #:use-module (guix packages)
   #:use-module (guix build-system gnu)
   #:use-module (guix download)
@@ -134,6 +136,14 @@
     #:commit-ish "release_725"
     #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9"))))
 
+(define-public specialist-frontend
+  (make-govuk-package
+   "specialist-frontend"
+   (github-archive
+    #:repository "specialist-frontend"
+    #:commit-ish "release_174"
+    #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))))
+
 (define-public signonotron2
   (make-govuk-package
    "signonotron2"
@@ -149,6 +159,68 @@
     #:repository "static"
     #:commit-ish "release_2431"
     #:hash (base32 "14l7523zhb07vxql8i87v9wmzcw6g2328k8zaiqp2s8x8i2iwrs2"))))
+
+(define-public router-api
+  (make-govuk-package
+   "router-api"
+   (github-archive
+    #:repository "router-api"
+    #:commit-ish "release_106"
+    #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d"))))
+
+(define-public router
+  (let
+      ((release "release_140"))
+    (package
+      (name "router")
+      (version "0")
+      (source
+       (github-archive
+        #:repository "router"
+        #:commit-ish release
+        #:hash (base32 "0v4r3vglqyrl6nrh24n7dxvh80vysgximgccqgyfxvmwlqrx26m7")))
+      (build-system gnu-build-system)
+      (native-inputs
+       `(("go" ,go)
+         ("bash" ,bash)
+         ("rsync" ,rsync)))
+      (arguments
+       `(#:make-flags (list ,(string-append "RELEASE_VERSION=" release))
+         #:phases
+         (modify-phases %standard-phases
+           (delete 'configure)
+           (delete 'install)
+           (delete 'check)
+           (replace 'build
+             (lambda* (#:key inputs outputs #:allow-other-keys)
+               (let* ((out (assoc-ref outputs "out"))
+                      (cwd (getcwd))
+                      (bash (string-append
+                             (assoc-ref inputs "bash")
+                             "/bin/bash")))
+                 (mkdir-p "__build/src/github.com/alphagov")
+                 (mkdir-p "__build/bin")
+                 (setenv "GOPATH" (string-append cwd "/__build"))
+                 (setenv "BINARY" (string-append cwd "/router"))
+                 (system*
+                  "rsync"
+                  "-a"
+                  "./"
+                  "__build/src/github.com/alphagov/router" "--exclude=__build")
+                 (and
+                  (with-directory-excursion
+                      "__build/src/github.com/alphagov/router"
+                    (and
+                     (zero? (system* "make" "build"))
+                     (mkdir-p (string-append out "/bin"))))
+                  (begin
+                    (copy-file "router"
+                               (string-append out "/bin/router"))
+                    #t))))))))
+      (synopsis name)
+      (description name)
+      (license #f)
+      (home-page #f))))
 
 (define-public publishing-e2e-tests
   (let
