@@ -3,6 +3,8 @@
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages pv)
   #:export (<mysql-connection-config>
             mysql-connection-config
             mysql-connection-config?
@@ -12,7 +14,8 @@
             run-with-mysql-port
             mysql-ensure-user-exists-gexp
             mysql-create-database-gexp
-            mysql-create-user-and-database-for-database-connection))
+            mysql-create-user-and-database-for-database-connection
+            mysql-run-file-gexp))
 
 (define-record-type* <mysql-connection-config>
   mysql-connection-config make-mysql-connection-config
@@ -54,6 +57,29 @@
                 (lambda ()
                   (primitive-exit 1)))
               (zero? (cdr (waitpid pid))))))))))
+
+(define (mysql-run-file-gexp database-connection file)
+  (match database-connection
+    (($ <mysql-connection-config> host user port database)
+     (with-imported-modules '((ice-9 popen))
+       #~(lambda ()
+           (let
+               ((pid (primitive-fork))
+                (root (getpwnam "root"))
+                (command `(,(string-append #$pv "/bin/pv")
+                           #$file
+                           "|"
+                           ,(string-append #$pbzip2 "/bin/pbzip2")
+                           "-d"
+                           "|"
+                           ,(string-append #$mariadb "/bin/mysql")
+                           "-h" #$host
+                           "-u" "root"
+                           "--password=''"
+                           "-P" ,(number->string #$port))))
+             (simple-format #t "Running command: ~A\n\n" (string-join command))
+             (zero?
+              (system (string-join command)))))))))
 
 (define (mysql-ensure-user-exists-gexp user password)
   #~(lambda (port)
