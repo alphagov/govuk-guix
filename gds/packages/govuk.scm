@@ -72,6 +72,7 @@
                  (("/usr/bin/env") (which "env")))
                (for-each
                 (lambda (script)
+                  (chmod script #o777)
                   (wrap-program
                       script
                     `("PATH" = (,path))
