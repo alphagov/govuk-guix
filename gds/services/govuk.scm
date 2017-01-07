@@ -106,6 +106,14 @@
   (port postgresql-connection-config-port)
   (database postgresql-connection-config-database))
 
+(define-record-type* <mysql-connection-config>
+  mysql-connection-config make-mysql-connection-config
+  mysql-connection-config?
+  (user mysql-connection-config-user)
+  (port mysql-connection-config-port)
+  (database mysql-connection-config-database)
+  (password mysql-connection-config-password))
+
 (define-record-type* <mongodb-connection-config>
   mongodb-connection-config make-mongodb-connection-config
   mongodb-connection-config?
@@ -125,6 +133,8 @@
     (postgresql-create-user-and-database config))
    ((mongodb-connection-config? config)
     (mongodb-create-user-and-database config))
+   ((mysql-connection-config? config)
+    (mysql-create-user-and-database config))
    (else
     (error
      "make-database-setup: Unknown database configuration ~A"
@@ -137,6 +147,13 @@
        ,(simple-format
          #f
          "postgres://localhost:~A/~A"
+         port
+         database)))
+    (($ <mysql-connection-config> user port database)
+     `("DATABASE_URL" .
+       ,(simple-format
+         #f
+         "mysql://localhost:~A/~A"
          port
          database)))
     (($ <mongodb-connection-config> user port database)
