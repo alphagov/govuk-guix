@@ -1,4 +1,4 @@
-(define-module (gds systems end-to-end-test)
+(define-module (gds systems govuk development)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
@@ -436,7 +436,7 @@
       (/usr/share/zoneinfo-service)
       %base-services))))
 
-(define end-to-end-test-os
+(define development-os
   (operating-system
     (host-name "govuk-test")
     (timezone "Europe/London")
@@ -453,4 +453,4 @@
            %base-file-systems))
     (services services)))
 
-end-to-end-test-os
+development-os
