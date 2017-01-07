@@ -335,7 +335,15 @@
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
     (packages
-     (cons* strace glibc %base-packages))
+     (cons*
+      strace
+      glibc
+      postgresql
+      mariadb
+      mongodb
+      mongo-tools
+      htop
+      %base-packages))
     (file-systems
      (cons (file-system
              (device "my-root")
