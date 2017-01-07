@@ -191,7 +191,7 @@
     (host "localhost")
     (user "halberd")
     (port "-")
-    (database "signon-production")
+    (database "signon_production")
     (password ""))
    (redis-connection-config)))
 
