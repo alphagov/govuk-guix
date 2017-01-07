@@ -133,6 +133,14 @@
     #:commit-ish "release_725"
     #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9"))))
 
+(define-public signonotron2
+  (make-govuk-package
+   "signonotron2"
+   (github-archive
+    #:repository "signonotron2"
+    #:commit-ish "release_688"
+    #:hash (base32 "1xqqcs4bncb8lkk4x0h90a4v1sfvmzr6x6b4sa24v8ap8707bbsa"))))
+
 (define-public publishing-e2e-tests
   (let
       ((govuk-package
