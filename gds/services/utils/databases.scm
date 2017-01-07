@@ -21,13 +21,8 @@
   #:use-module (gds services)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
-  #:export (<mongodb-connection-config>
-            mongodb-connection-config
-            mongodb-connection-config?
-            mongodb-connection-config-port
-            mongodb-connection-config-database
-
-            <redis-connection-config>
+  #:use-module (gds services utils databases mongodb)
+  #:export (<redis-connection-config>
             redis-connection-config
             redis-connection-config?
             redis-connection-config-port
@@ -36,17 +31,6 @@
             database-connection-config?
             database-connection-config->environment-variables
             setup-blank-databases-on-service-startup))
-
-(define-record-type* <mongodb-connection-config>
-  mongodb-connection-config make-mongodb-connection-config
-  mongodb-connection-config?
-  (user mongodb-connection-config-user)
-  (password mongodb-connection-config-password)
-  (host mongodb-connection-config-host
-        (default "127.0.0.1"))
-  (port mongodb-connection-config-port
-        (default 27017))
-  (database mongodb-connection-config-database))
 
 (define-record-type* <redis-connection-config>
   redis-connection-config make-redis-connection-config
@@ -150,39 +134,3 @@
                    #:run-as-root #t)
                   parameter))
             parameters))))))
-
-(define mongodb-create-user-and-database
-  (match-lambda
-    (($ <mongodb-connection-config> user password host port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (let
-               ((pid (primitive-fork))
-                (mongodb-user (getpwnam "mongodb"))
-                (mongo (string-append #$mongodb "/bin/mongo")))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid mongodb-user))
-                  (setuid (passwd:uid mongodb-user))
-                  (let ((p (open-pipe* OPEN_WRITE mongo "--port" (number->string #$port))))
-                    (display "\nChecking if user exists:\n")
-                    (simple-format p "
-use ~A
-db.createUser(
-  {
-    user: \"~A\",
-    pwd: \"~A\",
-    roles: [
-       { role: \"readWrite\", db: \"~A\" }
-    ]
-  }
-)
-" #$database #$user #$password #$database)
-                    (close-pipe p))
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (waitpid pid))))))))
