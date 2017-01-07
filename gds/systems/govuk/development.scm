@@ -9,131 +9,47 @@
   #:use-module (gnu services ssh)
   #:use-module (gnu services web)
   #:use-module (gnu services databases)
+  #:use-module (gds packages govuk)
   #:use-module (gnu packages linux)
-  #:use-module (guix packages)
-  #:use-module (guix download)
-  #:use-module (gds packages utils custom-sources)
   #:use-module (gds packages mongodb)
-  #:use-module (guix store)
+  #:use-module (gds services govuk)
   #:use-module (gds services base)
   #:use-module (gds services mongodb)
-  #:use-module (gds packages govuk)
-  #:use-module (gds services)
-  #:use-module (gds services rails)
-  #:use-module (gds services utils)
-  #:use-module (gds services utils databases)
-  #:use-module (gds services utils databases mysql)
-  #:use-module (gds services utils databases postgresql)
-  #:use-module (gds services utils databases mongodb)
-  #:use-module (gds services govuk)
-  #:use-module (gds services govuk plek)
-  #:use-module (gds services govuk nginx))
+  #:use-module (guix packages)
+  #:use-module (guix download)
+  #:use-module (guix store))
 
-(define govuk-ports
-  `((publishing-api . 53039)
-    (content-store . 53000)
-    (draft-content-store . 53001)
-    (specialist-publisher . 53064)
-    (need-api . 53052)
-    (maslow . 53053)
-    (specialist-frontend . 53065)
-    (draft-specialist-frontend . 53066)
-    (signon . 53016)
-    (static . 53013)
-    (draft-static . 53014)
-    (router-api . 53056)
-    (draft-router-api . 53557)))
+(define github-url-regex
+  (make-regexp
+   "https:\\/\\/github\\.com\\/[^\\/]*\\/[^\\/]*\\/archive\\/([^\\/]*)\\.tar\\.gz"))
 
-(define system-ports
-  `((postgresql . 55432)
-    (mongodb . 57017)
-    (redis . 56379)
-    (mysql . 53306)))
+(define* (custom-github-archive-source-for-package
+          app-package
+          commit-ish)
+  (let*
+      ((old-url
+        (origin-uri (package-source app-package)))
+       (regexp-match
+        (regexp-exec github-url-regex old-url)))
+    (if (not (regexp-match? regexp-match))
+        (error "No match"))
+    (with-store store
+      (download-to-store
+       store
+       (string-replace
+        old-url
+        commit-ish
+        (match:start regexp-match 1)
+        (match:end regexp-match 1))
+       #:recursive? #t))))
 
-(define base-services
-  (list
-   (syslog-service)
-   (urandom-seed-service)
-   (nscd-service)
-   (guix-service)
-   pretend-loopback-service))
+(define environment-variable-commit-ish-regex
+  (make-regexp
+   "GDS_GUIX_([A-Z0-9_]*)_COMMIT_ISH=(.*)"))
 
-(define live-router-config
-  (router-config (public-port 51001)
-                 (api-port 51002)
-                 (debug? #t)))
-
-(define draft-router-config
-  (router-config (public-port 51003)
-                 (api-port 51004)
-                 (debug? #t)))
-
-(define services
-  (append
-   api-services
-   publishing-application-services
-   supporting-application-services
-   frontend-services
-   draft-frontend-services
-   (list
-    (nginx
-     govuk-ports
-     live-router-config
-     draft-router-config)
-    (redis-service #:port (assq-ref system-ports 'redis))
-    (postgresql-service #:port (assq-ref system-ports 'postgresql))
-    (mongodb-service #:port (assq-ref system-ports 'mongodb))
-    (mysql-service #:config (mysql-configuration
-                             (port (assq-ref system-ports 'mysql))))
-    govuk-content-schemas-service
-    ;; Position is significant for /usr/bin/env-service and
-    ;; /usr/share/zoneinfo-service, as these need to be activated
-    ;; before services which require them in their activation
-    (/usr/bin/env-service)
-    (/usr/share/zoneinfo-service))
-   base-services))
-
-(define (update-routing-services-configuration
-         services)
-  (let
-      ((router-config->router-nodes-value
-        (lambda (router-config)
-          (simple-format
-           #f
-           "localhost:~A"
-           (router-config-api-port router-config)))))
-
-    (update-services-parameters
-     services
-     (list
-      (cons router-service-type
-            (list
-             (cons router-config?
-                   (const live-router-config))))
-      (cons draft-router-service-type
-            (list
-             (cons router-config?
-                   (const draft-router-config))))
-      (cons router-api-service-type
-            (list
-             (cons service-startup-config?
-                   (lambda (ssc)
-                     (service-startup-config-with-additional-environment-variables
-                      ssc
-                      `(("ROUTER_NODES"
-                         .
-                         ,(router-config->router-nodes-value
-                           live-router-config))))))))
-      (cons draft-router-api-service-type
-            (list
-             (cons service-startup-config?
-                   (lambda (ssc)
-                     (service-startup-config-with-additional-environment-variables
-                      ssc
-                      `(("ROUTER_NODES"
-                         .
-                         ,(router-config->router-nodes-value
-                           draft-router-config))))))))))))
+(define environment-variable-path-regex
+  (make-regexp
+   "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
 
 (define (get-package-source-config-list-from-environment regex)
   (map
@@ -264,9 +180,108 @@
        package)))
    package-commit-ish-list))
 
+(define %base-services
+  (list
+   (syslog-service)
+   (urandom-seed-service)
+   (nscd-service)
+   (guix-service)
+   pretend-loopback-service))
+
+(define govuk-ports
+  `((publishing-api . 53039)
+    (content-store . 53000)
+    (draft-content-store . 53001)
+    (specialist-publisher . 53064)
+    (need-api . 53052)
+    (maslow . 53053)
+    (specialist-frontend . 53065)
+    (signon . 53016)
+    (static . 53013)
+    (router-api . 53056)
+    (draft-router-api . 53556)))
+
+(define system-ports
+  `((postgresql . 55432)
+    (mongodb . 57017)
+    (redis . 56379)
+    (mysql . 53306)))
+
 (define (port-for service)
   (or (assq-ref govuk-ports service)
       (assq-ref system-ports service)))
+
+(define (nginx service-and-ports
+               router-config
+               draft-router-config)
+  (nginx-service
+   #:upstream-list
+   (cons*
+    (nginx-upstream-configuration
+     (name "www.guix-dev.gov.uk-proxy")
+     (server (string-append
+              "localhost:"
+              (number->string
+               (router-config-public-port router-config)))))
+    (nginx-upstream-configuration
+     (name "draft-origin.guix-dev.gov.uk-proxy")
+     (server (string-append
+              "localhost:"
+              (number->string
+               (router-config-public-port draft-router-config)))))
+    (map
+     (match-lambda
+       ((service . port)
+        (nginx-upstream-configuration
+         (name (string-append (symbol->string service) ".guix-dev.gov.uk-proxy"))
+         (server (string-append "localhost:" (number->string port))))))
+     service-and-ports))
+   #:vhost-list
+   (let
+       ((base
+         (nginx-vhost-configuration
+          (http-port 50080)
+          (https-port 50443)
+          (ssl-certificate #f)
+          (ssl-certificate-key #f))))
+     (cons*
+      (nginx-vhost-configuration
+       (inherit base)
+       (locations
+        (list
+         (nginx-location-configuration
+          (uri "/")
+          (body '("proxy_pass http://www.guix-dev.gov.uk-proxy;")))))
+       (server-name (list "www.guix-dev.gov.uk")))
+      (nginx-vhost-configuration
+       (inherit base)
+       (locations
+        (list
+         (nginx-location-configuration
+          (uri "/")
+          (body '("proxy_pass http://draft-origin.guix-dev.gov.uk-proxy;")))))
+       (server-name (list "draft-origin.guix-dev.gov.uk")))
+      (map
+       (match-lambda
+         ((service . port)
+          (nginx-vhost-configuration
+           (inherit base)
+           (locations
+            (list
+             (nginx-location-configuration
+              (uri "/")
+              (body '("try_files $uri/index.html $uri.html $uri @app;")))
+             (nginx-location-configuration
+              (name "@app")
+              (body (list (simple-format
+                           #f
+                           "proxy_pass http://~A.guix-dev.gov.uk-proxy;"
+                           (symbol->string service)))))))
+           (server-name (list (string-append
+                               (symbol->string service)
+                               ".guix-dev.gov.uk")))
+           (root (string-append "/var/lib/" (symbol->string service) "/public")))))
+       service-and-ports)))))
 
 (define (set-random-rails-secret-token service)
   (update-service-parameters
@@ -290,7 +305,22 @@
                 #:port 50080))))))
    services))
 
-(define-public (setup-services services)
+(define (correct-services-package-source package-path-list package-commit-ish-list services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        package?
+        (lambda (pkg)
+          (correct-source-of
+           package-path-list
+           package-commit-ish-list
+           pkg))))))
+   services))
+
+(define (set-common-app-service-config services)
   (map
    (lambda (service)
      (update-service-parameters
@@ -309,42 +339,119 @@
        (cons
         gds-sso-config?
         (gds-sso-config)))))
-   (update-routing-services-configuration
-    (correct-services-package-source-from-environment
-     (update-services-parameters
-      services
-      (list
+   services))
+
+(define services
+  (let
+      ((package-commit-ish-list
+        (get-package-source-config-list-from-environment
+         environment-variable-commit-ish-regex))
+       (package-path-list
+        (get-package-source-config-list-from-environment
+         environment-variable-path-regex))
+
+       (live-router-config
+        (router-config
+         (public-port 51001)
+         (api-port 51002)
+         (debug? #t)))
+       (draft-router-config
+        (router-config
+         (public-port 51003)
+         (api-port 51004)
+         (debug? #t)))
+
+       (redis (redis-service #:port (port-for 'redis)))
+       (postgresql (postgresql-service #:port (port-for 'postgresql)))
+       (mongodb (mongodb-service #:port (port-for 'mongodb)))
+       ;; Note that the mysql service in Guix defaults to using MariaDB
+       (mysql (mysql-service #:config
+                             (mysql-configuration
+                              (port (port-for 'mysql))))))
+    (log-package-path-list package-path-list)
+    (log-package-commit-ish-list package-commit-ish-list)
+    (append
+     (correct-services-package-source
+      package-path-list
+      package-commit-ish-list
+      (set-plek-config
        (cons
-        (const #t)
-        (list
-         (cons
-          plek-config?
-          (const
-           (make-custom-plek-config
-            govuk-ports
-            #:govuk-app-domain "guix-dev.gov.uk"
-            #:use-https? #f
-            #:port 50080)))))))))))
+        publishing-e2e-tests-service
+        (set-common-app-service-config
+         (list
+          publishing-api-service
+          content-store-service
+          draft-content-store-service
+          (update-service-parameters
+           router-service
+           (list
+            (cons router-config?
+                  (const live-router-config))))
+          (update-service-parameters
+           draft-router-service
+           (list
+            (cons router-config?
+                  (const draft-router-config))))
+          (update-service-parameters
+           router-api-service
+           (list
+            (cons router-api-config?
+                  (const
+                   (router-api-config
+                    (router-nodes
+                     (list
+                      (simple-format #f "localhost:~A"
+                                     (router-config-api-port live-router-config)))))))))
+          (update-service-parameters
+           draft-router-api-service
+           (list
+            (cons router-api-config?
+                  (const
+                   (router-api-config
+                    (router-nodes
+                     (list
+                      (simple-format #f "localhost:~A"
+                                     (router-config-api-port draft-router-config)))))))))
+          (set-random-rails-secret-token
+           specialist-publisher-service)
+          maslow-service
+          need-api-service
+          specialist-frontend-service
+          static-service
+          govuk-content-schemas-service
+          signon-service)))))
+     (cons*
+      (nginx
+       ;; (filter
+       ;;  (match-lambda
+       ;;    ((service . port)
+       ;;     (not
+       ;;      (or
+       ;;       (eq? service 'www)
+       ;;       (eq? service 'draft-origin)))))
+       govuk-ports
+       ;; )
+       live-router-config
+       draft-router-config)
+      redis
+      postgresql
+      mongodb
+      mysql
+      ;; Position is significant for /usr/bin/env-service and
+      ;; /usr/share/zoneinfo-service, as these need to be activated
+      ;; before services which require them in their activation
+      (/usr/bin/env-service)
+      (/usr/share/zoneinfo-service)
+      %base-services))))
 
-(define development-os-services
-  (setup-services services))
-
-(define-public development-os
+(define development-os
   (operating-system
     (host-name "govuk-test")
     (timezone "Europe/London")
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
     (packages
-     (cons*
-      strace
-      glibc
-      postgresql
-      mariadb
-      mongodb
-      mongo-tools
-      htop
-      %base-packages))
+     (cons* strace glibc %base-packages))
     (file-systems
      (cons (file-system
              (device "my-root")
@@ -352,7 +459,6 @@
              (mount-point "/")
              (type "ext4"))
            %base-file-systems))
-    (services
-     development-os-services)))
+    (services services)))
 
 development-os
