@@ -131,6 +131,16 @@
   (port mongodb-connection-config-port)
   (database mongodb-connection-config-database))
 
+(define-record-type* <redis-connection-config>
+  redis-connection-config make-redis-connection-config
+  redis-connection-config?
+  (host redis-connection-config-host
+        (default "localhost"))
+  (port redis-connection-config-port
+        (default 6379))
+  (db-number redis-connection-config-db-number
+             (default 0)))
+
 (define-record-type* <publishing-e2e-tests-config>
   publishing-e2e-tests-config make-publishing-e2e-tests-config
   publishing-e2e-tests-config?
@@ -145,6 +155,8 @@
     (mongodb-create-user-and-database config))
    ((mysql-connection-config? config)
     (mysql-create-user-and-database config))
+   ((redis-connection-config? config)
+    #~(lambda () #t))
    (else
     (error
      "make-database-setup: Unknown database configuration ~A"
@@ -173,6 +185,14 @@
          "mongodb://localhost:~A/~A"
          port
          database)))
+    (($ <redis-connection-config> host port db-number)
+     `("REDIS_URL" .
+       ,(simple-format
+         #f
+         "redis://~A:~A/~A"
+         host
+         port
+         db-number)))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
