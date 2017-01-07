@@ -221,7 +221,7 @@
       ((release "release_140"))
     (package
       (name "router")
-      (version "0")
+      (version release)
       (source
        (github-archive
         #:repository "router"
@@ -229,12 +229,9 @@
         #:hash (base32 "0v4r3vglqyrl6nrh24n7dxvh80vysgximgccqgyfxvmwlqrx26m7")))
       (build-system gnu-build-system)
       (native-inputs
-       `(("go" ,go)
-         ("bash" ,bash)
-         ("rsync" ,rsync)))
+       `(("go" ,go)))
       (arguments
-       `(#:make-flags (list ,(string-append "RELEASE_VERSION=" release))
-         #:phases
+       `(#:phases
          (modify-phases %standard-phases
            (delete 'configure)
            (delete 'install)
@@ -242,33 +239,28 @@
            (replace 'build
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((out (assoc-ref outputs "out"))
-                      (cwd (getcwd))
-                      (bash (string-append
-                             (assoc-ref inputs "bash")
-                             "/bin/bash")))
+                      (cwd (getcwd)))
+                 (copy-recursively cwd "../router-copy")
                  (mkdir-p "__build/src/github.com/alphagov")
                  (mkdir-p "__build/bin")
                  (setenv "GOPATH" (string-append cwd "/__build"))
                  (setenv "BINARY" (string-append cwd "/router"))
-                 (system*
-                  "rsync"
-                  "-a"
-                  "./"
-                  "__build/src/github.com/alphagov/router" "--exclude=__build")
+                 (rename-file "../router-copy"
+                              "__build/src/github.com/alphagov/router")
                  (and
                   (with-directory-excursion
                       "__build/src/github.com/alphagov/router"
                     (and
-                     (zero? (system* "make" "build"))
+                     (zero? (system* "make" "build" (string-append "RELEASE_VERSION=" ,release)))
                      (mkdir-p (string-append out "/bin"))))
                   (begin
                     (copy-file "router"
                                (string-append out "/bin/router"))
                     #t))))))))
-      (synopsis name)
-      (description name)
-      (license #f)
-      (home-page #f))))
+      (synopsis "")
+      (description "")
+      (license "")
+      (home-page "https://github.com/alphagov/router"))))
 
 (define-public publishing-e2e-tests
   (let
