@@ -1,6 +1,6 @@
 #!/bin/sh
 
-START_SCRIPT="$(./guix-pre-inst-env guix system container --fallback $@)"
+START_SCRIPT="$(bash ./guix-pre-inst-env guix system container --fallback $@)"
 
 if [ $? -eq 0 ]; then
     sudo "$START_SCRIPT"
