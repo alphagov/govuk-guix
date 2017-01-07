@@ -244,145 +244,173 @@ db.createUser(
                   (primitive-exit 1)))
               (waitpid pid))))))))
 
-(define* make-rails-start-script
-  (match-lambda
-    (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
-     (let*
-         ((string-name (symbol->string name))
-          (bundler
-           (car
-            (assoc-ref (package-propagated-inputs package)
-                       "bundler")))
-          (bundle-path-base "/tmp/guix/")
-          (database-connection-thunks
-           (map make-database-setup-thunk database-connection-configs))
-          (environment-variables
-           (concatenate
-            (list
-             (map
-              database-config->environment-variable
-              database-connection-configs)
-             `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
-               ("GOVUK_WEBSITE_ROOT" . "placeholder")
-               ("GOVUK_ASSET_ROOT" . "placeholder")
-               ("RAILS_ENV" . "production")
-               ("SECRET_KEY_BASE" . "t0a")
-               ("BUNDLE_PATH" .
-                ,(string-append bundle-path-base string-name "-FAKE_HASH/BUNDLE_PATH"))
-               ("BUNDLE_APP_CONFIG" .
-                ,(string-append root-directory "/.bundle"))
-               ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))))
-       (program-file
-        (string-append "start-" string-name)
-        (with-imported-modules '((guix build utils)
-                                 (ice-9 popen))
-          #~(let ((user (getpwnam #$string-name))
-                  (bundle (string-append #$root-directory "/bin/bundle"))
-                  (rake (string-append #$root-directory "/bin/rake"))
-                  (rails (string-append #$root-directory "/bin/rails")))
-              (use-modules (guix build utils)
-                           (ice-9 popen))
+(define (generic-rails-app-start-script
+         name
+         package
+         ports
+         root-directory
+         database-connection-configs)
+  (let*
+      ((string-name (symbol->string name))
+       (bundler
+        (car
+         (assoc-ref (package-propagated-inputs package)
+                    "bundler")))
+       (bundle-path-base "/tmp/guix/")
+       (database-connection-thunks
+        (map make-database-setup-thunk database-connection-configs))
+       (environment-variables
+        (concatenate
+         (list
+          (map
+           database-config->environment-variable
+           database-connection-configs)
+          `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
+            ("GOVUK_WEBSITE_ROOT" . "placeholder")
+            ("GOVUK_ASSET_ROOT" . "placeholder")
+            ("RAILS_ENV" . "production")
+            ("SECRET_KEY_BASE" . "t0a")
+            ("BUNDLE_PATH" .
+             ,(string-append bundle-path-base string-name "-FAKE_HASH/BUNDLE_PATH"))
+            ("BUNDLE_APP_CONFIG" .
+             ,(string-append root-directory "/.bundle"))
+            ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))))
+    (program-file
+     (string-append "start-" string-name)
+     (with-imported-modules '((guix build utils)
+                              (ice-9 popen))
+       #~(let ((user (getpwnam #$string-name))
+               (bundle (string-append #$root-directory "/bin/bundle"))
+               (rake (string-append #$root-directory "/bin/rake"))
+               (rails (string-append #$root-directory "/bin/rails")))
+           (use-modules (guix build utils)
+                        (ice-9 popen))
 
-              (for-each
-               (lambda (t) (t))
-               (list #$@database-connection-thunks))
-
-              (mkdir-p #$bundle-path-base)
-              (chmod #$bundle-path-base #o777)
-
-              ;; Start the service
-              (setgid (passwd:gid user))
-              (setuid (passwd:uid user))
-              (for-each
-               (lambda (env-var)
-                 (setenv (car env-var) (cdr env-var)))
-               '#$environment-variables)
-              (chdir #$root-directory)
-              (system* bundle "install")
-              (system* rake "db:setup")
-              (system* rails "s" "-p" (number->string (assq-ref '#$ports '#$name))))))))))
-
-(define rails-app-activation
-  (match-lambda
-    (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
-     #~(begin
-         (use-modules (guix build utils)
-                      (ice-9 match)
-                      (ice-9 ftw)
-                      (srfi srfi-26))
-
-         (let* ((string-name (symbol->string '#$name))
-                (user (getpwnam string-name)))
-           (mkdir-p #$root-directory)
-           (chown #$root-directory (passwd:uid user) (passwd:gid user))
            (for-each
-            (lambda (file)
-              (copy-recursively
-               (string-append #$package "/" file)
-               (string-append #$root-directory "/" file)
-               #:log (%make-void-port "w")
-               #:follow-symlinks? #t))
-            (scandir
-             #$package
-             (negate
-              (cut member <> '("." ".." "tmp" "log" ".bundle" "spec" "doc")))))
-           ;; If the Gemfile is patched, the Gemfile.lock needs to be writable
-           (chmod (string-append #$root-directory "/Gemfile.lock") #o777)
+            (lambda (t) (t))
+            (list #$@database-connection-thunks))
+
+           (mkdir-p #$bundle-path-base)
+           (chmod #$bundle-path-base #o777)
+
+           ;; Start the service
+           (setgid (passwd:gid user))
+           (setuid (passwd:uid user))
            (for-each
-            (lambda (file)
-              (mkdir-p file)
-              (chown file (passwd:uid user) (passwd:gid user)))
-            (map
-             (lambda (dir)
-               (string-append #$root-directory "/" dir))
-             '("tmp" "log")))
-           (let*
-               ((target
-                 (string-append "exec -a \"\\$0\" \"" #$package))
-                (replacement
-                 (string-append "exec -a \"$0\" \"" #$root-directory)))
-             (substitute* (find-files (string-append #$root-directory "/bin"))
-               ((target)
-                replacement)))
-           #t)))))
+            (lambda (env-var)
+              (setenv (car env-var) (cdr env-var)))
+            '#$environment-variables)
+           (chdir #$root-directory)
+           (system* bundle "install")
+           (system* rake "db:setup")
+           (system* rails "s" "-p" (number->string (assq-ref '#$ports '#$name))))))))
 
-(define (rails-app-shepherd-service config)
-  (let* ((start-script
-          (make-rails-start-script config))
-         (name (rails-app-config-name config)))
-    (list
-     (shepherd-service
-      (provision (list name))
-      (documentation
-       (simple-format #f "~A rails app" name))
-      (requirement (rails-app-config-requirements config))
-      (respawn? #f)
-      (start #~(make-forkexec-constructor #$start-script))
-      (stop #~(make-kill-destructor))))))
+(define (generic-rails-app-activation
+         name
+         package
+         root-directory)
+  #~(begin
+      (use-modules (guix build utils)
+                   (ice-9 match)
+                   (ice-9 ftw)
+                   (srfi srfi-26))
 
-(define (rails-app-service-account config)
-  (let
-      ((string-name
-        (symbol->string (rails-app-config-name config))))
-    (list
-     (user-account
-      (name string-name)
-      (group "nogroup")
-      (system? #t)
-      (comment (simple-format #f "~A service user" string-name))
-      (home-directory "/var/empty")
-      (shell #~(string-append #$shadow "/sbin/nologin"))))))
+      (let* ((string-name (symbol->string '#$name))
+             (user (getpwnam string-name)))
+        (mkdir-p #$root-directory)
+        (chown #$root-directory (passwd:uid user) (passwd:gid user))
+        (for-each
+         (lambda (file)
+           (copy-recursively
+            (string-append #$package "/" file)
+            (string-append #$root-directory "/" file)
+            #:log (%make-void-port "w")
+            #:follow-symlinks? #t))
+         (scandir
+          #$package
+          (negate
+           (cut member <> '("." ".." "tmp" "log" ".bundle" "spec" "doc")))))
+        ;; If the Gemfile is patched, the Gemfile.lock needs to be writable
+        (chmod (string-append #$root-directory "/Gemfile.lock") #o777)
+        (for-each
+         (lambda (file)
+           (mkdir-p file)
+           (chown file (passwd:uid user) (passwd:gid user)))
+         (map
+          (lambda (dir)
+            (string-append #$root-directory "/" dir))
+          '("tmp" "log")))
+        (let*
+            ((target
+              (string-append "exec -a \"\\$0\" \"" #$package))
+             (replacement
+              (string-append "exec -a \"$0\" \"" #$root-directory)))
+          (substitute* (find-files (string-append #$root-directory "/bin"))
+            ((target)
+             replacement)))
+        #t)))
+
+(define (generic-rails-app-shepherd-service
+         name
+         requirements
+         start-script)
+  (list
+   (shepherd-service
+    (provision (list name))
+    (documentation
+     (simple-format #f "~A rails app" name))
+    (requirement requirements)
+    (respawn? #f)
+    (start #~(make-forkexec-constructor #$start-script))
+    (stop #~(make-kill-destructor)))))
+
+(define (generic-rails-app-service-account
+         username)
+  (list
+   (user-account
+    (name username)
+    (group "nogroup")
+    (system? #t)
+    (home-directory "/var/empty")
+    (shell #~(string-append #$shadow "/sbin/nologin")))))
 
 (define (make-rails-app-service-type config)
   (service-type
    (name (rails-app-config-name config))
    (extensions
-    (list (service-extension shepherd-root-service-type
-                             rails-app-shepherd-service)
-          (service-extension activation-service-type
-                             rails-app-activation)
-          (service-extension account-service-type
-                             rails-app-service-account)))))
+    (append
+     (list
+      (service-extension shepherd-root-service-type
+                         (match-lambda
+                           (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
+                            (generic-rails-app-shepherd-service
+                             name
+                             requirements
+                             (generic-rails-app-start-script
+                              name
+                              package
+                              ports
+                              root-directory
+                              database-connection-configs)))))
+      (service-extension activation-service-type
+                         (match-lambda
+                           (($ <rails-app-config> name package requirements ports root-directory)
+                            (generic-rails-app-activation
+                             name
+                             package
+                             root-directory))))
+      (service-extension account-service-type
+                         (match-lambda
+                           (($ <rails-app-config> name)
+                            (generic-rails-app-service-account
+                             (symbol->string name))))))
+     (let ((signonotron2-application
+            (rails-app-config-signonotron2-application config)))
+       (if signonotron2-application
+           (list
+            (service-extension signonotron2-service-type
+                               (const signonotron2-application)))
+           '()))))))
 
 (define (rails-app-service config)
   (service
