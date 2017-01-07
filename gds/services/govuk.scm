@@ -163,7 +163,7 @@
      `("DATABASE_URL" .
        ,(simple-format
          #f
-         "mysql://localhost:~A/~A"
+         "mysql2://localhost:~A/~A"
          port
          database)))
     (($ <mongodb-connection-config> user port database)
