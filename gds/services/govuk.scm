@@ -20,6 +20,7 @@
   #:use-module (gds services utils databases)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
+  #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk plek)
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk signon)
