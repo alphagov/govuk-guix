@@ -417,6 +417,38 @@ db.createUser(
    (make-rails-app-service-type config)
    config))
 
+(define mysql-create-user-and-database
+  (match-lambda
+    (($ <mysql-connection-config> user port database password)
+     (with-imported-modules '((ice-9 popen))
+       #~(lambda ()
+           (let
+               ((pid (primitive-fork))
+                (mysql-user (getpwnam "mysql"))
+                (mysql (string-append #$mysql "/bin/mysql")))
+             (if
+              (= 0 pid)
+              (dynamic-wind
+                (const #t)
+                (lambda ()
+                  (setgid (passwd:gid mysql-user))
+                  (setuid (passwd:uid mysql-user))
+                  (let ((p (open-pipe* OPEN_WRITE mysql "-p" (number->string #$port))))
+                    (display "\nChecking if user exists:\n")
+                    (simple-format p "
+CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';
+" #$user #$password)
+                    (display "\nChecking if the database exists:\n")
+                    (simple-format p "
+CREATE DATABASE \"~A\";" #$database)
+                    (simple-format p "
+GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
+                    (close-pipe p))
+                  (primitive-exit 0))
+                (lambda ()
+                  (primitive-exit 1)))
+              (waitpid pid))))))))
+
 (define* make-publishing-e2e-tests-start-script
   (match-lambda
     (($ <publishing-e2e-tests-config> package ports)
