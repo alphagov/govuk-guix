@@ -1,14 +1,58 @@
 #!/bin/sh
 
-export GUIX_PACKAGE_PATH="$PWD/.guix-package-path${GUIX_PACKAGE_PATH:+:}$GUIX_PACKAGE_PATH"
+if [ ! -n "$BASH" ] ; then
+    echo Please run $0 with bash;
+    exit 1;
+fi
 
-guix environment \
-     --fallback \
-     --pure \
-     --ad-hoc bash coreutils less nss-certs guix@0.11.0-gds guile \
-     bash -- <<EOF
-export GDS_GUIX_PATH="$GDS_GUIX_PATH"
+export GUIX_PACKAGE_PATH="$PWD/.guix-package-path"
+
+if [ -n "$GDS_GUIX_CUSTOM_XDG_CONFIG_HOME" ]
+then
+    # Use the custom guix if specified, as this might save some work
+    # compiling guix later on?
+    export XDG_CONFIG_HOME="$GDS_GUIX_CUSTOM_XDG_CONFIG_HOME"
+fi
+
+# Put the right version of guix on the path, and coreutils as env and
+# cut are used by this script
+GDS_GUIX_SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc coreutils guix@0.11.0-gds --search-paths)"
+
+eval "$GDS_GUIX_SEARCH_PATHS"
+
+# To avoid $XDG_CONFIG_HOME/guix/latest from being used
+export XDG_CONFIG_HOME="${GDS_GUIX_CUSTOM_XDG_CONFIG_HOME:-"/dev/null"}"
+
+SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix@0.11.0-gds guile --search-paths)"
+
+INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER)
+
+for var in $(env | cut -d '=' -f 1); do
+    if [[ $var == GDS_GUIX* ]]
+    then
+       continue
+    fi
+
+    for var_to_skip in "${INCLUDED_VARIABLES[@]}"
+    do
+        if [ "$var" == "$var_to_skip" ]
+        then
+            continue 2
+        fi
+    done
+
+    unset $var;
+done
+
+set -u
+
+eval "$SEARCH_PATHS"
+
+export GUIX_ENVIRONMENT="$(dirname $(dirname $(type -p guix)))"
+
+export SSL_CERT_FILE="$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt"
 export SSL_CERT_DIR="$GUIX_ENVIRONMENT/etc/ssl/certs"
 
+export GIT_SSL_CAINFO="$SSL_CERT_FILE"
+
 bash ./pre-inst-env $@
-EOF
