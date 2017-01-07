@@ -84,5 +84,5 @@
            (server-name (list (string-append
                                (symbol->string service)
                                ".guix-dev.gov.uk")))
-           (root (string-append "/var/lib/" (symbol->string service) "/public")))))
+           (root (string-append "/var/apps/" (symbol->string service) "/public")))))
        service-and-ports)))))

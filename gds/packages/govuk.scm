@@ -386,9 +386,9 @@
 set -exu
 APP=\"$1\"
 shift
-BINDIR=\"/var/lib/$APP/bin\"
+BINDIR=\"/var/apps/$APP/bin\"
 . \"$BINDIR/env.sh\"
-cd \"/var/lib/$APP\"
+cd \"/var/apps/$APP\"
 ~A --preserve-env -u \"$APP\" \"$@\"
 " bash sudo)))
                     (chmod (string-append %output "/bin/govuk-setenv") #o555)

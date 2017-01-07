@@ -113,16 +113,16 @@
    (lambda (package)
      (shepherd-service
       (provision (list 'govuk-content-schemas))
-      (documentation "Ensure /var/lib/govuk-content-schemas exists")
+      (documentation "Ensure /var/apps/govuk-content-schemas exists")
       (start
        #~(lambda _
            (use-modules (guix build utils))
 
-           (if (not (file-exists? "/var/lib/govuk-content-schemas"))
+           (if (not (file-exists? "/var/apps/govuk-content-schemas"))
                (begin
-                 (mkdir-p "/var/lib")
+                 (mkdir-p "/var/apps")
                  (symlink #$package
-                          "/var/lib/govuk-content-schemas")))
+                          "/var/apps/govuk-content-schemas")))
            #t))
    (stop #~(lambda _
              #f))
@@ -219,8 +219,8 @@
         (append
          environment-variables
          `(("SECRET_KEY_BASE" . "t0a")
-           ("CAPYBARA_SAVE_PATH" . "/var/lib/publishing-e2e-tests/")
-           ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas")))))
+           ("CAPYBARA_SAVE_PATH" . "/var/apps/publishing-e2e-tests/")
+           ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas")))))
     (program-file
      (string-append "start-publishing-e2e-tests")
      (with-imported-modules '((guix build utils)
@@ -231,7 +231,7 @@
                               (ice-9 rdelim))
        #~(let ((bundle (string-append #$package "/bin/bundle"))
                (test-results.html
-                "/var/lib/publishing-e2e-tests/test-results.html"))
+                "/var/apps/publishing-e2e-tests/test-results.html"))
            (use-modules (guix build utils)
                         (gnu services herd)
                         (srfi srfi-26)
@@ -239,7 +239,7 @@
                         (ice-9 rw)
                         (ice-9 rdelim))
 
-           (mkdir-p "/var/lib/publishing-e2e-tests")
+           (mkdir-p "/var/apps/publishing-e2e-tests")
 
            (for-each
             (lambda (env-var)
@@ -253,7 +253,7 @@
              ;; Links to pages and screenshots are absolute, so turn
              ;; them in to relative links so that they work outside of
              ;; the container
-             (let ((substring "file:///var/lib/publishing-e2e-tests/"))
+             (let ((substring "file:///var/apps/publishing-e2e-tests/"))
                (with-atomic-file-replacement test-results.html
                  (lambda (in out)
                    (write-string/partial
@@ -271,7 +271,7 @@
 
              ;; Change file permissions to be writable by all
              (for-each (lambda (f) (chmod f #o666))
-                       (find-files "/var/lib/publishing-e2e-tests"))
+                       (find-files "/var/apps/publishing-e2e-tests"))
 
              (stop-service 'root)
              result))))))
@@ -333,7 +333,7 @@
            (requirement '(content-store draft-content-store)))
           (service-startup-config
            (environment-variables
-            '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))
+            '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
           (plek-config) (rails-app-config) publishing-api
           default-publishing-api-signon-application
           (sidekiq-config

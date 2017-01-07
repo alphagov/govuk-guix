@@ -74,6 +74,9 @@
     (cons "SECRET_KEY_BASE" (rails-app-config-secret-key-base config))
     (cons "SECRET_TOKEN" (rails-app-config-secret-token config)))))
 
+(define (app-name->root-directory name)
+  (string-append "/var/apps/" name))
+
 ;;;
 ;;; Generic Rails App Service
 ;;;
@@ -124,7 +127,7 @@
        (string-port
         (number->string (rails-app-config-port rails-app-config)))
        (root-directory
-        (string-append "/var/lib/" string-name))
+        (app-name->root-directory string-name))
        (ruby
         (car
          (assoc-ref (package-inputs package)
@@ -207,7 +210,7 @@
       ((rails-app-config (find rails-app-config? rest))
        (package (find package? rest))
        (string-name (symbol->string name))
-       (root-directory (string-append "/var/lib/" string-name))
+       (root-directory (app-name->root-directory string-name))
        (environment-variables
         (apply
          generic-rails-app-service-environment-variables
@@ -290,7 +293,7 @@
   (let
       ((package (find package? rest))
        (root-directory
-        (string-append "/var/lib/" (symbol->string name)))
+        (app-name->root-directory (symbol->string name)))
        (ss (find shepherd-service? rest))
        (rails-app-config (find rails-app-config? rest)))
     (cons
@@ -330,7 +333,10 @@
                     rest)))
                  (config-file (sidekiq-config-file sidekiq-config))
                  (string-name (symbol->string name))
-                 (pidfile (string-append "/var/lib/" string-name "/tmp/pids/sidekiq.pid")))
+                 (root-directory (app-name->root-directory string-name))
+                 (pidfile (string-append
+                           root-directory
+                           "/tmp/pids/sidekiq.pid")))
               (shepherd-service
                (inherit ss)
                (provision (list
@@ -345,22 +351,17 @@
                 (simple-format #f "~A sidekiq service" name))
                (respawn? #f)
                (start #~(make-forkexec-constructor
-                         (let
-                             ((command
-                               `(,(string-append "/var/lib/" #$string-name "/bin/bundle")
+                         `(,(string-append #$root-directory "/bin/bundle")
                            "exec"
                            "sidekiq"
                            ,@(if #$config-file '("-C" #$config-file) '())
                            "--pidfile" #$pidfile
                            "--daemon")
-                               ))
-                           (display "\n\ncommand:\n")(display command)(display "\n")
-                           command)
                          #:user #$string-name
                          #:pid-file #$pidfile
                          #:pid-file-timeout 30
-                         #:log-file (string-append "/var/log/" #$string-name "-sidekiq.log")
-                         #:directory (string-append "/var/lib/" #$string-name)
+                         #:log-file (string-append #$root-directory "-sidekiq.log")
+                         #:directory #$root-directory
                          #:environment-variables '#$environment-variables))
                (stop #~(make-kill-destructor)))))
            '())))))
