@@ -1,7 +1,16 @@
 (define-module (gds packages govuk)
   #:use-module (ice-9 regex)
+  #:use-module (ice-9 match)
+  #:use-module (srfi srfi-1)
   #:use-module (guix packages)
   #:use-module (guix utils)
+  #:use-module (guix build-system gnu)
+  #:use-module (guix build-system trivial)
+  #:use-module (guix build-system ruby)
+  #:use-module (guix download)
+  #:use-module (guix search-paths)
+  #:use-module (guix records)
+  #:use-module (guix git-download)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages certs)
@@ -9,15 +18,16 @@
   #:use-module (gnu packages linux)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages xml)
+  #:use-module (gnu packages compression)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages tls)
   #:use-module (gnu packages node)
   #:use-module (gnu packages golang)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages libffi)
   #:use-module (gnu packages rsync)
-  #:use-module (guix packages)
-  #:use-module (guix build-system gnu)
-  #:use-module (guix download)
-  #:use-module (guix store)
-  #:use-module (guix git-download)
+  #:use-module (gds packages utils)
+  #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party))
 
 (define (make-govuk-package
@@ -29,22 +39,24 @@
     (source source)
     (build-system gnu-build-system)
     (inputs
-     `(("bash" ,bash)))
-    (propagated-inputs
-     `(("ruby" ,ruby)
-       ("bundler" ,bundler)
+     `(("bash" ,bash)
+       ("ruby" ,ruby)
        ("gnu-make" ,gnu-make)
        ("gcc-toolchain" ,gcc-toolchain-5)
        ("linux-libre-headers" ,linux-libre-headers)
        ("nss-certs" ,nss-certs)
        ("postgresql" ,postgresql)
+       ("mysql" ,mysql)
+       ("openssl" ,openssl)
+       ("zlib" ,zlib)
        ("libxml2" ,libxml2)
        ("tzdata" ,tzdata)
        ("coreutils" ,coreutils) ;; just for ls
        ("libxslt" ,libxslt)
+       ("libffi" ,libffi)
+       ("pkg-config" ,pkg-config)
        ("node" ,node)
-       ("phantomjs" ,phantomjs)
-       ))
+       ("phantomjs" ,phantomjs)))
     (arguments
      `(#:modules ((srfi srfi-1)
                   (ice-9 ftw)
@@ -55,37 +67,25 @@
          (delete 'build)
          (delete 'check)
          (replace 'install
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (path
-                     (list->search-path-as-string
-                       (filter
-                        (lambda (path)
-                          (not (string-prefix? (assoc-ref %build-inputs "source")
-                                              path)))
-                        (search-path-as-string->list (getenv "PATH")));)
-                      ":")))
-               (copy-recursively "." out)
-               ;; Guix has QT 5.6, which does not work with capybara-webkit
-               (substitute* (string-append out "/Gemfile")
-                 (("gem [\"']capybara-webkit[\"']")
-                  "#gem 'capybara-webkit'"))
-               (substitute* (find-files (string-append out "/bin"))
-                 (("/usr/bin/env") (which "env")))
-               (for-each
-                (lambda (script)
-                  (chmod script #o777)
-                  (wrap-program
-                      script
-                    `("PATH" = (,path))
-                    `("SSL_CERT_DIR" = (,(string-append (assoc-ref %build-inputs "nss-certs")
-                                                        "/etc/ssl/certs")))
-                    `("C_INCLUDE_PATH" ":" prefix (,(getenv "C_INCLUDE_PATH")))
-                    `("CPLUS_INCLUDE_PATH" ":" prefix (,(getenv "CPLUS_INCLUDE_PATH")))
-                    `("LIBRARY_PATH" ":" prefix (,(getenv "LIBRARY_PATH")))
-                    `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))))
-                (find-files (string-append out "/bin")))
-               #t))))))
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out")))
+               (copy-recursively
+                "."
+                out
+                #:log (%make-void-port "w")))))
+         (add-after 'install 'patch-bin-files
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out")))
+               (substitute*
+                   (find-files
+                    (string-append out "/bin")
+                    (lambda (name stat)
+                      (or
+                       (access? name X_OK)
+                       (begin
+                         (simple-format #t "Skipping patching ~A as its not executable\n" name)
+                         #f))))
+                 (("/usr/bin/env") (which "env")))))))))
     (synopsis name)
     (description name)
     (license #f)
