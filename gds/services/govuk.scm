@@ -15,6 +15,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
   #:use-module (gds services sidekiq)
+  #:use-module (gds services govuk signon)
   #:use-module (gds packages mongodb)
   #:export (ports
             port-for
@@ -26,6 +27,11 @@
             rails-app-config?
             rails-app-service
             rails-app-service-type
+
+            signon-config
+            signon-config?
+            signon-config-rails-app-config
+            signon-config-applications
 
             postgresql-connection-config
             postgresql-connection-config?
@@ -98,7 +104,10 @@
   (requirements rails-app-config-requirements)
   (ports rails-app-config-ports)
   (root-directory rails-app-config-root-directory)
-  (database-connection-configs rails-app-config-database-connection-configs))
+  (database-connection-configs rails-app-config-database-connection-configs
+                               (default '()))
+  (signon-application rails-app-config-signon-application
+                      (default #f)))
 
 (define-record-type* <postgresql-connection-config>
   postgresql-connection-config make-postgresql-connection-config
@@ -405,12 +414,12 @@ db.createUser(
                            (($ <rails-app-config> name)
                             (generic-rails-app-service-account
                              (symbol->string name))))))
-     (let ((signonotron2-application
-            (rails-app-config-signonotron2-application config)))
-       (if signonotron2-application
+     (let ((signon-application
+            (rails-app-config-signon-application config)))
+       (if signon-application
            (list
-            (service-extension signonotron2-service-type
-                               (const signonotron2-application)))
+            (service-extension signon-service-type
+                               (const signon-application)))
            '()))))))
 
 (define (rails-app-service config)
@@ -449,6 +458,51 @@ GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
                 (lambda ()
                   (primitive-exit 1)))
               (waitpid pid))))))))
+
+;;;
+;;; Signon
+;;;
+
+(define-record-type* <signon-config>
+  signon-config make-signon-config
+  signon-config?
+  (applications signon-config-applications
+                (default '())))
+
+(define signon-service-type
+  (service-type
+   (inherit
+    (make-rails-app-service-type 'signon))
+   (compose list)
+   (extend (lambda (parameters applications)
+             (match parameters
+               ((plek-config rails-app-config package config rest ...)
+                (cons*
+                 plek-config
+                 rails-app-config
+                 package
+                 (signon-config
+                  (inherit config)
+                  (applications (append
+                                 (signon-config-applications config)
+                                 applications)))
+                 rest)))))))
+
+(define default-signon-database-connection-configs
+  (list
+   (mysql-connection-config
+    (host "localhost")
+    (user "halberd")
+    (port "-")
+    (database "signon-production")
+    (password ""))
+   (redis-connection-config)))
+
+(define signon-service
+  (service
+   signon-service-type
+   (cons* (plek-config) (rails-app-config) signonotron2
+          (signon-config) (sidekiq-config) default-signon-database-connection-configs)))
 
 (define* make-publishing-e2e-tests-start-script
   (match-lambda
@@ -544,7 +598,15 @@ GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
             (postgresql-connection-config
              (user "publishing-api")
              (port (port-for 'postgresql))
-             (database "publishing_api_production")))))
+             (database "publishing_api_production"))))
+          (signon-application
+           (signon-application
+            (name (symbol->string name))
+            (description "")
+            (redirect-uri "")
+            (home-uri "")
+            (uid "uid")
+            (secret "secret"))))
   (rails-app-service
    (rails-app-config
     (name name)
@@ -553,7 +615,9 @@ GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
     (ports ports)
     (root-directory root-directory)
     (database-connection-configs
-     database-connection-configs))))
+     database-connection-configs)
+    (signon-application
+     signon-application))))
 
 (define* (content-store-service
           #:optional #:key
@@ -604,7 +668,15 @@ GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
           (requirements '(publishing-api))
           (ports (ports))
           (root-directory "/var/lib/specialist-publisher")
-          (database-connection-configs '()))
+          (database-connection-configs '())
+          (signon-application
+           (signon-application
+            (name (symbol->string name))
+            (description "")
+            (redirect-uri "")
+            (home-uri "")
+            (uid (random-base16-string 32))
+            (secret (random-base16-string 32)))))
   (rails-app-service
    (rails-app-config
     (name name)
@@ -613,4 +685,6 @@ GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
     (ports ports)
     (root-directory root-directory)
     (database-connection-configs
-     database-connection-configs))))
+     database-connection-configs)
+    (signon-application
+     signon-application))))
