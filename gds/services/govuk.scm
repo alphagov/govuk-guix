@@ -262,6 +262,9 @@ db.createUser(
          database-connection-configs)
   (let*
       ((string-name (symbol->string name))
+       (port
+        (or (assq-ref ports name)
+            (error "Missing port for " name)))
        (bundler
         (car
          (assoc-ref (package-propagated-inputs package)
@@ -313,7 +316,7 @@ db.createUser(
            (chdir #$root-directory)
            (system* bundle "install")
            (system* rake "db:setup")
-           (system* rails "s" "-p" (number->string (assq-ref '#$ports '#$name))))))))
+           (system* rails "s" "-p" (number->string #$port)))))))
 
 (define (generic-rails-app-activation
          name
@@ -432,32 +435,47 @@ db.createUser(
     (($ <mysql-connection-config> user port database password)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
-           (let
+           (let*
                ((pid (primitive-fork))
-                (mysql-user (getpwnam "mysql"))
-                (mysql (string-append #$mysql "/bin/mysql")))
+                (root (getpwnam "root"))
+                (mysql (string-append #$mariadb "/bin/mysql"))
+                (command `(,mysql "-h" "127.0.0.1" "-u" "root" "--password=''" "-P" ,(number->string #$port))))
              (if
               (= 0 pid)
               (dynamic-wind
                 (const #t)
                 (lambda ()
-                  (setgid (passwd:gid mysql-user))
-                  (setuid (passwd:uid mysql-user))
-                  (let ((p (open-pipe* OPEN_WRITE mysql "-p" (number->string #$port))))
+                  (define (log-and-write p str . args)
+                    (display (apply simple-format #f str args))(display "\n")
+                    (apply simple-format p str args))
+
+                  (setgid (passwd:gid root))
+                  (setuid (passwd:uid root))
+                  (let ((p (open-pipe (string-join command " ") OPEN_WRITE)))
                     (display "\nChecking if user exists:\n")
-                    (simple-format p "
-CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';
+                    (log-and-write p "
+CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';\n
 " #$user #$password)
                     (display "\nChecking if the database exists:\n")
-                    (simple-format p "
-CREATE DATABASE \"~A\";" #$database)
-                    (simple-format p "
-GRANT ALL ON \"~A\".* TO '~A'@'localhost';" #$user #$database)
-                    (close-pipe p))
-                  (primitive-exit 0))
+                    (log-and-write p "
+CREATE DATABASE ~A;\n" #$database)
+                    (display "\nGRANT\n")
+                    (log-and-write p "
+GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
+                    (log-and-write p "EXIT\n")
+                    (primitive-exit
+                     (status:exit-val (close-pipe p)))))
                 (lambda ()
                   (primitive-exit 1)))
-              (waitpid pid))))))))
+              (or
+               (let ((result (waitpid pid)))
+                 (display "result\n") ;; TODO: Fix error handling
+                 (display result)
+                 (display "\n")
+                 (display (status:exit-val (cdr result)))
+                 (display "\n")
+                 (status:exit-val (cdr result)))
+               (error "Error initialising mysql")))))))))
 
 ;;;
 ;;; Signon
