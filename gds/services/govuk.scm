@@ -89,10 +89,8 @@
              #f))
    (respawn? #f)))))
 
-(define* (govuk-content-schemas-service
-          #:optional #:key
-          (package govuk-content-schemas))
-  (service govuk-content-schemas-service-type package))
+(define govuk-content-schemas-service
+  (service govuk-content-schemas-service-type govuk-content-schemas))
 
 
 (define-record-type* <service-startup-config>
