@@ -56,38 +56,6 @@
    (guix-service)
    pretend-loopback-service))
 
-(define github-url-regex
-  (make-regexp
-   "https:\\/\\/github\\.com\\/[^\\/]*\\/[^\\/]*\\/archive\\/([^\\/]*)\\.tar\\.gz"))
-
-(define* (custom-github-archive-source-for-package
-          app-package
-          commit-ish)
-  (let*
-      ((old-url
-        (origin-uri (package-source app-package)))
-       (regexp-match
-        (regexp-exec github-url-regex old-url)))
-    (if (not (regexp-match? regexp-match))
-        (error "No match"))
-    (with-store store
-      (download-to-store
-       store
-       (string-replace
-        old-url
-        commit-ish
-        (match:start regexp-match 1)
-        (match:end regexp-match 1))
-       #:recursive? #t))))
-
-(define environment-variable-commit-ish-regex
-  (make-regexp
-   "GDS_GUIX_([A-Z0-9_]*)_COMMIT_ISH=(.*)"))
-
-(define environment-variable-path-regex
-  (make-regexp
-   "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
-
 (define live-router-config
   (router-config (public-port 51001)
                  (api-port 51002)
@@ -318,21 +286,6 @@
                 #:govuk-app-domain "guix-dev.gov.uk"
                 #:use-https? #f
                 #:port 50080))))))
-   services))
-
-(define (correct-services-package-source package-path-list package-commit-ish-list services)
-  (map
-   (lambda (service)
-     (update-service-parameters
-      service
-      (list
-       (cons
-        package?
-        (lambda (pkg)
-          (correct-source-of
-           package-path-list
-           package-commit-ish-list
-           pkg))))))
    services))
 
 (define (set-common-app-service-config services)
