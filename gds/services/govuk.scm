@@ -18,7 +18,6 @@
   #:use-module (gds services govuk signon)
   #:use-module (gds packages mongodb)
   #:export (ports
-            port-for
 
             govuk-content-schemas-service-type
             govuk-content-schemas-service
@@ -772,9 +771,6 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
   (service
    publishing-e2e-tests-service-type
    (list (plek-config) publishing-e2e-tests)))
-
-(define (port-for service)
-  (assq-ref (ports) service))
 
 ;;;
 ;;; Publishing API Service
