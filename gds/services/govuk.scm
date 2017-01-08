@@ -57,6 +57,10 @@
   (router-nodes router-api-config-router-nodes
                 (default '())))
 
+;;;
+;;; GOV.UK Content Schemas
+;;;
+
 (define govuk-content-schemas-service-type
   (shepherd-service-type
    'govuk-content-schemas
