@@ -136,16 +136,21 @@
 (define-record-type* <postgresql-connection-config>
   postgresql-connection-config make-postgresql-connection-config
   postgresql-connection-config?
+  (host postgresql-connection-config-host
+        (default "localhost"))
   (user postgresql-connection-config-user)
-  (port postgresql-connection-config-port)
+  (port postgresql-connection-config-port
+        (default 5432))
   (database postgresql-connection-config-database))
 
 (define-record-type* <mysql-connection-config>
   mysql-connection-config make-mysql-connection-config
   mysql-connection-config?
-  (host mysql-connection-config-host)
+  (host mysql-connection-config-host
+        (default "localhost"))
   (user mysql-connection-config-user)
-  (port mysql-connection-config-port)
+  (port mysql-connection-config-port
+        (default 3306))
   (database mysql-connection-config-database)
   (password mysql-connection-config-password))
 
@@ -153,7 +158,11 @@
   mongodb-connection-config make-mongodb-connection-config
   mongodb-connection-config?
   (user mongodb-connection-config-user)
-  (port mongodb-connection-config-port)
+  (password mongodb-connection-config-password)
+  (host mongodb-connection-config-host
+        (default "127.0.0.1"))
+  (port mongodb-connection-config-port
+        (default 27017))
   (database mongodb-connection-config-database))
 
 (define-record-type* <redis-connection-config>
