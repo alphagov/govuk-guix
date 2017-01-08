@@ -23,8 +23,10 @@
   #:use-module (guix download)
   #:use-module (guix build-system gnu)
   #:use-module (gnu packages)
+  #:use-module (gnu packages golang)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages perl)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python))
 
@@ -77,3 +79,61 @@ schema-free document-oriented database.  A key goal of MongoDB is to bridge
 the gap between key/value stores (which are fast and highly scalable) and
 traditional RDBMS systems (which are deep in functionality).")
     (license (list license:agpl3 license:asl2.0))))
+
+(define-public mongo-tools
+  (package
+    (name "mongo-tools")
+    (version "3.4.0")
+    (source
+     (origin (method url-fetch)
+             (uri (string-append "https://github.com/mongodb/" name
+                                 "/archive/r" version ".tar.gz"))
+             (file-name (string-append name "-" version ".tar.gz"))
+             (sha256
+              (base32
+               "1xbcpnz2hz1wj5q5i3yqpcqh3g8ychyr2896m9z2v4l5sz5xcd23"))))
+    (build-system gnu-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'check)
+         (delete 'install)
+         (replace 'build
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((bash (string-append
+                          (assoc-ref inputs "bash")
+                          "/bin/bash"))
+                   (out (assoc-ref outputs "out")))
+               (and
+                (zero? (system* bash "set_gopath.sh"))
+                (begin
+                  (setenv "GOPATH" (string-join
+                                    (list
+                                     (string-append (getcwd) "/.gopath")
+                                     (string-append (getcwd) "/vendor"))
+                                    ":"))
+                  (mkdir-p (string-append out "/bin"))
+                  (setenv "GOBIN" (string-append out "/bin"))
+                  #t)
+                (and
+                 (map
+                  (lambda (tool)
+                    (zero?
+                     (system*
+                      "go"
+                      "install"
+                      "-v"
+                      "-tags=\"ssl sasl\""
+                      "-ldflags"
+                      "-extldflags=-Wl,-z,now,-z,relro"
+                      (string-append tool "/main/" tool ".go"))))
+                  '("bsondump" "mongodump" "mongoexport" "mongofiles" "mongoimport"
+                    "mongooplog" "mongorestore" "mongostat" "mongotop"))))))))))
+    (native-inputs
+     `(("go" ,go)
+       ("bash" ,bash)))
+    (home-page "https://github.com/mongodb/mongo-tools")
+    (synopsis "")
+    (description "")
+    (license "expat")))
