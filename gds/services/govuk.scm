@@ -14,6 +14,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
+  #:use-module (gds services sidekiq)
   #:use-module (gds packages mongodb)
   #:export (ports
             port-for
