@@ -902,6 +902,20 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
           default-specialist-publisher-database-connection-configs)))
 
 ;;;
+;;; Specialist Frontend
+;;;
+
+(define specialist-frontend-service-type
+  (make-rails-app-using-signon-service-type
+   'specialist-frontend
+   #:requirements '(content-store)))
+
+(define specialist-frontend-service
+  (service
+   specialist-frontend-service-type
+   (list (plek-config) (rails-app-config) specialist-frontend)))
+
+;;;
 ;;; Static service
 ;;;
 
