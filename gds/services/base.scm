@@ -44,28 +44,24 @@
 (define* (/usr/bin/env-service #:optional (package coreutils))
   (service /usr/bin/env-service-type package))
 
-(define /usr/share/zoneinfo-service-type
-  (shepherd-service-type
-   '/usr/share/zoneinfo
-   (lambda (package)
-     (shepherd-service
-      (provision (list '/usr/share/zoneinfo))
-      (documentation "Ensure /usr/share/zoneinfo exists")
-      (start
-       #~(begin
-           (use-modules (guix build utils))
+(define (/usr/share/zoneinfo-service-type package)
+  (service-type
+   (name '/usr/share/zoneinfo)
+   (extensions
+    (list
+     (service-extension activation-service-type
+                        (const
+                         #~(begin
+                             (use-modules (guix build utils))
 
-           (if (not (file-exists? "/usr/share/zoneinfo"))
-               (begin
-                 (mkdir-p "/usr/share")
-                 (symlink (string-append
-                           #$package
-                           "/share/zoneinfo")
-                          "/usr/share/zoneinfo")))
-           #t))
-      (stop #~(lambda _
-                #f))
-      (respawn? #f)))))
+                             (if (not (file-exists? "/usr/share/zoneinfo"))
+                                 (begin
+                                   (display "Creating /usr/share/zoneinfo symlink\n")
+                                   (mkdir-p "/usr/share")
+                                   (symlink (string-append
+                                             #$package
+                                             "/share/zoneinfo")
+                                            "/usr/share/zoneinfo"))))))))))
 
 (define* (/usr/share/zoneinfo-service #:optional (package tzdata))
-  (service /usr/share/zoneinfo-service-type package))
+  (service (/usr/share/zoneinfo-service-type package) package))
