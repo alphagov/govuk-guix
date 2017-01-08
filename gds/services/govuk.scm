@@ -790,3 +790,18 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
      database-connection-configs)
     (signon-application
      signon-application))))
+
+(define* (static-service
+          #:optional #:key
+          (name 'static)
+          (package static)
+          (requirements '())
+          (ports (ports))
+          (root-directory "/var/lib/static"))
+  (rails-app-service
+   (rails-app-config
+    (name name)
+    (package package)
+    (requirements requirements)
+    (ports ports)
+    (root-directory root-directory))))
