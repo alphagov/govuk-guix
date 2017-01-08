@@ -19,6 +19,33 @@
   #:use-module (guix download)
   #:use-module (guix store))
 
+(define govuk-ports
+  `((publishing-api . 53039)
+    (content-store . 53000)
+    (draft-content-store . 53001)
+    (specialist-publisher . 53064)
+    (need-api . 53052)
+    (maslow . 53053)
+    (specialist-frontend . 53065)
+    (signon . 53016)
+    (static . 53013)
+    (router-api . 53056)
+    (draft-router-api . 53556)))
+
+(define system-ports
+  `((postgresql . 55432)
+    (mongodb . 57017)
+    (redis . 56379)
+    (mysql . 53306)))
+
+(define %base-services
+  (list
+   (syslog-service)
+   (urandom-seed-service)
+   (nscd-service)
+   (guix-service)
+   pretend-loopback-service))
+
 (define github-url-regex
   (make-regexp
    "https:\\/\\/github\\.com\\/[^\\/]*\\/[^\\/]*\\/archive\\/([^\\/]*)\\.tar\\.gz"))
@@ -179,33 +206,6 @@
        commit-ish
        package)))
    package-commit-ish-list))
-
-(define %base-services
-  (list
-   (syslog-service)
-   (urandom-seed-service)
-   (nscd-service)
-   (guix-service)
-   pretend-loopback-service))
-
-(define govuk-ports
-  `((publishing-api . 53039)
-    (content-store . 53000)
-    (draft-content-store . 53001)
-    (specialist-publisher . 53064)
-    (need-api . 53052)
-    (maslow . 53053)
-    (specialist-frontend . 53065)
-    (signon . 53016)
-    (static . 53013)
-    (router-api . 53056)
-    (draft-router-api . 53556)))
-
-(define system-ports
-  `((postgresql . 55432)
-    (mongodb . 57017)
-    (redis . 56379)
-    (mysql . 53306)))
 
 (define (port-for service)
   (or (assq-ref govuk-ports service)
