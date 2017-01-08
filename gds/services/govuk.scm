@@ -240,7 +240,7 @@
 
 (define postgresql-create-user-and-database
   (match-lambda
-    (($ <postgresql-connection-config> user port database)
+    (($ <postgresql-connection-config> host user port database)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
