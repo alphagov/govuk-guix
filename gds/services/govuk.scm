@@ -347,48 +347,90 @@ db.createUser(
 
 (define (generic-rails-app-activation
          name
-         package
-         root-directory)
-  #~(begin
-      (use-modules (guix build utils)
-                   (ice-9 match)
-                   (ice-9 ftw)
-                   (srfi srfi-26))
+         .
+         rest)
+  (let*
+      ((rails-app-config (find rails-app-config? rest))
+       (package (find package? rest))
+       (string-name (symbol->string name))
+       (root-directory (app-name->root-directory string-name))
+       (environment-variables
+        (apply
+         generic-rails-app-service-environment-variables
+         root-directory
+         rails-app-config
+         rest)))
+    #~(begin
+        (use-modules (guix build utils)
+                     (ice-9 match)
+                     (ice-9 ftw)
+                     (srfi srfi-26))
+        (let* ((string-name (symbol->string '#$name))
+               (user (getpwnam string-name))
+               (bundle (string-append #$root-directory "/bin/bundle")))
+          (if
+           (not (file-exists? #$root-directory))
+           (begin
+             (mkdir-p #$root-directory)
+             (chown #$root-directory (passwd:uid user) (passwd:gid user))
+             (for-each
+              (lambda (file)
+                (copy-recursively
+                 (string-append #$package "/" file)
+                 (string-append #$root-directory "/" file)
+                 #:log (%make-void-port "w")))
+              (scandir
+               #$package
+               (negate
+                (cut member <> '("." ".." "tmp" "log" "spec" "doc")))))
 
-      (let* ((string-name (symbol->string '#$name))
-             (user (getpwnam string-name)))
-        (mkdir-p #$root-directory)
-        (chown #$root-directory (passwd:uid user) (passwd:gid user))
-        (for-each
-         (lambda (file)
-           (copy-recursively
-            (string-append #$package "/" file)
-            (string-append #$root-directory "/" file)
-            #:log (%make-void-port "w")
-            #:follow-symlinks? #t))
-         (scandir
-          #$package
-          (negate
-           (cut member <> '("." ".." "tmp" "log" ".bundle" "spec" "doc")))))
-        ;; If the Gemfile is patched, the Gemfile.lock needs to be writable
-        (chmod (string-append #$root-directory "/Gemfile.lock") #o777)
-        (for-each
-         (lambda (file)
-           (mkdir-p file)
-           (chown file (passwd:uid user) (passwd:gid user)))
-         (map
-          (lambda (dir)
-            (string-append #$root-directory "/" dir))
-          '("tmp" "log")))
-        (let*
-            ((target
-              (string-append "exec -a \"\\$0\" \"" #$package))
-             (replacement
-              (string-append "exec -a \"$0\" \"" #$root-directory)))
+             (for-each
+              (lambda (file)
+                (mkdir-p file)
+                (chown file (passwd:uid user) (passwd:gid user)))
+              (map
+               (lambda (dir)
+                 (string-append #$root-directory "/" dir))
+               '("tmp" "log" "public"))))
+           (begin
+             (copy-recursively
+              (string-append #$package "/bin")
+              (string-append #$root-directory "/bin")
+              #:log (%make-void-port "w")
+              #:follow-symlinks? #f)
+             (mkdir-p (string-append #$root-directory "/.bundle"))
+             (copy-file (string-append #$package "/.bundle/config")
+                        (string-append #$root-directory "/.bundle/config"))
+             (for-each
+              (lambda (name)
+                (let ((target
+                       (string-append #$root-directory "/vendor/" name)))
+                  (if (file-exists? target)
+                      (delete-file target))
+                  (symlink (string-append #$package "/vendor/" name)
+                           target)))
+              '("cache" "bundle"))))
+
+          (call-with-output-file (string-append #$root-directory "/bin/env.sh")
+            (lambda (port)
+              (for-each
+               (lambda (env-var)
+                 (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+               '#$environment-variables)))
+
+          (mkdir-p (string-append #$root-directory "/tmp/pids"))
+          (chmod (string-append #$root-directory "/tmp/pids") #o777)
+
           (substitute* (find-files (string-append #$root-directory "/bin"))
-            ((target)
-             replacement)))
-        #t)))
+            (("/usr/bin/env") (which "env")))
+          (let*
+              ((target
+                (string-append "exec -a \"\\$0\" \"" #$package))
+               (replacement
+                (string-append "exec -a \"$0\" \"" #$root-directory)))
+            (substitute* (find-files (string-append #$root-directory "/bin"))
+              ((target)
+               replacement)))))))
 
 (define (generic-rails-app-shepherd-service
          name
