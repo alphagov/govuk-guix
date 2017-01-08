@@ -288,7 +288,7 @@
                 #:port 50080))))))
    services))
 
-(define (set-common-app-service-config services)
+(define-public (setup-services services)
   (map
    (lambda (service)
      (update-service-parameters
@@ -307,90 +307,27 @@
        (cons
         gds-sso-config?
         (gds-sso-config)))))
-   services))
-
-(define services
-  (let
-      ((package-commit-ish-list
-        (get-package-source-config-list-from-environment
-         environment-variable-commit-ish-regex))
-       (package-path-list
-        (get-package-source-config-list-from-environment
-         environment-variable-path-regex))
-
-       (live-router-config
-        (router-config
-         (public-port 51001)
-         (api-port 51002)
-         (debug? #t)))
-       (draft-router-config
-        (router-config
-         (public-port 51003)
-         (api-port 51004)
-         (debug? #t)))
-
-       (redis (redis-service #:port (port-for 'redis)))
-       (postgresql (postgresql-service #:port (port-for 'postgresql)))
-       (mongodb (mongodb-service #:port (port-for 'mongodb)))
-       ;; Note that the mysql service in Guix defaults to using MariaDB
-       (mysql (mysql-service #:config
-                             (mysql-configuration
-                              (port (port-for 'mysql))))))
-    (log-package-path-list package-path-list)
-    (log-package-commit-ish-list package-commit-ish-list)
-    (append
-     (correct-services-package-source
-      package-path-list
-      package-commit-ish-list
-      (set-plek-config
+   (update-routing-services-configuration
+    (correct-services-package-source-from-environment
+     (update-services-parameters
+      services
+      (list
        (cons
-        publishing-e2e-tests-service
-        (set-common-app-service-config
-         (list
-          publishing-api-service
-          content-store-service
-          draft-content-store-service
-          (update-service-parameters
-           router-service
-           (list
-            (cons router-config?
-                  (const live-router-config))))
-          (update-service-parameters
-           draft-router-service
-           (list
-            (cons router-config?
-                  (const draft-router-config))))
-          (update-service-parameters
-           router-api-service
-           (list
-            (cons router-api-config?
-                  (const
-                   (router-api-config
-                    (router-nodes
-                     (list
-                      (simple-format #f "localhost:~A"
-                                     (router-config-api-port live-router-config)))))))))
-          (update-service-parameters
-           draft-router-api-service
-           (list
-            (cons router-api-config?
-                  (const
-                   (router-api-config
-                    (router-nodes
-                     (list
-                      (simple-format #f "localhost:~A"
-                                     (router-config-api-port draft-router-config)))))))))
-          (set-random-rails-secret-token
-           specialist-publisher-service)
-          maslow-service
-          need-api-service
-          specialist-frontend-service
-          static-service
-          govuk-content-schemas-service
-          signon-service)))))
-     services)))
+        (const #t)
+        (list
+         (cons
+          plek-config?
+          (const
+           (make-custom-plek-config
+            govuk-ports
+            #:govuk-app-domain "guix-dev.gov.uk"
+            #:use-https? #f
+            #:port 50080)))))))))))
 
-(define development-os
+(define development-os-services
+  (setup-services services))
+
+(define-public development-os
   (operating-system
     (host-name "govuk-test")
     (timezone "Europe/London")
@@ -405,6 +342,7 @@
              (mount-point "/")
              (type "ext4"))
            %base-file-systems))
-    (services services)))
+    (services
+     development-os-services)))
 
 development-os
