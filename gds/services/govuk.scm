@@ -7,6 +7,7 @@
                 #:select (shadow))
   #:use-module (guix records)
   #:use-module (guix gexp)
+  #:use-module (guix utils)
   #:use-module (ice-9 match)
   #:use-module (guix packages)
   #:use-module (guix gexp)
