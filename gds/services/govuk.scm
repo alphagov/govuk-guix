@@ -625,45 +625,17 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
   (service-type
    (name name)
    (extensions
-    (append
-     (list
-      (service-extension shepherd-root-service-type
-                         (match-lambda
-                           (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
-                            (generic-rails-app-shepherd-service
-                             name
-                             requirements
-                             (generic-rails-app-start-script
-                              name
-                              package
-                              ports
-                              root-directory
-                              database-connection-configs)))))
-      (service-extension activation-service-type
-                         (match-lambda
-                           (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
-                            (generic-rails-app-activation
-                             name
-                             package
-                             root-directory
-                             database-connection-configs))))
-      (service-extension account-service-type
-                         (match-lambda
-                           (($ <rails-app-config> name)
-                            (generic-rails-app-service-account
-                             (symbol->string name))))))
-     (let ((signon-application
-            (rails-app-config-signon-application config)))
-       (if signon-application
-           (list
-            (service-extension signon-service-type
-                               (const signon-application)))
-           '()))))))
-
-(define (rails-app-service config)
-  (service
-   (make-rails-app-service-type config)
-   config))
+    (list
+     (service-extension shepherd-root-service-type
+                        (lambda (parameters)
+                          (apply generic-rails-app-shepherd-services name requirements parameters)))
+     (service-extension activation-service-type
+                        (lambda (parameters)
+                          (apply generic-rails-app-activation name parameters)))
+     (service-extension account-service-type
+                        (const
+                         (generic-rails-app-service-account
+                          (symbol->string name))))))))
 
 (define (make-rails-app-using-signon-service-type name . rest)
   (let ((base-service-type
