@@ -780,7 +780,7 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
            (display "\n")
            (chdir #$package)
            (and
-            (zero? (system* bundle "install"))
+            (zero? (system* bundle "install" "--local"))
             (zero? (system* bundle "exec" "rspec"))))))))
 
 (define publishing-e2e-tests-service-type
