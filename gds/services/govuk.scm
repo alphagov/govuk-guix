@@ -389,25 +389,33 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 ;;;
 
 (define (generic-rails-app-service-environment-variables name root-directory bundle-path-base . parameters)
-  (apply
-   append
-   `(("PATH" . ,(string-append root-directory "/bin"))
-     ("BUNDLE_PATH" .
-      ,(string-append bundle-path-base name "-FAKE_HASH/BUNDLE_PATH"))
-     ("BUNDLE_APP_CONFIG" .
-      ,(string-append root-directory "/.bundle"))
-     ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))
-   (map
-    (lambda (parameter)
-      (cond
-       ((plek-config? parameter)
-        (plek-config->environment-variables parameter))
-       ((rails-app-config? parameter)
-        (rails-app-config->environment-variables parameter))
-       ((database-connection-config? parameter)
-        (database-connection-config->environment-variables parameter))
-       (else '())))
-    parameters)))
+  (let
+      ((bundle-path
+        (string-append bundle-path-base name "-FAKE_HASH/BUNDLE_PATH")))
+    (apply
+     append
+     `(("PATH" . ,(simple-format #f "~A/bin:~A/bin" root-directory bundle-path))
+       ("BUNDLE_PATH" . ,bundle-path)
+       ;; GOVUK_APP_NAME is primarily for Slimmer
+       ("GOVUK_APP_NAME" . ,name)
+       ("BUNDLE_APP_CONFIG" .
+        ,(string-append root-directory "/.bundle"))
+       ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))
+     (map
+      (lambda (parameter)
+        (cond
+         ((plek-config? parameter)
+          (plek-config->environment-variables parameter))
+         ((router-api-config? parameter)
+          (list (cons "ROUTER_NODES" (string-join
+                                      (router-api-config-router-nodes parameter)
+                                      ","))))
+         ((rails-app-config? parameter)
+          (rails-app-config->environment-variables parameter))
+         ((database-connection-config? parameter)
+          (database-connection-config->environment-variables parameter))
+         (else '())))
+      parameters))))
 
 (define (generic-rails-app-start-script
          name
