@@ -12,9 +12,9 @@
   #:use-module (gnu packages linux)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (gds packages utils custom-sources)
   #:use-module (gds packages mongodb)
   #:use-module (guix store)
-  #:use-module (gds packages govuk utils)
   #:use-module (gds services base)
   #:use-module (gds services mongodb)
   #:use-module (gds packages govuk)
@@ -27,7 +27,6 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk plek)
-  #:use-module (gds services govuk utils)
   #:use-module (gds services govuk nginx))
 
 (define govuk-ports
