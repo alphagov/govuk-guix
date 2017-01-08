@@ -26,9 +26,7 @@
   #:use-module (gds services govuk signon)
   #:use-module (gds services rails)
   #:use-module (gds packages mongodb)
-  #:export (ports
-
-            govuk-content-schemas-service-type
+  #:export (govuk-content-schemas-service-type
             govuk-content-schemas-service
 
             rails-app-service
@@ -85,16 +83,6 @@
             supporting-application-services
             frontend-services
             draft-frontend-services))
-
-(define ports
-  (make-parameter
-   `((postgresql . 5432)
-     (mongodb . 27017)
-     (publishing-api . 3039)
-     (content-store . 3000)
-     (draft-content-store . 3001)
-     (specialist-publisher . 3064))))
-
 
 ;;;
 ;;; GOV.UK Content Schemas
