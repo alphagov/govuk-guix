@@ -78,6 +78,16 @@
   (make-regexp
    "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
 
+(define live-router-config
+  (router-config (public-port 51001)
+                 (api-port 51002)
+                 (debug? #t)))
+
+(define draft-router-config
+  (router-config (public-port 51003)
+                 (api-port 51004)
+                 (debug? #t)))
+
 (define services
   (append
    api-services
@@ -101,6 +111,48 @@
     (/usr/bin/env-service)
     (/usr/share/zoneinfo-service))
    base-services))
+
+(define (update-routing-services-configuration
+         services)
+  (let
+      ((router-config->router-nodes-value
+        (lambda (router-config)
+          (simple-format
+           #f
+           "localhost:~A"
+           (router-config-api-port router-config)))))
+
+    (update-services-parameters
+     services
+     (list
+      (cons router-service-type
+            (list
+             (cons router-config?
+                   (const live-router-config))))
+      (cons draft-router-service-type
+            (list
+             (cons router-config?
+                   (const draft-router-config))))
+      (cons router-api-service-type
+            (list
+             (cons service-startup-config?
+                   (lambda (ssc)
+                     (service-startup-config-with-additional-environment-variables
+                      ssc
+                      `(("ROUTER_NODES"
+                         .
+                         ,(router-config->router-nodes-value
+                           live-router-config))))))))
+      (cons draft-router-api-service-type
+            (list
+             (cons service-startup-config?
+                   (lambda (ssc)
+                     (service-startup-config-with-additional-environment-variables
+                      ssc
+                      `(("ROUTER_NODES"
+                         .
+                         ,(router-config->router-nodes-value
+                           draft-router-config))))))))))))
 
 (define (get-package-source-config-list-from-environment regex)
   (map
