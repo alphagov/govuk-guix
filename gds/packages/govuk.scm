@@ -26,6 +26,7 @@
   #:use-module (gnu packages golang)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages libffi)
+  #:use-module (gnu packages version-control)
   #:use-module (gnu packages rsync)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler)
