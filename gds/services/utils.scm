@@ -6,7 +6,9 @@
   #:use-module (guix gcrypt)
   #:use-module (guix utils)
   #:use-module (guix gexp)
-  #:use-module (gnu services))
+  #:use-module (gnu services)
+  #:use-module (guix packages)
+  #:use-module (gds packages utils custom-sources))
 
 (define-public (ensure-service-parameters s test-and-value-pairs)
   (service
@@ -101,3 +103,38 @@
                (string-join
                 '#$args))
               #f)))))
+
+;;;
+;;; Service package sources
+;;;
+
+(define-public (correct-services-package-source package-path-list package-commit-ish-list services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        package?
+        (lambda (pkg)
+          (correct-source-of
+           package-path-list
+           package-commit-ish-list
+           pkg))))))
+   services))
+
+(define-public (correct-services-package-source-from-environment
+         services)
+  (let
+      ((package-commit-ish-list
+        (get-package-source-config-list-from-environment
+         environment-variable-commit-ish-regex))
+       (package-path-list
+        (get-package-source-config-list-from-environment
+         environment-variable-path-regex)))
+    (log-package-path-list package-path-list)
+    (log-package-commit-ish-list package-commit-ish-list)
+    (correct-services-package-source
+     package-path-list
+     package-commit-ish-list
+     services)))
