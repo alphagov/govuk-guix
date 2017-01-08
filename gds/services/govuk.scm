@@ -119,6 +119,7 @@
 (define-record-type* <mysql-connection-config>
   mysql-connection-config make-mysql-connection-config
   mysql-connection-config?
+  (host mysql-connection-config-host)
   (user mysql-connection-config-user)
   (port mysql-connection-config-port)
   (database mysql-connection-config-database)
@@ -171,11 +172,12 @@
          "postgres://localhost:~A/~A"
          port
          database)))
-    (($ <mysql-connection-config> user port database)
+    (($ <mysql-connection-config> host user port database)
      `("DATABASE_URL" .
        ,(simple-format
          #f
-         "mysql2://localhost:~A/~A"
+         "mysql2://~A:~A/~A"
+         host
          port
          database)))
     (($ <mongodb-connection-config> user port database)
@@ -516,14 +518,14 @@ db.createUser(
 
 (define mysql-create-user-and-database
   (match-lambda
-    (($ <mysql-connection-config> user port database password)
+    (($ <mysql-connection-config> host user port database password)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let*
                ((pid (primitive-fork))
                 (root (getpwnam "root"))
                 (mysql (string-append #$mariadb "/bin/mysql"))
-                (command `(,mysql "-h" "127.0.0.1" "-u" "root" "--password=''" "-P" ,(number->string #$port))))
+                (command `(,mysql "-h" #$host "-u" "root" "--password=''" "-P" ,(number->string #$port))))
              (if
               (= 0 pid)
               (dynamic-wind
