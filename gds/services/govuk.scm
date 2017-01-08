@@ -619,9 +619,11 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
     (home-directory "/var/empty")
     (shell #~(string-append #$shadow "/sbin/nologin")))))
 
-(define (make-rails-app-service-type config)
+(define* (make-rails-app-service-type name
+                                      #:optional #:key
+                                      (requirements '()))
   (service-type
-   (name (rails-app-config-name config))
+   (name name)
    (extensions
     (append
      (list
