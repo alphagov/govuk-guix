@@ -96,6 +96,11 @@
   (service govuk-content-schemas-service-type package))
 
 
+(define-record-type* <service-startup-config>
+  service-startup-config make-service-startup-config
+  service-startup-config?
+  (pre-startup-script service-startup-config-pre-startup-script))
+
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
   rails-app-config?
