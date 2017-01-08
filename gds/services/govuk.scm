@@ -56,6 +56,11 @@
             redis-connection-config?
             redis-connection-config-port
 
+            router-config
+            router-config?
+            router-config-public-port
+            router-config-api-port
+
             database-connection-config?
 
             publishing-api-service
@@ -914,6 +919,142 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
   (service
    specialist-frontend-service-type
    (list (plek-config) (rails-app-config) specialist-frontend)))
+
+;;;
+;;; Router
+;;;
+
+(define-record-type* <router-config>
+  router-config make-router-config
+  router-config?
+  (public-port router-config-public-port
+               (default 8080))
+  (api-port router-config-api-port
+            (default 8081))
+  (debug? router-config-debug
+          (default #f)))
+
+(define router-config->environment-variables
+  (match-lambda
+    (($ <router-config> public-port api-port debug?)
+     (append
+      (list
+       (cons "ROUTER_PUBADDR" (simple-format #f ":~A" public-port))
+       (cons "ROUTER_APIADDR" (simple-format #f ":~A" api-port)))
+      (if debug?
+          (list (cons "DEBUG" "true"))
+          '())))))
+
+(define (make-router-start-script environment-variables package . rest)
+  (let*
+      ((database-connection-configs
+        (filter database-connection-config? rest))
+       (environment-variables
+        (map
+         (match-lambda
+           ((name . value)
+            (cond
+             ((equal? name "MONGO_DB")
+              (cons "ROUTER_MONGO_DB" value))
+             ((equal? name "MONGODB_URI")
+              (cons "ROUTER_MONGO_URL" value))
+             (else
+              (cons name value)))))
+         (append
+          environment-variables
+          (concatenate
+           (map database-connection-config->environment-variables
+                database-connection-configs)))))
+       (database-connection-thunks
+        (map make-database-setup-thunk database-connection-configs)))
+    (program-file
+     (string-append "start-router")
+     (with-imported-modules '((guix build utils)
+                              (ice-9 popen))
+       #~(let ((user (getpwnam "nobody")))
+           (use-modules (guix build utils)
+                        (ice-9 popen))
+
+           (for-each
+            (lambda (t) (t))
+            (list #$@database-connection-thunks))
+
+           ;; Start the service
+           (setgid (passwd:gid user))
+           (setuid (passwd:uid user))
+
+           (display "\n")
+           (for-each
+            (lambda (env-var)
+              (simple-format
+               #t
+               "export ~A=~A\n"
+               (car env-var)
+               (cdr env-var))
+              (setenv (car env-var) (cdr env-var)))
+            '#$environment-variables)
+           (display "\n")
+
+           (chdir #$package)
+           (and
+            (zero? (system* (string-append #$package "/bin/router")))))))))
+
+(define (make-router-shepherd-service name)
+  (match-lambda
+    ((router-config package rest ...)
+     (let* ((start-script
+             (apply
+              make-router-start-script
+              (router-config->environment-variables router-config)
+              package
+              rest)))
+       (list
+        (shepherd-service
+         (provision (list name))
+         (documentation (symbol->string name))
+         (requirement '())
+         (respawn? #f)
+         (start #~(make-forkexec-constructor #$start-script))
+         (stop #~(make-kill-destructor))))))))
+
+(define (make-router-service-type name)
+  (service-type
+   (name name)
+   (extensions
+    (list (service-extension shepherd-root-service-type
+                             (make-router-shepherd-service name))))))
+
+(define default-router-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "router")
+    (password (random-base16-string 30))
+    (database "router"))))
+
+(define router-service-type
+  (make-router-service-type 'router))
+
+(define router-service
+  (service
+   router-service-type
+   (cons* (router-config) router
+          default-router-database-connection-configs)))
+
+(define default-draft-router-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "draft-router")
+    (password (random-base16-string 30))
+    (database "draft-router"))))
+
+(define draft-router-service-type
+  (make-router-service-type 'draft-router))
+
+(define draft-router-service
+  (service
+   draft-router-service-type
+   (cons* (router-config) router
+          default-draft-router-database-connection-configs)))
 
 ;;;
 ;;; Static service
