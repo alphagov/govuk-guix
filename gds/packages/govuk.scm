@@ -118,36 +118,36 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1mdcrhn96an5j9dbn2d3gli7a4b555zabihc93v4snzcjmfzin1k")))
+    (hash (base32 "0chz3xwgn9nbs1q8919r8mbcn73ca96jxk4aaf72nk4a28lc3qv4")))
    (make-govuk-package
     "publishing-api" ;; TODO: Pass archive details to make-govuk-package
     (github-archive
      #:repository "publishing-api"
-     #:commit-ish "release_607"
-     #:hash (base32 "1gz4njkbfdmv1qxb0d28wlzkmp421sxid5m7dh42vknjkp0prdqy")))))
+     #:commit-ish "release_654"
+     #:hash (base32 "1ja4pdpa9jz044zlcc8r4hqynn1vdyzz2kb1n9iix8sb4ciw9w2q")))))
 
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0938azjd7k7j4f7w6r8ydwd25bzjn39vxnn8k1vxnjwnn5pgcyff")))
+    (hash (base32 "01flp6kgb17386p9a6bykvh9133irwz70qabkz52mxra2lsmxa5x")))
    (make-govuk-package
     "content-store"
     (github-archive
      #:repository "content-store"
-     #:commit-ish "release_585"
-     #:hash (base32 "0i42za14jn0wrsninahymg9w3sddfnll8fbxmirrvcqcbxx55ydc")))))
+     #:commit-ish "release_599"
+     #:hash (base32 "1b0hkvl6nr54pap80q6y7zph03ryqqh4v1frmf9r7nycw8ga6nzl")))))
 
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ys7ahlw216hr6p80kbaxmwzrdyv60fh3a6qbzgsz76fvq2drakd"))
+    (hash (base32 "0j9i72vzwymb5zlz8xl62663w888l7z3ynfhvngmix175jfa1byk"))
     (without '("development" "test")))
    (make-govuk-package
     "specialist-publisher"
     (github-archive
      #:repository "specialist-publisher"
-     #:commit-ish "release_725"
-     #:hash (base32 "0a6n4a1qhfmak089xjn3payyz6b3vyfkbljdifxzrw4b9m232yn9")))))
+     #:commit-ish "release_751"
+     #:hash (base32 "1l2ncdw3p1a4kygp5gc2gjzbdh2prdygaqrhvp78q5fr1pk315lv")))))
 
 (define-public specialist-frontend
   (package-with-bundler
@@ -168,19 +168,19 @@
     "signonotron2"
     (github-archive
      #:repository "signonotron2"
-     #:commit-ish "release_688"
-     #:hash (base32 "1xqqcs4bncb8lkk4x0h90a4v1sfvmzr6x6b4sa24v8ap8707bbsa")))))
+     #:commit-ish "release_689"
+     #:hash (base32 "0idacqj1232hcsfzlf3yyx78s2qsvrr67ii2hf907ghjrjw7f9dz")))))
 
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01x4z3f1mls4m0wx8hn8h5cqkabii7gzcwg52ys3sd41g1rms9jg")))
+    (hash (base32 "0sifa4xwbrx7h0ncnbl8kxmi44zva3qv3b7pjnqzz3jxibjqab99")))
    (make-govuk-package
     "static"
     (github-archive
      #:repository "static"
-     #:commit-ish "release_2431"
-     #:hash (base32 "14l7523zhb07vxql8i87v9wmzcw6g2328k8zaiqp2s8x8i2iwrs2")))))
+     #:commit-ish "release_2441"
+     #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h")))))
 
 (define-public router-api
   (package-with-bundler
@@ -254,12 +254,12 @@
          "publishing-e2e-tests"
          (github-archive
           #:repository "publishing-e2e-tests"
-          #:commit-ish "da2c5e759fd4ff4bae62b7a41a80cee40cf136cb"
-          #:hash (base32 "1arrlch7681yjs6v4qyn9wnwsxzpar1lsca0qfm8zdizl6nfi0l1")))))
+          #:commit-ish "make-capybara-save-path-configurable"
+          #:hash (base32 "07zfd47b3aqh0hhcdi4h7bazrzb6q9b2ar6bis3apnxx2bbakzs3")))))
     (package-with-bundler
      (bundle-package
       (hash
-       (base32 "03ydsia5ipqclrs5yx8wldgi4m881hmvndwjsrb5s751fsbf8gmj")))
+       (base32 "0sar9zb44w1rcd987dkvw9p96bjwrqjfjarsasm488iv9qqmv9vn")))
      (package
        (inherit govuk-package)
        (arguments
@@ -295,8 +295,8 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
     "maslow"
     (github-archive
      #:repository "maslow"
-     #:commit-ish "release_178"
-     #:hash (base32 "1jyganvji06lkvs86fam7glvrn5gcx2jl9r6108ysbzdr2wfzs6j")))))
+     #:commit-ish "release_180"
+     #:hash (base32 "0zxcxznhp95sss85lrx4gdipwb75jhd3y9wsd01nrd1nl12hr0jx")))))
 
 (define-public govuk-content-schemas
   (package
@@ -305,8 +305,8 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
     (source
      (github-archive
       #:repository "govuk-content-schemas"
-      #:commit-ish "release_416"
-      #:hash (base32 "03is44yfnq5xs08d80cw4rhw4psm6v09ki4cascx3k3rllcs8a6p")))
+      #:commit-ish "release_455"
+      #:hash (base32 "1k4ck56lg0qglkr9zmla8cxmz88fdm08nvanqk9fai8wcj5hmjqm")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
