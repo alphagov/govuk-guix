@@ -281,7 +281,7 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$user)
 
 (define mongodb-create-user-and-database
   (match-lambda
-    (($ <mongodb-connection-config> user port database)
+    (($ <mongodb-connection-config> user password host port database)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
@@ -308,7 +308,7 @@ db.createUser(
     ]
   }
 )
-" #$database #$user "password" #$database)
+" #$database #$user #$password #$database)
                     (close-pipe p))
                   (primitive-exit 0))
                 (lambda ()
