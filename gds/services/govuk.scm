@@ -326,6 +326,13 @@ db.createUser(
            (mkdir-p #$bundle-path-base)
            (chmod #$bundle-path-base #o777)
 
+           (call-with-output-file (string-append #$root-directory "/bin/env.sh")
+             (lambda (port)
+               (for-each
+                (lambda (env-var)
+                  (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+                '#$environment-variables)))
+
            ;; Start the service
            (setgid (passwd:gid user))
            (setuid (passwd:uid user))
