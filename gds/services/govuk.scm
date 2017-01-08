@@ -829,6 +829,7 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
    publishing-api-service-type
    (cons* (plek-config) (rails-app-config) publishing-api
           default-publishing-api-signon-application
+          (sidekiq-config)
           default-publishing-api-database-connection-configs)))
 
 ;;;
