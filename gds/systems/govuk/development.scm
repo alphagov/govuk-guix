@@ -37,6 +37,7 @@
     (need-api . 53052)
     (maslow . 53053)
     (specialist-frontend . 53065)
+    (draft-specialist-frontend . 53066)
     (signon . 53016)
     (static . 53013)
     (router-api . 53056)
