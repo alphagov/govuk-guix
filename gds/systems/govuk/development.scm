@@ -372,29 +372,7 @@
           static-service
           govuk-content-schemas-service
           signon-service)))))
-     (cons*
-      (nginx
-       ;; (filter
-       ;;  (match-lambda
-       ;;    ((service . port)
-       ;;     (not
-       ;;      (or
-       ;;       (eq? service 'www)
-       ;;       (eq? service 'draft-origin)))))
-       govuk-ports
-       ;; )
-       live-router-config
-       draft-router-config)
-      redis
-      postgresql
-      mongodb
-      mysql
-      ;; Position is significant for /usr/bin/env-service and
-      ;; /usr/share/zoneinfo-service, as these need to be activated
-      ;; before services which require them in their activation
-      (/usr/bin/env-service)
-      (/usr/share/zoneinfo-service)
-      base-services))))
+     services)))
 
 (define development-os
   (operating-system
