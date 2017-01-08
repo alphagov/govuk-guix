@@ -39,7 +39,8 @@
             content-store-service
             draft-content-store-service
             specialist-publisher-service
-            publishing-e2e-tests-service))
+            publishing-e2e-tests-service
+            draft-content-store-service))
 
 (define ports
   (make-parameter
