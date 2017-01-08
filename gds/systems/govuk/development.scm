@@ -30,7 +30,7 @@
     (signon . 53016)
     (static . 53013)
     (router-api . 53056)
-    (draft-router-api . 53556)))
+    (draft-router-api . 53557)))
 
 (define system-ports
   `((postgresql . 55432)
