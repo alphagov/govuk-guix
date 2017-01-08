@@ -476,11 +476,12 @@ db.createUser(
                               database-connection-configs)))))
       (service-extension activation-service-type
                          (match-lambda
-                           (($ <rails-app-config> name package requirements ports root-directory)
+                           (($ <rails-app-config> name package requirements ports root-directory database-connection-configs)
                             (generic-rails-app-activation
                              name
                              package
-                             root-directory))))
+                             root-directory
+                             database-connection-configs))))
       (service-extension account-service-type
                          (match-lambda
                            (($ <rails-app-config> name)
