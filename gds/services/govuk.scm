@@ -180,11 +180,6 @@
   (db-number redis-connection-config-db-number
              (default 0)))
 
-(define-record-type* <publishing-e2e-tests-config>
-  publishing-e2e-tests-config make-publishing-e2e-tests-config
-  publishing-e2e-tests-config?
-  (package publishing-e2e-tests-config-package)
-  (ports publishing-e2e-tests-config-ports))
 
 (define (make-database-setup-thunk config)
   (cond
@@ -701,84 +696,82 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
    (cons* (plek-config) (rails-app-config) signonotron2
           (signon-config) (sidekiq-config) default-signon-database-connection-configs)))
 
-(define* make-publishing-e2e-tests-start-script
-  (match-lambda
-    (($ <publishing-e2e-tests-config> package ports)
-     (let*
-         ((bundle-path-base "/tmp/guix/")
-          (bundle-path
-           (string-append bundle-path-base "publishing-e2e-tests-FAKE_HASH/BUNDLE_PATH"))
-          (bundle-bin-path
-           (string-append bundle-path "/bin"))
-          (environment-variables
-           `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
-             ("GOVUK_WEBSITE_ROOT" . "placeholder")
-             ("GOVUK_ASSET_ROOT" . "placeholder")
-             ("RAILS_ENV" . "production")
-             ("SECRET_KEY_BASE" . "t0a")
-             ("BUNDLE_PATH" . ,bundle-path)
-             ("BUNDLE_APP_CONFIG" .
-              "/var/lib/publishing-e2e-tests/.bundle")
-             ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))
-       (program-file
-        (string-append "start-publishing-e2e-tests")
-        (with-imported-modules '((guix build utils)
-                                 (ice-9 popen))
-          #~(let ((user (getpwnam "nobody"))
-                  (bundle (string-append #$package "/bin/bundle"))
-                  (rspec (string-append #$bundle-bin-path "/rspec")))
-              (use-modules (guix build utils)
-                           (ice-9 popen))
+;;
+;; Publishing E2E Tests
+;;
 
-              (mkdir-p "/var/lib/publishing-e2e-tests")
-              (chown "/var/lib/publishing-e2e-tests"
-                     (passwd:uid user) (passwd:gid user))
+(define (make-publishing-e2e-tests-start-script environment-variables package)
+  (let*
+      ((bundle-path-base "/tmp/guix/")
+       (bundle-path
+        (string-append bundle-path-base "publishing-e2e-tests-FAKE_HASH/BUNDLE_PATH"))
+       (bundle-bin-path
+        (string-append bundle-path "/bin"))
+       (environment-variables
+        (append
+         environment-variables
+         `(("SECRET_KEY_BASE" . "t0a")
+           ("BUNDLE_PATH" . ,bundle-path)
+           ("BUNDLE_APP_CONFIG" .
+            "/var/lib/publishing-e2e-tests/.bundle")
+           ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas")))))
+    (program-file
+     (string-append "start-publishing-e2e-tests")
+     (with-imported-modules '((guix build utils)
+                              (ice-9 popen))
+       #~(let ((user (getpwnam "nobody"))
+               (bundle (string-append #$package "/bin/bundle"))
+               (rspec (string-append #$bundle-bin-path "/rspec")))
+           (use-modules (guix build utils)
+                        (ice-9 popen))
 
-              (mkdir-p #$bundle-path-base)
-              (chmod #$bundle-path-base #o777)
+           (mkdir-p "/var/lib/publishing-e2e-tests")
+           (chown "/var/lib/publishing-e2e-tests"
+                  (passwd:uid user) (passwd:gid user))
 
-              ;; Start the service
-              (setgid (passwd:gid user))
-              (setuid (passwd:uid user))
-              (for-each
-               (lambda (env-var)
-                 (setenv (car env-var) (cdr env-var)))
-               '#$environment-variables)
-              (chdir #$package)
-              (system* bundle "install")
-              (system* bundle "exec" "rspec"))))))))
+           (mkdir-p #$bundle-path-base)
+           (chmod #$bundle-path-base #o777)
 
-(define (publishing-e2e-tests-service config)
-  (let* ((start-script
-          (make-publishing-e2e-tests-start-script config)))
-    (list
-     (shepherd-service
-      (provision (list 'publishing-e2e-tests))
-      (documentation "publishing-e2e-tests")
-      (requirement '(specialist-publisher))
-      (respawn? #f)
-      (start #~(make-forkexec-constructor #$start-script))
-      (stop #~(make-kill-destructor))))))
+           ;; Start the service
+           (setgid (passwd:gid user))
+           (setuid (passwd:uid user))
+           (display "\n")
+           (for-each
+            (lambda (env-var)
+              (display "export ")(display (car env-var))(display "=")(display "\"")(display (cdr env-var))(display "\"\n")
+              (setenv (car env-var) (cdr env-var)))
+            '#$environment-variables)
+           (display "\n")
+           (chdir #$package)
+           (and
+            (zero? (system* bundle "install"))
+            (zero? (system* bundle "exec" "rspec"))))))))
 
 (define publishing-e2e-tests-service-type
   (service-type
    (name 'publishing-e2e-tests-service)
    (extensions
-    (list (service-extension shepherd-root-service-type
-                             publishing-e2e-tests-service)))))
+    (list (service-extension
+           shepherd-root-service-type
+           (match-lambda
+            ((plek-config package)
+             (let* ((start-script
+                     (make-publishing-e2e-tests-start-script
+                      (plek-config->environment-variables plek-config)
+                      package)))
+               (list
+                (shepherd-service
+                 (provision (list 'publishing-e2e-tests))
+                 (documentation "publishing-e2e-tests")
+                 (requirement '(specialist-publisher))
+                 (respawn? #f)
+                 (start #~(make-forkexec-constructor #$start-script))
+                 (stop #~(make-kill-destructor))))))))))))
 
-(define* (publishing-e2e-tests-service
-          #:optional #:key
-          (package publishing-e2e-tests)
-          (ports (ports)))
-  (let
-      ((config
-        (publishing-e2e-tests-config
-         (package package)
-         (ports ports))))
-    (service
-     publishing-e2e-tests-service-type
-     config)))
+(define publishing-e2e-tests-service
+  (service
+   publishing-e2e-tests-service-type
+   (list (plek-config) publishing-e2e-tests)))
 
 (define (port-for service)
   (assq-ref (ports) service))
