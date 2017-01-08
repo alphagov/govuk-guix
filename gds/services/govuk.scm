@@ -1089,6 +1089,28 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
           default-draft-router-database-connection-configs)))
 
 ;;;
+;;; Maslow
+;;;
+
+(define default-maslow-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "maslow")
+    (password (random-base16-string 30))
+    (database "maslow"))))
+
+(define maslow-service-type
+  (make-rails-app-using-signon-service-type
+   'maslow
+   #:requirements '(publishing-api)))
+
+(define maslow-service
+  (service
+   maslow-service-type
+   (cons* (plek-config) (rails-app-config) maslow
+          default-maslow-database-connection-configs)))
+
+;;;
 ;;; Static service
 ;;;
 
