@@ -61,6 +61,10 @@
             router-config-public-port
             router-config-api-port
 
+            router-api-config
+            router-api-config?
+            router-api-nodes
+
             database-connection-config?
 
             publishing-api-service
@@ -1054,6 +1058,34 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
   (service
    draft-router-service-type
    (cons* (router-config) router
+          default-draft-router-database-connection-configs)))
+
+;;;
+;;; Router API
+;;;
+
+(define router-api-service-type
+  (make-rails-app-using-signon-service-type
+   'router-api
+   #:requirements '(router)))
+
+(define router-api-service
+  (service
+   router-api-service-type
+   (cons* (plek-config) (rails-app-config) router-api
+          (router-api-config)
+          default-router-database-connection-configs)))
+
+(define draft-router-api-service-type
+  (make-rails-app-using-signon-service-type
+   'draft-router-api
+   #:requirements '(draft-router)))
+
+(define draft-router-api-service
+  (service
+   draft-router-api-service-type
+   (cons* (plek-config) (rails-app-config) router-api
+          (router-api-config)
           default-draft-router-database-connection-configs)))
 
 ;;;
