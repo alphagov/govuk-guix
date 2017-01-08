@@ -40,6 +40,7 @@
     (draft-specialist-frontend . 53066)
     (signon . 53016)
     (static . 53013)
+    (draft-static . 53014)
     (router-api . 53056)
     (draft-router-api . 53557)))
 
