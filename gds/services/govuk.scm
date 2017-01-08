@@ -496,6 +496,10 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 
 
 
+(define (gemrc ruby)
+  (mixed-text-file "gemrc"
+                   "custom_shebang: " ruby "/bin/ruby\n"))
+
 (define (generic-rails-app-activation
          name
          .
