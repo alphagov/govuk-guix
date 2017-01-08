@@ -776,120 +776,114 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 (define (port-for service)
   (assq-ref (ports) service))
 
-(define* (publishing-api-service
-          #:optional #:key
-          (name 'publishing-api)
-          (package publishing-api)
-          (requirements '(content-store postgres))
-          (ports (ports))
-          (root-directory "/var/lib/publishing-api")
-          (database-connection-configs
-           (list
-            (postgresql-connection-config
-             (user "publishing-api")
-             (port (port-for 'postgresql))
-             (database "publishing_api_production"))))
-          (signon-application
-           (signon-application
-            (name (symbol->string name))
-            (description "")
-            (redirect-uri "")
-            (home-uri "")
-            (uid "uid")
-            (secret "secret"))))
-  (rails-app-service
-   (rails-app-config
-    (name name)
-    (package package)
-    (requirements requirements)
-    (ports ports)
-    (root-directory root-directory)
-    (database-connection-configs
-     database-connection-configs)
-    (signon-application
-     signon-application))))
+;;;
+;;; Publishing API Service
+;;;
 
-(define* (content-store-service
-          #:optional #:key
-          (name 'content-store)
-          (package content-store)
-          (requirements '(mongodb))
-          (ports (ports))
-          (root-directory "/var/lib/content-store")
-          (database-connection-configs
-           (list
-            (mongodb-connection-config
-             (user "content-store")
-             (port (port-for 'mongodb))
-             (database "content-store")))))
-  (rails-app-service
-   (rails-app-config
-    (name name)
-    (package package)
-    (requirements requirements)
-    (ports ports)
-    (root-directory root-directory)
-    (database-connection-configs
-     database-connection-configs))))
+(define default-publishing-api-database-connection-configs
+  (list
+   (postgresql-connection-config
+    (user "publishing-api")
+    (port "5432")
+    (database "publishing_api_production"))))
 
-(define* (draft-content-store-service
-          #:optional #:key
-          (name 'draft-content-store)
-          (root-directory "/var/lib/draft-content-store")
-          (database-connection-configs
-           (list
-            (mongodb-connection-config
-             (user "draft-content-store")
-             (port (port-for 'mongodb))
-             (database "draft-content-store"))))
-          #:allow-other-keys
-          #:rest rest)
-  (apply
-   content-store-service
-   #:name name
-   #:root-directory root-directory
-   #:database-connection-configs database-connection-configs
-   rest))
+(define default-publishing-api-signon-application
+  (signon-application
+   (name "publishing-api")
+   (description "")
+   (redirect-uri "")
+   (home-uri "")
+   (uid "uid")))
 
-(define* (specialist-publisher-service
-          #:optional #:key
-          (name 'specialist-publisher)
-          (package specialist-publisher)
-          (requirements '(publishing-api))
-          (ports (ports))
-          (root-directory "/var/lib/specialist-publisher")
-          (database-connection-configs '())
-          (signon-application
-           (signon-application
-            (name (symbol->string name))
-            (description "")
-            (redirect-uri "")
-            (home-uri "")
-            (uid (random-base16-string 32))
-            (secret (random-base16-string 32)))))
-  (rails-app-service
-   (rails-app-config
-    (name name)
-    (package package)
-    (requirements requirements)
-    (ports ports)
-    (root-directory root-directory)
-    (database-connection-configs
-     database-connection-configs)
-    (signon-application
-     signon-application))))
+(define publishing-api-service-type
+  (make-rails-app-service-type
+   'publishing-api
+   #:requirements '(content-store draft-content-store)))
 
-(define* (static-service
-          #:optional #:key
-          (name 'static)
-          (package static)
-          (requirements '())
-          (ports (ports))
-          (root-directory "/var/lib/static"))
-  (rails-app-service
-   (rails-app-config
-    (name name)
-    (package package)
-    (requirements requirements)
-    (ports ports)
-    (root-directory root-directory))))
+(define publishing-api-service
+  (service
+   publishing-api-service-type
+   (cons* (plek-config) (rails-app-config) publishing-api
+          default-publishing-api-signon-application
+          default-publishing-api-database-connection-configs)))
+
+;;;
+;;; Content store
+;;;
+
+(define default-content-store-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "content-store")
+    (password (random-base16-string 30))
+    (database "content-store"))))
+
+(define content-store-service-type
+  (make-rails-app-using-signon-service-type
+   'content-store
+   #:requirements '(mongodb)))
+
+(define content-store-service
+  (service
+   content-store-service-type
+   (cons* (plek-config) (rails-app-config) content-store
+          default-content-store-database-connection-configs)))
+
+(define default-draft-content-store-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "draft-content-store")
+    (password (random-base16-string 30))
+    (database "draft-content-store"))))
+
+(define draft-content-store-service-type
+  (make-rails-app-service-type 'draft-content-store))
+
+(define draft-content-store-service
+  (service
+   draft-content-store-service-type
+   (cons* (plek-config) (rails-app-config) content-store
+          default-draft-content-store-database-connection-configs)))
+
+;;;
+;;; Specialist Publisher
+;;;
+
+(define default-specialist-publisher-database-connection-configs
+  (list
+   (mongodb-connection-config
+    (user "specialist-publisher")
+    (password (random-base16-string 30))
+    (database "specialist_publisher"))))
+
+(define default-specialist-publisher-service-startup-config
+  (service-startup-config
+   (pre-startup-scripts
+    (list
+     (run-command "rake" "db:seed")
+     (run-command "rake" "publishing_api:publish_finders")
+     (run-command "rake" "permissions:grant[David Heath]")))))
+
+(define specialist-publisher-service-type
+  (make-rails-app-using-signon-service-type
+   'specialist-publisher
+   #:requirements '(publishing-api)))
+
+(define specialist-publisher-service
+  (service
+   specialist-publisher-service-type
+   (cons* (plek-config) (rails-app-config) specialist-publisher
+          default-specialist-publisher-service-startup-config
+          default-specialist-publisher-database-connection-configs)))
+
+;;;
+;;; Static service
+;;;
+
+(define static-service-type
+  (make-rails-app-service-type 'static))
+
+(define static-service
+  (service
+   static-service-type
+   (list (plek-config) (rails-app-config) static)))
