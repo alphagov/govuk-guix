@@ -24,6 +24,11 @@
 
             rails-app-config
             rails-app-config?
+
+            update-rails-app-config-environment
+            update-rails-app-config-with-random-secret-key-base
+            update-rails-app-config-with-random-secret-token
+
             rails-app-service
             rails-app-service-type
 
@@ -41,6 +46,17 @@
             mongodb-connection-config?
             mongodb-connection-config-port
             mongodb-connection-config-database
+
+            mysql-connection-config
+            mysql-connection-config?
+            mysql-connection-config-port
+            mysql-connection-config-database
+
+            redis-connection-config
+            redis-connection-config?
+            redis-connection-config-port
+
+            database-connection-config?
 
             publishing-api-service
             content-store-service
