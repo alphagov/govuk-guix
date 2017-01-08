@@ -233,7 +233,9 @@
           port
           database))))
     (($ <mongodb-connection-config> user password host port database)
-     `(("MONGODB_URI" .
+     `(("MONGO_URL" . ,host)
+       ("MONGO_DB" . ,database)
+       ("MONGODB_URI" .
         ,(simple-format
           #f
           "mongodb://~A:~A/~A"
