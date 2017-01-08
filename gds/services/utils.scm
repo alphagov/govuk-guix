@@ -5,6 +5,7 @@
   #:use-module (rnrs bytevectors)
   #:use-module (guix gcrypt)
   #:use-module (guix utils)
+  #:use-module (guix gexp)
   #:use-module (gnu services))
 
 (define-public (ensure-service-parameters s test-and-value-pairs)
@@ -78,3 +79,25 @@
 (define-public (random-base16-string length)
   (bytevector->base16-string
    (gen-random-bv length)))
+
+;;;
+;;; G expressions
+;;;
+
+(define-public (run-command . args)
+  #~(lambda ()
+      (simple-format #t "Running command: ~A\n" (string-join '#$args))
+      (let
+          ((exit-val
+            (status:exit-val (system* #$@args))))
+        (display "\n")
+        (if (zero? exit-val)
+            #t
+            (begin
+              (simple-format
+               #t
+               "Command failed with exit status ~A: ~A\n"
+               exit-val
+               (string-join
+                '#$args))
+              #f)))))
