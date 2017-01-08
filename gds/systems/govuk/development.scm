@@ -78,6 +78,30 @@
   (make-regexp
    "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
 
+(define services
+  (append
+   api-services
+   publishing-application-services
+   supporting-application-services
+   frontend-services
+   draft-frontend-services
+   (list
+    (nginx
+     govuk-ports
+     live-router-config
+     draft-router-config)
+    (redis-service)
+    (postgresql-service)
+    (mongodb-service)
+    (mysql-service)
+    govuk-content-schemas-service
+    ;; Position is significant for /usr/bin/env-service and
+    ;; /usr/share/zoneinfo-service, as these need to be activated
+    ;; before services which require them in their activation
+    (/usr/bin/env-service)
+    (/usr/share/zoneinfo-service))
+   base-services))
+
 (define (get-package-source-config-list-from-environment regex)
   (map
    (lambda (name-value-match)
