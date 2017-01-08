@@ -31,9 +31,6 @@
             govuk-content-schemas-service-type
             govuk-content-schemas-service
 
-            rails-app-config
-            rails-app-config?
-
             update-rails-app-config-environment
             update-rails-app-config-with-random-secret-key-base
             update-rails-app-config-with-random-secret-token
