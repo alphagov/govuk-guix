@@ -61,8 +61,13 @@
 
             signon-service-type
             signon-service
+            static-service
 
-            static-service))
+            publishing-application-services
+            api-services
+            supporting-application-services
+            frontend-services
+            draft-frontend-services))
 
 (define ports
   (make-parameter
