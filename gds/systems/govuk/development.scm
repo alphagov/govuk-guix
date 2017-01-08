@@ -110,10 +110,11 @@
      govuk-ports
      live-router-config
      draft-router-config)
-    (redis-service)
-    (postgresql-service)
-    (mongodb-service)
-    (mysql-service)
+    (redis-service #:port (assq-ref system-ports 'redis))
+    (postgresql-service #:port (assq-ref system-ports 'postgresql))
+    (mongodb-service #:port (assq-ref system-ports 'mongodb))
+    (mysql-service #:config (mysql-configuration
+                             (port (assq-ref system-ports 'mysql))))
     govuk-content-schemas-service
     ;; Position is significant for /usr/bin/env-service and
     ;; /usr/share/zoneinfo-service, as these need to be activated
