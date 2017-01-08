@@ -180,6 +180,11 @@
   (db-number redis-connection-config-db-number
              (default 0)))
 
+(define (database-connection-config? config)
+  (or (postgresql-connection-config? config)
+      (mysql-connection-config? config)
+      (mongodb-connection-config? config)
+      (redis-connection-config? config)))
 
 (define (make-database-setup-thunk config)
   (cond
