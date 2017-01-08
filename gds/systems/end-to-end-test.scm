@@ -10,6 +10,7 @@
   #:use-module (gnu services web)
   #:use-module (gnu services databases)
   #:use-module (gds packages govuk)
+  #:use-module (gnu packages linux)
   #:use-module (gds packages mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services base)
@@ -394,7 +395,7 @@
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
     (packages
-     (cons glibc %base-packages))
+     (cons* strace glibc %base-packages))
     (file-systems
      (cons (file-system
              (device "my-root")
