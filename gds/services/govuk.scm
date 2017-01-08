@@ -313,6 +313,57 @@ db.createUser(
                   (primitive-exit 1)))
               (waitpid pid))))))))
 
+(define mysql-create-user-and-database
+  (match-lambda
+    (($ <mysql-connection-config> host user port database password)
+     (with-imported-modules '((ice-9 popen))
+       #~(lambda ()
+           (let*
+               ((pid (primitive-fork))
+                (root (getpwnam "root"))
+                (mysql (string-append #$mariadb "/bin/mysql"))
+                (command `(,mysql "-h" #$host "-u" "root" "--password=''" "-P" ,(number->string #$port))))
+             (if
+              (= 0 pid)
+              (dynamic-wind
+                (const #t)
+                (lambda ()
+                  (define (log-and-write p str . args)
+                    (display (apply simple-format #f str args))(display "\n")
+                    (apply simple-format p str args))
+
+                  (setgid (passwd:gid root))
+                  (setuid (passwd:uid root))
+                  ;(apply system* (append command '("-e" "\"SHOW DATABASES;\"")))
+                  (display "\n")
+                  (display (string-join command " "))
+                  (display "\n")
+                  (let ((p (open-pipe (string-join command " ") OPEN_WRITE)))
+                    (display "\nChecking if user exists:\n")
+                    (log-and-write p "
+CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';\n
+" #$user #$password)
+                    (display "\nChecking if the database exists:\n")
+                    (log-and-write p "
+CREATE DATABASE ~A;\n" #$database)
+                    (display "\nGRANT\n")
+                    (log-and-write p "
+GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
+                    (log-and-write p "EXIT\n")
+                    (primitive-exit
+                     (status:exit-val (close-pipe p)))))
+                (lambda ()
+                  (primitive-exit 1)))
+              (or
+               (let ((result (waitpid pid)))
+                 (display "result\n") ;; TODO: Fix error handling
+                 (display result)
+                 (display "\n")
+                 (display (status:exit-val (cdr result)))
+                 (display "\n")
+                 (status:exit-val (cdr result)))
+               (error "Error initialising mysql")))))))))
+
 (define (generic-rails-app-start-script
          name
          package
