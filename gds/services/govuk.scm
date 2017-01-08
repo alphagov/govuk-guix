@@ -50,6 +50,12 @@
      (draft-content-store . 3001)
      (specialist-publisher . 3064))))
 
+(define-record-type* <router-api-config>
+  router-api-config make-router-api-config
+  router-api-config?
+  (router-nodes router-api-config-router-nodes
+                (default '())))
+
 (define govuk-content-schemas-service-type
   (shepherd-service-type
    'govuk-content-schemas
