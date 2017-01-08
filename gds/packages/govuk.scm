@@ -353,7 +353,7 @@ BINDIR=\"/var/lib/$APP/bin\"
 . \"$BINDIR/env.sh\"
 export PATH=\"$PATH:$BINDIR\"
 cd \"/var/lib/$APP\"
-~A --preserve-env -u \"$APP\" $@
+~A --preserve-env -u \"$APP\" \"$@\"
 " bash sudo)))
                     (chmod (string-append %output "/bin/govuk-setenv") #o555)
                     #t))))
