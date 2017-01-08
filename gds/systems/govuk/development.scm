@@ -17,7 +17,17 @@
   #:use-module (gds services mongodb)
   #:use-module (guix packages)
   #:use-module (guix download)
-  #:use-module (guix store))
+  #:use-module (guix store)
+  #:use-module (gds services)
+  #:use-module (gds services rails)
+  #:use-module (gds services utils)
+  #:use-module (gds services utils databases)
+  #:use-module (gds services utils databases mysql)
+  #:use-module (gds services utils databases postgresql)
+  #:use-module (gds services govuk)
+  #:use-module (gds services govuk plek)
+  #:use-module (gds services govuk utils)
+  #:use-module (gds services govuk nginx))
 
 (define govuk-ports
   `((publishing-api . 53039)
