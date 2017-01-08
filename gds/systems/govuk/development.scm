@@ -38,7 +38,7 @@
     (redis . 56379)
     (mysql . 53306)))
 
-(define %base-services
+(define base-services
   (list
    (syslog-service)
    (urandom-seed-service)
@@ -362,7 +362,7 @@
       ;; before services which require them in their activation
       (/usr/bin/env-service)
       (/usr/share/zoneinfo-service)
-      %base-services))))
+      base-services))))
 
 (define development-os
   (operating-system
