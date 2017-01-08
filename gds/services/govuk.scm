@@ -196,38 +196,42 @@
      "make-database-setup: Unknown database configuration ~A"
      config))))
 
-(define database-config->environment-variable
+(define database-connection-config->environment-variables
   (match-lambda
-    (($ <postgresql-connection-config> user port database)
-     `("DATABASE_URL" .
-       ,(simple-format
-         #f
-         "postgres://localhost:~A/~A"
-         port
-         database)))
+    (($ <postgresql-connection-config> host user port database)
+     `(("DATABASE_URL" .
+        ,(simple-format
+          #f
+          "postgres://~A:~A/~A"
+          host
+          port
+          database))))
     (($ <mysql-connection-config> host user port database)
-     `("DATABASE_URL" .
-       ,(simple-format
-         #f
-         "mysql2://~A:~A/~A"
-         host
-         port
-         database)))
-    (($ <mongodb-connection-config> user port database)
-     `("MONGODB_URI" .
-       ,(simple-format
-         #f
-         "mongodb://localhost:~A/~A"
-         port
-         database)))
+     `(("DATABASE_URL" .
+        ,(simple-format
+          #f
+          "mysql2://~A:~A/~A"
+          host
+          port
+          database))))
+    (($ <mongodb-connection-config> user password host port database)
+     `(("MONGODB_URI" .
+        ,(simple-format
+          #f
+          "mongodb://~A:~A/~A"
+          host
+          port
+          database))))
     (($ <redis-connection-config> host port db-number)
-     `("REDIS_URL" .
-       ,(simple-format
-         #f
-         "redis://~A:~A/~A"
-         host
-         port
-         db-number)))
+     `(("REDIS_URL" .
+        ,(simple-format
+          #f
+          "redis://~A:~A/~A"
+          host
+          port
+          db-number))
+       ("REDIS_HOST" . ,host)
+       ("REDIS_PORT" . ,(number->string port))))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
