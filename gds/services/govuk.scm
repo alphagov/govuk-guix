@@ -748,6 +748,7 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
          environment-variables
          `(("SECRET_KEY_BASE" . "t0a")
            ("BUNDLE_PATH" . ,bundle-path)
+           ("CAPYBARA_SAVE_PATH" . "/tmp/guix/")
            ("BUNDLE_APP_CONFIG" .
             "/var/lib/publishing-e2e-tests/.bundle")
            ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas")))))
