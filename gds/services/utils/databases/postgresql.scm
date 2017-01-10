@@ -3,6 +3,8 @@
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages pv)
   #:export (<postgresql-connection-config>
             postgresql-connection-config
             postgresql-connection-config?
@@ -74,26 +76,27 @@ $body$;
 CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 
 (define (postgresql-import-gexp database-connection file)
-  (match-lambda
+  (match database-connection
     (($ <postgresql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (let
-               ((pid (primitive-fork))
-                (postgres-user (getpwnam "postgres"))
-                (psql (string-append #$postgresql "/bin/psql")))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid postgres-user))
-                  (setuid (passwd:uid postgres-user))
-                  (system* psql "-f" #$file "--quiet")
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (waitpid pid))))))))
+     #~(lambda _
+         (let*
+             ((psql (string-append #$postgresql "/bin/psql"))
+              (gzip (string-append #$gzip "/bin/gzip"))
+              (pv (string-append #$pv "/bin/pv"))
+              (command
+               (string-join
+                `(,pv
+                  ,#$file
+                  "|"
+                  ,gzip
+                  "-d"
+                  "|"
+                  ,psql
+                  ,(simple-format #f "postgres://~A:~A/~A" #$host #$port #$database)
+                  "--quiet")
+                " ")))
+           (simple-format #t "Running command: ~A\n" command)
+           (zero? (system command)))))))
 
 (define (postgresql-create-user-and-database-for-database-connection
          database-connection)
