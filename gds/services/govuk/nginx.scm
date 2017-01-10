@@ -75,8 +75,8 @@
              (nginx-location-configuration
               (uri "/")
               (body '("try_files $uri/index.html $uri.html $uri @app;")))
-             (nginx-location-configuration
-              (name "@app")
+             (nginx-named-location-configuration
+              (name "app")
               (body (list (simple-format
                            #f
                            "proxy_pass http://~A-proxy;"
