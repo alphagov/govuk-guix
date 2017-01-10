@@ -109,11 +109,19 @@
      ((key . script)
       #~(lambda ()
           (simple-format #t "Running pre-startup-script ~A\n" '#$key)
-          (if (#$script)
-              #t
-              (begin
-                (simple-format #t "pre-startup-script ~A failed\n" '#$key)
-                #f)))))
+          (let
+              ((result
+                (catch
+                  #t
+                  #$script
+                  (lambda (key . args) (cons key args)))))
+            (if (eq? result #t)
+                #t
+                (begin
+                  (simple-format #t "pre-startup-script ~A failed\n" '#$key)
+                  (if (list? result)
+                      (simple-format #t "result: ~A\n" result))
+                  #f))))))
    pre-startup-scripts))
 
 (define (generic-rails-app-start-script
