@@ -80,7 +80,10 @@
      govuk-ports
      live-router-config
      draft-router-config)
-    (redis-service #:port (assq-ref system-ports 'redis))
+    (service
+     redis-service-type
+     (redis-configuration
+      (port (assq-ref system-ports 'redis))))
     (postgresql-service #:port (assq-ref system-ports 'postgresql))
     (mongodb-service #:port (assq-ref system-ports 'mongodb))
     (mysql-service #:config (mysql-configuration
