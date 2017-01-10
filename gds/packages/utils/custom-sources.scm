@@ -4,6 +4,8 @@
   #:use-module (guix packages)
   #:use-module (guix store)
   #:use-module (guix download)
+  #:use-module (guix gexp)
+  #:use-module (gds packages utils bundler)
   #:export (github-url-regex
             environment-variable-commit-ish-regex
             environment-variable-path-regex
@@ -85,6 +87,20 @@
    package-commit-ish-list))
 
 (define (correct-source-of package-path-list package-commit-ish-list pkg)
+  (define (update-inputs source inputs)
+    (map
+     (match-lambda
+       ((name value rest ...)
+        (if (equal? name "gems")
+            (cons*
+             name
+             (bundle-package
+              (inherit value)
+              (source source))
+             rest)
+            (cons* name value rest))))
+     inputs))
+
   (let
       ((custom-path (assoc-ref package-path-list
                                (package-name pkg)))
@@ -94,15 +110,26 @@
      ((and custom-commit-ish custom-path)
       (error "cannot specify custom-commit-ish and custom-path"))
      (custom-commit-ish
-      (package
-        (inherit pkg)
-        (source
-         (custom-github-archive-source-for-package
-          pkg
-          custom-commit-ish))))
+      (let ((source
+             (custom-github-archive-source-for-package
+              pkg
+              custom-commit-ish)))
+        (package
+          (inherit pkg)
+          (source source)
+          (native-inputs
+           (update-inputs source (package-native-inputs pkg))))))
      (custom-path
-      (package
-        (inherit pkg)
-        (source custom-path)))
+      (let ((source
+             (local-file
+              custom-path
+              #:recursive? #t)))
+        (package
+          (inherit pkg)
+          (source source)
+          (native-inputs
+           (update-inputs
+            source
+            (package-native-inputs pkg))))))
      (else
       pkg))))
