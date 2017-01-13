@@ -125,16 +125,28 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                        #$ca-certificates
                        "/etc/ssl/certs/ca-certificates.crt"))
 
-              (run "tar"
-                   "--extract"
-                   "--anchored"
-                   "--wildcards"
-                   "--no-wildcards-match-slash"
-                   "--strip-components=1"
-                   "-C" #$output
-                   "-x"
-                   "-f" #$source
-                   "*/Gemfile*")
+              (if (directory-exists? #$source)
+                  (for-each
+                   (lambda (file)
+                     (copy-file (string-append #$source "/" file)
+                                (string-append #$output "/" file)))
+                   '("Gemfile" "Gemfile.lock"))
+                  (run "tar"
+                       "--extract"
+                       "--anchored"
+                       "--wildcards"
+                       "--no-wildcards-match-slash"
+                       "--strip-components=1"
+                       "-C" #$output
+                       "-x"
+                       "-f" #$source
+                       "*/Gemfile*"))
+              (simple-format #t "Using Gemfile ~A" (string-append
+                                                    #$output
+                                                    "/Gemfile\n"))
+              (simple-format #t "Using Gemfile.lock ~A" (string-append
+                                                         #$output
+                                                         "/Gemfile.lock\n"))
               (with-directory-excursion #$output
                 (and
                  (run bundle
