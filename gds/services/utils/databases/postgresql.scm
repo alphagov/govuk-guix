@@ -9,6 +9,8 @@
             postgresql-connection-config
             postgresql-connection-config?
             postgresql-connection-config-port
+            postgresql-connection-config-user
+            postgresql-connection-config-host
             postgresql-connection-config-database
 
             run-with-psql-port
