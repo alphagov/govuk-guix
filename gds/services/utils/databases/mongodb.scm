@@ -66,17 +66,34 @@ db.createUser(
     (($ <mongodb-connection-config> user password host port database)
      #~(lambda (port)
          (simple-format p "
-use ~A
-db.createUser(
-  {
-    user: \"~A\",
-    pwd: \"~A\",
-    roles: [
-       { role: \"readWrite\", db: \"~A\" }
-    ]
-  }
-)
-" #$database #$user #$password #$database)))))
+var database = \"~A\";
+var username = \"~A\";
+
+db = db.getSiblingDB(database);
+
+var profile = {
+  pwd: \"~A\",
+  roles: [
+     { role: \"readWrite\", db: database }
+  ]
+};
+
+if (db.getUser(username) === null) {
+  db.createUser(
+    Object.assign(
+      {
+        user: username,
+      },
+      profile
+    )
+  );
+} else {
+  db.updateUser(
+    username,
+    profile
+  );
+}
+" #$database #$user #$password)))))
 
 (define (run-with-mongodb-port database-connection operations)
   (match database-connection
