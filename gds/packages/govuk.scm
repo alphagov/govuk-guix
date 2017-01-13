@@ -106,27 +106,6 @@
                (lambda* (#:key inputs #:allow-other-keys)
                  (zero? (system* "bin/rake" "assets:precompile")))))))))))
 
-(define* (github-archive
-          #:optional #:key
-          repository
-          commit-ish
-          (user-or-org "alphagov")
-          (url (if repository
-                (string-append
-                 "https://github.com/"
-                 user-or-org "/"
-                 repository "/archive/"
-                 commit-ish ".tar.gz")
-                #f))
-          (hash-algo 'sha256)
-          (hash #f))
-  (if (not url)
-      (error "Either repository, or the full url must be specified"))
-  (origin
-    (method url-fetch)
-    (uri url)
-    (sha256 hash)))
-
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
