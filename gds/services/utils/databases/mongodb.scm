@@ -125,12 +125,14 @@ if (db.getUser(username) === null) {
   (match database-connection
     (($ <mongodb-connection-config> user password host port database)
      #~(lambda ()
-         (simple-format #t "Running mongorestore with ~A" #$file)
-         (zero?
-          (system*
-           (string-append #$mongo-tools "/bin/mongorestore")
-           "--host" (simple-format #f "~A:~A" #$host (number->string #$port))
-           "-u" #$user
-           "-p" #$password
-           "-d" #$database
-           #$file))))))
+         (let ((command
+                (list
+                 (string-append #$mongo-tools "/bin/mongorestore")
+                 "--host" (simple-format #f "~A:~A" #$host (number->string #$port))
+                 "-u" #$user
+                 "-p" #$password
+                 "-d" #$database
+                 #$file)))
+           (simple-format #t "Running command: ~A\n" (string-join command " "))
+           (zero?
+            (apply system* command)))))))
