@@ -104,25 +104,34 @@
          parameters)))))
 
 (define (run-pre-startup-scripts-gexp pre-startup-scripts)
-  (map
-   (match-lambda
-     ((key . script)
-      #~(lambda ()
-          (simple-format #t "Running pre-startup-script ~A\n" '#$key)
-          (let
-              ((result
-                (catch
-                  #t
-                  #$script
-                  (lambda (key . args) (cons key args)))))
-            (if (eq? result #t)
-                #t
-                (begin
-                  (simple-format #t "pre-startup-script ~A failed\n" '#$key)
-                  (if (list? result)
-                      (simple-format #t "result: ~A\n" result))
+  (let
+      ((script-gexps
+        (map
+         (match-lambda
+           ((key . script)
+            #~(lambda ()
+                (simple-format #t "Running pre-startup-script ~A\n" '#$key)
+                (let
+                    ((result
+                      (catch
+                        #t
+                        #$script
+                        (lambda (key . args) (cons key args)))))
+                  (or (eq? result #t)
+                      (begin
+                        (simple-format #t "pre-startup-script ~A failed\n" '#$key)
+                        (if (list? result)
+                            (simple-format #t "result: ~A\n" result))
+                        #f))))))
+         pre-startup-scripts)))
+    #~(let run ((scripts (list #$@script-gexps)))
+        (if (null? scripts)
+            #t
+            (let
+                ((result ((car scripts))))
+              (if (eq? result #t)
+                  (run (cdr scripts))
                   #f))))))
-   pre-startup-scripts))
 
 (define (generic-rails-app-start-script
          name
@@ -142,12 +151,14 @@
                     "ruby")))
        (service-startup-config
         (find service-startup-config? rest))
-       (run-pre-startup-scripts
-        (run-pre-startup-scripts-gexp
-         (if service-startup-config
-             (service-startup-config-pre-startup-scripts
-              service-startup-config)
-             '())))
+       (run-pre-startup-scripts-program
+        (program-file
+         (string-append "start-" string-name "-pre-startup-scripts")
+         (run-pre-startup-scripts-gexp
+          (if service-startup-config
+              (service-startup-config-pre-startup-scripts
+               service-startup-config)
+              '()))))
        (run-root-pre-startup-scripts
         (run-pre-startup-scripts-gexp
          (if service-startup-config
@@ -159,52 +170,44 @@
        (run-rake-db-setup?
         (not (null? database-connection-configs)))
        (environment-variables
-        (apply
-         generic-rails-app-service-environment-variables
-         root-directory
-         rails-app-config
-         rest)))
-    (program-file
-     (string-append "start-" string-name)
-     (with-imported-modules '((guix build utils)
-                              (ice-9 popen))
-       #~(let ((user (getpwnam #$string-name))
-               (bundle (string-append #$root-directory "/bin/bundle"))
-               (rake (string-append #$root-directory "/bin/rake"))
-               (rails (string-append #$root-directory "/bin/rails")))
-           (use-modules (guix build utils)
-                        (ice-9 popen))
+        (map
+         (match-lambda
+           ((key . value)
+            (string-append key "=" value)))
+         (apply
+          generic-rails-app-service-environment-variables
+          root-directory
+          rails-app-config
+          rest))))
+    #~(lambda args
+        (let ((user (getpwnam #$string-name))
+              (rails (string-append #$root-directory "/bin/rails"))
+              (pid-file (string-append
+                         #$root-directory
+                         "/tmp/pids/server.pid")))
 
-           (display "\n\nstarting ")(display '#$name)(display "\n\n")
+          (use-modules (guix build utils)
+                       (ice-9 popen))
 
-           (for-each
-            (lambda (env-var)
-              (setenv (car env-var) (cdr env-var)))
-            '#$environment-variables)
-           (chdir #$root-directory)
-
-           (and
-            ;; Run the root-pre-startup-scripts before switching user
-            (let run ((scripts
-                       (list #$@run-root-pre-startup-scripts)))
-              (if (null? scripts)
-                  #t
-                  (and ;; Stop if any script fails
-                   ((car scripts))
-                   (run (cdr scripts)))))
-            (begin
-              ;; Start the service
-              (setgid (passwd:gid user))
-              (setuid (passwd:uid user))
-              #t)
-            (let run ((scripts
-                       (list #$@run-pre-startup-scripts)))
-              (if (null? scripts)
-                  #t
-                  (and ;; Stop if any script fails
-                   ((car scripts))
-                   (run (cdr scripts))))
-            (zero? (system* rails "server" "--daemon" "-p" #$string-port))))))))
+          (and
+           #$run-root-pre-startup-scripts
+           (waitpid
+            (fork+exec-command
+             (list #$run-pre-startup-scripts-program)
+             #:user (passwd:uid user)
+             #:directory #$root-directory
+             #:environment-variables '#$environment-variables))
+           ((make-forkexec-constructor
+             (list rails
+                   "server"
+                   "--daemon"
+                   "-p" #$string-port
+                   "-P" pid-file)
+             #:user (passwd:uid user)
+             #:directory #$root-directory
+             #:pid-file pid-file
+             #:pid-file-timeout 10
+             #:environment-variables '#$environment-variables))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
@@ -318,12 +321,7 @@
         (documentation
          (simple-format #f "~A rails app" name))
         (respawn? #f)
-        (start #~(make-forkexec-constructor
-                  #$start-script
-                  #:pid-file (string-append
-                              #$root-directory
-                              "/tmp/pids/server.pid")
-                  #:pid-file-timeout 60))
+        (start start-script)
         (stop #~(make-kill-destructor))))
      (let ((sidekiq-config (find sidekiq-config? rest)))
        (if sidekiq-config
