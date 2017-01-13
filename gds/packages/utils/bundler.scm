@@ -12,6 +12,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages version-control)
   #:use-module (gnu packages certs)
   #:export (<bundle-package>
            bundle-package
@@ -58,7 +59,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                         (packages->manifest (list nss-certs))))
                       (guile (package->derivation guile system)))
     (define inputs
-      (list tar gzip bundler))
+      (list ruby tar gzip bundler git))
 
     (define search-paths
       (map
