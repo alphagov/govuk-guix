@@ -145,10 +145,6 @@
         (number->string (rails-app-config-port rails-app-config)))
        (root-directory
         (app-name->root-directory string-name))
-       (ruby
-        (car
-         (assoc-ref (package-inputs package)
-                    "ruby")))
        (service-startup-config
         (find service-startup-config? rest))
        (run-pre-startup-scripts-program
