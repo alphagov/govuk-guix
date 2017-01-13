@@ -101,25 +101,15 @@ if (db.getUser(username) === null) {
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
-               ((pid (primitive-fork))
-                (mongodb-user (getpwnam "mongodb"))
-                (mongo (string-append #$mongodb "/bin/mongo")))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid mongodb-user))
-                  (setuid (passwd:uid mongodb-user))
-                  (let ((p (open-pipe* OPEN_WRITE mongo "--port" (number->string #$port))))
-                    (for-each
-                     (lambda (o) (o p))
-                     (list #$@operations))
-                    (close-pipe p))
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (zero? (cdr (waitpid pid))))))))))
+               ((mongo (string-append #$mongodb "/bin/mongo")))
+             (let ((p (open-pipe* OPEN_WRITE mongo "--port" (number->string #$port))))
+               (for-each
+                (lambda (o) (o p))
+                (list #$@operations))
+               (simple-format p "exit")
+               (zero?
+                (status:exit-val
+                 (close-pipe p))))))))))
 
 (define (mongodb-restore-gexp database-connection file)
   (match database-connection
