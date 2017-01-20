@@ -2,6 +2,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
+  #:use-module (web uri)
   #:use-module (guix records)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
@@ -20,6 +21,7 @@
             plek-config-service-uri-function
 
             plek-config->environment-variables
+            plek-config->/etc/hosts-string
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
@@ -106,6 +108,27 @@
          "."
          govuk-app-domain
          string-port))))))
+
+(define (plek-config->/etc/hosts-string plek-config)
+  (define (string-uri->host s)
+    (uri-host
+     (string->uri s)))
+
+  (string-concatenate
+   (map
+    (cut string-append "127.0.0.1  " <> "\n")
+    (map
+     string-uri->host
+     (cons*
+      (plek-config-govuk-asset-root plek-config)
+      (plek-config-govuk-website-root plek-config)
+      (plek-config-govuk-asset-host plek-config)
+      (plek-config-draft-origin plek-config)
+      (map
+       (match-lambda
+        ((service . port)
+         ((plek-config-service-uri-function plek-config) service port)))
+       (plek-config-service-ports plek-config)))))))
 
 (define* (plek-config->environment-variables
           plek-config
