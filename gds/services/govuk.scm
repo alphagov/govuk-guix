@@ -254,6 +254,12 @@
              (for-each (lambda (f) (chmod f #o666))
                        (find-files "/var/apps/publishing-e2e-tests"))
 
+             (if result
+                 (call-with-output-file
+                     "/var/apps/publishing-e2e-tests/all-tests-succeeded"
+                   (lambda (port)
+                     (simple-format port ""))))
+
              (stop-service 'root)
              result))))))
 
