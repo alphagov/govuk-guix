@@ -453,70 +453,43 @@
           (list (cons "DEBUG" "true"))
           '())))))
 
-(define (make-router-start-script environment-variables package . rest)
-  (let*
-      ((database-connection-configs
-        (filter database-connection-config? rest))
-       (environment-variables
-        (map
-         (match-lambda
-           ((name . value)
-            (cond
-             ((equal? name "MONGO_DB")
-              (cons "ROUTER_MONGO_DB" value))
-             ((equal? name "MONGODB_URI")
-              (cons "ROUTER_MONGO_URL" value))
-             (else
-              (cons name value)))))
-         (append
-          environment-variables
-          (concatenate
-           (map database-connection-config->environment-variables
-                database-connection-configs))))))
-    (program-file
-     (string-append "start-router")
-     (with-imported-modules '((guix build utils)
-                              (ice-9 popen))
-       #~(let ((user (getpwnam "nobody")))
-           (use-modules (guix build utils)
-                        (ice-9 popen))
-
-           ;; Start the service
-           (setgid (passwd:gid user))
-           (setuid (passwd:uid user))
-
-           (display "\n")
-           (for-each
-            (lambda (env-var)
-              (simple-format
-               #t
-               "export ~A=~A\n"
-               (car env-var)
-               (cdr env-var))
-              (setenv (car env-var) (cdr env-var)))
-            '#$environment-variables)
-           (display "\n")
-
-           (chdir #$package)
-           (and
-            (zero? (system* (string-append #$package "/bin/router")))))))))
-
 (define (make-router-shepherd-service name)
   (match-lambda
     ((router-config package rest ...)
-     (let* ((start-script
-             (apply
-              make-router-start-script
-              (router-config->environment-variables router-config)
-              package
-              rest)))
+     (let ((environment-variables
+            (map
+             (match-lambda
+              ((key . value)
+               (string-append key "=" value)))
+             (map
+              (match-lambda
+               ((name . value)
+                (cond
+                 ((equal? name "MONGO_DB")
+                  (cons "ROUTER_MONGO_DB" value))
+                 ((equal? name "MONGODB_URI")
+                  (cons "ROUTER_MONGO_URL" value))
+                 (else
+                  (cons name value)))))
+              (append
+               (router-config->environment-variables router-config)
+               (concatenate
+                (map database-connection-config->environment-variables
+                     (filter database-connection-config? rest)))))))
+           (user (getpwnam "nobody"))
+           (string-service-name
+            (symbol->string name)))
        (list
         (shepherd-service
          (provision (list name))
-         (documentation (symbol->string name))
-         (requirement '())
+         (documentation string-service-name)
+         (requirement '(mongodb))
          (respawn? #f)
-         (start #~(make-forkexec-constructor #$start-script))
+         (start #~(make-forkexec-constructor
+                   (string-append #$package "/bin/router")
+                   #:user (passwd:uid #$user)
+                   #:environment-variables '#$environment-variables
+                   #:log-file (string-append "/var/log/" #$string-service-name)))
          (stop #~(make-kill-destructor))))))))
 
 (define (make-router-service-type name)
