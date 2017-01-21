@@ -297,6 +297,9 @@
                  (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
                '#$environment-variables)))
 
+          (mkdir-p (string-append #$root-directory "/tmp/pids"))
+          (chmod (string-append #$root-directory "/tmp/pids") #o777)
+
           (substitute* (find-files (string-append #$root-directory "/bin"))
             (("/usr/bin/env") (which "env")))
           (let*
