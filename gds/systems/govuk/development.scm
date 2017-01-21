@@ -340,6 +340,13 @@
     (timezone "Europe/London")
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
+    (hosts-file
+     (plain-file "hosts"
+                 (string-join
+                  (list
+                   (local-host-aliases host-name)
+                   (plek-config->/etc/hosts-string plek-config))
+                  "\n")))
     (packages
      (cons*
       strace
