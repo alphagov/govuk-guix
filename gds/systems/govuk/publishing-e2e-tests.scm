@@ -2,6 +2,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (gnu system)
   #:use-module (gnu services)
+  #:use-module (gnu services web)
   #:use-module (gds packages govuk)
   #:use-module (gds services)
   #:use-module (gds services rails)
@@ -54,4 +55,20 @@
              ;; . ,(run-command "rake" "permissions:grant[David Heath]"))
              ))
           parameter))
-       parameters)))))
+       parameters))
+     (nginx-service-type
+      parameter =>
+      (nginx-configuration
+       (inherit parameter)
+       (server-blocks
+        (cons
+         (nginx-server-configuration
+          (inherit (car (nginx-configuration-server-blocks parameter)))
+          (server-name '("publishing-e2e-tests.guix-dev.gov.uk"))
+          (root "/var/apps/publishing-e2e-tests")
+          (locations
+           (list
+            (nginx-location-configuration
+             (uri "/")
+             (body '("autoindex on;"))))))
+         (nginx-configuration-server-blocks parameter))))))))
