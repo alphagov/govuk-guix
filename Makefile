@@ -1,3 +1,3 @@
 
 check-system:
-	./bin/run-system-test gds/systems/end-to-end-test.scm
+	./bin/run-system-test gds/systems/govuk/publishing-e2e-tests-isolated.scm
