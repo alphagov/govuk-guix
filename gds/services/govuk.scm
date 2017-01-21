@@ -377,7 +377,8 @@
    (mongodb-connection-config
     (user "specialist-publisher")
     (password (random-base16-string 30))
-    (database "specialist_publisher"))))
+    (database "specialist_publisher"))
+   (redis-connection-config)))
 
 (define specialist-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
