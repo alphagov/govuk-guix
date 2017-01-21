@@ -148,13 +148,19 @@
        (service-startup-config
         (find service-startup-config? rest))
        (run-pre-startup-scripts-program
-        (program-file
-         (string-append "start-" string-name "-pre-startup-scripts")
-         (run-pre-startup-scripts-gexp
-          (if service-startup-config
-              (service-startup-config-pre-startup-scripts
-               service-startup-config)
-              '()))))
+        (if (null?
+             (service-startup-config-pre-startup-scripts
+              service-startup-config))
+            #f
+            (program-file
+             (string-append "start-" string-name "-pre-startup-scripts")
+             (let
+                 ((foo
+                   (run-pre-startup-scripts-gexp
+                    (service-startup-config-pre-startup-scripts
+                     service-startup-config))))
+               #~(begin
+                   (exit #$foo))))))
        (run-root-pre-startup-scripts
         (run-pre-startup-scripts-gexp
          (if service-startup-config
@@ -187,12 +193,21 @@
 
           (and
            #$run-root-pre-startup-scripts
-           (waitpid
-            (fork+exec-command
-             (list #$run-pre-startup-scripts-program)
-             #:user (passwd:uid user)
-             #:directory #$root-directory
-             #:environment-variables '#$environment-variables))
+           (or
+            (eq? #$run-pre-startup-scripts-program #f)
+            (let
+                ((pid
+                  (fork+exec-command
+                   (list #$run-pre-startup-scripts-program)
+                   #:user (passwd:uid user)
+                   #:directory #$root-directory
+                   #:environment-variables '#$environment-variables)))
+              (if (zero? (cdr (waitpid pid)))
+                  #t
+                  (begin
+                    (simple-format #t "~A: pre-startup-scripts failed\n"
+                                   #$string-name)
+                    #f)))))
            ((make-forkexec-constructor
              (list rails
                    "server"
