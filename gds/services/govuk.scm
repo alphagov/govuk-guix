@@ -229,7 +229,13 @@
            (chdir #$package)
            (let
                ((result
-                 (zero? (system* bundle "exec" "rspec" "--format" "html" "--out" test-results.html))))
+                 (zero? (system*
+                         bundle
+                         "exec"
+                         "rspec"
+                         "--format" "documentation"
+                         "--format" "html"
+                         "--out" test-results.html))))
 
              ;; Links to pages and screenshots are absolute, so turn
              ;; them in to relative links so that they work outside of
