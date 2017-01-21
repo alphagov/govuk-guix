@@ -293,6 +293,13 @@
                 #:port 50080))))))
    services))
 
+(define plek-config
+  (make-custom-plek-config
+   govuk-ports
+   #:govuk-app-domain "guix-dev.gov.uk"
+   #:use-https? #f
+   #:port 50080))
+
 (define-public (setup-services services)
   (map
    (lambda (service)
@@ -322,12 +329,7 @@
         (list
          (cons
           plek-config?
-          (const
-           (make-custom-plek-config
-            govuk-ports
-            #:govuk-app-domain "guix-dev.gov.uk"
-            #:use-https? #f
-            #:port 50080)))))))))))
+          (const plek-config))))))))))
 
 (define development-os-services
   (setup-services services))
