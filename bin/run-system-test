@@ -1,7 +1,21 @@
 #!/bin/sh
 
-START_SCRIPT="$(bash ./guix-pre-inst-env guix system container --fallback $@)"
+RESULTS_DIRECTORY="$(dirname $(dirname ${BASH_SOURCE[0]}))/test-results"
+
+mkdir -p "$RESULTS_DIRECTORY"
+rm -f "$RESULTS_DIRECTORY/all-tests-succeeded"
+
+START_SCRIPT="$(bash ./guix-pre-inst-env guix system container --fallback $@ --share=$RESULTS_DIRECTORY=/var/apps/publishing-e2e-tests)"
 
 if [ $? -eq 0 ]; then
     sudo "$START_SCRIPT"
+fi
+
+echo
+echo "Test results saved to $RESULTS_DIRECTORY"
+
+if [ -a "$RESULTS_DIRECTORY/all-tests-succeeded" ]; then
+    exit 0
+else
+    exit 1
 fi
