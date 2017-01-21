@@ -56,9 +56,6 @@ living at DIRECTORY.  Upon Git failure, return #f instead of a predicate."
     (package
       (inherit gnu:guix)
       (name "guix-gds")
-      (version (if local-source
-                   "local"
-                   "0.11.0"))
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ((#:tests? tests)
@@ -79,4 +76,7 @@ living at DIRECTORY.  Upon Git failure, return #f instead of a predicate."
              (sha256
               (base32
                "1lfp1y8jjqbd73w45h421b550ca0lqbl6w5yypxxqff8r0mi9i07"))
-             (file-name (string-append "guix-" version "-checkout"))))))))
+             (file-name (string-append
+                         "guix-"
+                         (package-version gnu:guix)
+                         "-checkout"))))))))
