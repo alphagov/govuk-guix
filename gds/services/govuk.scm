@@ -528,7 +528,9 @@
    router-api-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(router-api))
            (requirement '(router)))
+          (service-startup-config)
           (plek-config) (rails-app-config) router-api
           (router-api-config)
           default-router-database-connection-configs)))
@@ -541,7 +543,9 @@
    draft-router-api-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(draft-router-api))
            (requirement '(draft-router)))
+          (service-startup-config)
           (plek-config) (rails-app-config) router-api
           (router-api-config)
           default-draft-router-database-connection-configs)))
@@ -565,7 +569,9 @@
    maslow-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(maslow))
            (requirement '(publishing-api)))
+          (service-startup-config)
           (plek-config) (rails-app-config) maslow
           default-maslow-database-connection-configs)))
 
@@ -588,7 +594,9 @@
    need-api-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(need-api))
            (requirement '(publishing-api)))
+          (service-startup-config)
           (plek-config) (rails-app-config) need-api
           default-need-api-database-connection-configs)))
 
