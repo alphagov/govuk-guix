@@ -367,6 +367,19 @@
          (service-startup-config)
          (plek-config) (rails-app-config) specialist-frontend)))
 
+(define draft-specialist-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-specialist-frontend))
+
+(define draft-specialist-frontend-service
+  (service
+   draft-specialist-frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(draft-specialist-frontend))
+          (requirement '(draft-content-store)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) specialist-frontend)))
+
 ;;;
 ;;; Router
 ;;;
@@ -690,4 +703,4 @@
    ;; draft-multipage-frontend-service
    ;; draft-service-manual-frontend-service
    draft-static-service
-   ;; draft-specialist-frontend-service))
+   draft-specialist-frontend-service))
