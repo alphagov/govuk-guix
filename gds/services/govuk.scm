@@ -610,7 +610,11 @@
 (define static-service
   (service
    static-service-type
-   (list (service-startup-config) (plek-config) (rails-app-config)
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(static))
+          (requirement '(publishing-api)))
+         (service-startup-config) (plek-config) (rails-app-config)
          static)))
 
 (define draft-static-service-type
@@ -619,7 +623,11 @@
 (define draft-static-service
   (service
    draft-static-service-type
-   (list (service-startup-config
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(draft-static))
+          (requirement '(publishing-api)))
+         (service-startup-config
           (environment-variables
            '(("DRAFT_ENVIRONMENT" . "true"))))
          (plek-config) (rails-app-config) static)))
