@@ -361,8 +361,10 @@
   (service
    specialist-frontend-service-type
    (list (shepherd-service
-           (inherit default-shepherd-service)
-           (requirement '(content-store)))
+          (inherit default-shepherd-service)
+          (provision '(specialist-frontend))
+          (requirement '(content-store)))
+         (service-startup-config)
          (plek-config) (rails-app-config) specialist-frontend)))
 
 ;;;
