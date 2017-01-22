@@ -128,6 +128,8 @@
            #:package (correct-source-of content-store))
           (specialist-publisher-service
            #:package (correct-source-of specialist-publisher))
+          (signonotron2-service
+           #:package (correct-source-of signonotron2))
           (govuk-content-schemas-service
            #:package (correct-source-of govuk-content-schemas))
           (publishing-e2e-tests-service
