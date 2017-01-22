@@ -349,6 +349,7 @@
                   "\n")))
     (packages
      (cons*
+      govuk-setenv
       strace
       (specification->package+output "bind" "utils")
       glibc
