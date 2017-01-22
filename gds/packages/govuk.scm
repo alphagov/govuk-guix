@@ -11,6 +11,7 @@
   #:use-module (guix search-paths)
   #:use-module (guix records)
   #:use-module (guix git-download)
+  #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages certs)
@@ -321,3 +322,50 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
     (description "govuk-content-schemas")
     (license #f)
     (home-page #f)))
+
+(define-public govuk-setenv
+  (package
+   (name "govuk-setenv")
+   (version "1")
+   (source #f)
+   (build-system trivial-build-system)
+   (arguments
+    `(#:modules ((guix build utils))
+      #:builder (begin
+                  (use-modules (guix build utils))
+                  (let
+                      ((bash (string-append
+                              (assoc-ref %build-inputs "bash")
+                              "/bin/bash"))
+                       (sudo (string-append
+                              (assoc-ref %build-inputs "sudo")
+                              "/bin/sudo")))
+                    (mkdir-p (string-append %output "/bin"))
+                    (call-with-output-file (string-append
+                                            %output
+                                            "/bin/govuk-setenv")
+                      (lambda (port)
+                        (simple-format port "#!~A
+set -exu
+APP=\"$1\"
+shift
+BINDIR=\"/var/lib/$APP/bin\"
+. \"$BINDIR/env.sh\"
+export PATH=\"$PATH:$BINDIR\"
+cd \"/var/lib/$APP\"
+~A --preserve-env -u \"$APP\" $@
+" bash sudo)))
+                    (chmod (string-append %output "/bin/govuk-setenv") #o555)
+                    #t))))
+   (native-inputs
+    `(("bash" ,bash)
+      ("sudo" ,sudo)))
+   (synopsis "govuk-setenv script for running commands in the service environment")
+   (description "This script runs the specified command in an
+environment similar to that which the service is running. For example,
+running govuk-setenv @code{publishing-api rails console} runs the
+@code{rails console} command as the user associated with the
+Publishing API service, and with the environment variables for this
+service setup.")
+   (license #f)
+   (home-page #f)))
