@@ -315,10 +315,7 @@
         (lambda (config)
           (update-rails-app-config-environment
            "development"
-           (update-rails-app-config-with-random-secret-key-base config))))
-       (cons
-        gds-sso-config?
-        (gds-sso-config)))))
+           (update-rails-app-config-with-random-secret-key-base config)))))))
    (update-routing-services-configuration
     (correct-services-package-source-from-environment
      (update-services-parameters
