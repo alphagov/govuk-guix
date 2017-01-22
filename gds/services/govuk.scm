@@ -106,6 +106,33 @@
   (secret-token rails-app-config-secret-token
                 (default #f)))
 
+(define (update-rails-app-config-environment environment config)
+  (rails-app-config
+   (inherit config)
+   (environment environment)))
+
+(define (update-rails-app-config-with-random-secret-token config)
+  (rails-app-config
+   (inherit config)
+   (secret-token
+    (or (rails-app-config-secret-token config)
+        (random-base16-string 30)))))
+
+(define (update-rails-app-config-with-random-secret-key-base config)
+  (rails-app-config
+   (inherit config)
+   (secret-key-base
+    (or (rails-app-config-secret-key-base config)
+        (random-base16-string 30)))))
+
+(define (rails-app-config->environment-variables config)
+  (filter
+   (lambda (pair) (cdr pair))
+   (list
+    (cons "RAILS_ENV" (rails-app-config-environment config))
+    (cons "SECRET_KEY_BASE" (rails-app-config-secret-key-base config))
+    (cons "SECRET_TOKEN" (rails-app-config-secret-token config)))))
+
 (define-record-type* <postgresql-connection-config>
   postgresql-connection-config make-postgresql-connection-config
   postgresql-connection-config?
