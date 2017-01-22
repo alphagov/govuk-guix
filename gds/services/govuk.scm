@@ -120,10 +120,13 @@
    (provision #f)
    (start #f)))
 
+(define (make-rails-app-using-plek-service-type name)
+  (extend-service-type-with-plek
+   (make-rails-app-service-type name)))
 
-(define (make-rails-app-using-signon-service-type name . rest)
+(define (make-rails-app-using-plek-and-signon-service-type name)
   (let ((base-service-type
-         (apply make-rails-app-service-type name rest)))
+         (make-rails-app-using-plek-service-type name)))
     (service-type
      (inherit base-service-type)
      (extensions
