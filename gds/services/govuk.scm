@@ -99,15 +99,12 @@
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
   rails-app-config?
-  (name rails-app-config-name)
-  (package rails-app-config-package)
-  (requirements rails-app-config-requirements)
-  (ports rails-app-config-ports)
-  (root-directory rails-app-config-root-directory)
-  (database-connection-configs rails-app-config-database-connection-configs
-                               (default '()))
-  (signon-application rails-app-config-signon-application
-                      (default #f)))
+  (environment rails-app-config-environment
+               (default "production"))
+  (secret-key-base rails-app-config-secret-key-base
+                   (default #f))
+  (secret-token rails-app-config-secret-token
+                (default #f)))
 
 (define-record-type* <postgresql-connection-config>
   postgresql-connection-config make-postgresql-connection-config
