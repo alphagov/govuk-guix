@@ -27,6 +27,7 @@
 (define system-ports
   `((postgresql . 55432)
     (mongodb . 57017)
+    (mysql . 53306)
     (publishing-api . 53039)
     (content-store . 53000)
     (draft-content-store . 53001)
@@ -133,6 +134,8 @@
            #:package (correct-source-of publishing-e2e-tests))
           (postgresql-service #:port (number->string (port-for 'postgresql)))
           (mongodb-service #:port (port-for 'mongodb))
+          (mysql-service #:config (mysql-configuration
+                                   (port (port-for 'mysql))))
           (/usr/share/zoneinfo-service)
           (/usr/bin/env-service)
           %base-services))))))
