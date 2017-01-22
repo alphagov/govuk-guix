@@ -41,7 +41,15 @@
            (mkdir-p out)
            (setenv "PATH" (string-append bzip2 "/bin"))
            (chdir out)
-           (zero? (system* (string-append tar "/bin/tar") "xf" source "--strip" "1"))
+           (zero?
+            (system*
+             (string-append tar "/bin/tar")
+             "--extract"
+             "-f"
+             source
+             "--strip" "1"
+             "--wildcards"
+             "*/bin/phantomjs"))
            (system* patchelf "--set-interpreter" ld-so (string-append out "/bin/phantomjs"))
            (let*
                ((libs '("gcc:lib" "zlib" "fontconfig" "freetype" "libstdc++"))
