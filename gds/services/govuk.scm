@@ -292,7 +292,8 @@
    (postgresql-connection-config
     (user "publishing-api")
     (port "5432")
-    (database "publishing_api_production"))))
+    (database "publishing_api_production"))
+   (redis-connection-config)))
 
 (define default-publishing-api-signon-application
   (signon-application
