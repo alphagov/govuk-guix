@@ -397,37 +397,48 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 (define (generic-rails-app-start-script
          name
          package
-         ports
-         root-directory
-         database-connection-configs)
+         rails-app-config
+         plek-config
+         .
+         rest)
   (let*
       ((string-name (symbol->string name))
-       (port
-        (or (assq-ref ports name)
-            (error "Missing port for " name)))
+       (string-port
+        (number->string
+         (service-port-from-plek-config plek-config name)))
+       (root-directory
+        (string-append "/var/lib/" string-name))
        (bundler
         (car
          (assoc-ref (package-propagated-inputs package)
                     "bundler")))
        (bundle-path-base "/tmp/guix/")
+       (service-startup-config
+        (find service-startup-config? rest))
+       (pre-startup-scripts
+        (if service-startup-config
+            (let ((pre-startup-script
+                   (service-startup-config-pre-startup-script
+                    service-startup-config)))
+              (if (list? pre-startup-script)
+                  pre-startup-script
+                  (list pre-startup-script)))
+            '()))
+       (database-connection-configs
+        (filter database-connection-config? rest))
        (database-connection-thunks
         (map make-database-setup-thunk database-connection-configs))
+       (run-rake-db-setup?
+        (not (null? database-connection-configs)))
        (environment-variables
-        (concatenate
-         (list
-          (map
-           database-config->environment-variable
-           database-connection-configs)
-          `(("GOVUK_APP_DOMAIN" . "guix-test.gov.uk")
-            ("GOVUK_WEBSITE_ROOT" . "placeholder")
-            ("GOVUK_ASSET_ROOT" . "placeholder")
-            ("RAILS_ENV" . "production")
-            ("SECRET_KEY_BASE" . "t0a")
-            ("BUNDLE_PATH" .
-             ,(string-append bundle-path-base string-name "-FAKE_HASH/BUNDLE_PATH"))
-            ("BUNDLE_APP_CONFIG" .
-             ,(string-append root-directory "/.bundle"))
-            ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))))
+        (apply
+         generic-rails-app-service-environment-variables
+         string-name
+         root-directory
+         bundle-path-base
+         rails-app-config
+         plek-config
+         rest)))
     (program-file
      (string-append "start-" string-name)
      (with-imported-modules '((guix build utils)
@@ -443,16 +454,6 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
             (lambda (t) (t))
             (list #$@database-connection-thunks))
 
-           (mkdir-p #$bundle-path-base)
-           (chmod #$bundle-path-base #o777)
-
-           (call-with-output-file (string-append #$root-directory "/bin/env.sh")
-             (lambda (port)
-               (for-each
-                (lambda (env-var)
-                  (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
-                '#$environment-variables)))
-
            ;; Start the service
            (setgid (passwd:gid user))
            (setuid (passwd:uid user))
@@ -461,9 +462,16 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
               (setenv (car env-var) (cdr env-var)))
             '#$environment-variables)
            (chdir #$root-directory)
-           (system* bundle "install")
-           (system* rake "db:setup")
-           (system* rails "s" "-p" (number->string #$port)))))))
+           (and
+            (if #$run-rake-db-setup?
+                (zero? (system* rake "db:setup"))
+                #t)
+            (for-each
+             (lambda (t) (t))
+             (list #$@pre-startup-scripts))
+            (zero? (system* rails "server" "-p" #$string-port))))))))
+
+
 
 (define (generic-rails-app-activation
          name
