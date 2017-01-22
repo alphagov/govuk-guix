@@ -122,6 +122,7 @@ if (db.getUser(username) === null) {
                  "-u" #$user
                  "-p" #$password
                  "-d" #$database
+                 "--drop" ;; TODO: Make this optional
                  #$file)))
            (simple-format #t "Running command: ~A\n" (string-join command " "))
            (zero?
