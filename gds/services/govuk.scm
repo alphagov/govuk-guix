@@ -412,6 +412,7 @@
    specialist-publisher-service-type
    (cons* (shepherd-service
            (inherit default-shepherd-service)
+           (provision '(specialist-publisher))
            (requirement '(publishing-api)))
           (plek-config) (rails-app-config) specialist-publisher
           default-specialist-publisher-service-startup-config
