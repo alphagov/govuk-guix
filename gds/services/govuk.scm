@@ -711,27 +711,18 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 
 (define (make-publishing-e2e-tests-start-script environment-variables package)
   (let*
-      ((bundle-path-base "/tmp/guix/")
-       (bundle-path
-        (string-append bundle-path-base "publishing-e2e-tests-FAKE_HASH/BUNDLE_PATH"))
-       (bundle-bin-path
-        (string-append bundle-path "/bin"))
-       (environment-variables
+      ((environment-variables
         (append
          environment-variables
          `(("SECRET_KEY_BASE" . "t0a")
-           ("BUNDLE_PATH" . ,bundle-path)
            ("CAPYBARA_SAVE_PATH" . "/tmp/guix/")
-           ("BUNDLE_APP_CONFIG" .
-            "/var/lib/publishing-e2e-tests/.bundle")
            ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas")))))
     (program-file
      (string-append "start-publishing-e2e-tests")
      (with-imported-modules '((guix build utils)
                               (ice-9 popen))
        #~(let ((user (getpwnam "nobody"))
-               (bundle (string-append #$package "/bin/bundle"))
-               (rspec (string-append #$bundle-bin-path "/rspec")))
+               (bundle (string-append #$package "/bin/bundle")))
            (use-modules (guix build utils)
                         (ice-9 popen))
 
@@ -739,22 +730,15 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
            (chown "/var/lib/publishing-e2e-tests"
                   (passwd:uid user) (passwd:gid user))
 
-           (mkdir-p #$bundle-path-base)
-           (chmod #$bundle-path-base #o777)
-
            ;; Start the service
            (setgid (passwd:gid user))
            (setuid (passwd:uid user))
-           (display "\n")
            (for-each
             (lambda (env-var)
-              (display "export ")(display (car env-var))(display "=")(display "\"")(display (cdr env-var))(display "\"\n")
               (setenv (car env-var) (cdr env-var)))
             '#$environment-variables)
-           (display "\n")
            (chdir #$package)
            (and
-            (zero? (system* bundle "install" "--local"))
             (zero? (system* bundle "exec" "rspec"))))))))
 
 (define publishing-e2e-tests-service-type
