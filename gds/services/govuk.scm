@@ -413,11 +413,6 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
          (service-port-from-plek-config plek-config name)))
        (root-directory
         (string-append "/var/lib/" string-name))
-       (bundler
-        (car
-         (assoc-ref (package-propagated-inputs package)
-                    "bundler")))
-       (bundle-path-base "/tmp/guix/")
        (service-startup-config
         (find service-startup-config? rest))
        (pre-startup-scripts
@@ -440,7 +435,6 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
          generic-rails-app-service-environment-variables
          string-name
          root-directory
-         bundle-path-base
          rails-app-config
          plek-config
          rest)))
