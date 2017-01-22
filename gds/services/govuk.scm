@@ -430,6 +430,20 @@ db.createUser(
    (make-rails-app-service-type config)
    config))
 
+(define (make-rails-app-using-signon-service-type name . rest)
+  (let ((base-service-type
+         (apply make-rails-app-service-type name rest)))
+    (service-type
+     (inherit base-service-type)
+     (extensions
+      (cons
+       (service-extension signon-service-type
+                          (lambda (parameters)
+                            (filter
+                             signon-application?
+                             parameters)))
+       (service-type-extensions base-service-type))))))
+
 (define mysql-create-user-and-database
   (match-lambda
     (($ <mysql-connection-config> user port database password)
