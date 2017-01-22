@@ -7,6 +7,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
+  #:use-module (gnu services web)
   #:use-module (gnu services databases)
   #:use-module (gds packages govuk)
   #:use-module (gds packages mongodb)
@@ -16,22 +17,6 @@
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix store))
-
-(define %base-services
-  (list
-   (syslog-service)
-   (urandom-seed-service)
-   (nscd-service)
-   (guix-service)))
-
-(define system-ports
-  `((postgresql . 55432)
-    (mongodb . 57017)
-    (mysql . 53306)
-    (publishing-api . 53039)
-    (content-store . 53000)
-    (draft-content-store . 53001)
-    (specialist-publisher . 53064)))
 
 (define github-url-regex
   (make-regexp
@@ -57,11 +42,15 @@
         (match:end regexp-match 1))
        #:recursive? #t))))
 
-(define environment-variable-regex
+(define environment-variable-commit-ish-regex
   (make-regexp
    "GDS_GUIX_([A-Z0-9_]*)_COMMIT_ISH=(.*)"))
 
-(define (get-package-commit-ish-list-from-environment)
+(define environment-variable-path-regex
+  (make-regexp
+   "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
+
+(define (get-package-source-config-list-from-environment regex)
   (map
    (lambda (name-value-match)
      (cons
@@ -75,9 +64,327 @@
     regexp-match?
     (map
      (lambda (name-value)
-       (regexp-exec environment-variable-regex
-                    name-value))
+       (regexp-exec regex name-value))
      (environ)))))
+
+(define (update-database-connection-config-ports ports config)
+  (define (port-for service)
+    (or (assq-ref ports service)
+        (begin
+          (display "ports: ")
+          (display ports)
+          (display "\n")
+          (error "Missing port for " service))))
+
+  (cond
+   ((postgresql-connection-config? config)
+    (postgresql-connection-config
+     (inherit config)
+     (port (port-for 'postgresql))))
+   ((mysql-connection-config? config)
+    (mysql-connection-config
+     (inherit config)
+     (port (port-for 'mysql))))
+   ((mongodb-connection-config? config)
+    (mongodb-connection-config
+     (inherit config)
+     (port (port-for 'mongodb))))
+   ((redis-connection-config? config)
+    (redis-connection-config
+     (inherit config)
+     (port (port-for 'redis))))
+   (else (error "unknown database connection config " config))))
+
+(define (update-service-parameters s test-and-function-pairs)
+  (define (update-parameter parameter)
+    (fold
+     (lambda (test+function parameter)
+       (match test+function
+         ((test . function)
+          (if (test parameter)
+              (function parameter)
+               parameter))))
+     parameter
+     test-and-function-pairs))
+
+  (service
+   (service-kind s)
+   (let
+       ((parameters (service-parameters s)))
+     (if
+      (list? parameters)
+      (map update-parameter parameters)
+      (update-parameter parameters)))))
+
+(define (correct-source-of package-path-list package-commit-ish-list pkg)
+  (let
+      ((custom-path (assoc-ref package-path-list
+                               (package-name pkg)))
+       (custom-commit-ish (assoc-ref package-commit-ish-list
+                                     (package-name pkg))))
+    (cond
+     ((and custom-commit-ish custom-path)
+      (error "cannot specify custom-commit-ish and custom-path"))
+     (custom-commit-ish
+      (package
+        (inherit pkg)
+        (source
+         (custom-github-archive-source-for-package
+          pkg
+          custom-commit-ish))))
+     (custom-path
+      (package
+        (inherit pkg)
+        (source custom-path)))
+     (else
+      pkg))))
+
+(define (log-package-path-list package-path-list)
+  (for-each
+   (match-lambda
+     ((package . path)
+      (simple-format
+       #t
+       "Using path \"~A\" for the ~A package\n"
+       path
+       package)))
+   package-path-list))
+
+(define (log-package-commit-ish-list package-commit-ish-list)
+  (for-each
+   (match-lambda
+     ((package . commit-ish)
+      (simple-format
+       #t
+       "Using commit-ish \"~A\" for the ~A package\n"
+       commit-ish
+       package)))
+   package-commit-ish-list))
+
+(define %base-services
+  (list
+   (syslog-service)
+   (urandom-seed-service)
+   (nscd-service)
+   (guix-service)))
+
+(define govuk-ports
+  `((publishing-api . 53039)
+    (content-store . 53000)
+    (draft-content-store . 53001)
+    (specialist-publisher . 53064)
+    (maslow . 53053)
+    (specialist-frontend . 53065)
+    (signon . 53016)
+    (static . 53013)
+    (router-api . 53056)
+    (draft-router-api . 53556)))
+
+(define system-ports
+  `((postgresql . 55432)
+    (mongodb . 57017)
+    (redis . 56379)
+    (mysql . 53306)))
+
+(define (port-for service)
+  (or (assq-ref govuk-ports service)
+      (assq-ref system-ports service)))
+
+(define (nginx service-and-ports
+               router-config
+               draft-router-config)
+  (nginx-service
+   #:upstream-list
+   (cons*
+    (nginx-upstream-configuration
+     (name "www.guix-dev.gov.uk-proxy")
+     (server (string-append
+              "localhost:"
+              (number->string
+               (router-config-public-port router-config)))))
+    (nginx-upstream-configuration
+     (name "draft-origin.guix-dev.gov.uk-proxy")
+     (server (string-append
+              "localhost:"
+              (number->string
+               (router-config-public-port draft-router-config)))))
+    (map
+     (match-lambda
+       ((service . port)
+        (nginx-upstream-configuration
+         (name (string-append (symbol->string service) ".guix-dev.gov.uk-proxy"))
+         (server (string-append "localhost:" (number->string port))))))
+     service-and-ports))
+   #:vhost-list
+   (let
+       ((base
+         (nginx-vhost-configuration
+          (http-port 50080)
+          (https-port 50443)
+          (ssl-certificate #f)
+          (ssl-certificate-key #f))))
+     (cons*
+      (nginx-vhost-configuration
+       (inherit base)
+       (locations
+        (list
+         (nginx-location-configuration
+          (uri "/")
+          (body '("proxy_pass http://www.guix-dev.gov.uk-proxy;")))))
+       (server-name (list "www.guix-dev.gov.uk")))
+      (nginx-vhost-configuration
+       (inherit base)
+       (locations
+        (list
+         (nginx-location-configuration
+          (uri "/")
+          (body '("proxy_pass http://draft-origin.guix-dev.gov.uk-proxy;")))))
+       (server-name (list "draft-origin.guix-dev.gov.uk")))
+      (map
+       (match-lambda
+         ((service . port)
+          (nginx-vhost-configuration
+           (inherit base)
+           (locations
+            (list
+             (nginx-location-configuration
+              (uri "/")
+              (body '("try_files $uri/index.html $uri.html $uri @app;")))
+             (nginx-location-configuration
+              (name "@app")
+              (body (list (simple-format
+                           #f
+                           "proxy_pass http://~A.guix-dev.gov.uk-proxy;"
+                           (symbol->string service)))))))
+           (server-name (list (string-append
+                               (symbol->string service)
+                               ".guix-dev.gov.uk")))
+           (root (string-append "/var/lib/" (symbol->string service) "/public")))))
+       service-and-ports)))))
+
+(define (set-random-rails-secret-token service)
+  (update-service-parameters
+   service
+   (list
+    (cons rails-app-config?
+          update-rails-app-config-with-random-secret-token))))
+
+(define services
+  (let
+      ((package-commit-ish-list
+        (get-package-source-config-list-from-environment
+         environment-variable-commit-ish-regex))
+       (package-path-list
+        (get-package-source-config-list-from-environment
+         environment-variable-path-regex))
+
+       (live-router-config
+        (router-config
+         (public-port 51001)
+         (api-port 51002)
+         (debug? #t)))
+       (draft-router-config
+        (router-config
+         (public-port 51003)
+         (api-port 51004)
+         (debug? #t)))
+
+       (redis (redis-service #:port (port-for 'redis)))
+       (postgresql (postgresql-service #:port (port-for 'postgresql)))
+       (mongodb (mongodb-service #:port (port-for 'mongodb)))
+       ;; Note that the mysql service in Guix defaults to using MariaDB
+       (mysql (mysql-service #:config
+                             (mysql-configuration
+                              (port (port-for 'mysql))))))
+    (log-package-path-list package-path-list)
+    (log-package-commit-ish-list package-commit-ish-list)
+    (append
+     (map
+      (lambda (service)
+        (update-service-parameters
+         service
+         (list
+          (cons
+           package?
+           (lambda (pkg)
+             (correct-source-of
+              package-path-list
+              package-commit-ish-list
+              pkg)))
+          (cons
+           plek-config?
+           (const (make-custom-plek-config
+                   govuk-ports
+                   #:govuk-app-domain "guix-dev.gov.uk"
+                   #:use-https? #f
+                   #:port 50080)))
+          (cons
+           database-connection-config?
+           (lambda (config)
+             (update-database-connection-config-ports system-ports config)))
+          (cons
+           rails-app-config?
+           (lambda (config)
+             (update-rails-app-config-environment
+              "development"
+              (update-rails-app-config-with-random-secret-key-base config)))))))
+      (list
+       publishing-api-service
+       content-store-service
+       draft-content-store-service
+       (update-service-parameters
+        router-service
+        (list
+         (cons router-config?
+               (const live-router-config))))
+       (update-service-parameters
+        draft-router-service
+        (list
+         (cons router-config?
+               (const draft-router-config))))
+       (update-service-parameters
+        router-api-service
+        (list
+         (cons router-api-config?
+          (const
+           (router-api-config
+            (router-nodes
+             (list
+              (simple-format #f "localhost:~A"
+                             (router-config-api-port live-router-config)))))))))
+       (update-service-parameters
+        draft-router-api-service
+        (list
+         (cons router-api-config?
+               (const
+                (router-api-config
+                 (router-nodes
+                  (list
+                   (simple-format #f "localhost:~A"
+                                  (router-config-api-port draft-router-config)))))))))
+       (set-random-rails-secret-token
+        specialist-publisher-service)
+       maslow-service
+       specialist-frontend-service
+       static-service
+       govuk-content-schemas-service
+       publishing-e2e-tests-service
+       signon-service))
+     (cons*
+      (nginx
+       govuk-ports
+       live-router-config
+       draft-router-config)
+      redis
+      postgresql
+      mongodb
+      mysql
+      ;; Position is significant for /usr/bin/env-service and
+      ;; /usr/share/zoneinfo-service, as these need to be activated
+      ;; before services which require them in their activation
+      (/usr/bin/env-service)
+      (/usr/share/zoneinfo-service)
+      %base-services))))
 
 (define end-to-end-test-os
   (operating-system
@@ -85,6 +392,8 @@
     (timezone "Europe/London")
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
+    (packages
+     (cons glibc %base-packages))
     (file-systems
      (cons (file-system
              (device "my-root")
@@ -92,54 +401,6 @@
              (mount-point "/")
              (type "ext4"))
            %base-file-systems))
-    (services
-     (let*
-         ((package-commit-ish-list
-           (get-package-commit-ish-list-from-environment))
-          (correct-source-of
-           (lambda (app-package)
-             (let
-                 ((custom-commit-ish (assoc-ref package-commit-ish-list
-                                                (package-name app-package))))
-               (if custom-commit-ish
-                   (package
-                     (inherit app-package)
-                     (source
-                      (custom-github-archive-source-for-package
-                       app-package
-                       custom-commit-ish)))
-                   app-package)))))
-       (for-each
-        (match-lambda
-          ((package . commit-ish)
-           (simple-format
-            #t
-            "Using commit-ish \"~A\" for the ~A package\n"
-            commit-ish
-            package)))
-        package-commit-ish-list)
-       (parameterize ((ports system-ports))
-         (cons*
-          (publishing-api-service
-           #:package (correct-source-of publishing-api))
-          (content-store-service
-           #:package (correct-source-of content-store))
-          (draft-content-store-service
-           #:package (correct-source-of content-store))
-          (specialist-publisher-service
-           #:package (correct-source-of specialist-publisher))
-          (signonotron2-service
-           #:package (correct-source-of signonotron2))
-          (govuk-content-schemas-service
-           #:package (correct-source-of govuk-content-schemas))
-          (publishing-e2e-tests-service
-           #:package (correct-source-of publishing-e2e-tests))
-          (postgresql-service #:port (number->string (port-for 'postgresql)))
-          (mongodb-service #:port (port-for 'mongodb))
-          (mysql-service #:config (mysql-configuration
-                                   (port (port-for 'mysql))))
-          (/usr/share/zoneinfo-service)
-          (/usr/bin/env-service)
-          %base-services))))))
+    (services services)))
 
 end-to-end-test-os
