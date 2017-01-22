@@ -12,22 +12,25 @@
    (cons*
     (nginx-upstream-configuration
      (name "origin-proxy")
-     (server (string-append
-              "localhost:"
-              (number->string
-               (router-config-public-port router-config)))))
+     (servers (list
+               (string-append
+                "localhost:"
+                (number->string
+                 (router-config-public-port router-config))))))
     (nginx-upstream-configuration
      (name "draft-origin-proxy")
-     (server (string-append
-              "localhost:"
-              (number->string
-               (router-config-public-port draft-router-config)))))
+     (servers (list
+               (string-append
+                "localhost:"
+                (number->string
+                 (router-config-public-port draft-router-config))))))
     (map
      (match-lambda
        ((service . port)
         (nginx-upstream-configuration
          (name (string-append (symbol->string service) "-proxy"))
-         (server (string-append "localhost:" (number->string port))))))
+         (servers (list
+                   (string-append "localhost:" (number->string port)))))))
      service-and-ports))
    #:server-list
    (let
