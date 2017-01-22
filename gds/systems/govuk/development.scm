@@ -341,6 +341,7 @@
     (packages
      (cons*
       strace
+      (specification->package+output "bind" "utils")
       glibc
       postgresql
       mariadb
