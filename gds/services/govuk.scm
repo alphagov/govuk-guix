@@ -376,18 +376,12 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
 ;;; Generic Rails App Service
 ;;;
 
-(define (generic-rails-app-service-environment-variables name root-directory bundle-path-base . parameters)
-  (let
-      ((bundle-path
-        (string-append bundle-path-base name "-FAKE_HASH/BUNDLE_PATH")))
+(define (generic-rails-app-service-environment-variables name root-directory . parameters)
     (apply
      append
-     `(("PATH" . ,(simple-format #f "~A/bin:~A/bin" root-directory bundle-path))
-       ("BUNDLE_PATH" . ,bundle-path)
+     `(("PATH" . ,(simple-format #f "~A/bin" root-directory))
        ;; GOVUK_APP_NAME is primarily for Slimmer
        ("GOVUK_APP_NAME" . ,name)
-       ("BUNDLE_APP_CONFIG" .
-        ,(string-append root-directory "/.bundle"))
        ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))
      (map
       (lambda (parameter)
@@ -403,7 +397,7 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
          ((database-connection-config? parameter)
           (database-connection-config->environment-variables parameter))
          (else '())))
-      parameters))))
+      parameters)))
 
 (define (generic-rails-app-start-script
          name
