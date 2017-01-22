@@ -85,6 +85,28 @@
             draft-frontend-services))
 
 ;;;
+;;; Utilities
+;;;
+
+(define (make-rails-app-using-plek-service-type name)
+  (extend-service-type-with-plek
+   (make-rails-app-service-type name)))
+
+(define (make-rails-app-using-plek-and-signon-service-type name)
+  (let ((base-service-type
+         (make-rails-app-using-plek-service-type name)))
+    (service-type
+     (inherit base-service-type)
+     (extensions
+      (cons
+       (service-extension signon-service-type
+                          (lambda (parameters)
+                            (filter
+                             signon-application?
+                             parameters)))
+       (service-type-extensions base-service-type))))))
+
+;;;
 ;;; GOV.UK Content Schemas
 ;;;
 
@@ -111,27 +133,6 @@
 
 (define govuk-content-schemas-service
   (service govuk-content-schemas-service-type govuk-content-schemas))
-
-
-
-
-(define (make-rails-app-using-plek-service-type name)
-  (extend-service-type-with-plek
-   (make-rails-app-service-type name)))
-
-(define (make-rails-app-using-plek-and-signon-service-type name)
-  (let ((base-service-type
-         (make-rails-app-using-plek-service-type name)))
-    (service-type
-     (inherit base-service-type)
-     (extensions
-      (cons
-       (service-extension signon-service-type
-                          (lambda (parameters)
-                            (filter
-                             signon-application?
-                             parameters)))
-       (service-type-extensions base-service-type))))))
 
 ;;;
 ;;; Signon
