@@ -115,12 +115,6 @@
 
 
 
-;; Just specify #f for the fields without defaults
-(define default-shepherd-service
-  (shepherd-service
-   (provision #f)
-   (start #f)))
-
 (define (make-rails-app-using-plek-service-type name)
   (extend-service-type-with-plek
    (make-rails-app-service-type name)))

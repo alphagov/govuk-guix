@@ -7,6 +7,7 @@
   #:use-module (guix utils)
   #:use-module (guix gexp)
   #:use-module (gnu services)
+  #:use-module (gnu services shepherd)
   #:use-module (guix packages)
   #:use-module (gds packages utils custom-sources))
 
@@ -64,6 +65,12 @@
       service
       tests-and-functions))
    services))
+
+;; Just specify #f for the fields without defaults
+(define-public default-shepherd-service
+  (shepherd-service
+   (provision #f)
+   (start #f)))
 
 ;;;
 ;;; Crypto
