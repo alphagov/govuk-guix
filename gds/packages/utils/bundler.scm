@@ -182,19 +182,47 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                                ,(string-join
                                  (bundle-package-without bundle-pkg)
                                  ":"))))
-           (add-after 'set-bundle-without 'bundle-install
+           (add-after 'set-bundle-without 'path-remove-source
+                      (lambda _
+                        (setenv
+                         "PATH"
+                         (list->search-path-as-string
+                          (filter
+                           (lambda (path)
+                             (not (string-prefix?
+                                   (assoc-ref %build-inputs "source")
+                                   path)))
+                           (search-path-as-string->list (getenv "PATH")))
+                          ":"))))
+           (add-after 'path-remove-source 'bundle-install
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((cwd (getcwd))
                       (out (assoc-ref outputs "out")))
                  (setenv "GEMRC"  (assoc-ref %build-inputs "gemrc"))
-                 (simple-format #t "GEMRC=~A" (getenv "GEMRC"))
-                 (if (file-exists? (string-append cwd "/vendor/cache"))
+                 (simple-format #t "file-exists? ~A ~A\n" (string-append cwd "/vendor/cache") (file-exists? (string-append cwd "/vendor/cache")))
+                 (if (catch
+                       'system-error
+                       (lambda ()
+                         (lstat (string-append cwd "/vendor/cache"))
+                         #t)
+                       (lambda (key . args)
+                         #f))
                      (delete-file (string-append cwd "/vendor/cache")))
+                 (if (catch
+                       'system-error
+                       (lambda ()
+                         (lstat (string-append cwd "/vendor/bundle"))
+                         #t)
+                       (lambda (key . args)
+                         #f))
+                     (delete-file (string-append cwd "/vendor/bundle")))
                  (mkdir-p (string-append cwd "/vendor"))
                  (simple-format #t "symlinking /vendor/cache ~A\n" (assoc-ref %build-inputs "gems"))
                  (symlink (string-append (assoc-ref %build-inputs "gems")
                                          "/vendor/cache")
                           (string-append cwd "/vendor/cache"))
+                 (if (file-exists? (string-append cwd "/.bundle/config"))
+                     (chmod (string-append cwd "/.bundle/config") #o644))
                  (and
                   (zero? (system*
                           "bundle"
