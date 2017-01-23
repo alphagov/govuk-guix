@@ -29,16 +29,16 @@
          (name (string-append (symbol->string service) ".guix-dev.gov.uk-proxy"))
          (server (string-append "localhost:" (number->string port))))))
      service-and-ports))
-   #:vhost-list
+   #:server-list
    (let
        ((base
-         (nginx-vhost-configuration
+         (nginx-server-configuration
           (http-port 50080)
           (https-port 50443)
           (ssl-certificate #f)
           (ssl-certificate-key #f))))
      (cons*
-      (nginx-vhost-configuration
+      (nginx-server-configuration
        (inherit base)
        (locations
         (list
@@ -46,7 +46,7 @@
           (uri "/")
           (body '("proxy_pass http://www.guix-dev.gov.uk-proxy;")))))
        (server-name (list "www.guix-dev.gov.uk")))
-      (nginx-vhost-configuration
+      (nginx-server-configuration
        (inherit base)
        (locations
         (list
@@ -57,7 +57,7 @@
       (map
        (match-lambda
          ((service . port)
-          (nginx-vhost-configuration
+          (nginx-server-configuration
            (inherit base)
            (locations
             (list
