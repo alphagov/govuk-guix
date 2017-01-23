@@ -165,12 +165,13 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "0f3kjqq52bhpl2a5sy2j422kkg2gawjd09kykwr6ipiqadlj4z8r")))
-   (make-govuk-package
+   (package-rails-app
     "specialist-frontend"
     (github-archive
      #:repository "specialist-frontend"
      #:commit-ish "release_174"
-     #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))))
+     #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))
+    #:precompile-assets #t)))
 
 (define-public signonotron2
   (let ((pkg
@@ -196,12 +197,13 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "0sifa4xwbrx7h0ncnbl8kxmi44zva3qv3b7pjnqzz3jxibjqab99")))
-   (make-govuk-package
+   (package-rails-app
     "static"
     (github-archive
      #:repository "static"
      #:commit-ish "release_2441"
-     #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h")))))
+     #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h"))
+    #:precompile-assets #t)))
 
 (define-public router-api
   (package-with-bundler
