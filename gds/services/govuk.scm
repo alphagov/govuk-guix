@@ -421,7 +421,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(specialist-frontend))
-          (requirement '(content-store)))
+          (requirement '(content-store static)))
          (service-startup-config
           (environment-variables
            '(("GOVUK_APP_NAME" . "specialist-frontend"))))
@@ -436,7 +436,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(draft-specialist-frontend))
-          (requirement '(draft-content-store)))
+          (requirement '(draft-content-store draft-static)))
          (service-startup-config
           (environment-variables
            '(("GOVUK_APP_NAME" . "draft-specialist-frontend"))))
