@@ -14,6 +14,7 @@
             plek-config-govuk-asset-root
             plek-config-govuk-website-root
             plek-config-govuk-asset-host
+            plek-config-draft-origin
             plek-config-dev-domain
             plek-config-service-ports
             plek-config-service-uri-function
@@ -35,6 +36,8 @@
                       (default "https://www.gov.uk"))
   (govuk-asset-host plek-config-govuk-asset-host
                     (default "https://static.publishing.service.gov.uk"))
+  (draft-origin plek-config-draft-origin
+                (default "https://draft-origin.publishing.service.gov.uk"))
   (dev-domain plek-config-dev-domain
               (default #f))
   (service-ports plek-config-service-ports
@@ -88,6 +91,8 @@
       (string-append scheme "://www." govuk-app-domain string-port))
      (govuk-asset-host
       (string-append scheme "://static." govuk-app-domain string-port))
+     (draft-origin
+      (string-append scheme "://draft-origin." govuk-app-domain string-port))
      (service-ports service-ports)
      (service-uri-function
       (lambda (service port)
@@ -126,6 +131,7 @@
      (cons "GOVUK_ASSET_ROOT" (plek-config-govuk-asset-root plek-config))
      (cons "GOVUK_WEBSITE_ROOT" (plek-config-govuk-website-root plek-config))
      (cons "GOVUK_ASSET_HOST" (plek-config-govuk-asset-host plek-config))
+     (cons "PLEK_SERVICE_DRAFT_ORIGIN_URI" (plek-config-draft-origin plek-config))
      (map
       (match-lambda
         ((service . port)
