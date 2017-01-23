@@ -290,6 +290,57 @@
     (cons rails-app-config?
           update-rails-app-config-with-random-secret-token))))
 
+(define (set-plek-config services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        plek-config?
+        (const (make-custom-plek-config
+                govuk-ports
+                #:govuk-app-domain "guix-dev.gov.uk"
+                #:use-https? #f
+                #:port 50080))))))
+   services))
+
+(define (correct-services-package-source package-path-list package-commit-ish-list services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        package?
+        (lambda (pkg)
+          (correct-source-of
+           package-path-list
+           package-commit-ish-list
+           pkg))))))
+   services))
+
+(define (set-common-app-service-config services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        database-connection-config?
+        (lambda (config)
+          (update-database-connection-config-ports system-ports config)))
+       (cons
+        rails-app-config?
+        (lambda (config)
+          (update-rails-app-config-environment
+           "development"
+           (update-rails-app-config-with-random-secret-key-base config))))
+       (cons
+        gds-sso-config?
+        (gds-sso-config)))))
+   services))
+
 (define services
   (let
       ((package-commit-ish-list
