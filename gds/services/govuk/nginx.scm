@@ -11,13 +11,13 @@
    #:upstream-list
    (cons*
     (nginx-upstream-configuration
-     (name "www.guix-dev.gov.uk-proxy")
+     (name "origin-proxy")
      (server (string-append
               "localhost:"
               (number->string
                (router-config-public-port router-config)))))
     (nginx-upstream-configuration
-     (name "draft-origin.guix-dev.gov.uk-proxy")
+     (name "draft-origin-proxy")
      (server (string-append
               "localhost:"
               (number->string
@@ -26,7 +26,7 @@
      (match-lambda
        ((service . port)
         (nginx-upstream-configuration
-         (name (string-append (symbol->string service) ".guix-dev.gov.uk-proxy"))
+         (name (string-append (symbol->string service) "-proxy"))
          (server (string-append "localhost:" (number->string port))))))
      service-and-ports))
    #:server-list
@@ -44,7 +44,7 @@
         (list
          (nginx-location-configuration
           (uri "/")
-          (body '("proxy_pass http://www.guix-dev.gov.uk-proxy;")))))
+          (body '("proxy_pass http://origin-proxy;")))))
        (server-name (list "www.guix-dev.gov.uk")))
       (nginx-server-configuration
        (inherit base)
@@ -52,7 +52,7 @@
         (list
          (nginx-location-configuration
           (uri "/")
-          (body '("proxy_pass http://draft-origin.guix-dev.gov.uk-proxy;")))))
+          (body '("proxy_pass http://draft-origin-proxy;")))))
        (server-name (list "draft-origin.guix-dev.gov.uk")))
       (map
        (match-lambda
@@ -68,7 +68,7 @@
               (name "@app")
               (body (list (simple-format
                            #f
-                           "proxy_pass http://~A.guix-dev.gov.uk-proxy;"
+                           "proxy_pass http://~A-proxy;"
                            (symbol->string service)))))))
            (server-name (list (string-append
                                (symbol->string service)
