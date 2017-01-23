@@ -16,39 +16,3 @@
   sidekiq-config?
   (file sidekiq-config-file
         (default #f)))
-
-(define (generic-sidekiq-start-script
-         name
-         package
-         sidekiq-config
-         environment-variables)
-  (let*
-      ((string-name (symbol->string name))
-       (root-directory
-        (string-append "/var/lib/" string-name))
-       (config-file (sidekiq-config-file sidekiq-config)))
-    (program-file
-     (string-append "start-" string-name "-sidekiq")
-     (with-imported-modules '((guix build utils)
-                              (ice-9 popen))
-       #~(let ((user (getpwnam #$string-name))
-               (bundle (string-append #$root-directory "/bin/bundle")))
-           (use-modules (guix build utils)
-                        (ice-9 popen))
-
-           ;; Start the service
-           (setgid (passwd:gid user))
-           (setuid (passwd:uid user))
-
-           (for-each
-            (lambda (env-var)
-              (setenv (car env-var) (cdr env-var)))
-            '#$environment-variables)
-
-           (chdir #$root-directory)
-           (and
-            (zero? (apply
-                    system*
-                    (cons*
-                     bundle "exec" "sidekiq"
-                     (if #$config-file '("-C" #$config-file) '()))))))))))

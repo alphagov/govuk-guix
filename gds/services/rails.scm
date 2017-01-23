@@ -317,17 +317,20 @@
      (let ((sidekiq-config (find sidekiq-config? rest)))
        (if sidekiq-config
            (list
-            (let
-                ((sidekiq-start-script
-                  (generic-sidekiq-start-script
-                   name
-                   package
-                   sidekiq-config
+            (let*
+                ((environment-variables
+                  (map
+                   (match-lambda
+                     ((key . value)
+                      (string-append key "=" value)))
                    (apply
                     generic-rails-app-service-environment-variables
                     root-directory
                     rails-app-config
-                    rest))))
+                    rest)))
+                 (config-file (sidekiq-config-file sidekiq-config))
+                 (string-name (symbol->string name))
+                 (pidfile (string-append "/var/lib/" string-name "/tmp/pids/sidekiq.pid")))
               (shepherd-service
                (inherit ss)
                (provision (list
@@ -341,7 +344,24 @@
                (documentation
                 (simple-format #f "~A sidekiq service" name))
                (respawn? #f)
-               (start #~(make-forkexec-constructor #$sidekiq-start-script))
+               (start #~(make-forkexec-constructor
+                         (let
+                             ((command
+                               `(,(string-append "/var/lib/" #$string-name "/bin/bundle")
+                           "exec"
+                           "sidekiq"
+                           ,@(if #$config-file '("-C" #$config-file) '())
+                           "--pidfile" #$pidfile
+                           "--daemon")
+                               ))
+                           (display "\n\ncommand:\n")(display command)(display "\n")
+                           command)
+                         #:user #$string-name
+                         #:pid-file #$pidfile
+                         #:pid-file-timeout 30
+                         #:log-file (string-append "/var/log/" #$string-name "-sidekiq.log")
+                         #:directory (string-append "/var/lib/" #$string-name)
+                         #:environment-variables '#$environment-variables))
                (stop #~(make-kill-destructor)))))
            '())))))
 
