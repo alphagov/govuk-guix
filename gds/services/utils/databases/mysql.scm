@@ -33,7 +33,7 @@
            (let
                ((pid (primitive-fork))
                 (root (getpwnam "root"))
-                (command `(#$mysql
+                (command `(,(string-append #$mariadb "/bin/mysql")
                            "-h" #$host
                            "-u" "root"
                            "--password=''"
