@@ -1,5 +1,6 @@
 (define-module (gds services govuk plek)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (guix records)
   #:use-module (gnu services)
@@ -101,31 +102,55 @@
          govuk-app-domain
          string-port))))))
 
-(define* (plek-config->environment-variables plek-config)
-  (cons*
-   (cons "GOVUK_APP_DOMAIN" (plek-config-govuk-app-domain plek-config))
-   (cons "GOVUK_ASSET_ROOT" (plek-config-govuk-asset-root plek-config))
-   (cons "GOVUK_WEBSITE_ROOT" (plek-config-govuk-website-root plek-config))
-   (cons "GOVUK_ASSET_HOST" (plek-config-govuk-asset-host plek-config))
-   (map
-    (match-lambda
-      ((service . port)
-       (cons
-        (string-append
-         "PLEK_SERVICE_"
-         (service-symbol->environment-variable-string service)
-         "_URI")
-        ((plek-config-service-uri-function plek-config) service port))))
-    (plek-config-service-ports plek-config))))
-
-(define (filter-plek-config-service-ports pc services)
-  (plek-config
-   (inherit pc)
-   (service-ports
-    (lset-difference
-     eq?
-     (plek-config-service-ports pc)
-     services))))
+(define* (plek-config->environment-variables
+          plek-config
+          #:optional #:key
+          replace-services-with-draft-services-where-available
+          service-name-whitelist)
+  (let*
+      ((draft-service-names
+        (filter
+         (lambda (name)
+           (string-prefix?
+            "draft-"
+            (symbol->string name)))
+         (map first (plek-config-service-ports plek-config))))
+       (service-names-for-available-draft-services
+        (map
+         (lambda (name)
+           (string->symbol
+            (substring (symbol->string name) (string-length "draft-"))))
+         draft-service-names)))
+    (cons*
+     (cons "GOVUK_APP_DOMAIN" (plek-config-govuk-app-domain plek-config))
+     (cons "GOVUK_ASSET_ROOT" (plek-config-govuk-asset-root plek-config))
+     (cons "GOVUK_WEBSITE_ROOT" (plek-config-govuk-website-root plek-config))
+     (cons "GOVUK_ASSET_HOST" (plek-config-govuk-asset-host plek-config))
+     (map
+      (match-lambda
+        ((service . port)
+         (cons
+          (string-append
+           "PLEK_SERVICE_"
+           (service-symbol->environment-variable-string
+            (if (and replace-services-with-draft-services-where-available
+                     (memq service draft-service-names))
+                (string->symbol
+                 (substring (symbol->string service) (string-length "draft-")))
+                service))
+           "_URI")
+          ((plek-config-service-uri-function plek-config) service port))))
+      (filter
+       (match-lambda
+         ((service . port)
+          (and
+           (if replace-services-with-draft-services-where-available
+               (not (memq service service-names-for-available-draft-services))
+               #t)
+           (if (list? service-name-whitelist)
+               (memq service service-name-whitelist)
+               #t))))
+       (plek-config-service-ports plek-config))))))
 
 (define (update-service-extension-parameters-for-plek-config
          service-name
@@ -142,9 +167,18 @@
          (service-startup-config-with-additional-environment-variables
           parameter
           (plek-config->environment-variables
-           (filter-plek-config-service-ports
-            plek-config
-            (shepherd-service-requirement shepherd-service)))))
+           plek-config
+           #:replace-services-with-draft-services-where-available
+           (string-prefix? "draft-" (symbol->string service-name))
+           #:service-name-whitelist
+           (if (memq service-name '(content-store draft-content-store))
+               #f ;; The content stores are special, as while they
+                  ;; don't require the frontend services in the sense
+                  ;; that they must be running before the
+                  ;; content-stores are started, the information given
+                  ;; to Plek is used when configuring backends in the
+                  ;; routers, and therefore needs to be available.
+               (shepherd-service-requirement shepherd-service)))))
         ((rails-app-config? parameter)
          (rails-app-config
           (inherit parameter)
