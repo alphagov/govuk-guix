@@ -96,6 +96,24 @@
      (port (port-for 'redis))))
    (else (error "unknown database connection config " config))))
 
+(define (ensure-service-parameters s test-and-value-pairs)
+  (service
+   (service-kind s)
+   (fold
+    (lambda (test+value parameters)
+      (match test+value
+        ((test? . value)
+         (if (list? parameters)
+             (if (any test? parameters)
+                 (map (lambda (x) (if (test? x) value x))
+                      parameters)
+                 (append parameters (list value)))
+             (if (test? parameters)
+                 value
+                 (list parameters value))))))
+    (service-parameters s)
+    test-and-value-pairs)))
+
 (define (update-service-parameters s test-and-function-pairs)
   (define (update-parameter parameter)
     (fold
