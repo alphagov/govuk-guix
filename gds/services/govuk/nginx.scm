@@ -54,6 +54,17 @@
           (uri "/")
           (body '("proxy_pass http://draft-origin-proxy;")))))
        (server-name (list "draft-origin.guix-dev.gov.uk")))
+      (nginx-server-configuration
+       (inherit base)
+       (locations
+        (list
+         (nginx-location-configuration
+          (uri "/specialist-frontend")
+          (body '("proxy_pass http://specialist-frontend-proxy;")))
+         (nginx-location-configuration
+          (uri "/static")
+          (body '("proxy_pass http://static-proxy;")))))
+       (server-name (list "assets.guix-dev.gov.uk")))
       (map
        (match-lambda
          ((service . port)

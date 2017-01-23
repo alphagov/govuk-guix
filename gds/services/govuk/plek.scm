@@ -86,11 +86,11 @@
          govuk-app-domain
          #f))
      (govuk-asset-root
-      (string-append scheme "://static." govuk-app-domain string-port))
+      (string-append scheme "://assets." govuk-app-domain string-port))
      (govuk-website-root
       (string-append scheme "://www." govuk-app-domain string-port))
      (govuk-asset-host
-      (string-append scheme "://static." govuk-app-domain string-port))
+      (string-append scheme "://assets." govuk-app-domain string-port))
      (draft-origin
       (string-append scheme "://draft-origin." govuk-app-domain string-port))
      (service-ports service-ports)
