@@ -195,7 +195,10 @@
            (requirement '(mysql)))
           (service-startup-config)
           (plek-config) (rails-app-config) signonotron2
-          (signon-config) (sidekiq-config) default-signon-database-connection-configs)))
+          (signon-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          default-signon-database-connection-configs)))
 
 ;;
 ;; Publishing E2E Tests
@@ -324,7 +327,8 @@
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/lib/govuk-content-schemas"))))
           (plek-config) (rails-app-config) publishing-api
           default-publishing-api-signon-application
-          (sidekiq-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           default-publishing-api-database-connection-configs)))
 
 ;;;
