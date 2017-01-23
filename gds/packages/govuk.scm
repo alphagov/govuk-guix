@@ -266,26 +266,8 @@
         (substitute-keyword-arguments (package-arguments govuk-package)
           ((#:phases phases)
            `(modify-phases ,phases
-              (add-before 'install 'add-bundle
-                (lambda* (#:key inputs outputs #:allow-other-keys)
-                  (let*
-                      ((out (assoc-ref outputs "out"))
-                       (gemfile (string-append out "/Gemfile"))
-                       (ruby
-                        (string-append (assoc-ref inputs "ruby")
-                                       "/bin/ruby")))
-                    (define* (bundle ruby-path #:optional (port #f))
-                      (format port "#!~A
-ENV[\"BUNDLE_GEMFILE\"] ||= \"~A\"
-
-load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
-
-                    (mkdir-p (string-append out "/bin"))
-                    (call-with-output-file (string-append out "/bin/bundle")
-                      (lambda (port)
-                        (bundle ruby port)))
-                    (chmod (string-append out "/bin/bundle") #o544)
-                    #t)))))))))))
+              (add-before 'install 'create-bin-bundle
+                ,(create-bin-bundle))))))))))
 
 (define-public maslow
   (package-with-bundler
