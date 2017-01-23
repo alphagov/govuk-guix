@@ -371,78 +371,55 @@
     (log-package-path-list package-path-list)
     (log-package-commit-ish-list package-commit-ish-list)
     (append
-     (map
-      (lambda (service)
-        (update-service-parameters
-         service
+     (correct-services-package-source
+      package-path-list
+      package-commit-ish-list
+      (set-plek-config
+       (cons
+        publishing-e2e-tests-service
+        (set-common-app-service-config
          (list
-          (cons
-           package?
-           (lambda (pkg)
-             (correct-source-of
-              package-path-list
-              package-commit-ish-list
-              pkg)))
-          (cons
-           plek-config?
-           (const (make-custom-plek-config
-                   govuk-ports
-                   #:govuk-app-domain "guix-dev.gov.uk"
-                   #:use-https? #f
-                   #:port 50080)))
-          (cons
-           database-connection-config?
-           (lambda (config)
-             (update-database-connection-config-ports system-ports config)))
-          (cons
-           rails-app-config?
-           (lambda (config)
-             (update-rails-app-config-environment
-              "development"
-              (update-rails-app-config-with-random-secret-key-base config)))))))
-      (list
-       publishing-api-service
-       content-store-service
-       draft-content-store-service
-       (update-service-parameters
-        router-service
-        (list
-         (cons router-config?
-               (const live-router-config))))
-       (update-service-parameters
-        draft-router-service
-        (list
-         (cons router-config?
-               (const draft-router-config))))
-       (update-service-parameters
-        router-api-service
-        (list
-         (cons router-api-config?
-          (const
-           (router-api-config
-            (router-nodes
-             (list
-              (simple-format #f "localhost:~A"
-                             (router-config-api-port live-router-config)))))))))
-       (update-service-parameters
-        draft-router-api-service
-        (list
-         (cons router-api-config?
-               (const
-                (router-api-config
-                 (router-nodes
-                  (list
-                   (simple-format #f "localhost:~A"
-                                  (router-config-api-port draft-router-config)))))))))
-       (set-random-rails-secret-token
-        specialist-publisher-service)
-       maslow-service
-       need-api-service
-       specialist-frontend-service
-       static-service
-       govuk-content-schemas-service
-       publishing-e2e-tests-service
-       signon-service))
+          publishing-api-service
+          content-store-service
+          draft-content-store-service
+          (update-service-parameters
+           router-service
+           (list
+            (cons router-config?
+                  (const live-router-config))))
+          (update-service-parameters
+           draft-router-service
+           (list
+            (cons router-config?
+                  (const draft-router-config))))
+          (update-service-parameters
+           router-api-service
+           (list
+            (cons router-api-config?
+                  (const
+                   (router-api-config
+                    (router-nodes
+                     (list
+                      (simple-format #f "localhost:~A"
+                                     (router-config-api-port live-router-config)))))))))
+          (update-service-parameters
+           draft-router-api-service
+           (list
+            (cons router-api-config?
+                  (const
+                   (router-api-config
+                    (router-nodes
+                     (list
+                      (simple-format #f "localhost:~A"
+                                     (router-config-api-port draft-router-config)))))))))
+          (set-random-rails-secret-token
+           specialist-publisher-service)
+          maslow-service
+          need-api-service
+          specialist-frontend-service
+          static-service
+          govuk-content-schemas-service
+          signon-service)))))
      (cons*
       (nginx
        govuk-ports
