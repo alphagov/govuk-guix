@@ -1,5 +1,21 @@
 #!/bin/sh
 
+if [[ $# -eq 0 ]] ; then
+    cat <<EOF
+Usage: ./pre-inst-env COMMAND ARG...
+
+Run COMMAND in a pre-installation environment. This involves first
+generating a Guix environment containing the version of Guix contained
+within this repository. Then, using this version of Guix, create the
+environment in which to use. Only environment variables that are
+explicitly passed through are used.
+
+This script will use GNU Guix from the Guix store, if you want to use
+Guix from another location, use the ./pre-inst-env script instead.
+EOF
+    exit 1
+fi
+
 export GUILE_LOAD_PATH="$PWD${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
 export GUIX_PACKAGE_PATH="$PWD/.guix-package-path${GUIX_PACKAGE_PATH:+:}$GUIX_PACKAGE_PATH"
 
