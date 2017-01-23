@@ -270,26 +270,46 @@
                 ,(create-bin-bundle))))))))))
 
 (define-public maslow
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0g1y50vds1rc2qgis6b8wbydmfmja9wgr5s6hw8hra1z7nm3m3hs")))
-   (make-govuk-package
-    "maslow"
-    (github-archive
-     #:repository "maslow"
-     #:commit-ish "release_180"
-     #:hash (base32 "0zxcxznhp95sss85lrx4gdipwb75jhd3y9wsd01nrd1nl12hr0jx")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "0g1y50vds1rc2qgis6b8wbydmfmja9wgr5s6hw8hra1z7nm3m3hs")))
+         (make-govuk-package
+          "maslow"
+          (github-archive
+           #:repository "maslow"
+           #:commit-ish "release_180"
+           #:hash (base32 "0zxcxznhp95sss85lrx4gdipwb75jhd3y9wsd01nrd1nl12hr0jx"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'create-bin-bundle
+               ,(replace-mongoid.yml #:mongoid-version "3")))))))))
 
 (define-public need-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1hg85n9qf4710a93fkqfcpa8avj3q972ppk5w0is9sb0zi7kih5m")))
-   (make-govuk-package
-    "need-api"
-    (github-archive
-     #:repository "govuk_need_api"
-     #:commit-ish "release_133"
-     #:hash (base32 "0yrwyky6af8i3l2gl0z0qvcv6f9cgp9kjmyva1bjnkpdszx67qmc")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1hg85n9qf4710a93fkqfcpa8avj3q972ppk5w0is9sb0zi7kih5m")))
+         (make-govuk-package
+          "need-api"
+          (github-archive
+           #:repository "govuk_need_api"
+           #:commit-ish "release_133"
+           #:hash (base32 "0yrwyky6af8i3l2gl0z0qvcv6f9cgp9kjmyva1bjnkpdszx67qmc"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'create-bin-bundle
+               ,(replace-mongoid.yml #:mongoid-version "3")))))))))
 
 (define-public govuk-content-schemas
   (package
