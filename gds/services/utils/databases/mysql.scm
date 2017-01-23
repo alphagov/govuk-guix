@@ -53,7 +53,7 @@
                   (primitive-exit 0))
                 (lambda ()
                   (primitive-exit 1)))
-              (waitpid pid))))))))
+              (zero? (cdr (waitpid pid))))))))))
 
 (define (mysql-ensure-user-exists-gexp user password)
   #~(lambda (port)
