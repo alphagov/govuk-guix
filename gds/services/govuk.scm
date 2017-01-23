@@ -422,7 +422,9 @@
           (inherit default-shepherd-service)
           (provision '(specialist-frontend))
           (requirement '(content-store)))
-         (service-startup-config)
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "specialist-frontend"))))
          (plek-config) (rails-app-config) specialist-frontend)))
 
 (define draft-specialist-frontend-service-type
@@ -435,7 +437,9 @@
           (inherit default-shepherd-service)
           (provision '(draft-specialist-frontend))
           (requirement '(draft-content-store)))
-         (service-startup-config)
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "draft-specialist-frontend"))))
          (plek-config) (rails-app-config) specialist-frontend)))
 
 ;;;
