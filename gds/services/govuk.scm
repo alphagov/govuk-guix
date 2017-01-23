@@ -351,7 +351,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-store))
-           (requirement '(mongodb)))
+           (requirement '(router-api mongodb)))
           (service-startup-config)
           (plek-config) (rails-app-config) content-store
           default-content-store-database-connection-configs)))
@@ -372,7 +372,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(draft-content-store))
-           (requirement '(mongodb)))
+           (requirement '(draft-router-api mongodb)))
           (service-startup-config)
           (plek-config) (rails-app-config) content-store
           default-draft-content-store-database-connection-configs)))
