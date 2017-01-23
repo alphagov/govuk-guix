@@ -10,7 +10,8 @@
   (let ((treeish "spike-end-to-end-test-system"))
     (package
       (inherit gnu:guix)
-      (version (string-append "0.11.0-gds"))
+      (name "guix-gds")
+      (version (string-append "0.11.0"))
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ((#:tests? tests)
