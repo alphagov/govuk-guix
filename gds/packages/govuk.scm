@@ -94,6 +94,18 @@
     (license #f)
     (home-page #f)))
 
+(define* (package-rails-app name source #:optional #:key precompile-assets)
+  (let ((pkg (make-govuk-package name source)))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-before 'install 'asset-precompile
+               (lambda* (#:key inputs #:allow-other-keys)
+                 (zero? (system* "bin/rake" "assets:precompile")))))))))))
+
 (define* (github-archive
           #:optional #:key
           repository
