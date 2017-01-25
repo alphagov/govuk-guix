@@ -286,6 +286,7 @@
                        (string-append #$root-directory "/vendor/" name)))
                   (if (file-exists? target)
                       (delete-file target))
+                  (mkdir-p (string-append #$root-directory "/vendor"))
                   (symlink (string-append #$package "/vendor/" name)
                            target)))
               '("cache" "bundle"))))
