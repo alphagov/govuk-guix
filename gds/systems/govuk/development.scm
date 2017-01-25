@@ -33,6 +33,7 @@
   `((publishing-api . 53039)
     (content-store . 53000)
     (draft-content-store . 53001)
+    (content-tagger . 53116)
     (specialist-publisher . 53064)
     (need-api . 53052)
     (maslow . 53053)

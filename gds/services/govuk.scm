@@ -579,6 +579,31 @@
           default-draft-router-database-connection-configs)))
 
 ;;;
+;;; Content Tagger
+;;;
+
+(define default-content-tagger-database-connection-configs
+  (list
+   (postgresql-connection-config
+    (user "content-tagger")
+    (port "5432")
+    (database "content_tagger"))))
+
+(define content-tagger-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'content-tagger))
+
+(define content-tagger-service
+  (service
+   content-tagger-service-type
+   (cons* (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(content-tagger))
+           (requirement '(publishing-api signon)))
+          (service-startup-config)
+          (plek-config) (rails-app-config) content-tagger
+          default-content-tagger-database-connection-configs)))
+
+;;;
 ;;; Maslow
 ;;;
 
@@ -668,7 +693,7 @@
   (list
    ;; collections-publisher-service
    ;; contacts-admin-service
-   ;; content-tagger-service
+   content-tagger-service
    ;; local-links-manager-service
    ;; manuals-publisher-service
    maslow-service

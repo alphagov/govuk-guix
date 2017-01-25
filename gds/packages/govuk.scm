@@ -128,6 +128,18 @@
      #:commit-ish "release_599"
      #:hash (base32 "1b0hkvl6nr54pap80q6y7zph03ryqqh4v1frmf9r7nycw8ga6nzl")))))
 
+(define-public content-tagger
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "13k48989wnr2d2njas4254jfkhlsc42cdgn7gs1rii49h8h3gmqy"))
+    (without '("test")))
+   (make-govuk-package
+    "content-tagger"
+    (github-archive
+     #:repository "content-tagger"
+     #:commit-ish "release_332"
+     #:hash (base32 "0ia237jbg5zzbswgz9d9d3793cynp9vfkdckx0yf9p2wp23fkm92")))))
+
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
