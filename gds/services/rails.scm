@@ -381,7 +381,10 @@
                        #:user #$string-name
                        #:pid-file #$pidfile
                        #:pid-file-timeout 30
-                       #:log-file (string-append #$root-directory "-sidekiq.log")
+                       #:log-file (string-append
+                                   "/var/log/"
+                                   (symbol->string '#$sidekiq-service-name)
+                                   ".log")
                        #:directory #$root-directory
                        #:environment-variables '#$environment-variables))
              (stop #~(make-kill-destructor)))))
