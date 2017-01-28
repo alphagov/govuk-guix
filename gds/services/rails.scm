@@ -211,7 +211,6 @@
            ((make-forkexec-constructor
              (list rails
                    "server"
-                   "--daemon"
                    "-p" #$string-port
                    "-P" pid-file)
              #:user (passwd:uid user)
@@ -378,8 +377,7 @@
                          "exec"
                          "sidekiq"
                          ,@(if #$config-file '("-C" #$config-file) '())
-                         "--pidfile" #$pidfile
-                         "--daemon")
+                         "--pidfile" #$pidfile)
                        #:user #$string-name
                        #:pid-file #$pidfile
                        #:pid-file-timeout 30
