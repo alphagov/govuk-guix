@@ -109,7 +109,7 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0a2w0yx7zh5wc7y34ldahbghy2hdbcp91ky7z84i1kkf0sk1h9l4")))
+    (hash (base32 "0jn3cp980rgskncspy1gy0cd3zshpc01mb1a4awrfvk2cvymgds1")))
    (make-govuk-package
     "publishing-api"
     (github-archive
