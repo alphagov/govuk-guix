@@ -217,6 +217,7 @@
              #:directory #$root-directory
              #:pid-file pid-file
              #:pid-file-timeout 10
+             #:log-file (string-append "/var/log/" #$string-name ".log")
              #:environment-variables '#$environment-variables))))))
 
 (define (gemrc ruby)
