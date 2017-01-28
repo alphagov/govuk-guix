@@ -380,7 +380,7 @@
                          "--pidfile" #$pidfile)
                        #:user #$string-name
                        #:pid-file #$pidfile
-                       #:pid-file-timeout 30
+                       #:pid-file-timeout 5
                        #:log-file (string-append
                                    "/var/log/"
                                    (symbol->string '#$sidekiq-service-name)
