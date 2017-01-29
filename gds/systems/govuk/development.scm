@@ -12,6 +12,7 @@
   #:use-module (gnu packages linux)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (gds packages guix)
   #:use-module (gds packages utils custom-sources)
   #:use-module (gds packages mongodb)
   #:use-module (guix store)
@@ -56,7 +57,9 @@
    (syslog-service)
    (urandom-seed-service)
    (nscd-service)
-   (guix-service)
+   (guix-service
+    (guix-configuration
+     (guix guix)))
    pretend-loopback-service))
 
 (define live-router-config
