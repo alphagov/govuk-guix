@@ -179,7 +179,7 @@
            (provision '(signon))
            (requirement '(mysql)))
           (service-startup-config)
-          (plek-config) (rails-app-config) signonotron2
+          (plek-config) (rails-app-config) (@ (gds packages govuk) signon)
           (signon-config)
           (sidekiq-config
            (file "config/sidekiq.yml"))

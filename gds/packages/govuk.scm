@@ -164,17 +164,17 @@
      #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))
     #:precompile-assets #t)))
 
-(define-public signonotron2
+(define-public signon
   (let ((pkg
          (package-with-bundler
           (bundle-package
-           (hash (base32 "1fb4fzzv701lrcalq28ffbzgmg4j2svl9h9mglshbkawb18wygnf")))
+           (hash (base32 "1x6ycb7b1l9pgf1vlp7ys9jnzls00hh2sfwcxb5gvk6d8l0vx478")))
           (make-govuk-package
-           "signonotron2"
+           "signon"
            (github-archive
-            #:repository "signonotron2"
-            #:commit-ish "release_689"
-            #:hash (base32 "0idacqj1232hcsfzlf3yyx78s2qsvrr67ii2hf907ghjrjw7f9dz"))))))
+            #:repository "signon"
+            #:commit-ish "release_896"
+            #:hash (base32 "0bsg7pk5g4h2if6x1253rv48hssnm1xsqfjiyyg46w5ag5m13dl1"))))))
     (package
       (inherit pkg)
       (arguments
