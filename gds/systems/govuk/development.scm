@@ -10,6 +10,7 @@
   #:use-module (gnu services web)
   #:use-module (gnu services databases)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages version-control)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (gds packages guix)
@@ -354,6 +355,7 @@
       strace
       (specification->package+output "bind" "utils")
       glibc
+      git
       postgresql
       mariadb
       mongodb
