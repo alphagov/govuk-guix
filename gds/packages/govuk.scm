@@ -268,26 +268,16 @@
       (home-page "https://github.com/alphagov/router"))))
 
 (define-public publishing-e2e-tests
-  (let
-      ((govuk-package
-        (make-govuk-package
-         "publishing-e2e-tests"
-         (github-archive
-          #:repository "publishing-e2e-tests"
-          #:commit-ish "44058ef1421b81a9c4c11f5a7dba40d0404de29a"
-          #:hash (base32 "1xlgs4a7k49h54nv19ax3cd4a17jv74g13zn05hbrv041css3my9")))))
-    (package-with-bundler
-     (bundle-package
-      (hash
-       (base32 "0sar9zb44w1rcd987dkvw9p96bjwrqjfjarsasm488iv9qqmv9vn")))
-     (package
-       (inherit govuk-package)
-       (arguments
-        (substitute-keyword-arguments (package-arguments govuk-package)
-          ((#:phases phases)
-           `(modify-phases ,phases
-              (add-before 'install 'create-bin-bundle
-                ,(create-bin-bundle))))))))))
+  (package-with-bundler
+   (bundle-package
+    (hash
+     (base32 "0sar9zb44w1rcd987dkvw9p96bjwrqjfjarsasm488iv9qqmv9vn")))
+   (make-govuk-package
+    "publishing-e2e-tests"
+    (github-archive
+     #:repository "publishing-e2e-tests"
+     #:commit-ish "44058ef1421b81a9c4c11f5a7dba40d0404de29a"
+     #:hash (base32 "1xlgs4a7k49h54nv19ax3cd4a17jv74g13zn05hbrv041css3my9")))))
 
 (define-public maslow
   (let
