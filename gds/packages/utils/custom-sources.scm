@@ -1,10 +1,16 @@
 (define-module (gds packages utils custom-sources)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
+  #:use-module (ice-9 popen)
+  #:use-module (ice-9 rdelim)
   #:use-module (guix packages)
   #:use-module (guix store)
   #:use-module (guix download)
+  #:use-module (guix git-download)
   #:use-module (guix gexp)
+  #:use-module (guix build utils)
   #:use-module (gds packages utils bundler)
   #:export (github-url-regex
             environment-variable-commit-ish-regex
@@ -123,7 +129,8 @@
       (let ((source
              (local-file
               custom-path
-              #:recursive? #t)))
+              #:recursive? #t
+              #:select? (git-predicate custom-path))))
         (package
           (inherit pkg)
           (source source)
