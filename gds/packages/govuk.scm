@@ -307,7 +307,7 @@
        (substitute-keyword-arguments (package-arguments pkg)
          ((#:phases phases)
           `(modify-phases ,phases
-             (add-after 'install 'create-bin-bundle
+             (add-after 'install 'replace-mongoid.yml
                ,(replace-mongoid.yml #:mongoid-version "3")))))))))
 
 (define-public need-api
@@ -328,7 +328,7 @@
        (substitute-keyword-arguments (package-arguments pkg)
          ((#:phases phases)
           `(modify-phases ,phases
-             (add-after 'install 'create-bin-bundle
+             (add-after 'install 'replace-mongoid.yml
                ,(replace-mongoid.yml #:mongoid-version "3")))))))))
 
 (define-public govuk-content-schemas
