@@ -120,8 +120,7 @@
                   (or (eq? result #t)
                       (begin
                         (simple-format #t "pre-startup-script ~A failed\n" '#$key)
-                        (if (list? result)
-                            (simple-format #t "result: ~A\n" result))
+                        (simple-format #t "result: ~A\n" result)
                         #f))))))
          pre-startup-scripts)))
     #~(let run ((scripts (list #$@script-gexps)))
@@ -193,7 +192,8 @@
                       "exec" "rails"))))
               (pid-file (string-append
                          #$root-directory
-                         "/tmp/pids/server.pid")))
+                         "/tmp/pids/server.pid"))
+              (environment-variables '#$environment-variables))
 
           (use-modules (guix build utils)
                        (ice-9 popen))
@@ -208,7 +208,7 @@
                    (list #$run-pre-startup-scripts-program)
                    #:user (passwd:uid user)
                    #:directory #$root-directory
-                   #:environment-variables '#$environment-variables)))
+                   #:environment-variables environment-variables)))
               (if (zero? (cdr (waitpid pid)))
                   #t
                   (begin
@@ -225,7 +225,7 @@
              #:pid-file pid-file
              #:pid-file-timeout 10
              #:log-file (string-append "/var/log/" #$string-name ".log")
-             #:environment-variables '#$environment-variables))))))
+             #:environment-variables environment-variables))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
@@ -277,7 +277,7 @@
               (map
                (lambda (dir)
                  (string-append #$root-directory "/" dir))
-               '("tmp" "log" "public"))))
+               '("tmp" "tmp/pids" "log" "public"))))
            (begin
              (copy-recursively
               (string-append #$package "/bin")
@@ -292,11 +292,22 @@
                 (let ((target
                        (string-append #$root-directory "/vendor/" name)))
                   (if (file-exists? target)
-                      (delete-file target))
+                      (delete-file-recursively target))
                   (mkdir-p (string-append #$root-directory "/vendor"))
                   (symlink (string-append #$package "/vendor/" name)
                            target)))
-              '("cache" "bundle"))))
+              '("cache" "bundle"))
+
+             (for-each
+              (lambda (path)
+                (mkdir-p (string-append #$root-directory path))
+                (chmod (string-append #$root-directory path) #o777))
+              '("/tmp" "/tmp/pids" "/log"))
+
+             (for-each
+              (cut chmod <> #o666)
+              (find-files (string-append #$root-directory "/log")
+                          #:directories? #f))))
 
           (call-with-output-file (string-append #$root-directory "/bin/env.sh")
             (lambda (port)
@@ -304,9 +315,6 @@
                (lambda (env-var)
                  (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
                '#$environment-variables)))
-
-          (mkdir-p (string-append #$root-directory "/tmp/pids"))
-          (chmod (string-append #$root-directory "/tmp/pids") #o777)
 
           (substitute* (find-files (string-append #$root-directory "/bin"))
             (("/usr/bin/env") (which "env")))
