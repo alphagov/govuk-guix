@@ -131,14 +131,14 @@
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "13k48989wnr2d2njas4254jfkhlsc42cdgn7gs1rii49h8h3gmqy"))
+    (hash (base32 "1qpx3n6gp3v280k0a689cxn8iy413csmf1grrnj2qzs5g54l23bn"))
     (without '("test")))
    (make-govuk-package
     "content-tagger"
     (github-archive
      #:repository "content-tagger"
-     #:commit-ish "release_332"
-     #:hash (base32 "0ia237jbg5zzbswgz9d9d3793cynp9vfkdckx0yf9p2wp23fkm92")))))
+     #:commit-ish "release_341"
+     #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))))
 
 (define-public specialist-publisher
   (package-with-bundler
@@ -280,13 +280,13 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "086iy66h29y3djmmpmqjs5vfnvs3yw09iwbgphii2h24bk0msv2p")))
+          (hash (base32 "18ljpg3s12fwqj7pmjp44sddj4ich3ailvgjw6a0k88fwv3nlrbb")))
          (make-govuk-package
           "maslow"
           (github-archive
            #:repository "maslow"
-           #:commit-ish "release_180"
-           #:hash (base32 "0zxcxznhp95sss85lrx4gdipwb75jhd3y9wsd01nrd1nl12hr0jx"))))))
+           #:commit-ish "release_187"
+           #:hash (base32 "0x8cvmaw7687zrskkfni3024xrywcbihi3qck9xlh3f9wcajn51r"))))))
     (package
       (inherit pkg)
       (arguments
@@ -306,8 +306,8 @@
           "need-api"
           (github-archive
            #:repository "govuk_need_api"
-           #:commit-ish "release_138"
-           #:hash (base32 "0swfglpjp9077xfxxm0zj7mmqj1dxrpfk71j9w59palg4gqzzn14"))))))
+           #:commit-ish "release_141"
+           #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9"))))))
     (package
       (inherit pkg)
       (arguments
