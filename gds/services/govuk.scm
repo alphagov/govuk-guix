@@ -438,6 +438,64 @@
          (plek-config) (rails-app-config) specialist-frontend)))
 
 ;;;
+;;; Content API
+;;;
+
+(define content-api-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'content-api))
+
+(define content-api-service
+  (service
+   content-api-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(content-api))
+          (requirement '()))
+         (service-startup-config)
+         (plek-config) (rails-app-config) content-api)))
+
+;;;
+;;; Frontend
+;;;
+
+(define frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'frontend))
+
+(define frontend-service
+  (service
+   frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(frontend))
+          (requirement '(content-api)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) frontend)))
+
+;;;
+;;; Publisher
+;;;
+
+(define publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'publisher))
+
+(define publisher-service
+  (service
+   publisher-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(publisher))
+          (requirement '(content-api publishing-api)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) publisher
+         (redis-connection-config)
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
+         (mongodb-connection-config
+          (user "publisher")
+          (password (random-base16-string 30))
+          (database "govuk_content_production")))))
+
+;;;
 ;;; Router
 ;;;
 
@@ -717,7 +775,7 @@
    ;; manuals-publisher-service
    maslow-service
    ;; policy-publisher-service
-   ;; publisher-service
+   publisher-service
    ;; service-manual-publisher-service
    ;; short-url-manager-service
    specialist-publisher-service
@@ -732,7 +790,7 @@
    draft-content-store-service
    ;; email-alert-api-service
    ;; email-alert-service-service
-   ;; content-api-service
+   content-api-service
    need-api-service
    ;; imminence-service
    publishing-api-service
@@ -769,7 +827,7 @@
    ;; email-alert-frontend-service
    ;; feedback-service
    ;; finder-frontend-service
-   ;; frontend-service
+   frontend-service
    ;; government-frontend-service
    info-frontend-service
    ;; licence-finder-service
