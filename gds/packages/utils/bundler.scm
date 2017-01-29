@@ -1,5 +1,6 @@
 (define-module (gds packages utils bundler)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (guix monads)
   #:use-module (guix records)
@@ -177,6 +178,11 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
      (substitute-keyword-arguments (package-arguments pkg)
        ((#:phases phases)
         `(modify-phases ,phases
+           (delete 'set-bundle-without)
+           (delete 'path-remove-source)
+           (delete 'bundle-install)
+           (delete 'patch-tzinfo-data-source)
+           (delete 'wrap-bin-files-for-bundler)
            (add-after 'patch-generated-file-shebangs 'set-bundle-without
              (lambda _ (setenv "BUNDLE_WITHOUT"
                                ,(string-join
@@ -291,7 +297,13 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
      (cons*
       (list "bundler" bundler)
       (list "gemrc" (gemrc ruby))
-      (package-inputs pkg)))
+      (filter
+       (match-lambda
+         ((name rest ...)
+          (not (any
+                (cut string= name <>)
+                '("bundler" "gemrc")))))
+       (package-inputs pkg))))
     (native-inputs
      (cons
       (list "gems" (bundle-package
@@ -299,4 +311,8 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                     (source (package-source pkg))
                     (name (string-append (package-name pkg) "-bundle-package"))
                     (ruby ruby)))
-      (package-native-inputs pkg)))))
+      (filter
+       (match-lambda
+         ((name rest ...)
+          (not (string= name "gems"))))
+       (package-native-inputs pkg))))))
