@@ -94,17 +94,31 @@
     (license #f)
     (home-page #f)))
 
-(define* (package-rails-app name source #:optional #:key precompile-assets)
-  (let ((pkg (make-govuk-package name source)))
+(define* (package-rails-app name source
+                            #:optional #:key
+                            (precompile-assets #t))
+  (let ((pkg (make-govuk-package name source))
+        (phase-modifications
+         `(,@(if
+              precompile-assets
+              '(add-before
+                'install 'asset-precompile
+                (lambda*
+                 (#:key inputs #:allow-other-keys)
+                 (zero?
+                  (system* "bundle" "exec" "rake" "assets:precompile"))))
+              '()))))
     (package
       (inherit pkg)
       (arguments
-       (substitute-keyword-arguments (package-arguments pkg)
-         ((#:phases phases)
-          `(modify-phases ,phases
-             (add-before 'install 'asset-precompile
-               (lambda* (#:key inputs #:allow-other-keys)
-                 (zero? (system* "bin/rake" "assets:precompile")))))))))))
+       (substitute-keyword-arguments
+        (package-arguments pkg)
+        ((#:phases phases)
+         (if (null? phase-modifications)
+             phases
+             `(modify-phases
+               ,phases
+               ,phase-modifications))))))))
 
 (define-public publishing-api
   (package-with-bundler
