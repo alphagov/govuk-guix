@@ -178,6 +178,50 @@
      #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))
     #:precompile-assets #t)))
 
+(define-public content-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1v1zc8ahsyrba00ai5hllkhglqzpz1q6v1yvmy28vgb1ma6h6925")))
+   (package-rails-app
+    "content-api"
+    (github-archive
+     #:repository "govuk_content_api"
+     #:commit-ish "release_397"
+     #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv"))
+    #:precompile-assets #f)))
+
+(define-public publisher
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "00gmlxb16n1c2x3mh1g875j721kbzqyz8k8dvrwin2m69adbzkc5")))
+         (package-rails-app
+          "publisher"
+          (github-archive
+           #:repository "publisher"
+           #:commit-ish "release_1696"
+           #:hash (base32 "1pnzbgfsg29icgi5li70895mlr2xj2vdhnnw9k6zg3xnq4w4smfn"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-mongoid.yml
+               ,(replace-mongoid.yml)))))))))
+
+(define-public frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0d51mg5jgak0n3xfxgyasymswzpkhdzv2bps9wvy35813jksp8qf")))
+   (package-rails-app
+    "frontend"
+    (github-archive
+     #:repository "frontend"
+     #:commit-ish "release_2024"
+     #:hash (base32 "0qh97i164akfmfjl7zqavl5iiknybr4cynsh6klcqjqr9lknd03m")))))
+
 (define-public signon
   (let ((pkg
          (package-with-bundler
