@@ -7,6 +7,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system shadow)
+  #:use-module (gnu packages base)
   #:use-module ((gnu packages admin)
                 #:select (shadow))
   #:use-module (gds services)
@@ -317,7 +318,9 @@
                '#$environment-variables)))
 
           (substitute* (find-files (string-append #$root-directory "/bin"))
-            (("/usr/bin/env") (which "env")))
+            (("/usr/bin/env") (string-append
+                               #$coreutils
+                               "/bin/env")))
           (let*
               ((target
                 (string-append "exec -a \"\\$0\" \"" #$package))
