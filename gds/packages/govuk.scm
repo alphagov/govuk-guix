@@ -210,6 +210,18 @@
      #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h"))
     #:precompile-assets #t)))
 
+(define-public info-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0f1j9ca8dhvaip2iv1g46ys3xg4fy73ijnwr7rycq02pwzwqmzrx")))
+   (package-rails-app
+    "info-frontend"
+    (github-archive
+     #:repository "info-frontend"
+     #:commit-ish "release_56"
+     #:hash (base32 "0j42ad9s28v1153xb22x391g0kzhxvcc4m51civ0jl2v6v9w1zjq"))
+    #:precompile-assets #t)))
+
 (define-public router-api
   (package-with-bundler
    (bundle-package
