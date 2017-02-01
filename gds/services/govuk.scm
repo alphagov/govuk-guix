@@ -77,6 +77,8 @@
             signon-service
             static-service-type
             static-service
+            info-frontend-service-type
+            info-frontend-service
 
             publishing-application-services
             api-services
@@ -654,6 +656,23 @@
           default-need-api-database-connection-configs)))
 
 ;;;
+;;; Info Frontend
+;;;
+
+(define info-frontend-service-type
+  (make-rails-app-using-plek-service-type 'info-frontend))
+
+(define info-frontend-service
+  (service
+   info-frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(info-frontend))
+          (requirement '(content-store publishing-api)))
+         (service-startup-config) (plek-config) (rails-app-config)
+         info-frontend)))
+
+;;;
 ;;; Static service
 ;;;
 
@@ -753,7 +772,7 @@
    ;; finder-frontend-service
    ;; frontend-service
    ;; government-frontend-service
-   ;; info-frontend-service
+   info-frontend-service
    ;; licence-finder-service
    ;; manuals-frontend-service
    ;; multipage-frontend-service
