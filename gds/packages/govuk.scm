@@ -13,6 +13,7 @@
   #:use-module (guix git-download)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages curl)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages commencement)
@@ -24,6 +25,7 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu packages node)
   #:use-module (gnu packages golang)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages version-control)
@@ -499,3 +501,47 @@ Publishing API service, and with the environment variables for this
 service setup.")
    (license #f)
    (home-page #f)))
+
+(define-public whitehall
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1g5qf3lpmli4siiz3sbwkvg28jrypzqfvg0s89qd1fbmjqn8f9hj")))
+         (make-govuk-package
+          "whitehall"
+          (github-archive
+           #:repository "whitehall"
+           #:commit-ish "release_12554"
+           #:hash (base32 "15c894aaz73657c79nlws6d9243lqz5p9cngj8vqr98m1nqxbxhx"))))))
+    (package
+      (inherit pkg)
+      (inputs
+       `(("curl" ,curl)
+         ,@(package-inputs pkg)))
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+               ,(use-blank-database.yml)))))))))
+
+(define-public government-frontend
+  (let ((pkg
+         (package-with-bundler
+          (bundle-package
+           (hash (base32 "1nwb9qdz4iybf640rbdfg6v155gh0358c4ly77zzkds9sg79a3c4")))
+          (make-govuk-package
+           "government-frontend"
+           (github-archive
+            #:repository "government-frontend"
+            #:commit-ish "release_244"
+            #:hash (base32 "0zlxr1340ax3xpvnry48v3jr9sv6vlr268h647svg2y86a2avm0i"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-before 'bundle-install 'replace-ruby-version
+                         ,(replace-ruby-version (package-version ruby))))))))))
