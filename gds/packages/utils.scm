@@ -1,4 +1,5 @@
 (define-module (gds packages utils)
+  #:use-module (ice-9 match)
   #:use-module (guix utils)
   #:use-module (guix packages)
   #:use-module (guix build utils)
@@ -153,3 +154,15 @@ production:
            (lambda (port)
              (simple-format port "")))
          #t))))
+
+(define-public (package-with-ruby ruby pkg)
+  (package
+   (inherit pkg)
+   (inputs
+    (map
+     (match-lambda
+       ((name pkg rest ...)
+        (if (equal? name "ruby")
+            `("ruby" ,ruby)
+            (cons* name pkg rest))))
+     (package-inputs pkg)))))
