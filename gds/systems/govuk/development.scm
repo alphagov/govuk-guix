@@ -9,6 +9,11 @@
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
   #:use-module (gnu services web)
+  #:use-module (gnu services admin)
+  #:use-module (gnu packages web)
+  #:use-module (gnu packages vim)
+  #:use-module (gnu packages ncdu)
+  #:use-module (gnu packages code)
   #:use-module (gnu services databases)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages version-control)
@@ -428,6 +433,11 @@
       redis
       mongo-tools
       htop
+      vim
+      ncdu
+      the-silver-searcher
+      tree
+      jq
       %base-packages))
     (file-systems
      (cons (file-system
