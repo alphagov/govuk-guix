@@ -9,22 +9,37 @@
   #:use-module (guix profiles)
   #:use-module (guix store)
   #:use-module (guix utils)
+  #:use-module (guix download)
   #:use-module (guix search-paths)
+  #:use-module (guix build-system ruby)
   #:use-module (gnu packages base)
-  #:use-module (gnu packages ruby)
+  #:use-module ((gnu packages ruby) #:prefix guix:)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages certs)
-  #:export (<bundle-package>
-           bundle-package
-           bundle-package?
-           bundle-package-source
-           bundle-package-name
-           bundle-package-hash
-           bundle-package-ruby
-           bundle-package-without
+  #:export (bundler
 
-           package-with-bundler))
+            <bundle-package>
+            bundle-package
+            bundle-package?
+            bundle-package-source
+            bundle-package-name
+            bundle-package-hash
+            bundle-package-ruby
+            bundle-package-without
+
+            package-with-bundler))
+
+(define bundler
+  (package
+    (inherit guix:bundler)
+    (version "1.13.5")
+    (source (origin
+              (method url-fetch)
+              (uri (rubygems-uri "bundler" version))
+              (sha256
+               (base32
+                "0fxr7aq7qhlga423mygy7q96cwxmvqlcy676v2x5swlw8rlha2in"))))))
 
 (define-record-type* <bundle-package>
   bundle-package make-bundle-package
@@ -35,7 +50,7 @@
         (default "bundle-package"))
   (hash bundle-package-hash)
   (ruby bundle-package-ruby
-        (default ruby))
+        (default guix:ruby))
   (without bundle-package-without
            (default '())))
 
