@@ -213,13 +213,13 @@
 (define-public info-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0f1j9ca8dhvaip2iv1g46ys3xg4fy73ijnwr7rycq02pwzwqmzrx")))
+    (hash (base32 "1idjf7d44jjgprnv651ghsi4md450p3kyqlykmhd6hw14fcrc30c")))
    (package-rails-app
     "info-frontend"
     (github-archive
      #:repository "info-frontend"
-     #:commit-ish "release_56"
-     #:hash (base32 "0j42ad9s28v1153xb22x391g0kzhxvcc4m51civ0jl2v6v9w1zjq"))
+     #:commit-ish "release_60"
+     #:hash (base32 "1sh7wgfhaazbl5sdmj69s73xh1ppv3j2dpyzxxkkdsmi76v7brz7"))
     #:precompile-assets #t)))
 
 (define-public router-api
