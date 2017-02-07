@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ ! -n "$BASH" ] ; then
     echo Please run $0 with bash;
     exit 1;
