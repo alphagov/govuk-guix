@@ -49,7 +49,7 @@ living at DIRECTORY.  Upon Git failure, return #f instead of a predicate."
 (define-public guix
   ;; Note that when changing the treeish, you will need to change the
   ;; sha256 hash such that Guix thinks that it has not built this
-  (let ((treeish "spike-local-development-system-container")
+  (let ((treeish "release_2")
         (select? (delay (make-git-predicate
                          (getenv "GDS_GNU_GUIX_PATH"))))
         (local-source (string? (getenv "GDS_GNU_GUIX_PATH"))))
@@ -75,7 +75,7 @@ living at DIRECTORY.  Upon Git failure, return #f instead of a predicate."
                    (commit treeish)))
              (sha256
               (base32
-               "1af02bikavnlrgm862rcbc3ylii7lnrgxm1rqvpsfmlzf9f43rr2"))
+               "1jxvsyyzzzhj1b4v9dc3ydhmndsnakl46m26vhbnzmz3zdvwwpki"))
              (file-name (string-append
                          "guix-"
                          (package-version gnu:guix)
