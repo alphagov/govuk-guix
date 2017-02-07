@@ -187,50 +187,64 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
 (define (package-with-bundler
          bundle-pkg
          pkg)
-  (package
-    (inherit pkg)
-    (arguments
-     (substitute-keyword-arguments (package-arguments pkg)
-       ((#:phases phases)
-        `(modify-phases ,phases
-           (delete 'set-bundle-without)
-           (delete 'path-remove-source)
-           (delete 'bundle-install)
-           (delete 'patch-tzinfo-data-source)
-           (delete 'wrap-bin-files-for-bundler)
-           (add-after 'patch-generated-file-shebangs 'set-bundle-without
-             (lambda _ (setenv "BUNDLE_WITHOUT"
-                               ,(string-join
-                                 (bundle-package-without bundle-pkg)
-                                 ":"))))
-           (add-after 'set-bundle-without 'path-remove-source
-                      (lambda _
-                        (setenv
-                         "PATH"
-                         (list->search-path-as-string
-                          (filter
-                           (lambda (path)
-                             (not (string-prefix?
-                                   (assoc-ref %build-inputs "source")
-                                   path)))
-                           (search-path-as-string->list (getenv "PATH")))
-                          ":"))))
-           (add-after 'path-remove-source 'ensure-/bin/bundle-exists
-                      (lambda* (#:key inputs outputs #:allow-other-keys)
-                               (let*
-                                   ((out (assoc-ref outputs "out"))
-                                    (gemfile (string-append out "/Gemfile"))
-                                    (ruby
-                                     (string-append (assoc-ref inputs "ruby")
-                                                    "/bin/ruby"))
-                                    (bundle
-                                     (string-append (getcwd) "/bin/bundle")))
-                                 (if (not (file-exists? bundle))
-                                     (begin
-                                       (mkdir-p (string-append (getcwd) "/bin"))
-                                       (call-with-output-file bundle
-                                         (lambda (port)
-                                           (format port "#!~A
+  (let
+      ((ruby
+        (let
+            ((ruby-input
+              (find
+               (match-lambda ((name pkg rest ...)
+                              (equal? name "ruby")))
+               (package-inputs pkg))))
+          (match
+              ruby-input
+            ((#f)
+             #f)
+            ((name pkg rest ...)
+             pkg)))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (delete 'set-bundle-without)
+             (delete 'path-remove-source)
+             (delete 'bundle-install)
+             (delete 'patch-tzinfo-data-source)
+             (delete 'wrap-bin-files-for-bundler)
+             (add-after 'patch-generated-file-shebangs 'set-bundle-without
+                        (lambda _ (setenv "BUNDLE_WITHOUT"
+                                          ,(string-join
+                                            (bundle-package-without bundle-pkg)
+                                            ":"))))
+             (add-after 'set-bundle-without 'path-remove-source
+                        (lambda _
+                          (setenv
+                           "PATH"
+                           (list->search-path-as-string
+                            (filter
+                             (lambda (path)
+                               (not (string-prefix?
+                                     (assoc-ref %build-inputs "source")
+                                     path)))
+                             (search-path-as-string->list (getenv "PATH")))
+                            ":"))))
+             (add-after 'path-remove-source 'ensure-/bin/bundle-exists
+                        (lambda* (#:key inputs outputs #:allow-other-keys)
+                          (let*
+                              ((out (assoc-ref outputs "out"))
+                               (gemfile (string-append out "/Gemfile"))
+                               (ruby
+                                (string-append (assoc-ref inputs "ruby")
+                                               "/bin/ruby"))
+                               (bundle
+                                (string-append (getcwd) "/bin/bundle")))
+                            (if (not (file-exists? bundle))
+                                (begin
+                                  (mkdir-p (string-append (getcwd) "/bin"))
+                                  (call-with-output-file bundle
+                                    (lambda (port)
+                                      (format port "#!~A
 ENV[\"BUNDLE_GEMFILE\"] ||= \"~A\"
 
 load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
@@ -241,6 +255,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                (let* ((cwd (getcwd))
                       (out (assoc-ref outputs "out")))
                  (setenv "GEMRC"  (assoc-ref %build-inputs "gemrc"))
+                 (setenv "CC" "gcc")
                  (simple-format #t "file-exists? ~A ~A\n" (string-append cwd "/vendor/cache") (file-exists? (string-append cwd "/vendor/cache")))
                  (if (catch
                        'system-error
@@ -351,4 +366,4 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
        (match-lambda
          ((name rest ...)
           (not (string= name "gems"))))
-       (package-native-inputs pkg))))))
+       (package-native-inputs pkg)))))))
