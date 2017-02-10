@@ -41,6 +41,8 @@
     (maslow . 53053)
     (specialist-frontend . 53065)
     (draft-specialist-frontend . 53066)
+    (government-frontend . 53090)
+    (draft-government-frontend . 53091)
     (content-api . 53022)
     (frontend . 53005)
     (publisher . 53006)

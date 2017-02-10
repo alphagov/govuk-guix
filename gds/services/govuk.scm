@@ -404,6 +404,40 @@
           default-specialist-publisher-database-connection-configs)))
 
 ;;;
+;;; Government Frontend
+;;;
+
+(define government-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'government-frontend))
+
+(define government-frontend-service
+  (service
+   government-frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(government-frontend))
+          (requirement '(content-store static)))
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "government-frontend"))))
+         (plek-config) (rails-app-config) government-frontend)))
+
+(define draft-government-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-government-frontend))
+
+(define draft-government-frontend-service
+  (service
+   draft-government-frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(draft-government-frontend))
+          (requirement '(draft-content-store draft-static)))
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "draft-government-frontend"))))
+         (plek-config) (rails-app-config) government-frontend)))
+
+;;;
 ;;; Specialist Frontend
 ;;;
 
@@ -828,7 +862,7 @@
    ;; feedback-service
    ;; finder-frontend-service
    frontend-service
-   ;; government-frontend-service
+   government-frontend-service
    info-frontend-service
    ;; licence-finder-service
    ;; manuals-frontend-service
@@ -843,7 +877,7 @@
    ;; draft-collections-service
    ;; draft-contacts-service
    ;; draft-email-alert-service
-   ;; draft-government-frontend-service
+   draft-government-frontend-service
    ;; draft-manuals-frontend-service
    ;; draft-multipage-frontend-service
    ;; draft-service-manual-frontend-service
