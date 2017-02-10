@@ -183,14 +183,10 @@
           rest))))
     #~(lambda args
         (let ((user (getpwnam #$string-name))
-              (rails
-               (let ((bin-file
-                      (string-append #$root-directory "/bin/rails")))
-                 (if (file-exists? bin-file)
-                     (list bin-file)
-                     (list
-                      (string-append #$root-directory "/bin/bundle")
-                      "exec" "rails"))))
+              (unicorn
+               (list
+                (string-append #$root-directory "/bin/bundle")
+                "exec" "unicorn"))
               (pid-file (string-append
                          #$root-directory
                          "/tmp/pids/server.pid"))
@@ -217,8 +213,7 @@
                                    #$string-name)
                     #f)))))
            ((make-forkexec-constructor
-             `(,@rails
-               "server"
+             `(,@unicorn
                "-p" #$string-port
                "-P" ,pid-file)
              #:user (passwd:uid user)
