@@ -255,7 +255,14 @@ ENV[\"BUNDLE_GEMFILE\"] ||= \"~A\"
 
 load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                                        (chmod bundle #o544)))
-                                 #t)))
+                            #t)))
+             (add-after 'ensure-/bin/bundle-exists 'set-ld-library-path
+                        (lambda* (#:key inputs #:allow-other-keys)
+                          (display inputs)
+                          (set-path-environment-variable
+                           "LD_LIBRARY_PATH"
+                           '("lib")
+                           (map cdr inputs))))
            (add-after 'ensure-/bin/bundle-exists 'bundle-install
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((cwd (getcwd))
@@ -319,14 +326,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                                  (assoc-ref %build-inputs "source")
                                  path)))
                          (search-path-as-string->list (getenv "PATH")))
-                        ":"))
-                      (ld-library-path
-                       (map
-                        (lambda (lib)
-                          (string-append
-                           (assoc-ref inputs lib)
-                           "/lib"))
-                        '("zlib" "mysql" "openssl" "gcc-toolchain"))))
+                        ":")))
                (for-each
                   (lambda (script)
                     (chmod script #o777)
@@ -338,9 +338,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                       `("LIBRARY_PATH" ":" prefix (,(getenv "LIBRARY_PATH")))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
                       `("BUNDLE_WITHOUT" ":" prefix (,(getenv "BUNDLE_WITHOUT")))
-                      `("LD_LIBRARY_PATH" = (,(string-join
-                                               ld-library-path
-                                               ":")))))
+                      `("LD_LIBRARY_PATH" ":" prefix (,(getenv "LD_LIBRARY_PATH")))))
                   (find-files
                    (string-append out "/bin")
                    (lambda (name stat)
