@@ -73,6 +73,9 @@
             need-api-service
             need-api-service-type
 
+            whitehall-service-type
+            whitehall-service
+
             signon-service-type
             signon-service
             static-service-type
@@ -797,6 +800,32 @@
          (plek-config) (rails-app-config) static)))
 
 ;;;
+;;; Whitehall
+;;;
+
+(define whitehall-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'whitehall))
+
+(define whitehall-service
+  (service
+   whitehall-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(whitehall))
+          (requirement '(publishing-api signon static need-api maslow)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) whitehall
+         (signon-application (name "Whitehall"))
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
+         (mysql-connection-config
+          (host "localhost")
+          (user "whitehall")
+          (port "-")
+          (database "whitehall_production")
+          (password "")))))
+
+;;;
 ;;; Service Lists
 ;;;
 
@@ -814,7 +843,7 @@
    ;; short-url-manager-service
    specialist-publisher-service
    ;; travel-advice-publisher-service
-   ;; whitehall-service
+   whitehall-service
    ))
 
 (define api-services
