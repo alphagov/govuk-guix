@@ -29,6 +29,7 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk plek)
+  #:use-module (gds services govuk signon)
   #:use-module (gds services govuk nginx))
 
 (define govuk-ports
@@ -322,6 +323,18 @@
         database-connection-config?
         (lambda (config)
           (update-database-connection-config-ports system-ports config)))
+       (cons
+        signon-config?
+        (lambda (config)
+          (signon-config
+           (inherit config)
+           (users
+            (list
+             (signon-user
+              (name "Dev")
+              (email "dev@example.com")
+              (passphrase "wies1Oc8Gi0uGaim")
+              (role "superadmin")))))))
        (cons
         rails-app-config?
         (lambda (config)

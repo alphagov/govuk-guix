@@ -1,6 +1,7 @@
 (define-module (gds services)
   #:use-module (ice-9 match)
   #:use-module (guix records)
+  #:use-module (gnu services)
   #:export (<service-startup-config>
             service-startup-config
             service-startup-config?
@@ -9,7 +10,8 @@
             service-startup-config-root-pre-startup-scripts
 
             service-startup-config-with-additional-environment-variables
-            service-startup-config-add-pre-startup-scripts))
+            service-startup-config-add-pre-startup-scripts
+            service-type-extensions-modify-parameters))
 
 (define-record-type* <service-startup-config>
   service-startup-config make-service-startup-config
@@ -60,3 +62,16 @@
          (filter-out-replaced-scripts
           (service-startup-config-pre-startup-scripts ssc))
          scripts)))))
+
+(define (service-type-extensions-modify-parameters type f)
+  (service-type
+   (inherit type)
+   (extensions
+    (map
+     (lambda (se)
+       (service-extension
+        (service-extension-target se)
+        (lambda (parameters)
+          ((service-extension-compute se)
+           (f parameters)))))
+     (service-type-extensions type)))))

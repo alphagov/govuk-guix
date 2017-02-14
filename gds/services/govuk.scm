@@ -34,8 +34,8 @@
 
             signon-config
             signon-config?
-            signon-config-rails-app-config
             signon-config-applications
+            signon-config-users
 
             router-config
             router-config?
@@ -147,12 +147,29 @@
   signon-config make-signon-config
   signon-config?
   (applications signon-config-applications
+                (default '()))
+  (users        signon-config-users
                 (default '())))
 
 (define signon-service-type
   (service-type
    (inherit
-    (make-rails-app-using-plek-service-type 'signon))
+    (service-type-extensions-modify-parameters
+     (make-rails-app-using-plek-service-type 'signon)
+     (lambda (parameters)
+       (let ((config (find signon-config? parameters)))
+         (map
+          (lambda (parameter)
+            (if (service-startup-config? parameter)
+                (service-startup-config-add-pre-startup-scripts
+                 parameter
+                 `((signon-setup-users
+                    .
+                    ,(run-command
+                      "rails" "runner" (signon-setup-users-script
+                                        (signon-config-users config))))))
+                parameter))
+          parameters)))))
    (compose list)
    (extend (lambda (parameters applications)
              (map
