@@ -291,6 +291,13 @@
     (cons rails-app-config?
           update-rails-app-config-with-random-secret-token))))
 
+(define (set-random-signon-oauth service)
+  (update-service-parameters
+   service
+   (list
+    (cons signon-application?
+          update-signon-application-with-random-oauth))))
+
 (define (set-plek-config services)
   (map
    (lambda (service)
@@ -323,6 +330,10 @@
         database-connection-config?
         (lambda (config)
           (update-database-connection-config-ports system-ports config)))
+       (cons
+        signon-application?
+        (lambda (app)
+          (update-signon-application-with-random-oauth app)))
        (cons
         signon-config?
         (lambda (config)

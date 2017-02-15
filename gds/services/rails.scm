@@ -333,7 +333,8 @@
       ((package (find package? rest))
        (root-directory
         (app-name->root-directory (symbol->string name)))
-       (ss (find shepherd-service? rest))
+       (ss (or (find shepherd-service? rest)
+               (error "Missing shepherd service for ~A\n" name)))
        (rails-app-config (find rails-app-config? rest))
        (sidekiq-config (find sidekiq-config? rest))
        (sidekiq-service-name

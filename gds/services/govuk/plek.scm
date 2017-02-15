@@ -22,6 +22,7 @@
 
             plek-config->environment-variables
             plek-config->/etc/hosts-string
+            service-uri-from-plek-config
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
@@ -57,6 +58,11 @@
      (display (plek-config-service-ports plek-config))
      (display "\n")
      (error "Port missing from plek-config for" service))))
+
+(define (service-uri-from-plek-config plek-config service)
+  ((plek-config-service-uri-function plek-config)
+   service
+   (service-port-from-plek-config plek-config service)))
 
 (define (service-symbol->environment-variable-string service)
   (string-map

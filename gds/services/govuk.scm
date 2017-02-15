@@ -100,16 +100,33 @@
 (define (make-rails-app-using-plek-and-signon-service-type name)
   (let ((base-service-type
          (make-rails-app-using-plek-service-type name)))
-    (service-type
-     (inherit base-service-type)
-     (extensions
-      (cons
-       (service-extension signon-service-type
-                          (lambda (parameters)
-                            (filter
-                             signon-application?
-                             parameters)))
-       (service-type-extensions base-service-type))))))
+    (service-type-extensions-modify-parameters
+     (service-type
+      (inherit base-service-type)
+      (extensions
+       (cons
+        (service-extension signon-service-type
+                           (lambda (parameters)
+                             (filter
+                              signon-application?
+                              parameters)))
+        (service-type-extensions base-service-type))))
+     (lambda (parameters)
+       (let ((plek-config (find plek-config? parameters)))
+         (if plek-config
+             (map
+              (lambda (parameter)
+                (if (signon-application? parameter)
+                    (signon-application
+                     (inherit parameter)
+                     (home-uri (service-uri-from-plek-config plek-config name))
+                     (redirect-uri
+                      (string-append
+                       (service-uri-from-plek-config plek-config name)
+                       "/auth/gds/callback")))
+                    parameter))
+              parameters)
+             parameters))))))
 
 ;;;
 ;;; GOV.UK Content Schemas
@@ -167,10 +184,15 @@
                     .
                     ,(run-command
                       "rails" "runner" (signon-setup-users-script
-                                        (signon-config-users config))))))
+                                        (signon-config-users config))))
+                   (signon-setup-applications
+                    .
+                    ,(run-command
+                      "rails" "runner" (signon-setup-applications-script
+                                        (signon-config-applications config))))))
                 parameter))
           parameters)))))
-   (compose list)
+   (compose concatenate)
    (extend (lambda (parameters applications)
              (map
               (lambda (parameter)
