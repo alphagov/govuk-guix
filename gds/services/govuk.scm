@@ -100,6 +100,39 @@
 (define (make-rails-app-using-plek-and-signon-service-type name)
   (let ((base-service-type
          (make-rails-app-using-plek-service-type name)))
+    (define (update-service-startup-config parameters)
+      (let ((signon-application (find signon-application? parameters)))
+        (if signon-application
+            (map
+             (lambda (parameter)
+               (if (service-startup-config? parameter)
+                   (service-startup-config-with-additional-environment-variables
+                    parameter
+                    `(("OAUTH_ID" . ,(signon-application-oauth-id
+                                      signon-application))
+                      ("OAUTH_SECRET" . ,(signon-application-oauth-secret
+                                          signon-application))))
+                   parameter))
+             parameters)
+            parameters)))
+
+    (define (update-signon-application parameters)
+      (let ((plek-config (find plek-config? parameters)))
+        (if plek-config
+            (map
+             (lambda (parameter)
+               (if (signon-application? parameter)
+                   (signon-application
+                    (inherit parameter)
+                    (home-uri (service-uri-from-plek-config plek-config name))
+                    (redirect-uri
+                     (string-append
+                      (service-uri-from-plek-config plek-config name)
+                      "/auth/gds/callback")))
+                   parameter))
+             parameters)
+            parameters)))
+
     (service-type-extensions-modify-parameters
      (service-type
       (inherit base-service-type)
@@ -112,21 +145,8 @@
                               parameters)))
         (service-type-extensions base-service-type))))
      (lambda (parameters)
-       (let ((plek-config (find plek-config? parameters)))
-         (if plek-config
-             (map
-              (lambda (parameter)
-                (if (signon-application? parameter)
-                    (signon-application
-                     (inherit parameter)
-                     (home-uri (service-uri-from-plek-config plek-config name))
-                     (redirect-uri
-                      (string-append
-                       (service-uri-from-plek-config plek-config name)
-                       "/auth/gds/callback")))
-                    parameter))
-              parameters)
-             parameters))))))
+       (update-service-startup-config
+        (update-signon-application parameters))))))
 
 ;;;
 ;;; GOV.UK Content Schemas
@@ -180,16 +200,16 @@
             (if (service-startup-config? parameter)
                 (service-startup-config-add-pre-startup-scripts
                  parameter
-                 `((signon-setup-users
-                    .
-                    ,(run-command
-                      "rails" "runner" (signon-setup-users-script
-                                        (signon-config-users config))))
-                   (signon-setup-applications
+                 `((signon-setup-applications
                     .
                     ,(run-command
                       "rails" "runner" (signon-setup-applications-script
-                                        (signon-config-applications config))))))
+                                        (signon-config-applications config))))
+                   (signon-setup-users
+                    .
+                    ,(run-command
+                      "rails" "runner" (signon-setup-users-script
+                                        (signon-config-users config))))))
                 parameter))
           parameters)))))
    (compose concatenate)

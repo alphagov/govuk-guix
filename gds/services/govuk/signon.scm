@@ -129,6 +129,65 @@ users.each do |name, email, passphrase, role, application_permissions|
   u.skip_confirmation!
 
   u.save!
+
+  application_permissions.each do |application_name, permissions|
+    app = Doorkeeper::Application.find_by_name!(application_name)
+    permissions.each do |permission|
+      u.grant_application_permission(app, permission)
+    end
+  end
+end")
+    "\n")))
+
+(define (signon-setup-api-users-script signon-api-users)
+  (plain-file
+   "signon-setup-api-users.rb"
+   (string-join
+    `("users = ["
+      ,(string-join
+        (map
+         (lambda (user)
+           (define sq (cut string-append "'" <> "'"))
+
+           (string-append
+            "["
+            (string-join
+             (list
+              (sq (signon-user-name user))
+              (sq (signon-user-email user))
+              (sq (signon-user-passphrase user))
+              (sq (signon-user-role user))
+              (string-append
+               "["
+               (string-join
+                (map
+                 (match-lambda
+                   ((application . permissions)
+                    (string-append
+                     "[ '" application "', ["
+                     (string-join (map sq permissions) ", ")
+                     "]]")))
+                 (signon-user-application-permissions user)))
+               "]"))
+             ", ")
+            "]"))
+         signon-api-users)
+       ",\n")
+      "]"
+      "
+puts \"#{users.length} api users to create\"
+users.each do |name, email, passphrase, role, application_permissions|
+  puts \"Creating #{name}\"
+  u = ApiUser.new(
+    name: name,
+    email: email,
+    password = passphrase,
+    password_confirmation = passphrase
+  )
+  u.api_user = true
+  u.skip_confirmation!
+
+  u.save!
 end")
     "\n")))
 
