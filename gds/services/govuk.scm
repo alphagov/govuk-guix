@@ -100,7 +100,8 @@
 (define (make-rails-app-using-plek-and-signon-service-type name)
   (let ((base-service-type
          (make-rails-app-using-plek-service-type name)))
-    (define (update-service-startup-config parameters)
+
+    (define (update-service-startup-config-for-signon-application parameters)
       (let ((signon-application (find signon-application? parameters)))
         (if signon-application
             (map
@@ -115,6 +116,32 @@
                    parameter))
              parameters)
             parameters)))
+
+    (define (update-service-startup-config-for-signon-api-user parameters)
+      (map
+       (lambda (parameter)
+         (if (service-startup-config? parameter)
+             (service-startup-config-with-additional-environment-variables
+              parameter
+              (map
+               (match-lambda
+                 (($ <signon-authorisation> application-name token)
+                  (let ((name
+                         (string-append
+                          (string-map
+                           (lambda (c)
+                             (if (eq? c #\space) #\_ c))
+                           (string-upcase application-name))
+                          "_BEARER_TOKEN")))
+                    (cons name token))))
+               (concatenate
+                (map
+                 (match-lambda
+                   (($ <signon-api-user> name email authorisation-permissions)
+                    (map car authorisation-permissions)))
+                 (filter signon-api-user? parameters)))))
+             parameter))
+       parameters))
 
     (define (update-signon-application parameters)
       (let ((plek-config (find plek-config? parameters)))
@@ -141,12 +168,15 @@
         (service-extension signon-service-type
                            (lambda (parameters)
                              (filter
-                              signon-application?
+                              (lambda (parameter)
+                                (or (signon-application? parameter)
+                                    (signon-api-user? parameter)))
                               parameters)))
         (service-type-extensions base-service-type))))
      (lambda (parameters)
-       (update-service-startup-config
-        (update-signon-application parameters))))))
+       (update-service-startup-config-for-signon-application
+        (update-service-startup-config-for-signon-api-user
+         (update-signon-application parameters)))))))
 
 ;;;
 ;;; GOV.UK Content Schemas
@@ -186,6 +216,8 @@
   (applications signon-config-applications
                 (default '()))
   (users        signon-config-users
+                (default '()))
+  (api-users    signon-config-api-users
                 (default '())))
 
 (define signon-service-type
@@ -209,11 +241,16 @@
                     .
                     ,(run-command
                       "rails" "runner" (signon-setup-users-script
-                                        (signon-config-users config))))))
+                                        (signon-config-users config))))
+                   (signon-setup-api-users
+                    .
+                    ,(run-command
+                      "rails" "runner" (signon-setup-api-users-script
+                                        (signon-config-api-users config))))))
                 parameter))
           parameters)))))
    (compose concatenate)
-   (extend (lambda (parameters applications)
+   (extend (lambda (parameters extension-parameters)
              (map
               (lambda (parameter)
                 (if (signon-config? parameter)
@@ -221,7 +258,12 @@
                      (inherit parameter)
                      (applications (append
                                     (signon-config-applications parameter)
-                                    applications)))
+                                    (filter signon-application?
+                                            extension-parameters)))
+                     (api-users (append
+                                 (signon-config-api-users parameter)
+                                 (filter signon-api-user?
+                                         extension-parameters))))
                     parameter))
               parameters)))))
 

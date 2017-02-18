@@ -25,9 +25,24 @@
             signon-user-passphrase
             signon-user-application-permissions
 
+            <signon-api-user>
+            signon-api-user
+            signon-api-user?
+            signon-api-user-name
+            signon-api-user-email
+            signon-api-user-authorisation-permissions
+
+            <signon-authorisation>
+            signon-authorisation
+            signon-authorisation?
+            signon-authorisation-application-name
+            signon-authorisation-token
+
             use-real-gds-sso-strategy
             update-signon-application-with-random-oauth
+            update-signon-api-user-with-random-authorisation-tokens
             signon-setup-users-script
+            signon-setup-api-users-script
             signon-setup-applications-script))
 
 (define-record-type* <signon-application>
@@ -57,11 +72,43 @@
   (application-permissions signon-user-application-permissions
                            (default '())))
 
+(define-record-type* <signon-api-user>
+  signon-api-user make-signon-api-user
+  signon-api-user?
+  (name signon-api-user-name)
+  (email signon-api-user-email)
+  (authorisation-permissions signon-api-user-authorisation-permissions
+                             (default '())))
+
+(define-record-type* <signon-authorisation>
+  signon-authorisation make-signon-authorisation
+  signon-authorisation?
+  (application-name signon-authorisation-application-name)
+  (token signon-authorisation-token
+         (default #f)))
+
 (define (update-signon-application-with-random-oauth app)
   (signon-application
    (inherit app)
    (oauth-id (random-base16-string 64))
    (oauth-secret (random-base16-string 64))))
+
+(define (update-signon-authorisation-with-random-token authorisation)
+  (signon-authorisation
+   (inherit authorisation)
+   (token (random-base16-string 30))))
+
+(define (update-signon-api-user-with-random-authorisation-tokens api-user)
+  (signon-api-user
+   (inherit api-user)
+   (authorisation-permissions
+    (map
+     (match-lambda
+       ((authorisation . permissions)
+        (cons
+         (update-signon-authorisation-with-random-token authorisation)
+         permissions)))
+     (signon-api-user-authorisation-permissions api-user)))))
 
 (define (use-real-gds-sso-strategy services)
   (map
@@ -156,21 +203,21 @@ end")
             "["
             (string-join
              (list
-              (sq (signon-user-name user))
-              (sq (signon-user-email user))
-              (sq (signon-user-passphrase user))
-              (sq (signon-user-role user))
+              (sq (signon-api-user-name user))
+              (sq (signon-api-user-email user))
               (string-append
                "["
                (string-join
                 (map
                  (match-lambda
-                   ((application . permissions)
+                   ((($ <signon-authorisation> application-name token)
+                     .
+                     permissions)
                     (string-append
-                     "[ '" application "', ["
+                     "[ '" application-name "', '" token "', ["
                      (string-join (map sq permissions) ", ")
                      "]]")))
-                 (signon-user-application-permissions user)))
+                 (signon-api-user-authorisation-permissions user)))
                "]"))
              ", ")
             "]"))
@@ -180,17 +227,36 @@ end")
       "
 puts \"#{users.length} api users to create\"
 
-users.each do |name, email, passphrase, role, application_permissions|
+users.each do |name, email, authorisation_permissions|
   puts \"Creating #{name}\"
+
+  passphrase = SecureRandom.urlsafe_base64
+
   u = ApiUser.where(email: email).first_or_initialize(
     name: name,
-    password = passphrase,
-    password_confirmation = passphrase
+    password: passphrase,
+    password_confirmation: passphrase
   )
   u.api_user = true
   u.skip_confirmation!
-
   u.save!
+
+  authorisation_permissions.each do |application_name, token, permissions|
+    app = Doorkeeper::Application.find_by_name!(application_name)
+
+    permissions.each do |permission|
+      u.grant_application_permission(app, permission)
+    end
+
+    authorisation = u.authorisations.build(
+      expires_in: ApiUser::DEFAULT_TOKEN_LIFE
+    )
+    authorisation.application_id = app.id
+    authorisation.save!
+
+    authorisation.token = token
+    authorisation.save!
+  end
 end")
     "\n")))
 
