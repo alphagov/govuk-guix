@@ -227,7 +227,8 @@
   (let ((pkg
          (package-with-bundler
           (bundle-package
-           (hash (base32 "1x6ycb7b1l9pgf1vlp7ys9jnzls00hh2sfwcxb5gvk6d8l0vx478")))
+           (hash (base32 "1x6ycb7b1l9pgf1vlp7ys9jnzls00hh2sfwcxb5gvk6d8l0vx478"))
+           (without '("development" "test")))
           (make-govuk-package
            "signon"
            (github-archive
