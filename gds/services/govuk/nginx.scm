@@ -91,7 +91,8 @@
               (name "app")
               (body (list (simple-format
                            #f
-                           "proxy_pass http://~A-proxy;"
+                           "proxy_pass http://~A-proxy;
+proxy_set_header Host $host:$server_port;"
                            (symbol->string service)))))))
            (server-name (list (string-append
                                (symbol->string service)
