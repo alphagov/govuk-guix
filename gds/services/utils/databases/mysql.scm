@@ -8,8 +8,11 @@
   #:export (<mysql-connection-config>
             mysql-connection-config
             mysql-connection-config?
+            mysql-connection-config-host
+            mysql-connection-config-user
             mysql-connection-config-port
             mysql-connection-config-database
+            mysql-connection-config-password
 
             run-with-mysql-port
             mysql-ensure-user-exists-gexp
