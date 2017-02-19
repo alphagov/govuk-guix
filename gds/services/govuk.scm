@@ -498,7 +498,16 @@
           (plek-config) (rails-app-config) specialist-publisher
           (signon-application
            (name "Specialist Publisher")
-           (supported-permissions '("gds_editor")))
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Specialist Publisher")
+           (email "specialist-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
           (service-startup-config)
           default-specialist-publisher-database-connection-configs)))
 
