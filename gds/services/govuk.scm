@@ -417,7 +417,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(publishing-api))
-           (requirement '(content-store draft-content-store)))
+           (requirement '(content-store draft-content-store signon)))
           (service-startup-config
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
