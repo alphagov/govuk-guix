@@ -70,7 +70,7 @@
                ((pid (primitive-fork))
                 (root (getpwnam "root"))
                 (command `(,(string-append #$pv "/bin/pv")
-                           #$file
+                           ,#$file
                            "|"
                            ,(string-append #$pbzip2 "/bin/pbzip2")
                            "-d"
