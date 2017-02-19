@@ -38,7 +38,7 @@
             signon-authorisation-application-name
             signon-authorisation-token
 
-            use-real-gds-sso-strategy
+            use-gds-sso-strategy
             update-signon-application-with-random-oauth
             update-signon-api-user-with-random-authorisation-tokens
             signon-setup-users-script
@@ -110,7 +110,7 @@
          permissions)))
      (signon-api-user-authorisation-permissions api-user)))))
 
-(define (use-real-gds-sso-strategy services)
+(define (use-gds-sso-strategy services strategy)
   (map
    (lambda (s)
      (service
@@ -123,7 +123,7 @@
            (service-startup-config? parameter)
            (service-startup-config-with-additional-environment-variables
             parameter
-            '(("GDS_SSO_STRATEGY" . "real")))
+            `(("GDS_SSO_STRATEGY" . ,strategy)))
            parameter))
         (service-parameters s))
        (service-parameters s))))
