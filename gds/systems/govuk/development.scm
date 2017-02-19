@@ -335,6 +335,10 @@
         (lambda (app)
           (update-signon-application-with-random-oauth app)))
        (cons
+        signon-api-user?
+        (lambda (api-user)
+          (update-signon-api-user-with-random-authorisation-tokens api-user)))
+       (cons
         signon-config?
         (lambda (config)
           (signon-config
