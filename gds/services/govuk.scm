@@ -716,7 +716,6 @@
    ;; local-links-manager-service
    ;; manuals-publisher-service
    maslow-service
-   ;; panopticon-service
    ;; policy-publisher-service
    ;; publisher-service
    ;; service-manual-publisher-service
