@@ -345,7 +345,9 @@
               (name "Dev")
               (email "dev@example.com")
               (passphrase "wies1Oc8Gi0uGaim")
-              (role "superadmin")))))))
+              (role "superadmin")
+              (application-permissions
+               '(("Specialist Publisher" . ("signin" "gds_editor"))))))))))
        (cons
         rails-app-config?
         (lambda (config)
