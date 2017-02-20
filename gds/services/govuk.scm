@@ -418,7 +418,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(specialist-publisher))
-           (requirement '(publishing-api)))
+           (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) specialist-publisher
           (service-startup-config)
           default-specialist-publisher-database-connection-configs)))
