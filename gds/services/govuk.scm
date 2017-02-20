@@ -454,6 +454,9 @@
            (provision '(specialist-publisher))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) specialist-publisher
+          (signon-application
+           (name "Specialist Publisher")
+           (supported-permissions '("gds_editor")))
           (service-startup-config)
           default-specialist-publisher-database-connection-configs)))
 
