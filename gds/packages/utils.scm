@@ -128,6 +128,19 @@ production:
 ")))
          #t))))
 
+(define-public (replace-ruby-version version)
+  `(lambda* (#:key outputs #:allow-other-keys)
+     (let ((location
+            (string-append
+             (getcwd)
+             "/.ruby-version")))
+       (if (file-exists? location)
+           (delete-file location))
+       (call-with-output-file location
+         (lambda (port)
+           (simple-format port "~A" ,version)))
+       #t)))
+
 (define-public use-blank-database.yml
   (lambda ()
     `(lambda* (#:key outputs #:allow-other-keys)

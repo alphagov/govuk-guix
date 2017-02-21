@@ -163,6 +163,12 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
               (simple-format #t "Using Gemfile.lock ~A" (string-append
                                                          #$output
                                                          "/Gemfile.lock\n"))
+
+              (simple-format #f "Setting .ruby-version to ~A\n" #$ruby-version)
+              (call-with-output-file (string-append #$output "/.ruby-version")
+                (lambda (port)
+                  (simple-format port "~A\n" #$ruby-version)))
+
               (with-directory-excursion #$output
                 (and
                  (run bundle
