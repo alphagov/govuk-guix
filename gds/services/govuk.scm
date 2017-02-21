@@ -726,7 +726,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(info-frontend))
-          (requirement '(content-store publishing-api)))
+          (requirement '(content-store publishing-api static)))
          (service-startup-config) (plek-config) (rails-app-config)
          info-frontend)))
 
