@@ -147,8 +147,7 @@
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qpx3n6gp3v280k0a689cxn8iy413csmf1grrnj2qzs5g54l23bn"))
-    (without '("test")))
+    (hash (base32 "1q1h9bpshrijrzzrzgfgsrqs017rfmzn4zxrdvqbz0cnj3igj1af")))
    (make-govuk-package
     "content-tagger"
     (github-archive
