@@ -346,16 +346,8 @@
     (database "publishing_api_production"))
    (redis-connection-config)))
 
-(define default-publishing-api-signon-application
-  (signon-application
-   (name "publishing-api")
-   (description "")
-   (redirect-uri "")
-   (home-uri "")
-   (uid "uid")))
-
 (define publishing-api-service-type
-  (make-rails-app-using-plek-service-type 'publishing-api))
+  (make-rails-app-using-plek-and-signon-service-type 'publishing-api))
 
 (define publishing-api-service
   (service
@@ -368,7 +360,7 @@
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
           (plek-config) (rails-app-config) publishing-api
-          default-publishing-api-signon-application
+          (signon-application (name "Publishing API"))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           default-publishing-api-database-connection-configs)))
