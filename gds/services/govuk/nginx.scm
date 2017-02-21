@@ -68,6 +68,9 @@
        (locations
         (list
          (nginx-location-configuration
+          (uri "/info-frontend")
+          (body '("proxy_pass http://info-frontend-proxy;")))
+         (nginx-location-configuration
           (uri "/specialist-frontend")
           (body '("proxy_pass http://specialist-frontend-proxy;")))
          (nginx-location-configuration
