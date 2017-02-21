@@ -213,7 +213,11 @@
                   ;; content-stores are started, the information given
                   ;; to Plek is used when configuring backends in the
                   ;; routers, and therefore needs to be available.
-               (shepherd-service-requirement shepherd-service)))))
+               (cons
+                service-name ;; Some services (e.g. Whitehall) use
+                             ;; Plek to find there own host, so
+                             ;; include it by default
+                (shepherd-service-requirement shepherd-service))))))
         ((rails-app-config? parameter)
          (rails-app-config
           (inherit parameter)
