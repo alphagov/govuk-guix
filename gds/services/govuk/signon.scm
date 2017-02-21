@@ -119,9 +119,12 @@
       "]"
       "
 puts \"#{users.length} users to create\"
+
+Devise.deny_old_passwords = false
+
 users.each do |name, email, passphrase, role, application_permissions|
   puts \"Creating #{name}\"
-  u = User.new(name: name, email: email)
+  u = User.where(name: name, email: email).first_or_initialize
   u.password = passphrase
   u.role = role
 
@@ -176,11 +179,11 @@ end")
       "]"
       "
 puts \"#{users.length} api users to create\"
+
 users.each do |name, email, passphrase, role, application_permissions|
   puts \"Creating #{name}\"
-  u = ApiUser.new(
+  u = ApiUser.where(email: email).first_or_initialize(
     name: name,
-    email: email,
     password = passphrase,
     password_confirmation = passphrase
   )
@@ -223,12 +226,12 @@ end")
         ",\n")
       "]"
       "
-puts \"#{apps.length} applicationsn to create\"
+puts \"#{apps.length} applications to create\"
+
 apps.each do |name, description, redirect_uri, home_uri, supported_permissions, oauth_id, oauth_secret|
   puts \"Creating #{name}\"
 
-  app = Doorkeeper::Application.create!(
-    name: name,
+  app = Doorkeeper::Application.where(name: name).first_or_create!(
     redirect_uri: redirect_uri,
     description: description,
     home_uri: home_uri,
@@ -237,7 +240,10 @@ apps.each do |name, description, redirect_uri, home_uri, supported_permissions, 
   )
 
   supported_permissions.each do |permission|
-    SupportedPermission.create(application_id: app.id, name: permission)
+    SupportedPermission.where(
+      name: permission,
+      application_id: app.id
+    ).first_or_create!
   end
 end")
     "\n")))
