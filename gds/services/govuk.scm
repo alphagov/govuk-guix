@@ -869,7 +869,11 @@
           (inherit default-shepherd-service)
           (provision '(info-frontend))
           (requirement '(content-store publishing-api static)))
-         (service-startup-config) (plek-config) (rails-app-config)
+         (service-startup-config-add-pre-startup-scripts
+          (service-startup-config)
+          `((publish-special-routes
+             . ,(run-command "rake" "publishing_api:publish_special_routes"))))
+         (plek-config) (rails-app-config)
          info-frontend)))
 
 ;;;
