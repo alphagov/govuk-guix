@@ -47,7 +47,10 @@
         (list
          (nginx-location-configuration
           (uri "/")
-          (body '("proxy_pass http://origin-proxy;")))))
+          (body '("proxy_pass http://origin-proxy;")))
+         (nginx-location-configuration
+          (uri "/api/content")
+          (body '("proxy_pass http://content-store-proxy;")))))
        (server-name (list "www.guix-dev.gov.uk")))
       (nginx-server-configuration
        (inherit base)
@@ -55,7 +58,10 @@
         (list
          (nginx-location-configuration
           (uri "/")
-          (body '("proxy_pass http://draft-origin-proxy;")))))
+          (body '("proxy_pass http://draft-origin-proxy;")))
+         (nginx-location-configuration
+          (uri "/api/content")
+          (body '("proxy_pass http://draft-content-store-proxy;")))))
        (server-name (list "draft-origin.guix-dev.gov.uk")))
       (nginx-server-configuration
        (inherit base)
