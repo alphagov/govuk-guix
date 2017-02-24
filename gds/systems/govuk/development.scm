@@ -4,6 +4,7 @@
   #:use-module (ice-9 match)
   #:use-module (gnu)
   #:use-module (gnu packages admin)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages databases)
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
@@ -69,6 +70,9 @@
    (guix-service
     (guix-configuration
      (guix guix)))
+   (service special-files-service-type
+            `(("/bin/sh" ,(file-append (canonical-package bash)
+                                       "/bin/sh"))))
    pretend-loopback-service))
 
 (define live-router-config
