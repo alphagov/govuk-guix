@@ -96,7 +96,9 @@
     (nginx
      govuk-ports
      live-router-config
-     draft-router-config)
+     draft-router-config
+     '((rummager . ("search"))
+       (frontend . ("private-frontend"))))
     (service
      redis-service-type
      (redis-configuration
