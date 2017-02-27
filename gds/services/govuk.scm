@@ -583,6 +583,12 @@
 ;;; Content API
 ;;;
 
+(define govuk-content-database-connection
+  (mongodb-connection-config
+   (user "govuk-content")
+   (password (random-base16-string 30))
+   (database "govuk_content_production")))
+
 (define content-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'contentapi))
 
@@ -594,7 +600,8 @@
           (provision '(contentapi))
           (requirement '()))
          (service-startup-config)
-         (plek-config) (rails-app-config) content-api)))
+         (plek-config) (rails-app-config) content-api
+         govuk-content-database-connection)))
 
 ;;;
 ;;; Frontend
@@ -658,10 +665,7 @@
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
-         (mongodb-connection-config
-          (user "publisher")
-          (password (random-base16-string 30))
-          (database "govuk_content_production")))))
+         govuk-content-database-connection)))
 
 ;;;
 ;;; Router
