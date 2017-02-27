@@ -639,7 +639,8 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(publisher))
-          (requirement '(content-api publishing-api)))
+          (requirement '(contentapi publishing-api frontend draft-frontend
+                         rummager signon)))
          (service-startup-config)
          (plek-config) (rails-app-config) publisher
          (redis-connection-config)
