@@ -11,6 +11,7 @@
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services govuk)
+  #:use-module (gds services govuk signon)
   #:use-module (gds systems govuk development))
 
 (define services
@@ -36,9 +37,13 @@
                   (service-parameters s)))
                 (rails-run-db:setup s)
                 s))
-          (map
-           setup-blank-databases-on-service-startup
-           services))
+          (use-gds-sso-strategy
+           (map
+            setup-blank-databases-on-service-startup
+            services)
+           "mock")) ;; This is not a real value that the gds-sso gem
+                    ;; uses, as it just checks if the value is "real" or
+                    ;; not.
        (specialist-publisher-service-type
         parameters =>
         (map
