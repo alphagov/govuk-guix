@@ -584,14 +584,14 @@
 ;;;
 
 (define content-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'content-api))
+  (make-rails-app-using-plek-and-signon-service-type 'contentapi))
 
 (define content-api-service
   (service
    content-api-service-type
    (list (shepherd-service
           (inherit default-shepherd-service)
-          (provision '(content-api))
+          (provision '(contentapi))
           (requirement '()))
          (service-startup-config)
          (plek-config) (rails-app-config) content-api)))
