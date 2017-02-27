@@ -183,9 +183,7 @@ users.each do |name, email, passphrase, role, application_permissions|
 
   application_permissions.each do |application_name, permissions|
     app = Doorkeeper::Application.find_by_name!(application_name)
-    permissions.each do |permission|
-      u.grant_application_permission(app, permission)
-    end
+    u.grant_application_permissions(app, permissions)
   end
 end")
     "\n")))
@@ -245,9 +243,7 @@ users.each do |name, email, authorisation_permissions|
   authorisation_permissions.each do |application_name, token, permissions|
     app = Doorkeeper::Application.find_by_name!(application_name)
 
-    permissions.each do |permission|
-      u.grant_application_permission(app, permission)
-    end
+    u.grant_application_permissions(app, permissions)
 
     authorisation = u.authorisations.build(
       expires_in: ApiUser::DEFAULT_TOKEN_LIFE
