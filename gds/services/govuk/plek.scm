@@ -18,6 +18,7 @@
             plek-config-draft-origin
             plek-config-dev-domain
             plek-config-service-ports
+            plek-config-service-port-aliases
             plek-config-service-uri-function
 
             plek-config->environment-variables
@@ -45,6 +46,8 @@
               (default #f))
   (service-ports plek-config-service-ports
                  (default '()))
+  (service-port-aliases plek-config-service-port-aliases
+                        (default '()))
   (service-uri-function plek-config-service-uri-function
                         (default #f)))
 
@@ -76,7 +79,8 @@
           #:optional #:key
           (govuk-app-domain (plek-config-govuk-app-domain (plek-config)))
           (use-https? #t)
-          (port (if use-https? 443 80)))
+          (port (if use-https? 443 80))
+          (aliases '()))
   (let
       ((scheme
         (if use-https? "https" "http"))
@@ -102,6 +106,7 @@
      (draft-origin
       (string-append scheme "://draft-origin." govuk-app-domain string-port))
      (service-ports service-ports)
+     (service-port-aliases aliases)
      (service-uri-function
       (lambda (service port)
         ;; For the default implementation, deliberately don't use
@@ -213,11 +218,19 @@
                   ;; content-stores are started, the information given
                   ;; to Plek is used when configuring backends in the
                   ;; routers, and therefore needs to be available.
-               (cons
-                service-name ;; Some services (e.g. Whitehall) use
-                             ;; Plek to find there own host, so
-                             ;; include it by default
-                (shepherd-service-requirement shepherd-service))))))
+               (append
+                (list service-name) ;; Some services (e.g. Whitehall) use
+                                    ;; Plek to find there own host, so
+                                    ;; include it by default
+                (shepherd-service-requirement shepherd-service)
+                (concatenate
+                 (map
+                  (lambda (requirement)
+                    (or (assq-ref
+                         (plek-config-service-port-aliases plek-config)
+                         requirement)
+                        '()))
+                  (shepherd-service-requirement shepherd-service))))))))
         ((rails-app-config? parameter)
          (rails-app-config
           (inherit parameter)
