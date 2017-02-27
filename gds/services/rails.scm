@@ -124,14 +124,23 @@
                         (simple-format #t "result: ~A\n" result)
                         #f))))))
          pre-startup-scripts)))
-    #~(let run ((scripts (list #$@script-gexps)))
-        (if (null? scripts)
-            #t
-            (let
-                ((result ((car scripts))))
-              (if (eq? result #t)
-                  (run (cdr scripts))
-                  #f))))))
+    (if (null? script-gexps)
+        #~#t
+        #~(begin
+            (simple-format
+             #t
+             "Running ~A startup scripts\n" #$(length script-gexps))
+            (for-each
+             (lambda (key) (simple-format #t "  - ~A\n" key))
+             '#$(map car pre-startup-scripts))
+            (let run ((scripts (list #$@script-gexps)))
+              (if (null? scripts)
+                  #t
+                  (let
+                      ((result ((car scripts))))
+                    (if (eq? result #t)
+                        (run (cdr scripts))
+                        #f))))))))
 
 (define (generic-rails-app-start-script
          name
