@@ -869,6 +869,24 @@
           default-need-api-database-connection-configs)))
 
 ;;;
+;;; Rummager
+;;;
+
+(define rummager-service-type
+  (make-rails-app-using-plek-service-type 'rummager))
+
+(define rummager-service
+  (service
+   rummager-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(rummager))
+          (requirement '(content-store publishing-api static)))
+         (service-startup-config)
+         (plek-config) (rails-app-config)
+         rummager)))
+
+;;;
 ;;; Info Frontend
 ;;;
 
@@ -979,7 +997,7 @@
    need-api-service
    ;; imminence-service
    publishing-api-service
-   ;; rummager-service
+   rummager-service
    ;; asset-manager-service
    router-api-service
    draft-router-api-service
