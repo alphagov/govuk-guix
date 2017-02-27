@@ -613,6 +613,19 @@
          (service-startup-config)
          (plek-config) (rails-app-config) frontend)))
 
+(define draft-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-frontend))
+
+(define draft-frontend-service
+  (service
+   draft-frontend-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(draft-frontend))
+          (requirement '(contentapi draft-static rummager draft-content-store)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) frontend)))
+
 ;;;
 ;;; Publisher
 ;;;
@@ -1015,6 +1028,7 @@
    ;; draft-collections-service
    ;; draft-contacts-service
    ;; draft-email-alert-service
+   draft-frontend-service
    draft-government-frontend-service
    ;; draft-manuals-frontend-service
    ;; draft-multipage-frontend-service
