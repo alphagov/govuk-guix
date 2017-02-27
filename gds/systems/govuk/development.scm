@@ -324,7 +324,9 @@
    govuk-ports
    #:govuk-app-domain "guix-dev.gov.uk"
    #:use-https? #f
-   #:port 50080))
+   #:port 50080
+   #:aliases '((rummager . (search))
+               (frontend . (private-frontend)))))
 
 (define-public (setup-services services)
   (map
