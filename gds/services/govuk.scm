@@ -76,6 +76,15 @@
             whitehall-service-type
             whitehall-service
 
+            publisher-service-type
+            publisher-service
+
+            frontend-service-type
+            frontend-service
+
+            draft-frontend-service-type
+            draft-frontend-service
+
             signon-service-type
             signon-service
             static-service-type
