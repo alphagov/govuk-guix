@@ -644,6 +644,18 @@
          (service-startup-config)
          (plek-config) (rails-app-config) publisher
          (redis-connection-config)
+         (signon-application
+          (name "Publisher")
+          (supported-permissions '("signin" "skip_review")))
+         (signon-api-user
+          (name "Publisher")
+          (email "publisher@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
          (mongodb-connection-config
@@ -816,6 +828,18 @@
            (provision '(content-tagger))
            (requirement '(publishing-api signon)))
           (service-startup-config)
+          (signon-application
+           (name "Content Tagger")
+           (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Content Tagger")
+           (email "content-tagger@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
           (plek-config) (rails-app-config) content-tagger
           default-content-tagger-database-connection-configs)))
 
@@ -841,6 +865,18 @@
            (provision '(maslow))
            (requirement '(publishing-api need-api signon)))
           (service-startup-config)
+          (signon-application
+           (name "Maslow")
+           (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Maslow")
+           (email "maslow@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
           (plek-config) (rails-app-config) maslow
           default-maslow-database-connection-configs)))
 
@@ -956,7 +992,18 @@
           (requirement '(publishing-api signon static need-api maslow)))
          (service-startup-config)
          (plek-config) (rails-app-config) whitehall
-         (signon-application (name "Whitehall"))
+         (signon-application
+          (name "Whitehall")
+          (supported-permissions '("signin" "GDS Editor" "GDS Admin")))
+         (signon-api-user
+          (name "Whitehall")
+          (email "whitehall@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
          (mysql-connection-config
