@@ -394,13 +394,13 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "18ljpg3s12fwqj7pmjp44sddj4ich3ailvgjw6a0k88fwv3nlrbb")))
+          (hash (base32 "0911wcbx3ixbw3l2yqsmcjqxx8lsfqja3skbj17ah8dr22pszs5d")))
          (make-govuk-package
           "maslow"
           (github-archive
            #:repository "maslow"
-           #:commit-ish "release_187"
-           #:hash (base32 "0x8cvmaw7687zrskkfni3024xrywcbihi3qck9xlh3f9wcajn51r"))))))
+           #:commit-ish "release_194"
+           #:hash (base32 "0npk0nj9mfw7fgs5rarhd8fig3359c6vnj6614jvmpwspqraqdxv"))))))
     (package
       (inherit pkg)
       (arguments
