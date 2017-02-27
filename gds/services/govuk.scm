@@ -941,7 +941,7 @@
 ;;;
 
 (define info-frontend-service-type
-  (make-rails-app-using-plek-service-type 'info-frontend))
+  (make-rails-app-using-plek-and-signon-service-type 'info-frontend))
 
 (define info-frontend-service
   (service
@@ -950,6 +950,15 @@
           (inherit default-shepherd-service)
           (provision '(info-frontend))
           (requirement '(content-store publishing-api static)))
+         (signon-api-user
+          (name "Info Frontend")
+          (email "info-frontend@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((publish-special-routes
