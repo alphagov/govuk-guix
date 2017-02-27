@@ -126,13 +126,13 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0jn3cp980rgskncspy1gy0cd3zshpc01mb1a4awrfvk2cvymgds1")))
+    (hash (base32 "0xzxq6r9ksy3f5j74yifqf5wrk4ryblr8fj7bj3jvb7lqj2n78v1")))
    (make-govuk-package
     "publishing-api"
     (github-archive
      #:repository "publishing-api"
-     #:commit-ish "release_654"
-     #:hash (base32 "1ja4pdpa9jz044zlcc8r4hqynn1vdyzz2kb1n9iix8sb4ciw9w2q")))))
+     #:commit-ish "release_758"
+     #:hash (base32 "0261kwc4qfix9xfhlnc8q4xmya7k10z9yh4xy8l1ll5clcpjfqnf")))))
 
 (define-public content-store
   (package-with-bundler
