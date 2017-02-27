@@ -6,7 +6,8 @@
 (define-public (nginx
                 service-and-ports
                 router-config
-                draft-router-config)
+                draft-router-config
+                server-aliases)
   (nginx-service
    #:upstream-list
    (cons*
@@ -94,8 +95,10 @@
                            "proxy_pass http://~A-proxy;
 proxy_set_header Host $host:$server_port;"
                            (symbol->string service)))))))
-           (server-name (list (string-append
+           (server-name (cons (string-append
                                (symbol->string service)
-                               ".guix-dev.gov.uk")))
+                               ".guix-dev.gov.uk")
+                              (or (assq-ref server-aliases service)
+                                  '())))
            (root (string-append "/var/apps/" (symbol->string service) "/public")))))
        service-and-ports)))))
