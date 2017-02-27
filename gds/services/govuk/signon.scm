@@ -157,7 +157,8 @@
                      "[ '" application "', ["
                      (string-join (map sq permissions) ", ")
                      "]]")))
-                 (signon-user-application-permissions user)))
+                 (signon-user-application-permissions user))
+                ", ")
                "]"))
              ", ")
             "]"))
