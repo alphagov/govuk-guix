@@ -425,6 +425,7 @@
       postgresql
       mariadb
       mongodb
+      redis
       mongo-tools
       htop
       %base-packages))
