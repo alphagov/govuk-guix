@@ -28,6 +28,8 @@
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mongodb)
+  #:use-module (gds services utils databases elasticsearch)
+  #:use-module (gds services third-party elasticsearch)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk signon)
@@ -64,6 +66,7 @@
   `((postgresql . 55432)
     (mongodb . 57017)
     (redis . 56379)
+    (elasticsearch . 59200)
     (mysql . 53306)))
 
 (define base-services
@@ -109,6 +112,10 @@
       (port (assq-ref system-ports 'redis))))
     (postgresql-service #:port (assq-ref system-ports 'postgresql))
     (mongodb-service #:port (assq-ref system-ports 'mongodb))
+    (service
+     elasticsearch-service-type
+     (elasticsearch-configuration
+      (http-port (assq-ref system-ports 'elasticsearch))))
     (mysql-service #:config (mysql-configuration
                              (port (assq-ref system-ports 'mysql))))
     govuk-content-schemas-service
@@ -200,6 +207,10 @@
     (mongodb-connection-config
      (inherit config)
      (port (port-for 'mongodb))))
+   ((elasticsearch-connection-config? config)
+    (elasticsearch-connection-config
+     (inherit config)
+     (port (port-for 'elasticsearch))))
    ((redis-connection-config? config)
     (redis-connection-config
      (inherit config)
