@@ -31,7 +31,11 @@
    (environment-variables
     (append
      environment-variables
-     (service-startup-config-environment-variables ssc)))))
+     (filter
+      (match-lambda
+        ((key . value)
+         (not (assoc-ref environment-variables key))))
+      (service-startup-config-environment-variables ssc))))))
 
 (define* (service-startup-config-add-pre-startup-scripts
           ssc
