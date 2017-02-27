@@ -211,7 +211,9 @@
          ((#:phases phases)
           `(modify-phases ,phases
              (add-after 'install 'replace-mongoid.yml
-               ,(replace-mongoid.yml)))))))))
+               ,(replace-mongoid.yml))
+             (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
+               ,(replace-gds-sso-initializer)))))))))
 
 (define-public frontend
   (package-with-bundler
