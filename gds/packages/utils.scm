@@ -50,12 +50,12 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
          #t))))
 
 (define-public replace-mongoid.yml
-  (lambda* (#:key (mongoid-version "4"))
+  (lambda* (#:key (mongoid-version "4")
+                  (path "/config/mongoid.yml"))
     `(lambda* (#:key outputs #:allow-other-keys)
        (let ((location
               (string-append
-               (assoc-ref outputs "out")
-               "/config/mongoid.yml"))
+               (assoc-ref outputs "out") ,path))
              (clients-or-sessions
               (if (equal? ,mongoid-version "3")
                   "sessions"
