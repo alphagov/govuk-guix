@@ -374,7 +374,11 @@
               (passphrase "wies1Oc8Gi0uGaim")
               (role "superadmin")
               (application-permissions
-               '(("Specialist Publisher" . ("signin" "gds_editor"))))))))))
+               '(("Specialist Publisher" . ("signin" "gds_editor"))
+                 ("Publisher" . ("signin" "skip_review"))
+                 ("Whitehall" . ("signin"))
+                 ("Maslow" . ("signin"))
+                 ("Content Tagger" . ("signin"))))))))))
        (cons
         rails-app-config?
         (lambda (config)
