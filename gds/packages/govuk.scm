@@ -181,16 +181,26 @@
     #:precompile-assets #t)))
 
 (define-public content-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1v1zc8ahsyrba00ai5hllkhglqzpz1q6v1yvmy28vgb1ma6h6925")))
-   (package-rails-app
-    "content-api"
-    (github-archive
-     #:repository "govuk_content_api"
-     #:commit-ish "release_397"
-     #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv"))
-    #:precompile-assets #f)))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "0csjlacjx7r9iv8j82vl2fbki824bq76hvsjzvbxmabpwwbyn0zk")))
+         (package-rails-app
+          "content-api"
+          (github-archive
+           #:repository "govuk_content_api"
+           #:commit-ish "release_397"
+           #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv"))
+          #:precompile-assets #f))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-mongoid.yml
+               ,(replace-mongoid.yml #:path "/mongoid.yml")))))))))
 
 (define-public publisher
   (let
