@@ -385,17 +385,19 @@
           (update-rails-app-config-environment
            "development"
            (update-rails-app-config-with-random-secret-key-base config)))))))
-   (update-routing-services-configuration
-    (correct-services-package-source-from-environment
-     (update-services-parameters
-      services
-      (list
-       (cons
-        (const #t)
-        (list
-         (cons
-          plek-config?
-          (const plek-config))))))))))
+   (use-gds-sso-strategy
+    (update-routing-services-configuration
+     (correct-services-package-source-from-environment
+      (update-services-parameters
+       services
+       (list
+        (cons
+         (const #t)
+         (list
+          (cons
+           plek-config?
+           (const plek-config))))))))
+    "real")))
 
 (define development-os-services
   (setup-services services))
