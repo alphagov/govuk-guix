@@ -609,7 +609,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(frontend))
-          (requirement '(content-api)))
+          (requirement '(contentapi static rummager content-store)))
          (service-startup-config)
          (plek-config) (rails-app-config) frontend)))
 
