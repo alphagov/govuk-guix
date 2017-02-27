@@ -24,6 +24,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages node)
+  #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages web)
   #:use-module (gnu packages pkg-config)
@@ -518,6 +519,7 @@ service setup.")
       (inherit pkg)
       (inputs
        `(("curl" ,curl)
+         ("imagemagick" ,imagemagick)
          ,@(package-inputs pkg)))
       (arguments
        (substitute-keyword-arguments (package-arguments pkg)
