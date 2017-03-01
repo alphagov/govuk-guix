@@ -196,9 +196,8 @@
                (list
                 (string-append #$root-directory "/bin/bundle")
                 "exec" "unicorn"))
-              (pid-file (string-append
-                         #$root-directory
-                         "/tmp/pids/server.pid"))
+              (pid-file #$(string-append
+                           "/tmp/" string-name ".pid"))
               (environment-variables '#$environment-variables))
 
           (use-modules (guix build utils)
@@ -388,8 +387,7 @@
                (string-name (symbol->string name))
                (root-directory (app-name->root-directory string-name))
                (pidfile (string-append
-                         root-directory
-                         "/tmp/pids/sidekiq.pid")))
+                         "/tmp/" (symbol->string sidekiq-service-name) ".pid")))
             (shepherd-service
              (inherit ss)
              (provision (list sidekiq-service-name))
