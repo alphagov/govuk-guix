@@ -194,7 +194,7 @@
         (let ((user (getpwnam #$string-name))
               (unicorn
                (list
-                (string-append #$root-directory "/bin/bundle")
+                #$(string-append root-directory "/bin/bundle")
                 "exec" "unicorn"))
               (pid-file #$(string-append
                            "/tmp/" string-name ".pid"))
