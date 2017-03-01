@@ -294,7 +294,9 @@ puts \"#{apps.length} applications to create\"
 apps.each do |name, description, redirect_uri, home_uri, supported_permissions, oauth_id, oauth_secret|
   puts \"Creating #{name}\"
 
-  app = Doorkeeper::Application.where(name: name).first_or_create!(
+  app = Doorkeeper::Application.where(name: name).first_or_create
+
+  app.update!(
     redirect_uri: redirect_uri,
     description: description,
     home_uri: home_uri,
