@@ -33,7 +33,7 @@
   #:use-module (gnu packages rsync)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler)
-  #:use-module (gds packages third-party))
+  #:use-module (gds packages third-party phantomjs))
 
 (define (make-govuk-package
          name

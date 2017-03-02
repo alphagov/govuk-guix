@@ -1,4 +1,4 @@
-(define-module (gds services mongodb)
+(define-module (gds services third-party mongodb)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system shadow)
@@ -6,7 +6,7 @@
   #:use-module (guix records)
   #:use-module (guix gexp)
   #:use-module (ice-9 match)
-  #:use-module (gds packages mongodb)
+  #:use-module (gds packages third-party mongodb)
   #:export (mongodb-configuration
             mongodb-configuration?
             mongodb-service

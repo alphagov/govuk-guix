@@ -1,4 +1,4 @@
-(define-module (gds packages third-party)
+(define-module (gds packages third-party phantomjs)
   #:use-module (guix packages)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
