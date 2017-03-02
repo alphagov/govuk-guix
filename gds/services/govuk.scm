@@ -25,7 +25,6 @@
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk signon)
   #:use-module (gds services rails)
-  #:use-module (gds packages mongodb)
   #:export (govuk-content-schemas-service-type
             govuk-content-schemas-service
 

@@ -17,7 +17,6 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
-  #:use-module (gds packages mongodb)
   #:use-module (gds services)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
