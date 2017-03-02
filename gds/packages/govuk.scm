@@ -157,16 +157,32 @@
      #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))))
 
 (define-public specialist-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0j9i72vzwymb5zlz8xl62663w888l7z3ynfhvngmix175jfa1byk"))
-    (without '("development" "test")))
-   (make-govuk-package
-    "specialist-publisher"
-    (github-archive
-     #:repository "specialist-publisher"
-     #:commit-ish "release_751"
-     #:hash (base32 "1l2ncdw3p1a4kygp5gc2gjzbdh2prdygaqrhvp78q5fr1pk315lv")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "0j9i72vzwymb5zlz8xl62663w888l7z3ynfhvngmix175jfa1byk"))
+          (without '("development" "test")))
+         (make-govuk-package
+          "specialist-publisher"
+          (github-archive
+           #:repository "specialist-publisher"
+           #:commit-ish "release_751"
+           #:hash (base32 "1l2ncdw3p1a4kygp5gc2gjzbdh2prdygaqrhvp78q5fr1pk315lv"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after
+              'install 'alter-secrets.yml
+              (lambda* (#:key outputs #:allow-other-keys)
+                (substitute* (string-append
+                              (assoc-ref outputs "out")
+                              "/config/secrets.yml")
+                  (("SECRET_TOKEN")
+                   "SECRET_KEY_BASE")))))))))))
 
 (define-public specialist-frontend
   (package-with-bundler
