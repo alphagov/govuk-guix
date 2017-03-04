@@ -178,8 +178,8 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                  (run bundle
                       "package"
                       "--all"
-                      "--no-install")))
-              (reset-timestamps #$output)))))
+                      "--no-install")
+                 (begin (reset-timestamps #$output) #t)))))))
 
     (gexp->derivation name build
                       #:system system
