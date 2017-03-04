@@ -12,6 +12,7 @@
   #:use-module (guix download)
   #:use-module (guix search-paths)
   #:use-module (guix build-system ruby)
+  #:use-module (guix build utils)
   #:use-module (gnu packages base)
   #:use-module ((gnu packages ruby) #:prefix guix:)
   #:use-module (gnu packages compression)
@@ -30,6 +31,24 @@
 
             package-with-bundler))
 
+(define (patch-ruby ruby)
+  (package
+    (inherit ruby)
+    (arguments
+     (substitute-keyword-arguments
+         (default-keyword-arguments
+           (package-arguments guix:ruby)
+           `(#:tests? #t))
+       ((#:tests? _) #t)
+       ((#:phases phases)
+        `(modify-phases ,phases
+           (add-after
+            'configure 'patch-for-reproducible-gemspecs
+            (lambda _
+              (substitute* "lib/rubygems/specification.rb"
+                (("current_value = self\\.send\\(attr_name\\)")
+                 "current_value = self.send(attr_name)\n      current_value = current_value.sort if %i(files test_files).include? attr_name  # patched through govuk-guix"))))))))))
+
 (define bundler
   (package
     (inherit guix:bundler)
@@ -39,7 +58,14 @@
               (uri (rubygems-uri "bundler" version))
               (sha256
                (base32
-                "0fxr7aq7qhlga423mygy7q96cwxmvqlcy676v2x5swlw8rlha2in"))))))
+                "0fxr7aq7qhlga423mygy7q96cwxmvqlcy676v2x5swlw8rlha2in"))))
+    (arguments
+     (substitute-keyword-arguments
+         (default-keyword-arguments
+           (package-arguments guix:bundler)
+           `(#:ruby ,guix:ruby))
+       ((#:ruby ruby)
+        (patch-ruby ruby))))))
 
 (define-record-type* <bundle-package>
   bundle-package make-bundle-package
@@ -59,7 +85,8 @@
   ;; "Compile" FILE by adding it to the store.
   (match bundle-package
     (($ <bundle-package> source name hash ruby without)
-     (run-bundle-package source name hash ruby without #:system system))))
+     (run-bundle-package source name hash (patch-ruby ruby) without
+                         #:system system))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
