@@ -126,7 +126,7 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0xzxq6r9ksy3f5j74yifqf5wrk4ryblr8fj7bj3jvb7lqj2n78v1")))
+    (hash (base32 "1ab3m0i5dljp1mldlw6pd0xvi5qd0p6pdkv898lzx66wg9z3w6m9")))
    (make-govuk-package
     "publishing-api"
     (github-archive
@@ -137,7 +137,7 @@
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01flp6kgb17386p9a6bykvh9133irwz70qabkz52mxra2lsmxa5x")))
+    (hash (base32 "11l8r4mdip55xhgr0486dxg9qlvb6bpscw25lrns5a86cqxnrig5")))
    (make-govuk-package
     "content-store"
     (github-archive
@@ -161,7 +161,7 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "0j9i72vzwymb5zlz8xl62663w888l7z3ynfhvngmix175jfa1byk"))
+          (hash (base32 "0iwgfd6ppv40iwps1m3li1al6glh2ckinfby8vs7ckay5yr1bg7v"))
           (without '("development" "test")))
          (make-govuk-package
           "specialist-publisher"
@@ -187,7 +187,7 @@
 (define-public specialist-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0f3kjqq52bhpl2a5sy2j422kkg2gawjd09kykwr6ipiqadlj4z8r")))
+    (hash (base32 "0j0sms0d5dwgdlj6y9cfq7ay2r7szk5ih5cs04hrhlqplilk7q1d")))
    (package-rails-app
     "specialist-frontend"
     (github-archive
@@ -223,7 +223,7 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "00gmlxb16n1c2x3mh1g875j721kbzqyz8k8dvrwin2m69adbzkc5")))
+          (hash (base32 "0sm2x81ilafd4amsizxzb2wv3xb2lrxrj5qv137pqx6zalmxzhhk")))
          (package-rails-app
           "publisher"
           (github-archive
@@ -244,7 +244,7 @@
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0d51mg5jgak0n3xfxgyasymswzpkhdzv2bps9wvy35813jksp8qf")))
+    (hash (base32 "0j15vj0rv7ydj62w3f8rwl72b6521alk3aq5s1nnv0rzb6zmwbn4")))
    (package-rails-app
     "frontend"
     (github-archive
@@ -256,7 +256,7 @@
   (let ((pkg
          (package-with-bundler
           (bundle-package
-           (hash (base32 "1x6ycb7b1l9pgf1vlp7ys9jnzls00hh2sfwcxb5gvk6d8l0vx478"))
+           (hash (base32 "0vidm9aikp74yvdnh2infmf45xyx9sfiya27h4g8s6lj06dx6p2f"))
            (without '("development" "test")))
           (make-govuk-package
            "signon"
@@ -276,7 +276,7 @@
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0sifa4xwbrx7h0ncnbl8kxmi44zva3qv3b7pjnqzz3jxibjqab99")))
+    (hash (base32 "179brwqjg8hxkqc4r0ga194nc5alfajyp9ms21hbqx7ykh9vwhan")))
    (package-rails-app
     "static"
     (github-archive
@@ -300,7 +300,7 @@
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1b15pz35acpzwykvl34b7ygcsizxjwzg67p1n4lbz0dcc9vjhrky")))
+    (hash (base32 "18xi02azlxjqll2h9fqhy3rgqm41zhkkh464psli0d6h3hgw3phk")))
    (make-govuk-package
     "router-api"
     (github-archive
@@ -421,7 +421,7 @@
   (package-with-bundler
    (bundle-package
     (hash
-     (base32 "0sar9zb44w1rcd987dkvw9p96bjwrqjfjarsasm488iv9qqmv9vn")))
+     (base32 "1bcs0j60pz620jn19n94sbkvp6drzanw60mmd361vqhgnzj8pmff")))
    (make-govuk-package
     "publishing-e2e-tests"
     (github-archive
@@ -455,7 +455,7 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "1hg85n9qf4710a93fkqfcpa8avj3q972ppk5w0is9sb0zi7kih5m")))
+          (hash (base32 "0kfxvx2cw42zkc07vayymra5a6sssbqlppsnh73q7hvmr20ykyq8")))
          (make-govuk-package
           "need-api"
           (github-archive
@@ -548,7 +548,7 @@ service setup.")
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "1g5qf3lpmli4siiz3sbwkvg28jrypzqfvg0s89qd1fbmjqn8f9hj")))
+          (hash (base32 "187qm7l7jqcv7hn7cz3bq98zc2sira4795vgiif2sr3hhjwrnvxk")))
          (make-govuk-package
           "whitehall"
           (github-archive
