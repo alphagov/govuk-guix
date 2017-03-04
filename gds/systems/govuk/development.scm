@@ -9,6 +9,7 @@
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
   #:use-module (gnu services web)
+  #:use-module (gnu services memcached)
   #:use-module (gnu services admin)
   #:use-module (gnu packages web)
   #:use-module (gnu packages vim)
@@ -115,6 +116,9 @@
      redis-service-type
      (redis-configuration
       (port (assq-ref system-ports 'redis))))
+    (service
+     memcached-service-type
+     (memcached-configuration))
     (postgresql-service #:port (assq-ref system-ports 'postgresql))
     (mongodb-service #:port (assq-ref system-ports 'mongodb))
     (service
