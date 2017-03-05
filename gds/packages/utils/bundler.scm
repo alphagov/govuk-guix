@@ -183,10 +183,10 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                        "-x"
                        "-f" #$source
                        "*/Gemfile*"))
-              (simple-format #t "Using Gemfile ~A" (string-append
+              (simple-format #t "Using Gemfile ~A\n" (string-append
                                                     #$output
                                                     "/Gemfile\n"))
-              (simple-format #t "Using Gemfile.lock ~A" (string-append
+              (simple-format #t "Using Gemfile.lock ~A\n" (string-append
                                                          #$output
                                                          "/Gemfile.lock\n"))
 
