@@ -151,7 +151,6 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                    (bundle (string-append #$bundler "/bin/bundle")))
 
               (mkdir-p vendor/cache)
-                                        ;(setenv "GEM_PATH" (gem-home #$ruby #$ruby-version))
 
               (mkdir-p home)
               (setenv "HOME" home)
