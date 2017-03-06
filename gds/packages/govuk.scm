@@ -126,7 +126,7 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ab3m0i5dljp1mldlw6pd0xvi5qd0p6pdkv898lzx66wg9z3w6m9")))
+    (hash (base32 "0hppfwyar1987jphr9kwzilr2mmr89xssa82kmzfb27hvzh682pq")))
    (make-govuk-package
     "publishing-api"
     (github-archive
@@ -223,7 +223,7 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "0sm2x81ilafd4amsizxzb2wv3xb2lrxrj5qv137pqx6zalmxzhhk")))
+          (hash (base32 "1ria1slkcbgvzfp072i3p47l2h8bwv4izxxg4gi75g5pfxgd91ci")))
          (package-rails-app
           "publisher"
           (github-archive
@@ -548,7 +548,7 @@ service setup.")
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "187qm7l7jqcv7hn7cz3bq98zc2sira4795vgiif2sr3hhjwrnvxk")))
+          (hash (base32 "024nibhwc61g1awj3v7mqgq80wmf7jmpa5055ryqkv9xfliijcl2")))
          (make-govuk-package
           "whitehall"
           (github-archive
