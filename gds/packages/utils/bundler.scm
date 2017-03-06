@@ -124,7 +124,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                          (gnu build install)
                          (ice-9 match))
             (define (run . args)
-              (display args)
+              (simple-format #t "running ~A\n" (string-join args))
               (zero? (apply system* args)))
 
             (set-path-environment-variable "PATH" '("bin" "sbin") '#+inputs)
