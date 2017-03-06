@@ -205,6 +205,20 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                       "package"
                       "--all"
                       "--no-install")
+                 (let
+                     ((files
+                       (find-files #$output
+                                   ".*\\.gemspec")))
+                   (if (null? files)
+                       (simple-format #t "No gemspecs to substitute dates for\n")
+                       (begin
+                         (simple-format
+                          #t "Substituting dates in ~A\n"
+                          (string-join files ", "))
+                         (substitute* files
+                           ((".*s\\.date = \".*\"")
+                            "  # date removed by govuk-guix"))))
+                   #t)
                  (begin (reset-timestamps #$output) #t)))))))
 
     (gexp->derivation name build
