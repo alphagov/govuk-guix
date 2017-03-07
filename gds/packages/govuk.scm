@@ -123,6 +123,81 @@
                ,phases
                ,phase-modifications))))))))
 
+(define-public collections-publisher
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1am82z6arb94w8gzmnfzadl1fqza6rw3yvsay3f9kmy8zx8w7h2n")))
+         (package-rails-app
+          "collections-publisher"
+          (github-archive
+           #:repository "collections-publisher"
+           #:commit-ish "release_255"
+           #:hash (base32 "0s5s1br84xcd0gg82v0f2rabbb8ryc5952frs3syjjmzgqvm1ykd"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+                        ,(use-blank-database.yml)))))))))
+
+(define-public contacts-admin
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
+   (package-rails-app
+    "contacts-admin"
+    (github-archive
+     #:repository "contacts-admin"
+     #:commit-ish "release_343"
+     #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk"))
+    #:precompile-assets #f))) ;; Asset precompilation fails
+
+(define-public local-links-manager
+  (let ((pkg
+         (package-with-bundler
+          (bundle-package
+           (hash (base32 "0avy99bq44wlclap50nfrkrmdsnmdla0zz718lrvdm1npqdbln90")))
+          (package-rails-app
+           "local-links-manager"
+           (github-archive
+            #:repository "local-links-manager"
+            #:commit-ish "release_108"
+            #:hash (base32 "11ykzxrrlx7lwjqnv45z0z5x1s26k354ksll0y2w88bnx79p4hg3"))
+           #:precompile-assets #f)))) ;; Asset precompilation fails
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+                        ,(use-blank-database.yml)))))))))
+
+(define-public manuals-publisher
+  (let ((pkg
+         (package-with-bundler
+          (bundle-package
+           (hash (base32 "0wc6gfffn1hfsxcp479icw1r4rlzz4wgj9hi1vmfs3kng0pyzxyn")))
+          (package-rails-app
+           "manuals-publisher"
+           (github-archive
+            #:repository "manuals-publisher"
+            #:commit-ish "release_744"
+            #:hash (base32 "1zj6b0kbpf29g78q330p2chh04n8fzzy2587py5qr1zm9f8k4bvm"))
+           #:precompile-assets #f)))) ;; Asset precompilation fails
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-mongoid.yml
+                        ,(replace-mongoid.yml)))))))))
+
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
@@ -133,6 +208,17 @@
      #:repository "publishing-api"
      #:commit-ish "release_758"
      #:hash (base32 "0261kwc4qfix9xfhlnc8q4xmya7k10z9yh4xy8l1ll5clcpjfqnf")))))
+
+(define-public policy-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "029rdnjh0fdx7arijbi1gq3r1hc34xpdi386rfw857n40f1p1zwi")))
+   (package-rails-app
+    "policy-publisher"
+    (github-archive
+     #:repository "policy-publisher"
+     #:commit-ish "release_167"
+     #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr")))))
 
 (define-public content-store
   (package-with-bundler
@@ -155,6 +241,29 @@
      #:repository "content-tagger"
      #:commit-ish "release_341"
      #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))))
+
+(define-public service-manual-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0anh8zkprbxs2rikwf9xbygxj9fg0x0dysjy3dbhw8f9lq4zhr9z")))
+   (package-rails-app
+    "service-manual-publisher"
+    (github-archive
+     #:repository "service-manual-publisher"
+     #:commit-ish "release_284"
+     #:hash (base32 "0hgmk3y9x7nnq9amy5sy5sk71cqvdmc950vv8mvdr1r8mc2hzvr1")))))
+
+(define-public short-url-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "155mp2xi968hhzkk3rk6rj5rd4qgcp0rb6n01aim01515xzy84il")))
+   (package-rails-app
+    "short-url-manager"
+    (github-archive
+     #:repository "short-url-manager"
+     #:commit-ish "release_103"
+     #:hash (base32 "1ll9kq17iaa5jkj7k0ck9r2gydw79j27jjvplbaadk31jsmh87jy"))
+    #:precompile-assets #f))) ;; Fails as can't connect to MongoDB
 
 (define-public specialist-publisher
   (let
@@ -195,6 +304,27 @@
      #:commit-ish "release_174"
      #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))
     #:precompile-assets #t)))
+
+(define-public travel-advice-publisher
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1gjd5bf1h3xgy2j449sinzpgbmmird3a75spwfv5vhicw25ij4id")))
+         (package-rails-app
+          "travel-advice-publisher"
+          (github-archive
+           #:repository "travel-advice-publisher"
+           #:commit-ish "release_238"
+           #:hash (base32 "1rp6chk0d2yjb1zbl2yzksid01l9hik0vw03cw2cl5i7dkfb5zy7"))))))
+       (package
+        (inherit pkg)
+        (arguments
+         (substitute-keyword-arguments (package-arguments pkg)
+          ((#:phases phases)
+           `(modify-phases ,phases
+              (add-after 'install 'replace-mongoid.yml
+                ,(replace-mongoid.yml)))))))))
 
 (define-public content-api
   (let
