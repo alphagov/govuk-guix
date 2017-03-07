@@ -42,31 +42,55 @@
   #:use-module (gds services govuk nginx))
 
 (define govuk-ports
-  `((publishing-api . 53039)
-    (content-store . 53000)
-    (draft-content-store . 53001)
-    (content-tagger . 53116)
-    (whitehall . 53020)
-    (specialist-publisher . 53064)
-    (need-api . 53052)
-    (maslow . 53053)
-    (specialist-frontend . 53065)
-    (draft-specialist-frontend . 53066)
-    (government-frontend . 53090)
-    (draft-government-frontend . 53091)
-    (contentapi . 53022)
-    (frontend . 53005)
-    (private-frontend . 53005)
-    (draft-frontend . 53007)
-    (rummager . 53009)
-    (search . 53009)
-    (publisher . 53006)
-    (signon . 53016)
-    (static . 53013)
-    (info-frontend . 53010)
-    (draft-static . 53014)
-    (router-api . 53056)
-    (draft-router-api . 53557)))
+  (let ((defaults '((publishing-api . 53039)
+                    (content-store . 53000)
+                    (draft-content-store . 53001)
+                    (content-tagger . 53116)
+                    (whitehall . 53020)
+                    (specialist-publisher . 53064)
+                    (need-api . 53052)
+                    (maslow . 53053)
+                    (specialist-frontend . 53065)
+                    (draft-specialist-frontend . 53066)
+                    (government-frontend . 53090)
+                    (draft-government-frontend . 53091)
+                    (contentapi . 53022)
+                    (frontend . 53005)
+                    (private-frontend . 53005)
+                    (draft-frontend . 53007)
+                    (rummager . 53009)
+                    (search . 53009)
+                    (publisher . 53006)
+                    (signon . 53016)
+                    (static . 53013)
+                    (info-frontend . 53010)
+                    (draft-static . 53014)
+                    (router-api . 53056)
+                    (draft-router-api . 53557))))
+    (define (get-next-port ports)
+      (define (get-next-free-port candidate-port)
+        (if (memq candidate-port
+                  (map cdr ports))
+            (get-next-free-port (+ 1 candidate-port))
+            candidate-port))
+
+      (get-next-free-port 50000))
+
+    (fold
+     (lambda (service ports)
+       (let ((name (service-type-name (service-kind service))))
+         (if (assq-ref ports name)
+             ports
+             (cons
+              (cons name (get-next-port ports))
+              ports))))
+     defaults
+     (append
+      api-services
+      publishing-application-services
+      supporting-application-services
+      frontend-services
+      draft-frontend-services))))
 
 (define system-ports
   `((postgresql . 55432)
