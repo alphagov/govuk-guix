@@ -18,6 +18,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages certs)
+  #:use-module (gds packages utils)
   #:export (bundler
 
             <bundle-package>
@@ -303,7 +304,9 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                            "LD_LIBRARY_PATH"
                            '("lib")
                            (map cdr inputs))))
-           (add-after 'ensure-/bin/bundle-exists 'bundle-install
+             (add-after 'set-ld-library-path 'replace-ruby-version
+                        ,(replace-ruby-version (package-version ruby)))
+           (add-after 'replace-ruby-version 'bundle-install
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((cwd (getcwd))
                       (out (assoc-ref outputs "out")))
