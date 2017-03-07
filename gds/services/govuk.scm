@@ -299,6 +299,269 @@
            (file "config/sidekiq.yml"))
           default-signon-database-connection-configs)))
 
+;;;
+;;; Collections Publisher
+;;;
+
+(define collections-publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'collections-publisher))
+
+(define collections-publisher-service
+  (service
+   collections-publisher-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(collections-publisher))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) collections-publisher
+          (signon-application
+           (name "Collections Publisher")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Collections Publisher")
+           (email "collections-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mysql-connection-config
+           (user "collections-pub")
+           (password (random-base16-string 30))
+           (database "collections_publisher")))))
+
+;;;
+;;; Contacts Admin
+;;;
+
+(define contacts-admin-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'contacts-admin))
+
+(define contacts-admin-service
+  (service
+   contacts-admin-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(contacts-admin))
+           (requirement '(publishing-api whitehall signon)))
+          (plek-config) (rails-app-config) contacts-admin
+          (signon-application
+           (name "Contacts Admin")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Contacts Admin")
+           (email "contacts-admin@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (mysql-connection-config
+           (user "contacts-admin")
+           (password (random-base16-string 30))
+           (database "contacts_admin")))))
+
+;;;
+;;; Local Links Manager
+;;;
+
+(define local-links-manager-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'local-links-manager))
+
+(define local-links-manager-service
+  (service
+   local-links-manager-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(local-links-manager))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) local-links-manager
+          (signon-application
+           (name "Local Links Manager")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Local Links Manager")
+           (email "local-links-manager@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (postgresql-connection-config
+           (user "local-links-manager")
+           (database "local_links_manager")))))
+
+;;;
+;;; Manuals Publisher
+;;;
+
+(define manuals-publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'manuals-publisher))
+
+(define manuals-publisher-service
+  (service
+   manuals-publisher-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(manuals-publisher))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) manuals-publisher
+          (signon-application
+           (name "Manuals Publisher")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Manuals Publisher")
+           (email "manuals-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "manuals-publisher")
+           (password (random-base16-string 30))
+           (database "manuals_publisher")))))
+
+;;;
+;;; Policy Publisher
+;;;
+
+(define policy-publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'policy-publisher))
+
+(define policy-publisher-service
+  (service
+   policy-publisher-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(policy-publisher))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) policy-publisher
+          (signon-application
+           (name "Policy Publisher")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Policy Publisher")
+           (email "policy-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "policy-publisher")
+           (database "policy_publisher")))))
+
+;;;
+;;; Service Manual Publisher
+;;;
+
+(define service-manual-publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'service-manual-publisher))
+
+(define service-manual-publisher-service
+  (service
+   service-manual-publisher-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(service-manual-publisher))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) service-manual-publisher
+          (signon-application
+           (name "Service Manual Publisher")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Service Manual Publisher")
+           (email "service-manual-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "service-manual-publisher")
+           (database "service_manual_publisher")))))
+
+;;;
+;;; Short Url Manager
+;;;
+
+(define short-url-manager-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'short-url-manager))
+
+(define short-url-manager-service
+  (service
+   short-url-manager-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(short-url-manager))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) short-url-manager
+          (signon-application
+           (name "Short URL Manager")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Short URL Manager")
+           (email "short-url-manager@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "short-url-manager")
+           (password (random-base16-string 30))
+           (database "short_url_manager")))))
+
+;;;
+;;; Travel Advice Publisher
+;;;
+
+(define travel-advice-publisher-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'travel-advice-publisher))
+
+(define travel-advice-publisher-service
+  (service
+   travel-advice-publisher-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(travel-advice-publisher))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) travel-advice-publisher
+          (signon-application
+           (name "Travel Advice Publisher")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Travel Advice Publisher")
+           (email "travel-advice-publisher@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "travel-advice-publisher")
+           (password (random-base16-string 30))
+           (database "travel_advice_publisher")))))
+
 ;;
 ;; Publishing E2E Tests
 ;;
@@ -1040,20 +1303,19 @@
 
 (define publishing-application-services
   (list
-   ;; collections-publisher-service
-   ;; contacts-admin-service
+   collections-publisher-service
+   contacts-admin-service
    content-tagger-service
-   ;; local-links-manager-service
-   ;; manuals-publisher-service
+   local-links-manager-service
+   manuals-publisher-service
    maslow-service
-   ;; policy-publisher-service
+   policy-publisher-service
    publisher-service
-   ;; service-manual-publisher-service
-   ;; short-url-manager-service
+   service-manual-publisher-service
+   short-url-manager-service
    specialist-publisher-service
-   ;; travel-advice-publisher-service
-   whitehall-service
-   ))
+   travel-advice-publisher-service
+   whitehall-service))
 
 (define api-services
   (list
