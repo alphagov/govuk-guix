@@ -113,6 +113,9 @@
               '()))))
     (package
       (inherit pkg)
+      (inputs
+       `(("inetutils" ,inetutils)  ;; The redis-lock gem depends on hostname
+         ,@(package-inputs pkg)))
       (arguments
        (substitute-keyword-arguments
         (package-arguments pkg)
