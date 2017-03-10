@@ -272,7 +272,7 @@
               (scandir
                #$package
                (negate
-                (cut member <> '("." ".." "tmp" "log" "spec" "doc")))))
+                (cut member <> '("." ".." "tmp" "log" "doc")))))
 
              (for-each
               (lambda (file)
