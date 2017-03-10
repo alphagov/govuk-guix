@@ -456,8 +456,8 @@
     "content-store"
     (github-archive
      #:repository "content-store"
-     #:commit-ish "release_599"
-     #:hash (base32 "1b0hkvl6nr54pap80q6y7zph03ryqqh4v1frmf9r7nycw8ga6nzl")))))
+     #:commit-ish "release_607"
+     #:hash (base32 "0g2jykjyi5db4n1imffrr2isxsfqw5y0qaybdb5gkqn4hx381qlk")))))
 
 (define-public content-tagger
   (package-with-bundler
