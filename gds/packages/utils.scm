@@ -25,6 +25,11 @@
   (origin
     (method url-fetch)
     (uri url)
+    (file-name (string-append
+                (string-join
+                 (list user-or-org repository commit-ish)
+                 "-")
+                ".tar.gz"))
     (sha256 hash)))
 
 (define-public create-bin-bundle
