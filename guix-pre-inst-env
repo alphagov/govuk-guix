@@ -41,7 +41,7 @@ eval "$GDS_GUIX_SEARCH_PATHS"
 # To avoid $XDG_CONFIG_HOME/guix/latest from being used
 export XDG_CONFIG_HOME="${GDS_GUIX_CUSTOM_XDG_CONFIG_HOME:-"/dev/null"}"
 
-SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile --search-paths)"
+SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile git --search-paths)"
 
 INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER)
 
