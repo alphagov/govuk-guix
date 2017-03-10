@@ -458,6 +458,9 @@
                  (find service-startup-config? parameters)
                  `((rails-db:setup
                     .
-                    ,(run-command "rake" "db:setup"))))
+                    ,#~(lambda ()
+                         (if (file-exists? "bin/rake")
+                             (#$(run-command "rake" "db:setup"))
+                             (#$(run-command "bundle" "exec" "rake" "db:setup")))))))
                 parameter))
           parameters)))))
