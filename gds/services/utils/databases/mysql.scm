@@ -67,9 +67,7 @@
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
-               ((pid (primitive-fork))
-                (root (getpwnam "root"))
-                (command `(,(string-append #$pv "/bin/pv")
+               ((command `(,(string-append #$pv "/bin/pv")
                            ,#$file
                            "|"
                            ,(string-append #$pbzip2 "/bin/pbzip2")
