@@ -126,6 +126,62 @@
                ,phases
                ,phase-modifications))))))))
 
+(define-public authenticating-proxy
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0al4dn0qjfhyap1cha4r7ix3vz3z0n2g3hb9004l5ifk520mmyi4")))
+   (package-rails-app
+    "authenticating-proxy"
+    (github-archive
+     #:repository "authenticating-proxy"
+     #:commit-ish "release_35"
+     #:hash (base32 "1yivzr9lbpa1m2k2l9pl476vay34b9nswnfz9hdhsf4lz74yp378"))
+    #:precompile-assets #f)))
+
+(define-public bouncer
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0z05c16a4rz0kf1wq3cqykfm3v1b48kbx32g7zyhniq5ax9hhka2")))
+   (package-rails-app
+    "bouncer"
+    (github-archive
+     #:repository "bouncer"
+     #:commit-ish "release_203"
+     #:hash (base32 "19vvkkcc8qsb2gly79bbqrg0vp1hivwsvg5ks497707blhs1qbks")))))
+
+(define-public calculators
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0z05c16a4rz0kf1wq3cqykfm3v1b48kbx32g7zyhniq5ax9hhka2")))
+   (package-rails-app
+    "calculators"
+    (github-archive
+     #:repository "calculators"
+     #:commit-ish "release_182"
+     #:hash (base32 "19vvkkcc8qsb2gly79bbqrg0vp1hivwsvg5ks497707blhs1qbks")))))
+
+(define-public calendars
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0pb8viv6cvp91qg1a9n0648frw5v49kf3z5vn3585fdmx6q9jd9k")))
+   (package-rails-app
+    "calendars"
+    (github-archive
+     #:repository "calendars"
+     #:commit-ish "release_419"
+     #:hash (base32 "0c88ginv7fwhwr0fk5gb894c16icshnl4fdf4ikms20k4qz3nbzm")))))
+
+(define-public collections
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1717fy92ww92ghhwbfwzhwm86plyi5dkx82db2mdfh84w8m00xm2")))
+   (package-rails-app
+    "collections"
+    (github-archive
+     #:repository "collections"
+     #:commit-ish "release_294"
+     #:hash (base32 "12dz2m5j7gry6g24lcbadnr1104r8vn7972jhzlnzqc3ksbdjkhm")))))
+
 (define-public collections-publisher
   (let
       ((pkg
@@ -159,6 +215,107 @@
      #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk"))
     #:precompile-assets #f))) ;; Asset precompilation fails
 
+(define-public contacts-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0pabhmanjs1m0b5zdkwng7p2fpjmwjipvwraimywyq8dikvxl8jh")))
+   (package-rails-app
+    "contacts-frontend"
+    (github-archive
+     #:repository "contacts-frontend"
+     #:commit-ish "release_72"
+     #:hash (base32 "155fb85hpad0i0szm1k9w4a254ydk3bzlmj4niii8pc0icghcs0x")))))
+
+(define-public design-principles
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1y3az4pqy8a3i712niccvsib3932bzpj99pvfqij9r8ha6v5a78i")))
+   (package-rails-app
+    "design-principles"
+    (github-archive
+     #:repository "design-principles"
+     #:commit-ish "release_870"
+     #:hash (base32 "1b4kqpjn5dnxa8y6f7ncazz1sclbrkkhklk8dzrjsfgsq062js31"))
+    #:precompile-assets #f))) ;; asset precompilation fails
+
+(define-public email-alert-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "13x9n88f56x4cx18fl409dzkhdr6k8rc2sbvx85jbydwyvvbqy5c")))
+   (package-rails-app
+    "email-alert-frontend"
+    (github-archive
+     #:repository "email-alert-frontend"
+     #:commit-ish "release_30"
+     #:hash (base32 "0yxjc15dgnszy44zdvcqm84x8nq7y34jx282rylvs630wbd38gac")))))
+
+(define-public email-alert-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "17nswlp66kkx0vja4yf94zrccgpwzgr7x4nhrz46brbgnv226zn1")))
+   (package-rails-app
+    "email-alert-api"
+    (github-archive
+     #:repository "email-alert-api"
+     #:commit-ish "release_161"
+     #:hash (base32 "1bznicrxasrz7r7d0pz6iy388hy4jax5l05rg8j6c25p55bwk04p"))
+    #:precompile-assets #f)))
+
+(define-public email-alert-service
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1zp0wqjf721fg6fpnwhw30960ill070zpj4lh690s5cdwai1rfja")))
+   (make-govuk-package
+    "email-alert-service"
+    (github-archive
+     #:repository "email-alert-service"
+     #:commit-ish "release_65"
+     #:hash (base32 "0gvds70g8x8qnc13biqj121z0r3p6b9vjvbfhizffxi73zpdfw57")))))
+
+(define-public feedback
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1f3jl7i0yiy4svyhg6h74v9m6bwjmc50c65j02s1ncnxn9hb472h")))
+   (package-rails-app
+    "feedback"
+    (github-archive
+     #:repository "feedback"
+     #:commit-ish "release_292"
+     #:hash (base32 "1b8nl2bv5ffgi995c4wwsl0ffscflk30nj2ih7vh3sr6lalnqcf3")))))
+
+(define-public finder-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1jh4rnfqpnjzckjxyk62qs1rrg3drj3fzy920iycdy6aqk2d9958")))
+   (package-rails-app
+    "finder-frontend"
+    (github-archive
+     #:repository "finder-frontend"
+     #:commit-ish "release_301"
+     #:hash (base32 "1sczxdadl47z2lzbg2cakd96insvv32yb5fx4wgx9hb1ks5qybvk")))))
+
+(define-public imminence
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1smwll8m13215dd8m1dsxii847cd054vfq896xsivrqy73fs0asm")))
+   (package-rails-app
+    "imminence"
+    (github-archive
+     #:repository "imminence"
+     #:commit-ish "release_307"
+     #:hash (base32 "0bnc5x79qlmmhjg81jpwr91235qggkmc1n6hy3sch97gv1a7zn46")))))
+
+(define-public licence-finder
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1cfgxbm7qhhfn2w27khn7avn3q0w7961zpj88i8vq6vhlvdn5qzj")))
+   (package-rails-app
+    "licence-finder"
+    (github-archive
+     #:repository "licence-finder"
+     #:commit-ish "release_279"
+     #:hash (base32 "0jgsravvf4ssn6mf5q1hpiwxvnp8ccgvv1cj80254a0fbix2qg0h")))))
+
 (define-public local-links-manager
   (let ((pkg
          (package-with-bundler
@@ -180,6 +337,17 @@
              (add-after 'install 'replace-database.yml
                         ,(use-blank-database.yml)))))))))
 
+(define-public manuals-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1ka2mwjmbsia3ib64ndjwz4918laxdl7aqgcrwixm8538kfma8ql")))
+   (package-rails-app
+    "manuals-frontend"
+    (github-archive
+     #:repository "manuals-frontend"
+     #:commit-ish "release_191"
+     #:hash (base32 "1zvqsrmrkcrvqglinbyrghi7fw1zfc0r6hpgc7yqk5w86g17dj45")))))
+
 (define-public manuals-publisher
   (let ((pkg
          (package-with-bundler
@@ -200,6 +368,17 @@
           `(modify-phases ,phases
              (add-after 'install 'replace-mongoid.yml
                         ,(replace-mongoid.yml)))))))))
+
+(define-public multipage-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0h7g4s2yzwp9a77fd5rpwj7sbsj0vfy0216g98j2175nx75b8ic7")))
+   (package-rails-app
+    "multipage-frontend"
+    (github-archive
+     #:repository "multipage-frontend"
+     #:commit-ish "release_55"
+     #:hash (base32 "055ga8s0z9ljmcfkrwhl6if6qshq4bn303dhqr5476a10mgdghf7")))))
 
 (define-public publishing-api
   (package-with-bundler
@@ -223,6 +402,52 @@
      #:commit-ish "release_167"
      #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr")))))
 
+(define-public search-admin
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "06wy96q5przv7pnc1wxxkl606jyayhyn3si3fi93v9c3rwaiv0sk")))
+   (package-rails-app
+    "search-admin"
+    (github-archive
+     #:repository "search-admin"
+     #:commit-ish "release_91"
+     #:hash (base32 "1kr3rlwiydnpdrcw809rmy1xspz9m5i8a1dsqm7fpfyyyn2v4is5")))))
+
+(define-public service-manual-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "023jq5606gvj0wa8v8v7maxhqm8z0k3fkz2bbnajv6wcjd5dm0hf")))
+   (package-rails-app
+    "service-manual-frontend"
+    (github-archive
+     #:repository "service-manual-frontend"
+     #:commit-ish "release_99"
+     #:hash (base32 "1fsgx2p91j43n70mwzdi31s7gi1smdm5y0q9zyp8nby1dxf5qhpf")))))
+
+(define-public smart-answers
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0k91z124p6x17wpnvy23bfr9x24hvp04v0cblg8xg0xi32imb0bh")))
+   (package-rails-app
+    "smart-answers"
+    (github-archive
+     #:repository "smart-answers"
+     #:commit-ish "release_3521"
+     #:hash (base32 "1q3fnbvw86c4ca4brwlr0igi01a9dd2szb6n5gz7q0fmnd19304m"))
+    #:precompile-assets #f))) ;; asset precompilation fails
+
+(define-public support
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
+   (package-rails-app
+    "support"
+    (github-archive
+     #:repository "support"
+     #:commit-ish "release_586"
+     #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc"))
+    #:precompile-assets #f))) ;; asset precompilation fails
+
 (define-public content-store
   (package-with-bundler
    (bundle-package
@@ -244,6 +469,17 @@
      #:repository "content-tagger"
      #:commit-ish "release_341"
      #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))))
+
+(define-public release
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1mbhlvv6jigbd1v04nhcp31n1zbbdl4pb0d36ad29lynsp85ri5l")))
+   (package-rails-app
+    "release"
+    (github-archive
+     #:repository "release"
+     #:commit-ish "release_232"
+     #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))))
 
 (define-public service-manual-publisher
   (package-with-bundler
@@ -307,6 +543,17 @@
      #:commit-ish "release_174"
      #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44"))
     #:precompile-assets #t)))
+
+(define-public transition
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
+   (package-rails-app
+    "transition"
+    (github-archive
+     #:repository "transition"
+     #:commit-ish "release_786"
+     #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk")))))
 
 (define-public travel-advice-publisher
   (let
