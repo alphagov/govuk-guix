@@ -138,6 +138,18 @@
      #:hash (base32 "1yivzr9lbpa1m2k2l9pl476vay34b9nswnfz9hdhsf4lz74yp378"))
     #:precompile-assets #f)))
 
+(define-public asset-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1v9mf7qzkrq0lapfag897x59b3ng2md9gwm2xvj3c3252315qbgf")))
+   (package-rails-app
+    "asset-manager"
+    (github-archive
+     #:repository "asset-manager"
+     #:commit-ish "release_92"
+     #:hash (base32 "0b7qxzckzckwgvvw1wq3sgzkf0yj2yp947gz1d4jndz5g4b5j57r"))
+    #:precompile-assets #f)))
+
 (define-public bouncer
   (package-with-bundler
    (bundle-package
@@ -294,6 +306,18 @@
      #:commit-ish "release_301"
      #:hash (base32 "1sczxdadl47z2lzbg2cakd96insvv32yb5fx4wgx9hb1ks5qybvk")))))
 
+(define-public hmrc-manuals-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "18av10h8wbxmy1kdfd3n5raiavvxadpx88qa7fv7rln1pa3jk26n")))
+   (package-rails-app
+    "hmrc-manuals-api"
+    (github-archive
+     #:repository "hmrc-manuals-api"
+     #:commit-ish "release_175"
+     #:hash (base32 "12c2dm51yq19449xvq3fbdkrbbbppkivlkadldav7zk4p3rpq573"))
+    #:precompile-assets #f)))
+
 (define-public imminence
   (package-with-bundler
    (bundle-package
@@ -447,6 +471,28 @@
      #:commit-ish "release_586"
      #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc"))
     #:precompile-assets #f))) ;; asset precompilation fails
+
+(define-public support-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1n9fgi7hsyzbdx06nmfqswvz199g0gy4x3izmb1jpx8ijlzsj0cg")))
+   (package-rails-app
+    "support-api"
+    (github-archive
+     #:repository "support-api"
+     #:commit-ish "release_123"
+     #:hash (base32 "1y504xxni3bhr6byjka9ls7m60h3vcakjk2khsyf9bs407kp6k79")))))
+
+(define-public content-performance-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
+   (package-rails-app
+    "content-performance-manager"
+    (github-archive
+     #:repository "content-performance-manager"
+     #:commit-ish "release_30"
+     #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))))
 
 (define-public content-store
   (package-with-bundler
