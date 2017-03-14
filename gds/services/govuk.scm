@@ -300,6 +300,146 @@
           default-signon-database-connection-configs)))
 
 ;;;
+;;; Asset Manager
+;;;
+
+(define asset-manager-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'asset-manager))
+
+(define asset-manager-service
+  (service
+   asset-manager-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(asset-manager))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) asset-manager
+          (signon-application
+           (name "Asset Manager")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "asset-manager")
+           (password (random-base16-string 30))
+           (database "asset_manager")))))
+
+;;;
+;;; Authenticating Proxy
+;;;
+
+(define authenticating-proxy-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'authenticating-proxy))
+
+(define authenticating-proxy-service
+  (service
+   authenticating-proxy-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(authenticating-proxy))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) authenticating-proxy
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "authenticating-proxy")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+;;;
+;;; Calculators
+;;;
+
+(define calculators-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'calculators))
+
+(define calculators-service
+  (service
+   calculators-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(calculators))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) calculators
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "calculators")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+;;;
+;;; Calendars
+;;;
+
+(define calendars-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'calendars))
+
+(define calendars-service
+  (service
+   calendars-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(calendars))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) calendars
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "calendars")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+;;;
+;;; Collections
+;;;
+
+(define collections-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'collections))
+
+(define collections-service
+  (service
+   collections-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(collections))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) collections
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "collections")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+(define draft-collections-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
+
+(define draft-collections-service
+  (service
+   draft-collections-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-collections))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) collections
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "draft-collections")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+;;;
 ;;; Collections Publisher
 ;;;
 
@@ -367,6 +507,322 @@
            (database "contacts_admin")))))
 
 ;;;
+;;; Contacts Frontend
+;;;
+
+(define contacts-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'contacts-frontend))
+
+(define contacts-frontend-service
+  (service
+   contacts-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(contacts-frontend))
+           (requirement '(publishing-api whitehall signon)))
+          (plek-config) (rails-app-config) contacts-frontend
+          (signon-application
+           (name "Contacts Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Contacts Frontend")
+           (email "contacts-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (mysql-connection-config
+           (user "contacts-frontend")
+           (password (random-base16-string 30))
+           (database "contacts_frontend")))))
+
+(define draft-contacts-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-contacts-frontend))
+
+(define draft-contacts-frontend-service
+  (service
+   draft-contacts-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-contacts-frontend))
+           (requirement '(publishing-api whitehall signon)))
+          (plek-config) (rails-app-config) contacts-frontend
+          (signon-application
+           (name "Contacts Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Contacts Frontend")
+           (email "draft-contacts-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (mysql-connection-config
+           (user "draft-contacts-frontend")
+           (password (random-base16-string 30))
+           (database "contacts_frontend")))))
+
+;;;
+;;; Content Performance Manager
+;;;
+
+(define content-performance-manager-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'content-performance-manager))
+
+(define content-performance-manager-service
+  (service
+   content-performance-manager-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(content-performance-manager))
+           (requirement '(publishing-api whitehall signon)))
+          (plek-config) (rails-app-config) content-performance-manager
+          (signon-application
+           (name "Content Performance Manager")
+           (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Content Performance Manager")
+           (email "content-performance-manager@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (postgresql-connection-config
+           (user "content-performance-manager")
+           (database "content-performance_manager")))))
+
+;;;
+;;; Design Principles
+;;;
+
+(define design-principles-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'design-principles))
+
+(define design-principles-service
+  (service
+   design-principles-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(design-principles))
+           (requirement '()))
+          (plek-config) (rails-app-config) design-principles
+          (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (postgresql-connection-config
+           (user "design-principles")
+           (database "email_alert_api")))))
+
+;;;
+;;; Email Alert API
+;;;
+
+(define email-alert-api-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'email-alert-api))
+
+(define email-alert-api-service
+  (service
+   email-alert-api-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(email-alert-api))
+           (requirement '()))
+          (plek-config) (rails-app-config) email-alert-api
+          (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (postgresql-connection-config
+           (user "email-alert-api")
+           (database "email_alert_api")))))
+
+;;;
+;;; Email Alert Frontend
+;;;
+
+(define email-alert-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'email-alert-frontend))
+
+(define email-alert-frontend-service
+  (service
+   email-alert-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(email-alert-frontend))
+           (requirement '()))
+          (plek-config) (rails-app-config) email-alert-frontend
+          (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (postgresql-connection-config
+           (user "email-alert-frontend")
+           (database "email_alert_frontend")))))
+
+(define draft-email-alert-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-email-alert-frontend))
+
+(define draft-email-alert-frontend-service
+  (service
+   draft-email-alert-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-email-alert-frontend))
+           (requirement '()))
+          (plek-config) (rails-app-config) email-alert-frontend
+          (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (postgresql-connection-config
+           (user "draft-email-alert-frontend")
+           (database "email_alert_frontend")))))
+
+;;;
+;;; Email Alert Service
+;;;
+
+(define email-alert-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'email-alert-service))
+
+(define email-alert-service-service
+  (service
+   email-alert-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(email-alert-service))
+           (requirement '()))
+          (plek-config) (rails-app-config) email-alert-service
+          (service-startup-config)
+          (redis-connection-config))))
+
+;;;
+;;; Feedback
+;;;
+
+(define feedback-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'feedback))
+
+(define feedback-service
+  (service
+   feedback-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(feedback))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) feedback
+          (signon-application
+           (name "Authenticating Proxy")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "feedback")
+           (password (random-base16-string 30))
+           (database "authenticating_proxy")))))
+
+;;;
+;;; Finder Frontend
+;;;
+
+(define finder-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'finder-frontend))
+
+(define finder-frontend-service
+  (service
+   finder-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(finder-frontend))
+           (requirement '()))
+          (plek-config) (rails-app-config) finder-frontend
+          (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (postgresql-connection-config
+           (user "finder-frontend")
+           (database "email_alert_api")))))
+
+;;;
+;;; HMRC Manuals API
+;;;
+
+(define hmrc-manuals-api-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'hmrc-manuals-api))
+
+(define hmrc-manuals-api-service
+  (service
+   hmrc-manuals-api-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(hmrc-manuals-api))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) hmrc-manuals-api
+          (signon-application
+           (name "HMRC Manuals Api")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "HMRC Manuals Api")
+           (email "hmrc-manuals-api@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (postgresql-connection-config
+           (user "hmrc-manuals-api")
+           (database "hmrc_manuals_api")))))
+
+;;;
+;;; Licence Finder
+;;;
+
+(define licence-finder-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'licence-finder))
+
+(define licence-finder-service
+  (service
+   licence-finder-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(licence-finder))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) licence-finder
+          (signon-application
+           (name "Licence Finder")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Licence Finder")
+           (email "licence-finder@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "licence-finder")
+           (password (random-base16-string 30))
+           (database "licence_finder")))))
+
+;;;
 ;;; Local Links Manager
 ;;;
 
@@ -398,6 +854,101 @@
           (postgresql-connection-config
            (user "local-links-manager")
            (database "local_links_manager")))))
+
+;;;
+;;; Imminence
+;;;
+
+(define imminence-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'imminence))
+
+(define imminence-service
+  (service
+   imminence-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(imminence))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) imminence
+          (signon-application
+           (name "Imminence")
+           (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Imminence")
+           (email "imminence@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "imminence")
+           (password (random-base16-string 30))
+           (database "imminence")))))
+
+;;;
+;;; Manuals Frontend
+;;;
+
+(define manuals-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'manuals-frontend))
+
+(define manuals-frontend-service
+  (service
+   manuals-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(manuals-frontend))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) manuals-frontend
+          (signon-application
+           (name "Manuals Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Manuals Frontend")
+           (email "manuals-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "manuals-frontend")
+           (password (random-base16-string 30))
+           (database "manuals_frontend")))))
+
+(define draft-manuals-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-manuals-frontend))
+
+(define draft-manuals-frontend-service
+  (service
+   draft-manuals-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-manuals-frontend))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) manuals-frontend
+          (signon-application
+           (name "Manuals Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Manuals Frontend")
+           (email "draft-manuals-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "draft-manuals-frontend")
+           (password (random-base16-string 30))
+           (database "manuals_frontend")))))
 
 ;;;
 ;;; Manuals Publisher
@@ -433,6 +984,62 @@
            (database "manuals_publisher")))))
 
 ;;;
+;;; Multipage Frontend
+;;;
+
+(define multipage-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'multipage-frontend))
+
+(define multipage-frontend-service
+  (service
+   multipage-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(multipage-frontend))
+           (requirement '(content-store static)))
+          (plek-config) (rails-app-config) multipage-frontend
+          (signon-api-user
+           (name "Multipage Frontend")
+           (email "multipage-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "multipage-frontend")
+           (password (random-base16-string 30))
+           (database "multipage_frontend")))))
+
+(define draft-multipage-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-multipage-frontend))
+
+(define draft-multipage-frontend-service
+  (service
+   draft-multipage-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-multipage-frontend))
+           (requirement '(draft-content-store draft-static)))
+          (plek-config) (rails-app-config) multipage-frontend
+          (signon-api-user
+           (name "Multipage Frontend")
+           (email "draft-multipage-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (mongodb-connection-config
+           (user "draft-multipage-frontend")
+           (password (random-base16-string 30))
+           (database "multipage_frontend")))))
+
+;;;
 ;;; Policy Publisher
 ;;;
 
@@ -463,6 +1070,52 @@
           (postgresql-connection-config
            (user "policy-publisher")
            (database "policy_publisher")))))
+
+;;;
+;;; Release
+;;;
+
+(define release-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'release))
+
+(define release-service
+  (service
+   release-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(release))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) release
+          (signon-application
+           (name "Release")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "release")
+           (database "release")))))
+
+;;;
+;;; Search Admin
+;;;
+
+(define search-admin-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'search-admin-publisher))
+
+(define search-admin-service
+  (service
+   search-admin-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(search-admin))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) search-admin
+          (signon-application
+           (name "Search Admin")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "search-admin")
+           (database "search_admin")))))
 
 ;;;
 ;;; Service Manual Publisher
@@ -497,6 +1150,66 @@
            (database "service_manual_publisher")))))
 
 ;;;
+;;; Service Manual Frontend
+;;;
+
+(define service-manual-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'service-manual-frontend))
+
+(define service-manual-frontend-service
+  (service
+   service-manual-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(service-manual-frontend))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) service-manual-frontend
+          (signon-application
+           (name "Service Manual Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Service Manual Frontend")
+           (email "service-manual-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "service-manual-frontend")
+           (database "service_manual_frontend")))))
+
+(define draft-service-manual-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-service-manual-frontend))
+
+(define draft-service-manual-frontend-service
+  (service
+   draft-service-manual-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-service-manual-frontend))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) service-manual-frontend
+          (signon-application
+           (name "Service Manual Frontend")
+           (supported-permissions '("signin" "gds_editor")))
+          (signon-api-user
+           (name "Service Manual Frontend")
+           (email "draft-service-manual-frontend@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "draft-service-manual-frontend")
+           (database "service_manual_frontend")))))
+
+;;;
 ;;; Short Url Manager
 ;;;
 
@@ -528,6 +1241,69 @@
            (user "short-url-manager")
            (password (random-base16-string 30))
            (database "short_url_manager")))))
+
+;;;
+;;; Smart Answers
+;;;
+
+(define smart-answers-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'smart-answers-publisher))
+
+(define smart-answers-service
+  (service
+   smart-answers-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(smart-answers))
+           (requirement '(publishing-api signon)))
+          (plek-config) (rails-app-config) smart-answers
+          (signon-application
+           (name "Smart Answers")
+           (supported-permissions '("signin")))
+          (service-startup-config)
+          (postgresql-connection-config
+           (user "smart-answers")
+           (database "smart_answers")))))
+
+;;;
+;;; Support
+;;;
+
+(define support-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'support))
+
+(define support-service
+  (service
+   support-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(support))
+          (requirement '(publishing-api signon)))
+         (plek-config) (rails-app-config) support
+         (service-startup-config)
+         (postgresql-connection-config
+          (user "support")
+          (database "support")))))
+
+;;;
+;;; Support API
+;;;
+
+(define support-api-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'support-api))
+
+(define support-api-service
+  (service
+   support-api-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(support-api))
+          (requirement '(publishing-api signon)))
+         (plek-config) (rails-app-config) support-api
+         (service-startup-config)
+         (postgresql-connection-config
+          (user "support-api")
+          (database "support_api")))))
 
 ;;;
 ;;; Travel Advice Publisher
