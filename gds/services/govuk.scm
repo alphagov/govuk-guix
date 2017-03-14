@@ -2095,68 +2095,65 @@
 
 (define api-services
   (list
-   ;; business-support-api-service
    content-store-service
    draft-content-store-service
-   ;; email-alert-api-service
-   ;; email-alert-service-service
+   email-alert-api-service
+   email-alert-service-service
    content-api-service
    need-api-service
-   ;; imminence-service
+   imminence-service
    publishing-api-service
    rummager-service
-   ;; asset-manager-service
+   asset-manager-service
    router-api-service
    draft-router-api-service
-   ;; support-api-service
-   ;; hmrc-manuals-api-service
+   support-api-service
+   hmrc-manuals-api-service
    ;; mapit-service
-   ;; metadata-api-service
    ))
 
 (define supporting-application-services
   (list
    ;; bouncer-service
-   ;; authenticating-proxy-service
-   ;; search-admin-service
+   authenticating-proxy-service
+   search-admin-service
    signon-service
-   ;; support-service
+   support-service
    ;; transition-service
-   ;; release-service
+   release-service
    router-service
    draft-router-service))
 
 (define frontend-services
   (list
-   ;; business-support-finder-service
-   ;; calculators-service
-   ;; calendars-service
-   ;; collections-service
-   ;; contacts-frontend-service
-   ;; design-principles-service
-   ;; email-alert-frontend-service
-   ;; feedback-service
-   ;; finder-frontend-service
+   calculators-service
+   calendars-service
+   collections-service
+   contacts-frontend-service
+   design-principles-service
+   email-alert-frontend-service
+   feedback-service
+   finder-frontend-service
    frontend-service
    government-frontend-service
    info-frontend-service
-   ;; licence-finder-service
-   ;; manuals-frontend-service
-   ;; multipage-frontend-service
-   ;; smart-answers-service
-   ;; service-manual-frontend-service
+   licence-finder-service
+   manuals-frontend-service
+   multipage-frontend-service
+   service-manual-frontend-service
+   smart-answers-service
    specialist-frontend-service
    static-service))
 
 (define draft-frontend-services
   (list
-   ;; draft-collections-service
-   ;; draft-contacts-service
-   ;; draft-email-alert-service
+   draft-collections-service
+   draft-contacts-frontend-service
+   draft-email-alert-frontend-service
    draft-frontend-service
    draft-government-frontend-service
-   ;; draft-manuals-frontend-service
-   ;; draft-multipage-frontend-service
-   ;; draft-service-manual-frontend-service
+   draft-manuals-frontend-service
+   draft-multipage-frontend-service
+   draft-service-manual-frontend-service
    draft-static-service
    draft-specialist-frontend-service))
