@@ -252,6 +252,7 @@
          rest)))
     #~(begin
         (use-modules (guix build utils)
+                     (guix build syscalls)
                      (ice-9 match)
                      (ice-9 ftw)
                      (srfi srfi-26))
@@ -307,6 +308,8 @@
                 (mkdir-p (string-append #$root-directory path))
                 (chmod (string-append #$root-directory path) #o777))
               '("/tmp" "/log"))
+
+             (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs")
 
              (for-each
               (cut chmod <> #o666)
