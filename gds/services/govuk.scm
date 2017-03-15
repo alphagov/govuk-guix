@@ -1433,7 +1433,7 @@
                 (shepherd-service
                  (provision (list 'publishing-e2e-tests))
                  (documentation "publishing-e2e-tests")
-                 (requirement '(specialist-publisher))
+                 (requirement '(specialist-publisher nginx))
                  (respawn? #f)
                  (start #~(make-forkexec-constructor #$start-script))
                  (stop #~(make-kill-destructor))))))))))))
@@ -1541,7 +1541,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(specialist-publisher))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api signon mongodb)))
           (plek-config) (rails-app-config) specialist-publisher
           (signon-application
            (name "Specialist Publisher")
