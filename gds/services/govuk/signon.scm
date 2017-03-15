@@ -41,6 +41,7 @@
             use-gds-sso-strategy
             update-signon-application-with-random-oauth
             update-signon-api-user-with-random-authorisation-tokens
+            filter-signon-user-application-permissions
             signon-setup-users-script
             signon-setup-api-users-script
             signon-setup-applications-script))
@@ -109,6 +110,20 @@
          (update-signon-authorisation-with-random-token authorisation)
          permissions)))
      (signon-api-user-authorisation-permissions api-user)))))
+
+(define (filter-signon-user-application-permissions user applications)
+  (signon-user
+   (inherit user)
+   (application-permissions
+    (let ((application-names
+           (map
+            (match-lambda (($ <signon-application> name) name)
+                          ((and name string) name))
+            applications)))
+      (filter
+       (lambda (permission)
+         (member (car permission) application-names))
+       (signon-user-application-permissions user))))))
 
 (define (use-gds-sso-strategy services strategy)
   (map

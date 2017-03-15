@@ -249,7 +249,10 @@
                     .
                     ,(run-command
                       "rails" "runner" (signon-setup-users-script
-                                        (signon-config-users config))))
+                                        (map
+                                         (cut filter-signon-user-application-permissions
+                                           <> (signon-config-applications config))
+                                         (signon-config-users config)))))
                    (signon-setup-api-users
                     .
                     ,(run-command
