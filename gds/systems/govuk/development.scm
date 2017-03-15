@@ -98,7 +98,7 @@
     (elasticsearch . 59200)
     (mysql . 53306)))
 
-(define base-services
+(define-public base-services
   (list
    (syslog-service)
    (urandom-seed-service)

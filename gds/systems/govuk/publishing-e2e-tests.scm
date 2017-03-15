@@ -12,6 +12,7 @@
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
+  #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
 (define services
@@ -21,7 +22,9 @@
     (operating-system-user-services development-os))))
 
 (define-public publishing-e2e-tests-os
-  (operating-system
+  (system-without-unnecessary-services
+   (cons publishing-e2e-tests-service base-services)
+   (operating-system
     (inherit development-os)
     (services
      (modify-services
@@ -74,6 +77,6 @@
               (nginx-location-configuration
                (uri "/")
                (body '("autoindex on;"))))))
-           (nginx-configuration-server-blocks parameter)))))))))
+           (nginx-configuration-server-blocks parameter))))))))))
 
 publishing-e2e-tests-os
