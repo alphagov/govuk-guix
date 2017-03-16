@@ -90,6 +90,12 @@
 (define (system-without-unnecessary-services
          services-to-keep
          system)
+  (for-each (lambda (service)
+              (unless (member service
+                              (operating-system-user-services system))
+                (error "Could not find ~A in system services"
+                       service)))
+            services-to-keep)
   (operating-system
    (inherit system)
    (services
