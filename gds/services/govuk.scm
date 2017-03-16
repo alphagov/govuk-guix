@@ -294,7 +294,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(signon))
-           (requirement '(mysql)))
+           (requirement '(mysql loopback)))
           (service-startup-config)
           (plek-config) (rails-app-config) (@ (gds packages govuk) signon)
           (signon-config)
@@ -1436,7 +1436,8 @@
                 (shepherd-service
                  (provision (list 'publishing-e2e-tests))
                  (documentation "publishing-e2e-tests")
-                 (requirement '(specialist-publisher nginx))
+                 (requirement '(specialist-publisher specialist-frontend
+                                draft-specialist-frontend nginx asset-manager))
                  (respawn? #f)
                  (start #~(make-forkexec-constructor #$start-script))
                  (stop #~(make-kill-destructor))))))))))))
@@ -1467,7 +1468,8 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(publishing-api))
-           (requirement '(content-store draft-content-store signon)))
+           (requirement '(content-store draft-content-store signon
+                          govuk-content-schemas redis loopback postgres)))
           (service-startup-config
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
@@ -1544,7 +1546,7 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(specialist-publisher))
-           (requirement '(publishing-api signon mongodb)))
+           (requirement '(publishing-api signon mongodb nginx)))
           (plek-config) (rails-app-config) specialist-publisher
           (signon-application
            (name "Specialist Publisher")
