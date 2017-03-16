@@ -23,7 +23,10 @@
 
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
-   (cons publishing-e2e-tests-service base-services)
+   (cons (find (lambda (s) (eq? (service-kind s)
+                                publishing-e2e-tests-service-type))
+               services)
+         base-services)
    (operating-system
     (inherit development-os)
     (services
