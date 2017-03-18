@@ -1,0 +1,138 @@
+#!/usr/bin/env guile
+-*- scheme -*-
+!#
+
+(use-modules
+ (srfi srfi-1)
+ (ice-9 match)
+ (guix ui)
+ (guix scripts)
+ (gnu services)
+ (gnu system)
+ (gds services govuk)
+ (gds services utils databases mysql)
+ (gds services utils databases mongodb)
+ (gds services utils databases postgresql)
+ (gds systems govuk development)
+ (gds data data-source)
+ (gds data data-extract)
+ (gds data govuk sources development-repository))
+
+(define data-sources
+  (list development-repository-data-source))
+
+(define (all-extracts)
+  (concatenate
+   (filter-map
+    (match-lambda (($ <data-source> list-extracts)
+                   (list-extracts)))
+    data-sources)))
+
+(define (list-available-extracts . args)
+  (for-each
+   (match-lambda
+     ((service-type . extracts)
+      (simple-format #t "service: ~A\n" (if service-type
+                                            (service-type-name service-type)
+                                            "<unknown>"))
+      (for-each
+       (match-lambda
+         ((database . extracts)
+          (simple-format #t "  database: ~A\n" database)
+          (for-each
+           (lambda (extract)
+             (simple-format #t "    - ~A\n" (data-extract-datetime extract)))
+           extracts)))
+       (group-extracts data-extract-database extracts))))
+   (group-extracts data-extract-services (all-extracts))))
+
+(define (parse-args args)
+  (if (null? args)
+      (leave (_ "To load data, specifiy a service"))
+      (map
+       (lambda (service-name)
+         (or
+          (find (lambda (service)
+                  (equal?
+                   (string->symbol service-name)
+                   (service-type-name (service-kind service))))
+                (operating-system-user-services development-os)) ;; TODO: Maybe this wants to be the
+                                ;; services from a particular system
+                                ;; instead?
+          (unless service
+            (leave (_ "Could not find service with name ~A") service-name))))
+       args)))
+
+(define (database-connection-config service extract)
+  (find
+   (or
+    (assoc-ref
+     `(("postgresql" . ,postgresql-connection-config?)
+       ("mongo"      . ,mongodb-connection-config?)
+       ("mysql"      . ,mysql-connection-config?))
+     (data-extract-database extract))
+    (error "Unrecognised database type ~A" (data-extract-database extract)))
+   (service-parameters service)))
+
+(define (get-extracts-and-database-connection-configs services databases)
+  (define (missing-connection-error service extract)
+    (display (service-parameters service))
+    (error
+     "Couldn't find a database connection configuration for ~A for the ~A service"
+     (data-extract-database extract)
+     (service-type-name (service-kind service))))
+
+  (let ((extracts (all-extracts)))
+    (concatenate
+     (map
+      (lambda (service)
+        (let ((service-extracts (filter-extracts
+                                 extracts
+                                 #:service-type (service-kind service))))
+          (if (null? service-extracts)
+              (leave (_ "No extracts found for service ~A")
+                     (service-type-name (service-kind service)))
+              (map
+               (match-lambda
+                 ((database . extracts)
+                  (let ((extract (first extracts)))
+                    (cons extract
+                          (list
+                           (or
+                            (database-connection-config service extract)
+                            (missing-connection-error service extract)))))))
+               (group-extracts data-extract-database service-extracts)))))
+      services))))
+
+(define (load . args)
+  (map
+   (match-lambda
+     ((extract . database-connection-configs)
+      (for-each
+       (lambda (database-connection-config)
+         (match extract
+           (($ <data-extract> file datetime database services)
+            (simple-format #t "Importing ~A in to ~A" datetime database)))
+         (display (load-extract extract database-connection-config)))
+       database-connection-configs)))
+   (get-extracts-and-database-connection-configs
+    (parse-args args)
+    #f)))
+
+(define (govuk-data . args)
+  (define commands
+    `(("list" . ,list-available-extracts)
+      ("load" . ,load)))
+
+  (with-error-handling
+    (simple-format #t "~A\n" args)
+    (if (= (length args) 1)
+        (leave (_ "no command specified"))
+        (let* ((command (second args))
+               (handler
+                (assoc-ref commands command)))
+          (if handler
+              (apply handler (cddr args))
+              (leave (_ "command ~A is not recognised") command))))))
+
+(apply govuk-data (command-line))
