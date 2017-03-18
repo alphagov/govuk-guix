@@ -104,7 +104,8 @@
             api-services
             supporting-application-services
             frontend-services
-            draft-frontend-services))
+            draft-frontend-services
+            govuk-services))
 
 ;;;
 ;;; Utilities
@@ -2171,3 +2172,11 @@
    draft-service-manual-frontend-service
    draft-static-service
    draft-specialist-frontend-service))
+
+(define govuk-services
+  (append
+   publishing-application-services
+   api-services
+   supporting-application-services
+   frontend-services
+   draft-frontend-services))
