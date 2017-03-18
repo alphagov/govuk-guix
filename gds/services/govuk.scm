@@ -74,12 +74,21 @@
 
             whitehall-service-type
             whitehall-service
-
+            email-alert-api-service-type
             publisher-service-type
             publisher-service
 
             frontend-service-type
             frontend-service
+
+            content-tagger-service-type
+            content-tagger-service
+
+            support-api-service-type
+            email-alert-api-service-type
+            policy-publisher-service-type
+            local-links-manager-service-type
+            service-manual-publisher-service-type
 
             draft-frontend-service-type
             draft-frontend-service
