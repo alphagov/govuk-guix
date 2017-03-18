@@ -874,7 +874,9 @@
          ((#:phases phases)
           `(modify-phases ,phases
              (add-after 'install 'replace-mongoid.yml
-               ,(replace-mongoid.yml #:mongoid-version "3")))))))))
+               ,(replace-mongoid.yml #:mongoid-version "3"))
+             (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
+               ,(replace-gds-sso-initializer)))))))))
 
 (define-public need-api
   (let
