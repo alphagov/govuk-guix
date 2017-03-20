@@ -1933,7 +1933,7 @@
           (service-startup-config)
           (signon-application
            (name "Maslow")
-           (supported-permissions '("signin")))
+           (supported-permissions '("signin" "admin" "editor")))
           (signon-api-user
            (name "Maslow")
            (email "maslow@guix-dev.gov.uk")
