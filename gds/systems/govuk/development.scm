@@ -407,7 +407,7 @@
                '(("Specialist Publisher" . ("signin" "gds_editor"))
                  ("Publisher" . ("signin" "skip_review"))
                  ("Whitehall" . ("signin"))
-                 ("Maslow" . ("signin"))
+                 ("Maslow" . ("signin" "admin"))
                  ("Content Tagger" . ("signin"))))))))))
        (cons
         rails-app-config?
