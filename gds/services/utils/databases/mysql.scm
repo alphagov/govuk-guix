@@ -37,29 +37,17 @@
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
-               ((pid (primitive-fork))
-                (root (getpwnam "root"))
-                (command `(,(string-append #$mariadb "/bin/mysql")
+               ((command `(,(string-append #$mariadb "/bin/mysql")
                            "-h" #$host
                            "-u" "root"
                            "--password=''"
                            "-P" ,(number->string #$port))))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid root))
-                  (setuid (passwd:uid root))
-                  (let ((p (apply open-pipe* OPEN_WRITE command)))
-                    (for-each
-                     (lambda (o) (o p))
-                     (list #$@operations))
-                    (close-pipe p))
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (zero? (cdr (waitpid pid))))))))))
+             (simple-format #t "Connecting to mysql... (~A)\n" (string-join command))
+             (let ((p (apply open-pipe* OPEN_WRITE command)))
+               (for-each
+                (lambda (o) (o p))
+                (list #$@operations))
+               (close-pipe p))))))))
 
 (define (mysql-run-file-gexp database-connection file)
   (match database-connection
