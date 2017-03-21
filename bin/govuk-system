@@ -1,0 +1,72 @@
+#!/usr/bin/env guile
+-*- scheme -*-
+!#
+
+(use-modules
+ (srfi srfi-1)
+ (ice-9 match)
+ (guix ui)
+ (guix monads)
+ (guix scripts)
+ (guix derivations)
+ (guix store)
+ (gnu services)
+ (gnu system)
+ (gnu system linux-container)
+ (gds services govuk)
+ (gds systems utils)
+ (gds systems govuk development))
+
+(define (args->service-types args)
+  (map
+   (lambda (service-name)
+     (or (find (lambda (service-type)
+                 (equal?
+                  (string->symbol service-name)
+                  (service-type-name service-type)))
+               (map service-kind govuk-services))
+         (leave (_ "Could not find service with name ~A") service-name)))
+   args))
+
+(define (args->system args)
+  (system-without-unnecessary-services
+   (let ((service-types-whitelist
+          (if (null? args)
+              (map service-kind govuk-services)
+              (args->service-types args))))
+     (filter
+      (lambda (service)
+        (member (service-kind service) service-types-whitelist))
+      (operating-system-user-services development-os)))
+   development-os))
+
+(define (start . args)
+  (define (start-script)
+    (with-store store
+      (run-with-store store
+        (mlet* %store-monad
+            ((sys (container-script
+                   (args->system args)
+                   #:container-shared-network? #t)))
+          (mbegin %store-monad
+            (built-derivations (list sys))
+            (return (derivation->output-path sys)))))))
+
+  (system* (start-script)))
+
+(define (govuk-system . args)
+  (define commands
+    `(("start" . ,start)))
+
+  (with-error-handling
+    (simple-format #t "~A\n" args)
+    (if (= (length args) 1)
+        (leave (_ "no command specified"))
+        (let* ((command (second args))
+               (handler
+                (assoc-ref commands command)))
+          (if handler
+              (apply handler (cddr args))
+              (leave (_ "command ~A is not recognised") command))))))
+
+(apply govuk-system (command-line))
