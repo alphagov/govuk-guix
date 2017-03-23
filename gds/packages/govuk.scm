@@ -99,10 +99,20 @@
 
 (define* (package-rails-app name source
                             #:optional #:key
-                            (precompile-assets #t))
+                            (precompile-assets #t)
+                            (create-tmp-directory #f))
   (let ((pkg (make-govuk-package name source))
         (phase-modifications
          `(,@(if
+              create-tmp-directory
+              '((add-after
+                 'install 'create-tmp-directory
+                 (lambda* (#:key outputs #:allow-other-keys)
+                   (mkdir (string-append
+                           (assoc-ref outputs "out")
+                           "/tmp")))))
+              '())
+           ,@(if
               precompile-assets
               '(add-before
                 'install 'asset-precompile
