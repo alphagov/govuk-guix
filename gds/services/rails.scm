@@ -250,8 +250,12 @@
          root-directory
          rails-app-config
          rest)))
+    (with-imported-modules `((guix build syscalls)
+                             (guix build bournish)
+                             (gnu build file-systems)) ;; TODO: Indent properly
     #~(begin
         (use-modules (guix build utils)
+                     (gnu build file-systems)
                      (guix build syscalls)
                      (ice-9 match)
                      (ice-9 ftw)
@@ -264,32 +268,29 @@
            (begin
              (mkdir-p #$root-directory)
              (chown #$root-directory (passwd:uid user) (passwd:gid user))
-             (for-each
-              (lambda (file)
-                (copy-recursively
-                 (string-append #$package "/" file)
-                 (string-append #$root-directory "/" file)
-                 #:log (%make-void-port "w")))
-              (scandir
-               #$package
-               (negate
-                (cut member <> '("." ".." "tmp" "log" "doc")))))
+             (bind-mount #$package #$root-directory)
 
              (for-each
               (lambda (file)
-                (mkdir-p file)
-                (chown file (passwd:uid user) (passwd:gid user)))
+                (if (file-exists? file)
+                    (mount "tmpfs" file "tmpfs")))
               (map
                (lambda (dir)
                  (string-append #$root-directory "/" dir))
-               '("tmp" "log" "public"))))
+               '("log" "public"))))
            (begin
+             (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")
              (copy-recursively
               (string-append #$package "/bin")
               (string-append #$root-directory "/bin")
               #:log (%make-void-port "w")
               #:follow-symlinks? #f)
+             (substitute* (find-files (string-append #$root-directory "/bin"))
+               (("/usr/bin/env") (string-append
+                                  #$coreutils
+                                  "/bin/env")))
              (mkdir-p (string-append #$root-directory "/.bundle"))
+             (mount "tmpfs" (string-append #$root-directory "/.bundle") "tmpfs")
              (copy-file (string-append #$package "/.bundle/config")
                         (string-append #$root-directory "/.bundle/config"))
              (for-each
@@ -316,25 +317,16 @@
               (find-files (string-append #$root-directory "/log")
                           #:directories? #f))))
 
-          (call-with-output-file (string-append #$root-directory "/bin/env.sh")
-            (lambda (port)
-              (for-each
-               (lambda (env-var)
-                 (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
-               '#$environment-variables)))
+          (if (file-exists? (string-append #$root-directory "/tmp"))
+              (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs"))
 
-          (substitute* (find-files (string-append #$root-directory "/bin"))
-            (("/usr/bin/env") (string-append
-                               #$coreutils
-                               "/bin/env")))
-          (let*
-              ((target
-                (string-append "exec -a \"\\$0\" \"" #$package))
-               (replacement
-                (string-append "exec -a \"$0\" \"" #$root-directory)))
-            (substitute* (find-files (string-append #$root-directory "/bin"))
-              ((target)
-               replacement)))))))
+          ;; (call-with-output-file (string-append #$root-directory "/bin/env.sh")
+          ;;   (lambda (port)
+          ;;     (for-each
+          ;;      (lambda (env-var)
+          ;;        (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+          ;;      '#$environment-variables)))
+          )))))
 
 (define (generic-rails-app-shepherd-services
          name
