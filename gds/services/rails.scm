@@ -252,81 +252,81 @@
          rest)))
     (with-imported-modules `((guix build syscalls)
                              (guix build bournish)
-                             (gnu build file-systems)) ;; TODO: Indent properly
-    #~(begin
-        (use-modules (guix build utils)
-                     (gnu build file-systems)
-                     (guix build syscalls)
-                     (ice-9 match)
-                     (ice-9 ftw)
-                     (srfi srfi-26))
-        (let* ((string-name (symbol->string '#$name))
-               (user (getpwnam string-name))
-               (bundle (string-append #$root-directory "/bin/bundle")))
-          (if
-           (not (file-exists? #$root-directory))
-           (begin
-             (mkdir-p #$root-directory)
-             (chown #$root-directory (passwd:uid user) (passwd:gid user))
-             (bind-mount #$package #$root-directory)
+                             (gnu build file-systems))
+     #~(begin
+         (use-modules (guix build utils)
+                      (gnu build file-systems)
+                      (guix build syscalls)
+                      (ice-9 match)
+                      (ice-9 ftw)
+                      (srfi srfi-26))
+         (let* ((string-name (symbol->string '#$name))
+                (user (getpwnam string-name))
+                (bundle (string-append #$root-directory "/bin/bundle")))
+           (if
+            (not (file-exists? #$root-directory))
+            (begin
+              (mkdir-p #$root-directory)
+              (chown #$root-directory (passwd:uid user) (passwd:gid user))
+              (bind-mount #$package #$root-directory)
 
-             (for-each
-              (lambda (file)
-                (if (file-exists? file)
-                    (mount "tmpfs" file "tmpfs")))
-              (map
-               (lambda (dir)
-                 (string-append #$root-directory "/" dir))
-               '("log" "public"))))
-           (begin
-             (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")
-             (copy-recursively
-              (string-append #$package "/bin")
-              (string-append #$root-directory "/bin")
-              #:log (%make-void-port "w")
-              #:follow-symlinks? #f)
-             (substitute* (find-files (string-append #$root-directory "/bin"))
-               (("/usr/bin/env") (string-append
-                                  #$coreutils
-                                  "/bin/env")))
-             (mkdir-p (string-append #$root-directory "/.bundle"))
-             (mount "tmpfs" (string-append #$root-directory "/.bundle") "tmpfs")
-             (copy-file (string-append #$package "/.bundle/config")
-                        (string-append #$root-directory "/.bundle/config"))
-             (for-each
-              (lambda (name)
-                (let ((target
-                       (string-append #$root-directory "/vendor/" name)))
-                  (if (file-exists? target)
-                      (delete-file-recursively target))
-                  (mkdir-p (string-append #$root-directory "/vendor"))
-                  (symlink (string-append #$package "/vendor/" name)
-                           target)))
-              '("cache" "bundle"))
+              (for-each
+               (lambda (file)
+                 (if (file-exists? file)
+                     (mount "tmpfs" file "tmpfs")))
+               (map
+                (lambda (dir)
+                  (string-append #$root-directory "/" dir))
+                '("log" "public"))))
+            (begin
+              (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")
+              (copy-recursively
+               (string-append #$package "/bin")
+               (string-append #$root-directory "/bin")
+               #:log (%make-void-port "w")
+               #:follow-symlinks? #f)
+              (substitute* (find-files (string-append #$root-directory "/bin"))
+                           (("/usr/bin/env") (string-append
+                                              #$coreutils
+                                              "/bin/env")))
+              (mkdir-p (string-append #$root-directory "/.bundle"))
+              (mount "tmpfs" (string-append #$root-directory "/.bundle") "tmpfs")
+              (copy-file (string-append #$package "/.bundle/config")
+                         (string-append #$root-directory "/.bundle/config"))
+              (for-each
+               (lambda (name)
+                 (let ((target
+                        (string-append #$root-directory "/vendor/" name)))
+                   (if (file-exists? target)
+                       (delete-file-recursively target))
+                   (mkdir-p (string-append #$root-directory "/vendor"))
+                   (symlink (string-append #$package "/vendor/" name)
+                            target)))
+               '("cache" "bundle"))
 
-             (for-each
-              (lambda (path)
-                (mkdir-p (string-append #$root-directory path))
-                (chmod (string-append #$root-directory path) #o777))
-              '("/tmp" "/log"))
+              (for-each
+               (lambda (path)
+                 (mkdir-p (string-append #$root-directory path))
+                 (chmod (string-append #$root-directory path) #o777))
+               '("/tmp" "/log"))
 
-             (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs")
+              (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs")
 
-             (for-each
-              (cut chmod <> #o666)
-              (find-files (string-append #$root-directory "/log")
-                          #:directories? #f))))
+              (for-each
+               (cut chmod <> #o666)
+               (find-files (string-append #$root-directory "/log")
+                           #:directories? #f))))
 
-          (if (file-exists? (string-append #$root-directory "/tmp"))
-              (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs"))
+           (if (file-exists? (string-append #$root-directory "/tmp"))
+               (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs"))
 
-          ;; (call-with-output-file (string-append #$root-directory "/bin/env.sh")
-          ;;   (lambda (port)
-          ;;     (for-each
-          ;;      (lambda (env-var)
-          ;;        (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
-          ;;      '#$environment-variables)))
-          )))))
+           ;; (call-with-output-file (string-append #$root-directory "/bin/env.sh")
+           ;;   (lambda (port)
+           ;;     (for-each
+           ;;      (lambda (env-var)
+           ;;        (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+           ;;      '#$environment-variables)))
+           )))))
 
 (define (generic-rails-app-shepherd-services
          name
