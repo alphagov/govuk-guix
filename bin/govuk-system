@@ -31,9 +31,11 @@
 (define (args->system args)
   (system-without-unnecessary-services
    (let ((service-types-whitelist
-          (if (null? args)
-              (map service-kind govuk-services)
-              (args->service-types args))))
+          (append
+           (if (null? args)
+               (map service-kind govuk-services)
+               (args->service-types args))
+           (map service-kind base-services))))
      (filter
       (lambda (service)
         (member (service-kind service) service-types-whitelist))
