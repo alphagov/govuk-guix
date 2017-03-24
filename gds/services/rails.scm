@@ -320,13 +320,15 @@
            (if (file-exists? (string-append #$root-directory "/tmp"))
                (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs"))
 
-           ;; (call-with-output-file (string-append #$root-directory "/bin/env.sh")
-           ;;   (lambda (port)
-           ;;     (for-each
-           ;;      (lambda (env-var)
-           ;;        (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
-           ;;      '#$environment-variables)))
-           )))))
+           (let* ((dir (string-append "/tmp/env.d/"))
+                  (file (string-append dir string-name)))
+             (mkdir-p dir)
+             (call-with-output-file file
+               (lambda (port)
+                 (for-each
+                  (lambda (env-var)
+                    (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+                  '#$environment-variables)))))))))
 
 (define (generic-rails-app-shepherd-services
          name

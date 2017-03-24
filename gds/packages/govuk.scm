@@ -961,8 +961,7 @@
 set -exu
 APP=\"$1\"
 shift
-BINDIR=\"/var/apps/$APP/bin\"
-. \"$BINDIR/env.sh\"
+source \"/tmp/env.d/$APP\"
 cd \"/var/apps/$APP\"
 ~A --preserve-env -u \"$APP\" \"$@\"
 " bash sudo)))
