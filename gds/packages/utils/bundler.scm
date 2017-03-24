@@ -12,6 +12,7 @@
   #:use-module (guix download)
   #:use-module (guix search-paths)
   #:use-module (guix build-system ruby)
+  #:use-module (guix build-system gnu)
   #:use-module (guix build utils)
   #:use-module (gnu packages base)
   #:use-module ((gnu packages ruby) #:prefix guix:)
@@ -235,6 +236,139 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                       #:guile-for-build guile
                       #:local-build? #t)))
 
+(define (bundle-install-package
+         bundle-pkg
+         pkg)
+  (let
+      ((ruby
+        (let
+            ((ruby-input
+              (find
+               (match-lambda ((name pkg rest ...)
+                              (equal? name "ruby")))
+               (package-inputs pkg))))
+          (match
+              ruby-input
+            ((#f)
+             #f)
+            ((name pkg rest ...)
+             pkg)))))
+    (package
+     (name (string-append (package-name pkg) "-bundle-install"))
+     (version "0")
+     (source (bundle-package
+              (inherit bundle-pkg)
+              (source (package-source pkg))
+              (name (string-append (package-name pkg) "-bundle-package"))
+              (ruby ruby)))
+     (build-system gnu-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'check)
+          (delete 'install)
+          (add-after 'patch-generated-file-shebangs 'set-bundle-without
+                     (lambda _ (setenv "BUNDLE_WITHOUT"
+                                       ,(string-join
+                                         (bundle-package-without bundle-pkg)
+                                         ":"))))
+          (add-after 'set-bundle-without 'path-remove-source
+                     (lambda _
+                       (setenv
+                        "PATH"
+                        (list->search-path-as-string
+                         (filter
+                          (lambda (path)
+                            (not (string-prefix?
+                                  (assoc-ref %build-inputs "source")
+                                  path)))
+                          (search-path-as-string->list (getenv "PATH")))
+                         ":"))))
+          (add-after 'path-remove-source 'set-ld-library-path
+                     (lambda* (#:key inputs #:allow-other-keys)
+                       (display inputs)
+                       (set-path-environment-variable
+                        "LD_LIBRARY_PATH"
+                        '("lib")
+                        (map cdr inputs))))
+          (add-after 'set-ld-library-path 'replace-ruby-version
+                     ,(replace-ruby-version (package-version ruby)))
+          (replace 'build
+                   (lambda* (#:key inputs outputs #:allow-other-keys)
+                     (let* ((cwd (getcwd))
+                            (out (assoc-ref outputs "out")))
+                       (setenv "GEMRC"  (assoc-ref %build-inputs "gemrc"))
+                       (setenv "CC" "gcc")
+                       ;; (if (catch
+                       ;;       'system-error
+                       ;;       (lambda ()
+                       ;;         (lstat (string-append cwd "/vendor/cache"))
+                       ;;         #t)
+                       ;;       (lambda (key . args)
+                       ;;         #f))
+                       ;;     (delete-file (string-append cwd "/vendor/cache")))
+                       ;; (if (catch
+                       ;;       'system-error
+                       ;;       (lambda ()
+                       ;;         (lstat (string-append cwd "/vendor/bundle"))
+                       ;;         #t)
+                       ;;       (lambda (key . args)
+                       ;;         #f))
+                       ;;     (delete-file (string-append cwd "/vendor/bundle")))
+                       (if (file-exists? (string-append cwd "/.bundle/config"))
+                           (chmod (string-append cwd "/.bundle/config") #o644))
+                       (and
+                        (zero? (system*
+                                "bundle"
+                                "config"
+                                "--local"
+                                "build.nokogiri"
+                                "--use-system-libraries"))
+                        (zero? (system*
+                                "bundle"
+                                "install"
+                                "--local"
+                                "--deployment"
+                                "--path" (string-append
+                                          (assoc-ref outputs "out")
+                                          "/vendor/bundle")
+                                "--jobs=4"))))))
+          (add-after 'build 'install-bundle-package-cache
+                     (lambda* (#:key inputs outputs #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out")))
+                         (mkdir (string-append out "/vendor/bundle/bundler"))
+                         (symlink
+                          (string-append
+                           (assoc-ref inputs "gems")
+                           "/vendor/cache")
+                          (string-append out "/vendor/bundle/bundler/gems")))))
+          (add-after 'build 'patch-tzinfo-data-source
+                     (lambda* (#:key inputs #:allow-other-keys)
+                       (substitute* (find-files "vendor/bundle/ruby"
+                                                "zoneinfo_data_source.rb")
+                                    (("DEFAULT_SEARCH_PATH = .*$")
+                                     (string-append
+                                      "DEFAULT_SEARCH_PATH = ['"
+                                      (assoc-ref inputs "tzdata") "/share/zoneinfo"
+                                      "'].freeze"))))))))
+    (inputs
+     (cons*
+      (list "bundler" bundler)
+      (list "gems" (bundle-package
+                    (inherit bundle-pkg)
+                    (source (package-source pkg))
+                    (name (string-append (package-name pkg) "-bundle-package"))
+                    (ruby ruby)))
+      (list "gemrc" (gemrc ruby))
+      (package-inputs pkg)))
+    (native-inputs
+     (package-native-inputs pkg))
+    (synopsis "")
+    (license "")
+    (description "")
+    (home-page ""))))
+
 (define (package-with-bundler
          bundle-pkg
          pkg)
@@ -310,80 +444,77 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                            (map cdr inputs))))
              (add-after 'set-ld-library-path 'replace-ruby-version
                         ,(replace-ruby-version (package-version ruby)))
-           (add-after 'replace-ruby-version 'bundle-install
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let* ((cwd (getcwd))
-                      (out (assoc-ref outputs "out")))
-                 (setenv "GEMRC"  (assoc-ref %build-inputs "gemrc"))
-                 (setenv "CC" "gcc")
-                 (simple-format #t "file-exists? ~A ~A\n" (string-append cwd "/vendor/cache") (file-exists? (string-append cwd "/vendor/cache")))
-                 (if (catch
-                       'system-error
-                       (lambda ()
-                         (lstat (string-append cwd "/vendor/cache"))
-                         #t)
-                       (lambda (key . args)
-                         #f))
-                     (delete-file (string-append cwd "/vendor/cache")))
-                 (if (catch
-                       'system-error
-                       (lambda ()
-                         (lstat (string-append cwd "/vendor/bundle"))
-                         #t)
-                       (lambda (key . args)
-                         #f))
-                     (delete-file (string-append cwd "/vendor/bundle")))
-                 (mkdir-p (string-append cwd "/vendor"))
-                 (simple-format #t "symlinking /vendor/cache ~A\n" (assoc-ref %build-inputs "gems"))
-                 (symlink (string-append (assoc-ref %build-inputs "gems")
-                                         "/vendor/cache")
-                          (string-append cwd "/vendor/cache"))
-                 (if (file-exists? (string-append cwd "/.bundle/config"))
-                     (chmod (string-append cwd "/.bundle/config") #o644))
-                 (and
-                  (zero? (system*
-                          "bundle"
-                          "config"
-                          "--local"
-                          "build.nokogiri"
-                          "--use-system-libraries"))
-                  (zero? (system*
-                          "bundle"
-                          "install"
-                          "--local"
-                          "--deployment"
-                          "--jobs=4"))))))
-           (add-after 'bundle-install 'patch-tzinfo-data-source
-             (lambda* (#:key inputs #:allow-other-keys)
-               (substitute* (find-files "vendor/bundle/ruby"
-                                        "zoneinfo_data_source.rb")
-                 (("DEFAULT_SEARCH_PATH = .*$")
-                  (string-append
-                   "DEFAULT_SEARCH_PATH = ['"
-                   (assoc-ref inputs "tzdata") "/share/zoneinfo"
-                   "'].freeze")))))
+             (add-before 'install 'add-bundle-install-bin-to-path
+                         (lambda* (#:key inputs #:allow-other-keys)
+                           (let*
+                               ((prefix
+                                 (string-append
+                                  (assoc-ref %build-inputs "bundle-install")
+                                  "/vendor/bundle/ruby/"))
+                                (bin
+                                 (string-append
+                                  prefix
+                                  (first (scandir prefix
+                                                  (negate (lambda (f)
+                                                            (member f '("." ".."))))))
+                                  "/bin")))
+                             (setenv
+                              "PATH"
+                              (list->search-path-as-string
+                               (cons*
+                                bin
+                                (search-path-as-string->list (getenv "PATH")))
+                               ":")))))
+             (add-after 'add-bundle-install-bin-to-path
+                        'add-bundle-install-gems-to-path
+                         (lambda* (#:key inputs #:allow-other-keys)
+                           (let*
+                               ((prefix
+                                 (string-append
+                                  (assoc-ref %build-inputs "bundle-install")
+                                  "/vendor/bundle/ruby/"))
+                                (ruby-version
+                                 (first
+                                  (scandir prefix
+                                           (negate
+                                            (lambda (f)
+                                              (member f '("." ".."))))))))
+                             (setenv
+                              "GEM_PATH"
+                              (list->search-path-as-string
+                               (cons*
+                                (string-append
+                                 prefix
+                                 ruby-version)
+                                (search-path-as-string->list (getenv "GEM_PATH")))
+                               ":")))))
            (add-after 'install 'wrap-bin-files-for-bundler
              (lambda* (#:key inputs outputs #:allow-other-keys)
                (let* ((out (assoc-ref outputs "out"))
-                      (path
-                       (list->search-path-as-string
-                        (filter
-                         (lambda (path)
-                           (not (string-prefix?
-                                 (assoc-ref %build-inputs "source")
-                                 path)))
-                         (search-path-as-string->list (getenv "PATH")))
-                        ":")))
+                      (gem_home
+                       (let ((prefix
+                              (string-append
+                               (assoc-ref %build-inputs "bundle-install")
+                               "/vendor/bundle/ruby/")))
+                         (string-append
+                          prefix
+                          (first (scandir prefix (negate (lambda (f)
+                                                           (member f '("." ".."))))))
+                          "/gems"))))
                (for-each
                   (lambda (script)
                     (chmod script #o777)
                     (wrap-program
                         script
-                      `("PATH" = (,path))
+                      `("PATH" = (,(getenv "PATH")))
                       `("SSL_CERT_DIR" = (,(string-append (assoc-ref %build-inputs "nss-certs")
                                                           "/etc/ssl/certs")))
                       `("LIBRARY_PATH" ":" prefix (,(getenv "LIBRARY_PATH")))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
+                      `("BUNDLE_PATH" ":" prefix (,(string-append
+                                                    (assoc-ref %build-inputs
+                                                               "bundle-install")
+                                                    "/vendor/bundle")))
                       `("BUNDLE_WITHOUT" ":" prefix (,(getenv "BUNDLE_WITHOUT")))
                       `("LD_LIBRARY_PATH" ":" prefix (,(getenv "LD_LIBRARY_PATH")))))
                   (find-files
@@ -398,13 +529,14 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
     (inputs
      (cons*
       (list "bundler" bundler)
+      (list "bundle-install" (bundle-install-package bundle-pkg pkg))
       (list "gemrc" (gemrc ruby))
       (filter
        (match-lambda
          ((name rest ...)
           (not (any
                 (cut string= name <>)
-                '("bundler" "gemrc")))))
+                '("bundler" "gemrc" "bundle-install")))))
        (package-inputs pkg))))
     (native-inputs
      (cons
