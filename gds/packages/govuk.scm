@@ -115,7 +115,7 @@
            ,@(if
               precompile-assets
               '(add-before
-                'install 'asset-precompile
+                'install 'precompile-rails-assets
                 (lambda*
                  (#:key inputs #:allow-other-keys)
                  (zero?
