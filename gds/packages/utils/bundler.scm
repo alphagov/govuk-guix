@@ -445,19 +445,23 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                            (map cdr inputs))))
              (add-after 'set-ld-library-path 'replace-ruby-version
                         ,(replace-ruby-version (package-version ruby)))
-             (add-before 'install 'add-bundle-install-bin-to-path
+             (add-after 'replace-ruby-version 'add-bundle-install-bin-to-path
                          (lambda* (#:key inputs #:allow-other-keys)
                            (let*
                                ((prefix
                                  (string-append
                                   (assoc-ref %build-inputs "bundle-install")
                                   "/vendor/bundle/ruby/"))
+                                (ruby-version
+                                 (first
+                                  (scandir prefix
+                                           (negate
+                                            (lambda (f)
+                                              (member f '("." "..")))))))
                                 (bin
                                  (string-append
                                   prefix
-                                  (first (scandir prefix
-                                                  (negate (lambda (f)
-                                                            (member f '("." ".."))))))
+                                  ruby-version
                                   "/bin")))
                              (setenv
                               "PATH"
