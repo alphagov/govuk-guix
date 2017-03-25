@@ -265,6 +265,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (delete 'validate-runpath)
           (delete 'configure)
           (delete 'check)
           (delete 'install)
