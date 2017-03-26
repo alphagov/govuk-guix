@@ -435,12 +435,13 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "0hppfwyar1987jphr9kwzilr2mmr89xssa82kmzfb27hvzh682pq")))
-   (make-govuk-package
+   (package-rails-app
     "publishing-api"
     (github-archive
      #:repository "publishing-api"
      #:commit-ish "release_758"
-     #:hash (base32 "0261kwc4qfix9xfhlnc8q4xmya7k10z9yh4xy8l1ll5clcpjfqnf")))))
+     #:hash (base32 "0261kwc4qfix9xfhlnc8q4xmya7k10z9yh4xy8l1ll5clcpjfqnf"))
+    #:precompile-assets #f)))
 
 (define-public policy-publisher
   (package-with-bundler
