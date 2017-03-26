@@ -1989,6 +1989,7 @@
           (provision '(rummager))
           (requirement '(content-store publishing-api static)))
          (service-startup-config)
+         (redis-connection-config)
          (plek-config) (rails-app-config)
          rummager)))
 
