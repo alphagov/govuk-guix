@@ -47,7 +47,9 @@
                (for-each
                 (lambda (o) (o p))
                 (list #$@operations))
-               (close-pipe p))))))))
+               (zero?
+                (status:exit-val
+                 (close-pipe p))))))))))
 
 (define (mysql-run-file-gexp database-connection file)
   (match database-connection
