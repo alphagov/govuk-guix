@@ -219,7 +219,7 @@
                   (begin
                     (simple-format #t "~A: pre-startup-scripts failed\n"
                                    #$string-name)
-                    #f)))))
+                    #f))))
            ((make-forkexec-constructor
              `(,@unicorn
                "-p" #$string-port
@@ -229,7 +229,7 @@
              #:pid-file pid-file
              #:pid-file-timeout 10
              #:log-file (string-append "/var/log/" #$string-name ".log")
-             #:environment-variables environment-variables))))))
+             #:environment-variables environment-variables)))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
