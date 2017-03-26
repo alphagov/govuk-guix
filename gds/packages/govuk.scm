@@ -810,16 +810,26 @@
       (home-page "https://github.com/alphagov/router"))))
 
 (define-public rummager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1ik8q0zs05r6s5kgrll9pvl3d16n1jjsnim1jpb3gl7rsl2r51vj")))
-   (package-rails-app
-    "rummager"
-    (github-archive
-     #:repository "rummager"
-     #:commit-ish "release_1315"
-     #:hash (base32 "09sryv4cd1if5qgwpcm6gsnd0x8kclrq3wqqk4x4kk8hfnqxcbmy"))
-    #:precompile-assets #f)))
+  (let ((pkg
+         (package-with-bundler
+          (bundle-package
+           (hash (base32 "1ik8q0zs05r6s5kgrll9pvl3d16n1jjsnim1jpb3gl7rsl2r51vj")))
+          (package-rails-app
+           "rummager"
+           (github-archive
+            #:repository "rummager"
+            #:commit-ish "release_1315"
+            #:hash (base32 "09sryv4cd1if5qgwpcm6gsnd0x8kclrq3wqqk4x4kk8hfnqxcbmy"))
+           #:precompile-assets #f))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after
+              'install 'replace-redis.yml
+              ,(replace-redis.yml)))))))))
 
 (define-public metadata-api
   (let
