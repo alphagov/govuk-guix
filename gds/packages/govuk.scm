@@ -103,7 +103,25 @@
                             (create-tmp-directory #f))
   (let ((pkg (make-govuk-package name source))
         (phase-modifications
-         `(,@(if
+         `((add-after
+            'wrap-bin-files-for-bundler 'wrap-with-relative-path
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (files
+                      (find-files
+                       (string-append out "/bin")
+                       (lambda (name stat)
+                         (or
+                          (access? name X_OK)
+                          (begin
+                            (simple-format
+                             #t
+                             "Skipping wrapping ~A as its not executable\n" name)
+                            #f))))))
+                (substitute* files
+                  (((string-append out "/bin"))
+                   "${BASH_SOURCE%/*}")))))
+           ,@(if
               create-tmp-directory
               '((add-after
                  'install 'create-tmp-directory
@@ -114,12 +132,11 @@
               '())
            ,@(if
               precompile-assets
-              '(add-before
-                'install 'precompile-rails-assets
-                (lambda*
-                 (#:key inputs #:allow-other-keys)
-                 (zero?
-                  (system* "bundle" "exec" "rake" "assets:precompile"))))
+              '((add-before
+                 'install 'precompile-rails-assets
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (zero?
+                    (system* "bundle" "exec" "rake" "assets:precompile")))))
               '()))))
     (package
       (inherit pkg)
@@ -134,7 +151,7 @@
              phases
              `(modify-phases
                ,phases
-               ,phase-modifications))))))))
+               ,@phase-modifications))))))))
 
 (define-public authenticating-proxy
   (package-with-bundler
