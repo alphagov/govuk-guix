@@ -713,7 +713,7 @@
           (bundle-package
            (hash (base32 "0vidm9aikp74yvdnh2infmf45xyx9sfiya27h4g8s6lj06dx6p2f"))
            (without '("development" "test")))
-          (make-govuk-package
+          (package-rails-app
            "signon"
            (github-archive
             #:repository "signon"
