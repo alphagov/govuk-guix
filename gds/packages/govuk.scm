@@ -576,6 +576,7 @@
      #:repository "short-url-manager"
      #:commit-ish "release_103"
      #:hash (base32 "1ll9kq17iaa5jkj7k0ck9r2gydw79j27jjvplbaadk31jsmh87jy"))
+    #:create-tmp-directory #t
     #:precompile-assets #f))) ;; Fails as can't connect to MongoDB
 
 (define-public specialist-publisher
