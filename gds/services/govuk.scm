@@ -1346,6 +1346,9 @@
                (application-name "Publishing API"))
               '("signin")))))
           (service-startup-config)
+          (redis-connection-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           (mongodb-connection-config
            (user "travel-advice-publisher")
            (password (random-base16-string 30))
