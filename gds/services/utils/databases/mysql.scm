@@ -40,7 +40,7 @@
                ((command `(,(string-append #$mariadb "/bin/mysql")
                            "-h" #$host
                            "-u" "root"
-                           "--password=''"
+                           "--password="
                            "-P" ,(number->string #$port))))
              (simple-format #t "Connecting to mysql... (~A)\n" (string-join command))
              (let ((p (apply open-pipe* OPEN_WRITE command)))
