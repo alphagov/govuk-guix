@@ -1331,7 +1331,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(travel-advice-publisher))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api signon static rummager)))
           (plek-config) (rails-app-config) travel-advice-publisher
           (signon-application
            (name "Travel Advice Publisher")
