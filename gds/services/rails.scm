@@ -285,25 +285,11 @@
                (string-append #$root-directory "/bin")
                #:log (%make-void-port "w")
                #:follow-symlinks? #f)
-              (substitute* (find-files (string-append #$root-directory "/bin"))
-                           (("/usr/bin/env") (string-append
-                                              #$coreutils
-                                              "/bin/env")))
-              (mkdir-p (string-append #$root-directory "/.bundle"))
-              (mount "tmpfs" (string-append #$root-directory "/.bundle") "tmpfs")
-              (copy-file (string-append #$package "/.bundle/config")
-                         (string-append #$root-directory "/.bundle/config"))
-              (for-each
-               (lambda (name)
-                 (let ((target
-                        (string-append #$root-directory "/vendor/" name)))
-                   (if (file-exists? target)
-                       (delete-file-recursively target))
-                   (mkdir-p (string-append #$root-directory "/vendor"))
-                   (symlink (string-append #$package "/vendor/" name)
-                            target)))
-               '("cache" "bundle"))
-
+              (substitute* (find-files (string-append #$root-directory "/bin")
+                                       (lambda (name stat)
+                                         (access? name X_OK)))
+                           (((string-append #$package "/bin"))
+                            "${BASH_SOURCE%/*}"))
               (for-each
                (lambda (path)
                  (mkdir-p (string-append #$root-directory path))
