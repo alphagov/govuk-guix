@@ -2085,6 +2085,10 @@
             (cons
              (signon-authorisation
               (application-name "Publishing API"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Need API"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
