@@ -537,7 +537,7 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "1q1h9bpshrijrzzrzgfgsrqs017rfmzn4zxrdvqbz0cnj3igj1af")))
-   (make-govuk-package
+   (package-rails-app
     "content-tagger"
     (github-archive
      #:repository "content-tagger"
