@@ -214,7 +214,7 @@ end")
            (define sq (cut string-append "'" <> "'"))
 
            (string-append
-            "["
+            "  ["
             (string-join
              (list
               (sq (signon-api-user-name user))
@@ -228,10 +228,11 @@ end")
                      .
                      permissions)
                     (string-append
-                     "[ '" application-name "', '" token "', ["
+                     "\n    ['" application-name "', '" token "', ["
                      (string-join (map sq permissions) ", ")
                      "]]")))
-                 (signon-api-user-authorisation-permissions user)))
+                 (signon-api-user-authorisation-permissions user))
+                ",")
                "]"))
              ", ")
             "]"))
