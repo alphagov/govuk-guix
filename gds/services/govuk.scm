@@ -1969,8 +1969,11 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(need-api))
-           (requirement '(publishing-api)))
+           (requirement '(publishing-api signon)))
           (service-startup-config)
+          (signon-application
+           (name "Need API")
+           (supported-permissions '("signin" "write")))
           (plek-config) (rails-app-config) need-api
           default-need-api-database-connection-configs)))
 
