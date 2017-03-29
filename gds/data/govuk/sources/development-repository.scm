@@ -116,7 +116,21 @@
                       "/")))
                    (member "latest/daily_*")))
                  ((equal? database "mongo")
-                  '())
+                  (let
+                      ((filename
+                        (first
+                         (scandir
+                          (string-join (list backup-directory date database hostname) "/")
+                          (lambda (name) (string-suffix? ".tgz" name))))))
+                    (tar-extract
+                     (name extract-name)
+                     (archive
+                      (local-file
+                       (string-join
+                        (list backup-directory date database hostname filename)
+                        "/")))
+                     (member
+                      (string-append (string-drop-right filename 4) "/" extract-name)))))
                  ((equal? database "elasticsearch")
                   '())
                  (else
