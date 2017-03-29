@@ -126,6 +126,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                          (ice-9 match))
             (define (run . args)
               (simple-format #t "running ~A\n" (string-join args))
+              (force-output)
               (zero? (apply system* args)))
 
             (set-path-environment-variable "PATH" '("bin" "sbin") '#+inputs)
