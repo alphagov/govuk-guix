@@ -281,7 +281,7 @@
               (map
                (lambda (dir)
                  (string-append #$root-directory "/" dir))
-               '("tmp" "tmp/pids" "log" "public"))))
+               '("tmp" "log" "public"))))
            (begin
              (copy-recursively
               (string-append #$package "/bin")
@@ -306,7 +306,7 @@
               (lambda (path)
                 (mkdir-p (string-append #$root-directory path))
                 (chmod (string-append #$root-directory path) #o777))
-              '("/tmp" "/tmp/pids" "/log"))
+              '("/tmp" "/log"))
 
              (for-each
               (cut chmod <> #o666)
