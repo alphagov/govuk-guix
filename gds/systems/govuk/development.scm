@@ -56,7 +56,6 @@
                     (draft-government-frontend . 53091)
                     (contentapi . 53022)
                     (frontend . 53005)
-                    (private-frontend . 53005)
                     (draft-frontend . 53007)
                     (rummager . 53009)
                     (search . 53009)
@@ -134,8 +133,7 @@
      govuk-ports
      live-router-config
      draft-router-config
-     '((rummager . ("search"))
-       (frontend . ("private-frontend"))))
+     '((rummager . ("search")))
     (service
      redis-service-type
      (redis-configuration
@@ -373,8 +371,7 @@
    #:govuk-app-domain "guix-dev.gov.uk"
    #:use-https? #f
    #:port 50080
-   #:aliases '((rummager . (search))
-               (frontend . (private-frontend)))))
+   #:aliases '((rummager . (search))))
 
 (define-public (setup-services services)
   (map
