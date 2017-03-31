@@ -124,11 +124,11 @@
            ,@(if
               create-tmp-directory
               '((add-after
-                 'install 'create-tmp-directory
-                 (lambda* (#:key outputs #:allow-other-keys)
-                   (mkdir (string-append
-                           (assoc-ref outputs "out")
-                           "/tmp")))))
+                'install 'create-tmp-directory
+                (lambda* (#:key outputs #:allow-other-keys)
+                  (mkdir (string-append
+                          (assoc-ref outputs "out")
+                          "/tmp")))))
               '())
            ,@(if
               precompile-assets
