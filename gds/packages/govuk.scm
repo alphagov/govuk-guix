@@ -1032,7 +1032,14 @@ service setup.")
          ((#:phases phases)
           `(modify-phases ,phases
              (add-after 'install 'replace-database.yml
-               ,(use-blank-database.yml)))))))))
+                        ,(use-blank-database.yml))
+             (add-after 'install 'set-bulk-upload-zip-file-tmp
+              (lambda* (#:key outputs #:allow-other-keys)
+                (substitute* (string-append
+                              (assoc-ref outputs "out")
+                              "/config/initializers/bulk_upload_zip_file.rb")
+                  (("Rails\\.root\\.join\\('bulk-upload-zip-file-tmp'\\)")
+                   "\"/tmp/whitehall/bulk-upload-zip-file\"")))))))))))
 
 (define-public government-frontend
   (let ((pkg
