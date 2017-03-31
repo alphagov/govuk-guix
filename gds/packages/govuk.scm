@@ -69,9 +69,9 @@
                   ,@%gnu-build-system-modules)
        #:phases
        (modify-phases %standard-phases
-         (delete 'configure)
-         (delete 'build)
-         (delete 'check)
+         (replace 'configure (lambda args #t))
+         (replace 'build (lambda args #t))
+         (replace 'check (lambda args #t))
          (replace 'install
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out")))
