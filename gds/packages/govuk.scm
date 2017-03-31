@@ -526,12 +526,13 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "11l8r4mdip55xhgr0486dxg9qlvb6bpscw25lrns5a86cqxnrig5")))
-   (make-govuk-package
+   (package-rails-app
     "content-store"
     (github-archive
      #:repository "content-store"
      #:commit-ish "release_607"
-     #:hash (base32 "0g2jykjyi5db4n1imffrr2isxsfqw5y0qaybdb5gkqn4hx381qlk")))))
+     #:hash (base32 "0g2jykjyi5db4n1imffrr2isxsfqw5y0qaybdb5gkqn4hx381qlk"))
+    #:precompile-assets #f)))
 
 (define-public content-tagger
   (package-with-bundler
@@ -586,7 +587,7 @@
          (bundle-package
           (hash (base32 "0iwgfd6ppv40iwps1m3li1al6glh2ckinfby8vs7ckay5yr1bg7v"))
           (without '("development" "test")))
-         (make-govuk-package
+         (package-rails-app
           "specialist-publisher"
           (github-archive
            #:repository "specialist-publisher"
@@ -756,12 +757,13 @@
   (package-with-bundler
    (bundle-package
     (hash (base32 "18xi02azlxjqll2h9fqhy3rgqm41zhkkh464psli0d6h3hgw3phk")))
-   (make-govuk-package
+   (package-rails-app
     "router-api"
     (github-archive
      #:repository "router-api"
      #:commit-ish "release_106"
-     #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d")))))
+     #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d"))
+    #:precompile-assets #f)))
 
 (define-public router
   (let
@@ -900,7 +902,7 @@
         (package-with-bundler
          (bundle-package
           (hash (base32 "0911wcbx3ixbw3l2yqsmcjqxx8lsfqja3skbj17ah8dr22pszs5d")))
-         (make-govuk-package
+         (package-rails-app
           "maslow"
           (github-archive
            #:repository "maslow"
@@ -923,12 +925,13 @@
         (package-with-bundler
          (bundle-package
           (hash (base32 "0kfxvx2cw42zkc07vayymra5a6sssbqlppsnh73q7hvmr20ykyq8")))
-         (make-govuk-package
+         (package-rails-app
           "need-api"
           (github-archive
            #:repository "govuk_need_api"
            #:commit-ish "release_141"
-           #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9"))))))
+           #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9"))
+          #:precompile-assets #f))))
     (package
       (inherit pkg)
       (arguments
@@ -1015,7 +1018,7 @@ service setup.")
         (package-with-bundler
          (bundle-package
           (hash (base32 "024nibhwc61g1awj3v7mqgq80wmf7jmpa5055ryqkv9xfliijcl2")))
-         (make-govuk-package
+         (package-rails-app
           "whitehall"
           (github-archive
            #:repository "whitehall"
@@ -1046,7 +1049,7 @@ service setup.")
          (package-with-bundler
           (bundle-package
            (hash (base32 "1nwb9qdz4iybf640rbdfg6v155gh0358c4ly77zzkds9sg79a3c4")))
-          (make-govuk-package
+          (package-rails-app
            "government-frontend"
            (github-archive
             #:repository "government-frontend"
