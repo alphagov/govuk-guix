@@ -486,6 +486,10 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                                            (negate
                                             (lambda (f)
                                               (member f '("." ".."))))))))
+                             (setenv "BUNDLE_PATH"
+                                     (string-append
+                                      (assoc-ref %build-inputs "bundle-install")
+                                      "/vendor/bundle"))
                              (setenv
                               "GEM_PATH"
                               (list->search-path-as-string
@@ -518,10 +522,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                                                           "/etc/ssl/certs")))
                       `("LIBRARY_PATH" ":" prefix (,(getenv "LIBRARY_PATH")))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
-                      `("BUNDLE_PATH" ":" prefix (,(string-append
-                                                    (assoc-ref %build-inputs
-                                                               "bundle-install")
-                                                    "/vendor/bundle")))
+                      `("BUNDLE_PATH" = (,(getenv "BUNDLE_PATH")))
                       `("BUNDLE_WITHOUT" ":" prefix (,(getenv "BUNDLE_WITHOUT")))
                       `("LD_LIBRARY_PATH" ":" prefix (,(getenv "LD_LIBRARY_PATH")))))
                   (find-files
