@@ -441,7 +441,6 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                             #t)))
              (add-after 'ensure-/bin/bundle-exists 'set-ld-library-path
                         (lambda* (#:key inputs #:allow-other-keys)
-                          (display inputs)
                           (set-path-environment-variable
                            "LD_LIBRARY_PATH"
                            '("lib")
