@@ -401,7 +401,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
              (delete 'bundle-install)
              (delete 'patch-tzinfo-data-source)
              (delete 'wrap-bin-files-for-bundler)
-             (add-after 'patch-generated-file-shebangs 'set-bundle-without
+             (add-before 'configure 'set-bundle-without
                         (lambda _ (setenv "BUNDLE_WITHOUT"
                                           ,(string-join
                                             (bundle-package-without bundle-pkg)
@@ -447,7 +447,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                            (map cdr inputs))))
              (add-after 'set-ld-library-path 'replace-ruby-version
                         ,(replace-ruby-version (package-version ruby)))
-             (add-after 'replace-ruby-version 'add-bundle-install-bin-to-path
+             (add-before 'configure 'add-bundle-install-bin-to-path
                          (lambda* (#:key inputs #:allow-other-keys)
                            (let*
                                ((prefix
