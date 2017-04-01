@@ -73,7 +73,20 @@
             (built-derivations (list sys))
             (return (derivation->output-path sys)))))))
 
-  (system* (start-script)))
+  (define (sudo-path)
+    (find
+     file-exists?
+     '("/usr/bin/sudo")))
+
+  (exit
+   (status:exit-val
+    (apply
+     system*
+     (if (eq? (getuid) 1)
+         (list (start-script))
+         (list
+          (sudo-path)
+          (start-script)))))))
 
 (define (govuk-system . args)
   (define commands
