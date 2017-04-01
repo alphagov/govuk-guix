@@ -3,7 +3,7 @@
   #:use-module (gnu services web)
   #:use-module (gds services govuk))
 
-(define-public (nginx
+(define-public (govuk-nginx-service
                 service-and-ports
                 router-config
                 draft-router-config

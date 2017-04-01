@@ -129,7 +129,7 @@
    frontend-services
    draft-frontend-services
    (list
-    (nginx
+    (govuk-nginx-service
      govuk-ports
      live-router-config
      draft-router-config
