@@ -1,4 +1,4 @@
-#!/usr/bin/env guile
+#!/usr/bin/guile --no-auto-compile
 -*- scheme -*-
 !#
 
