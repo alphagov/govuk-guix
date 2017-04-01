@@ -16,8 +16,10 @@
 (define-record-type* <mongodb-connection-config>
   mongodb-connection-config make-mongodb-connection-config
   mongodb-connection-config?
-  (user mongodb-connection-config-user)
-  (password mongodb-connection-config-password)
+  (user mongodb-connection-config-user
+        (default #f))
+  (password mongodb-connection-config-password
+            (default #f))
   (host mongodb-connection-config-host
         (default "127.0.0.1"))
   (port mongodb-connection-config-port
