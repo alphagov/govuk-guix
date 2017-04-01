@@ -2,6 +2,25 @@
 -*- scheme -*-
 !#
 
+;; To allow this script to be run directly, even from the Git
+;; repository, check if the environment is setup by checking if the
+;; (gds services) module is loadable. If it's not loadable, start this
+;; script again, but use the guix-pre-inst-env helper to setup the
+;; environment.
+(catch
+  #t
+  (lambda ()
+    (resolve-interface '(gds services)))
+  (lambda args
+    (exit
+     (status:exit-val
+      (apply
+       system*
+       (string-append (getcwd) "/guix-pre-inst-env")
+       "guile"
+       (current-filename)
+       (cdr (command-line)))))))
+
 (use-modules
  (srfi srfi-1)
  (ice-9 match)
