@@ -469,7 +469,7 @@
           (plek-config) (rails-app-config) collections-publisher
           (signon-application
            (name "Collections Publisher")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin" "GDS Editor" "Edit Taxonomy" "Sidekiq Monitoring")))
           (signon-api-user
            (name "Collections Publisher")
            (email "collections-publisher@guix-dev.gov.uk")
@@ -502,7 +502,7 @@
           (plek-config) (rails-app-config) contacts-admin
           (signon-application
            (name "Contacts Admin")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin")))
           (signon-api-user
            (name "Contacts Admin")
            (email "contacts-admin@guix-dev.gov.uk")
@@ -786,7 +786,7 @@
           (plek-config) (rails-app-config) hmrc-manuals-api
           (signon-application
            (name "HMRC Manuals Api")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin")))
           (signon-api-user
            (name "HMRC Manuals Api")
            (email "hmrc-manuals-api@guix-dev.gov.uk")
@@ -852,7 +852,7 @@
           (plek-config) (rails-app-config) local-links-manager
           (signon-application
            (name "Local Links Manager")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin")))
           (signon-api-user
            (name "Local Links Manager")
            (email "local-links-manager@guix-dev.gov.uk")
@@ -980,7 +980,7 @@
           (plek-config) (rails-app-config) manuals-publisher
           (signon-application
            (name "Manuals Publisher")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin" "editor" "gds_editor")))
           (signon-api-user
            (name "Manuals Publisher")
            (email "manuals-publisher@guix-dev.gov.uk")
@@ -1069,7 +1069,7 @@
           (plek-config) (rails-app-config) policy-publisher
           (signon-application
            (name "Policy Publisher")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin")))
           (signon-api-user
            (name "Policy Publisher")
            (email "policy-publisher@guix-dev.gov.uk")
@@ -1101,7 +1101,7 @@
           (plek-config) (rails-app-config) release
           (signon-application
            (name "Release")
-           (supported-permissions '("signin")))
+           (supported-permissions '("signin" "deploy")))
           (service-startup-config)
           (postgresql-connection-config
            (user "release")
@@ -1239,7 +1239,7 @@
           (plek-config) (rails-app-config) short-url-manager
           (signon-application
            (name "Short URL Manager")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin" "manage_short_urls" "request_short_urls")))
           (signon-api-user
            (name "Short URL Manager")
            (email "short-url-manager@guix-dev.gov.uk")
@@ -1487,7 +1487,9 @@
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
           (plek-config) (rails-app-config) publishing-api
-          (signon-application (name "Publishing API"))
+          (signon-application
+           (name "Publishing API")
+           (supported-permissions '("signon" "view_all")))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           default-publishing-api-database-connection-configs)))
@@ -1563,7 +1565,7 @@
           (plek-config) (rails-app-config) specialist-publisher
           (signon-application
            (name "Specialist Publisher")
-           (supported-permissions '("signin" "gds_editor")))
+           (supported-permissions '("signin" "editor" "gds_editor")))
           (signon-api-user
            (name "Specialist Publisher")
            (email "specialist-publisher@guix-dev.gov.uk")
@@ -1665,6 +1667,9 @@
           (provision '(contentapi))
           (requirement '()))
          (service-startup-config)
+         (signon-application
+          (name "Content API")
+          (supported-permissions '("signin" "access_unpublished")))
          (plek-config) (rails-app-config) content-api
          govuk-content-database-connection)))
 
@@ -2076,7 +2081,9 @@
          (plek-config) (rails-app-config) whitehall
          (signon-application
           (name "Whitehall")
-          (supported-permissions '("signin" "GDS Editor" "GDS Admin")))
+          (supported-permissions '("signin" "Editor" "GDS Editor" "GDS Admin"
+                                   "Import CSVs" "Managing Editor" "Upload Executable File Attachments"
+                                   "World Editor" "World Writer")))
          (signon-api-user
           (name "Whitehall")
           (email "whitehall@guix-dev.gov.uk")
