@@ -332,8 +332,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "asset-manager")
-           (password (random-base16-string 30))
            (database "asset_manager")))))
 
 ;;;
@@ -356,8 +354,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "authenticating-proxy")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 ;;;
@@ -380,8 +376,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "calculators")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 ;;;
@@ -404,8 +398,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "calendars")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 ;;;
@@ -428,8 +420,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "collections")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 (define draft-collections-service-type
@@ -448,8 +438,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "draft-collections")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 ;;;
@@ -742,8 +730,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
-           (user "feedback")
-           (password (random-base16-string 30))
            (database "authenticating_proxy")))))
 
 ;;;
@@ -831,8 +817,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "licence-finder")
-           (password (random-base16-string 30))
            (database "licence_finder")))))
 
 ;;;
@@ -897,8 +881,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "imminence")
-           (password (random-base16-string 30))
            (database "imminence")))))
 
 ;;;
@@ -930,8 +912,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "manuals-frontend")
-           (password (random-base16-string 30))
            (database "manuals_frontend")))))
 
 (define draft-manuals-frontend-service-type
@@ -959,8 +939,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "draft-manuals-frontend")
-           (password (random-base16-string 30))
            (database "manuals_frontend")))))
 
 ;;;
@@ -992,8 +970,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "manuals-publisher")
-           (password (random-base16-string 30))
            (database "manuals_publisher")))))
 
 ;;;
@@ -1022,8 +998,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "multipage-frontend")
-           (password (random-base16-string 30))
            (database "multipage_frontend")))))
 
 (define draft-multipage-frontend-service-type
@@ -1048,8 +1022,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "draft-multipage-frontend")
-           (password (random-base16-string 30))
            (database "multipage_frontend")))))
 
 ;;;
@@ -1251,8 +1223,6 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (user "short-url-manager")
-           (password (random-base16-string 30))
            (database "short_url_manager")))))
 
 ;;;
@@ -1350,8 +1320,6 @@
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (mongodb-connection-config
-           (user "travel-advice-publisher")
-           (password (random-base16-string 30))
            (database "travel_advice_publisher")))))
 
 ;;
@@ -1501,8 +1469,6 @@
 (define default-content-store-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "content-store")
-    (password (random-base16-string 30))
     (database "content-store"))))
 
 (define content-store-service-type
@@ -1522,8 +1488,6 @@
 (define default-draft-content-store-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "draft-content-store")
-    (password (random-base16-string 30))
     (database "draft-content-store"))))
 
 (define draft-content-store-service-type
@@ -1547,8 +1511,6 @@
 (define default-specialist-publisher-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "specialist-publisher")
-    (password (random-base16-string 30))
     (database "specialist_publisher"))
    (redis-connection-config)))
 
@@ -1652,8 +1614,6 @@
 
 (define govuk-content-database-connection
   (mongodb-connection-config
-   (user "govuk-content")
-   (password (random-base16-string 30))
    (database "govuk_content_production")))
 
 (define content-api-service-type
@@ -1811,8 +1771,6 @@
 (define default-router-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "router")
-    (password (random-base16-string 30))
     (database "router"))))
 
 (define router-service-type
@@ -1827,8 +1785,6 @@
 (define default-draft-router-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "draft-router")
-    (password (random-base16-string 30))
     (database "draft-router"))))
 
 (define draft-router-service-type
@@ -1924,8 +1880,6 @@
 (define default-maslow-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "maslow")
-    (password (random-base16-string 30))
     (database "maslow"))))
 
 (define maslow-service-type
@@ -1961,8 +1915,6 @@
 (define default-need-api-database-connection-configs
   (list
    (mongodb-connection-config
-    (user "need-api")
-    (password (random-base16-string 30))
     (database "govuk_needs_development"))))
 
 (define need-api-service-type
