@@ -118,8 +118,8 @@ if (db.getUser(username) === null) {
          (let ((command
                 `(,(string-append #$mongo-tools "/bin/mongorestore")
                   "--host" ,(simple-format #f "~A:~A" #$host (number->string #$port))
-                  "-u" #$user
-                  "-p" #$password
+                  #$@(if user `("-u" #$user) '())
+                  #$@(if password `("-p" #$password) '())
                   "-d" #$database
                   "--drop" ;; TODO: Make this optional
                   #$file)))
