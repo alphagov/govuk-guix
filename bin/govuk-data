@@ -144,7 +144,6 @@
       ("load" . ,load)))
 
   (with-error-handling
-    (simple-format #t "~A\n" args)
     (if (= (length args) 1)
         (leave (_ "no command specified"))
         (let* ((command (second args))
