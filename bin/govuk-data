@@ -143,6 +143,7 @@
     `(("list" . ,list-available-extracts)
       ("load" . ,load)))
 
+  (display "\n")
   (with-error-handling
     (if (= (length args) 1)
         (leave (_ "no command specified"))

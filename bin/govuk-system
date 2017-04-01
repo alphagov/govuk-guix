@@ -79,6 +79,7 @@
   (define commands
     `(("start" . ,start)))
 
+  (display "\n")
   (with-error-handling
     (if (= (length args) 1)
         (leave (_ "no command specified"))
