@@ -1,5 +1,6 @@
 (define-module (gds systems govuk development)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
   #:use-module (gnu)
@@ -404,11 +405,16 @@
               (passphrase "wies1Oc8Gi0uGaim")
               (role "superadmin")
               (application-permissions
-               '(("Specialist Publisher" . ("signin" "gds_editor"))
-                 ("Publisher" . ("signin" "skip_review"))
-                 ("Whitehall" . ("signin"))
-                 ("Maslow" . ("signin" "admin"))
-                 ("Content Tagger" . ("signin"))))))))))
+               (map
+                (lambda (app)
+                  (cons
+                   (signon-application-name app)
+                   (signon-application-supported-permissions app)))
+                (filter-map
+                 (lambda (service)
+                   (and (list? (service-parameters service))
+                        (find signon-application? (service-parameters service))))
+                 services)))))))))
        (cons
         rails-app-config?
         (lambda (config)
