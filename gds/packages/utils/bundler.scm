@@ -288,7 +288,6 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                          ":"))))
           (add-after 'path-remove-source 'set-ld-library-path
                      (lambda* (#:key inputs #:allow-other-keys)
-                       (display inputs)
                        (set-path-environment-variable
                         "LD_LIBRARY_PATH"
                         '("lib")
