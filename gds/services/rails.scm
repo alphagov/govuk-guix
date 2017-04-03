@@ -296,8 +296,6 @@
                  (chmod (string-append #$root-directory path) #o777))
                '("/tmp" "/log"))
 
-              (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs")
-
               (for-each
                (cut chmod <> #o666)
                (find-files (string-append #$root-directory "/log")
