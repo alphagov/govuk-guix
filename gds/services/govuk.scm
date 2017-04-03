@@ -1051,9 +1051,12 @@
            (name "Release")
            (supported-permissions '("signin" "deploy")))
           (service-startup-config)
-          (postgresql-connection-config
+          (mysql-connection-config
+           (host "localhost")
            (user "release")
-           (database "release")))))
+           (port "-")
+           (database "release_production")
+           (password "")))))
 
 ;;;
 ;;; Search Admin
@@ -1074,9 +1077,12 @@
            (name "Search Admin")
            (supported-permissions '("signin")))
           (service-startup-config)
-          (postgresql-connection-config
-           (user "search-admin")
-           (database "search_admin")))))
+          (mysql-connection-config
+           (host "localhost")
+           (user "search_admin")
+           (port "-")
+           (database "search_admin_production")
+           (password "")))))
 
 ;;;
 ;;; Service Manual Publisher
