@@ -428,6 +428,17 @@
        services
        (list
         (cons
+         authenticating-proxy-service-type
+         (list
+          (cons service-startup-config?
+                (lambda (ssc)
+                  (service-startup-config-with-additional-environment-variables
+                   ssc
+                   `(("GOVUK_UPSTREAM_URI"
+                      .
+                      ,(service-uri-from-plek-config
+                        plek-config 'draft-router))))))))
+        (cons
          (const #t)
          (list
           (cons
