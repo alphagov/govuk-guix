@@ -16,6 +16,7 @@
      (status:exit-val
       (apply
        system*
+       "bash"
        (string-append (getcwd) "/guix-pre-inst-env")
        "guile"
        (current-filename)
