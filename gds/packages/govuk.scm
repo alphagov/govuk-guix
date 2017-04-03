@@ -815,13 +815,13 @@
   (let ((pkg
          (package-with-bundler
           (bundle-package
-           (hash (base32 "1ik8q0zs05r6s5kgrll9pvl3d16n1jjsnim1jpb3gl7rsl2r51vj")))
+           (hash (base32 "1905s1pw9l1jv71z2paqahdy6hdbywprxq7n64929vz927zwykq9")))
           (package-rails-app
            "rummager"
            (github-archive
             #:repository "rummager"
-            #:commit-ish "release_1315"
-            #:hash (base32 "09sryv4cd1if5qgwpcm6gsnd0x8kclrq3wqqk4x4kk8hfnqxcbmy"))
+            #:commit-ish "release_1328"
+            #:hash (base32 "19a896x7sv5y468ya51cp84p7s9npbgw1i9sh6nzda37sxfdism5"))
            #:precompile-assets #f))))
     (package
       (inherit pkg)
