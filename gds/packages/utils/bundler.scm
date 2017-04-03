@@ -340,7 +340,7 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                          (mkdir (string-append out "/vendor/bundle/bundler"))
                          (symlink
                           (string-append
-                           (assoc-ref inputs "gems")
+                           (assoc-ref inputs "source")
                            "/vendor/cache")
                           (string-append out "/vendor/bundle/bundler/gems")))))
           (add-after 'build 'patch-tzinfo-data-source
@@ -358,11 +358,6 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
     (inputs
      (cons*
       (list "bundler" bundler)
-      (list "gems" (bundle-package
-                    (inherit bundle-pkg)
-                    (source (package-source pkg))
-                    (name (string-append (package-name pkg) "-bundle-package"))
-                    (ruby ruby)))
       (list "gemrc" (gemrc ruby))
       (package-inputs pkg)))
     (native-inputs
@@ -544,16 +539,4 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
           (not (any
                 (cut string= name <>)
                 '("bundler" "gemrc" "bundle-install")))))
-       (package-inputs pkg))))
-    (native-inputs
-     (cons
-      (list "gems" (bundle-package
-                    (inherit bundle-pkg)
-                    (source (package-source pkg))
-                    (name (string-append (package-name pkg) "-bundle-package"))
-                    (ruby ruby)))
-      (filter
-       (match-lambda
-         ((name rest ...)
-          (not (string= name "gems"))))
-       (package-native-inputs pkg)))))))
+       (package-inputs pkg)))))))
