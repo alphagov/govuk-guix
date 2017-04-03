@@ -619,13 +619,7 @@
            (provision '(design-principles))
            (requirement '()))
           (plek-config) (rails-app-config) design-principles
-          (service-startup-config)
-          (redis-connection-config)
-          (sidekiq-config
-           (file "config/sidekiq.yml"))
-          (postgresql-connection-config
-           (user "design-principles")
-           (database "email_alert_api")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Email Alert API
@@ -665,13 +659,7 @@
            (provision '(email-alert-frontend))
            (requirement '()))
           (plek-config) (rails-app-config) email-alert-frontend
-          (service-startup-config)
-          (redis-connection-config)
-          (sidekiq-config
-           (file "config/sidekiq.yml"))
-          (postgresql-connection-config
-           (user "email-alert-frontend")
-           (database "email_alert_frontend")))))
+          (service-startup-config))))
 
 (define draft-email-alert-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-email-alert-frontend))
@@ -684,13 +672,7 @@
            (provision '(draft-email-alert-frontend))
            (requirement '()))
           (plek-config) (rails-app-config) email-alert-frontend
-          (service-startup-config)
-          (redis-connection-config)
-          (sidekiq-config
-           (file "config/sidekiq.yml"))
-          (postgresql-connection-config
-           (user "draft-email-alert-frontend")
-           (database "email_alert_frontend")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Email Alert Service
@@ -748,9 +730,6 @@
            (requirement '()))
           (plek-config) (rails-app-config) finder-frontend
           (service-startup-config)
-          (redis-connection-config)
-          (sidekiq-config
-           (file "config/sidekiq.yml"))
           (postgresql-connection-config
            (user "finder-frontend")
            (database "email_alert_api")))))
@@ -783,10 +762,7 @@
                (application-name "Publishing API"))
               '("signin")))))
           (service-startup-config)
-          (redis-connection-config)
-          (postgresql-connection-config
-           (user "hmrc-manuals-api")
-           (database "hmrc_manuals_api")))))
+          (redis-connection-config))))
 
 ;;;
 ;;; Licence Finder
@@ -1243,10 +1219,7 @@
           (signon-application
            (name "Smart Answers")
            (supported-permissions '("signin")))
-          (service-startup-config)
-          (postgresql-connection-config
-           (user "smart-answers")
-           (database "smart_answers")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Support
@@ -1263,10 +1236,7 @@
           (provision '(support))
           (requirement '(publishing-api signon)))
          (plek-config) (rails-app-config) support
-         (service-startup-config)
-         (postgresql-connection-config
-          (user "support")
-          (database "support")))))
+         (service-startup-config))))
 
 ;;;
 ;;; Support API
