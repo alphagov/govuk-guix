@@ -45,6 +45,8 @@
             router-api-config?
             router-api-nodes
 
+            authenticating-proxy-service-type
+            authenticating-proxy-service
             publishing-api-service-type
             publishing-api-service
             content-store-service-type
