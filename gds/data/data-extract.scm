@@ -68,7 +68,7 @@
 (define (load-extract extract database-connection-config)
   (let* ((load-gexp
           (match (data-extract-database extract)
-            ("postgres"
+            ("postgresql"
              (postgresql-import-gexp
               database-connection-config
               (data-extract-file extract)))
