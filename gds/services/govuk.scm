@@ -223,20 +223,10 @@
                     parameter))
               parameters)))))
 
-(define default-signon-database-connection-configs
-  (list
-   (mysql-connection-config
-    (host "localhost")
-    (user "halberd")
-    (port "-")
-    (database "signon_production")
-    (password ""))
-   (redis-connection-config)))
-
 (define-public signon-service
   (service
    signon-service-type
-   (cons* (shepherd-service
+   (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(signon))
            (requirement '(mysql loopback)))
@@ -245,7 +235,13 @@
           (signon-config)
           (sidekiq-config
            (file "config/sidekiq.yml"))
-          default-signon-database-connection-configs)))
+          (mysql-connection-config
+           (host "localhost")
+           (user "halberd")
+           (port "-")
+           (database "signon_production")
+           (password ""))
+          (redis-connection-config))))
 
 ;;;
 ;;; Asset Manager
@@ -1343,21 +1339,13 @@
 ;;; Publishing API Service
 ;;;
 
-(define default-publishing-api-database-connection-configs
-  (list
-   (postgresql-connection-config
-    (user "publishing-api")
-    (port "5432")
-    (database "publishing_api_production"))
-   (redis-connection-config)))
-
 (define-public publishing-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'publishing-api))
 
 (define-public publishing-api-service
   (service
    publishing-api-service-type
-   (cons* (shepherd-service
+   (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(publishing-api))
            (requirement '(content-store draft-content-store signon
@@ -1371,16 +1359,15 @@
            (supported-permissions '("signon" "view_all")))
           (sidekiq-config
            (file "config/sidekiq.yml"))
-          default-publishing-api-database-connection-configs)))
+          (postgresql-connection-config
+           (user "publishing-api")
+           (port "5432")
+           (database "publishing_api_production"))
+          (redis-connection-config))))
 
 ;;;
 ;;; Content store
 ;;;
-
-(define default-content-store-database-connection-configs
-  (list
-   (mongodb-connection-config
-    (database "content-store"))))
 
 (define-public content-store-service-type
   (make-rails-app-using-plek-and-signon-service-type 'content-store))
@@ -1388,18 +1375,14 @@
 (define-public content-store-service
   (service
    content-store-service-type
-   (cons* (shepherd-service
+   (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-store))
            (requirement '(router-api mongodb)))
           (service-startup-config)
           (plek-config) (rails-app-config) content-store
-          default-content-store-database-connection-configs)))
-
-(define default-draft-content-store-database-connection-configs
-  (list
-   (mongodb-connection-config
-    (database "draft-content-store"))))
+          (mongodb-connection-config
+           (database "content-store")))))
 
 (define-public draft-content-store-service-type
   (make-rails-app-using-plek-service-type 'draft-content-store))
@@ -1407,23 +1390,18 @@
 (define-public draft-content-store-service
   (service
    draft-content-store-service-type
-   (cons* (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(draft-content-store))
-           (requirement '(draft-router-api mongodb)))
-          (service-startup-config)
-          (plek-config) (rails-app-config) content-store
-          default-draft-content-store-database-connection-configs)))
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(draft-content-store))
+          (requirement '(draft-router-api mongodb)))
+         (service-startup-config)
+         (plek-config) (rails-app-config) content-store
+         (mongodb-connection-config
+          (database "draft-content-store")))))
 
 ;;;
 ;;; Specialist Publisher
 ;;;
-
-(define default-specialist-publisher-database-connection-configs
-  (list
-   (mongodb-connection-config
-    (database "specialist_publisher"))
-   (redis-connection-config)))
 
 (define-public specialist-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
@@ -1431,25 +1409,27 @@
 (define-public specialist-publisher-service
   (service
    specialist-publisher-service-type
-   (cons* (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(specialist-publisher))
-           (requirement '(publishing-api signon mongodb nginx)))
-          (plek-config) (rails-app-config) specialist-publisher
-          (signon-application
-           (name "Specialist Publisher")
-           (supported-permissions '("signin" "editor" "gds_editor")))
-          (signon-api-user
-           (name "Specialist Publisher")
-           (email "specialist-publisher@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (service-startup-config)
-          default-specialist-publisher-database-connection-configs)))
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(specialist-publisher))
+          (requirement '(publishing-api signon mongodb nginx)))
+         (plek-config) (rails-app-config) specialist-publisher
+         (signon-application
+          (name "Specialist Publisher")
+          (supported-permissions '("signin" "editor" "gds_editor")))
+         (signon-api-user
+          (name "Specialist Publisher")
+          (email "specialist-publisher@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
+         (service-startup-config)
+         (mongodb-connection-config
+          (database "specialist_publisher"))
+         (redis-connection-config))))
 
 ;;;
 ;;; Government Frontend
@@ -1751,47 +1731,38 @@
 ;;; Content Tagger
 ;;;
 
-(define default-content-tagger-database-connection-configs
-  (list
-   (postgresql-connection-config
-    (user "content-tagger")
-    (port "5432")
-    (database "content_tagger"))))
-
 (define-public content-tagger-service-type
   (make-rails-app-using-plek-and-signon-service-type 'content-tagger))
 
 (define-public content-tagger-service
   (service
    content-tagger-service-type
-   (cons* (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(content-tagger))
-           (requirement '(publishing-api signon)))
-          (service-startup-config)
-          (signon-application
-           (name "Content Tagger")
-           (supported-permissions '("signin")))
-          (signon-api-user
-           (name "Content Tagger")
-           (email "content-tagger@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (plek-config) (rails-app-config) content-tagger
-          default-content-tagger-database-connection-configs)))
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(content-tagger))
+          (requirement '(publishing-api signon)))
+         (service-startup-config)
+         (signon-application
+          (name "Content Tagger")
+          (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Content Tagger")
+          (email "content-tagger@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
+         (plek-config) (rails-app-config) content-tagger
+         (postgresql-connection-config
+          (user "content-tagger")
+          (port "5432")
+          (database "content_tagger")))))
 
 ;;;
 ;;; Maslow
 ;;;
-
-(define default-maslow-database-connection-configs
-  (list
-   (mongodb-connection-config
-    (database "maslow"))))
 
 (define-public maslow-service-type
   (make-rails-app-using-plek-and-signon-service-type 'maslow))
@@ -1799,34 +1770,30 @@
 (define-public maslow-service
   (service
    maslow-service-type
-   (cons* (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(maslow))
-           (requirement '(publishing-api need-api signon)))
-          (service-startup-config)
-          (signon-application
-           (name "Maslow")
-           (supported-permissions '("signin" "admin" "editor")))
-          (signon-api-user
-           (name "Maslow")
-           (email "maslow@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (plek-config) (rails-app-config) maslow
-          default-maslow-database-connection-configs)))
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(maslow))
+          (requirement '(publishing-api need-api signon)))
+         (service-startup-config)
+         (signon-application
+          (name "Maslow")
+          (supported-permissions '("signin" "admin" "editor")))
+         (signon-api-user
+          (name "Maslow")
+          (email "maslow@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
+         (plek-config) (rails-app-config) maslow
+         (mongodb-connection-config
+          (database "maslow")))))
 
 ;;;
 ;;; Need API
 ;;;
-
-(define default-need-api-database-connection-configs
-  (list
-   (mongodb-connection-config
-    (database "govuk_needs_development"))))
 
 (define-public need-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'need-api))
@@ -1834,16 +1801,17 @@
 (define-public need-api-service
   (service
    need-api-service-type
-   (cons* (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(need-api))
-           (requirement '(publishing-api signon)))
-          (service-startup-config)
-          (signon-application
-           (name "Need API")
-           (supported-permissions '("signin" "write")))
-          (plek-config) (rails-app-config) need-api
-          default-need-api-database-connection-configs)))
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(need-api))
+          (requirement '(publishing-api signon)))
+         (service-startup-config)
+         (signon-application
+          (name "Need API")
+          (supported-permissions '("signin" "write")))
+         (plek-config) (rails-app-config) need-api
+         (mongodb-connection-config
+          (database "govuk_needs_development")))))
 
 ;;;
 ;;; Rummager
