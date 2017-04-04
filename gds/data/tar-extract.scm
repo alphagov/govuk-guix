@@ -26,24 +26,47 @@
   (match tar-extract
     (($ <tar-extract> name archive member)
      (mlet %store-monad ((guile (package->derivation (default-guile) system)))
+
+       (define inputs (list gzip bzip2))
+
        (define build
          (with-imported-modules `((guix build utils))
-           #~(let ((tar-command
-                    (list
-                     (string-append #$tar "/bin/tar")
-                     "--extract"
-                     "--file" #$archive
-                     (string-append "--directory=" "/gnu/store");;#$output)
-                     "-x"
-                     #$member)))
-               (display #$output)
-               (setenv "PATH" (string-append #$gzip "/bin"))
-               (simple-format #t "running ~A\n" (string-join tar-command))
+           #~(let* ((tmp-directory (tmpnam))
+                    (tar-command
+                     (list
+                      (string-append #$tar "/bin/tar")
+                      "--extract"
+                      "--wildcards"
+                      "--file" #$archive
+                      (string-append "--directory=" tmp-directory)
+                      "-x"
+                      #$member)))
+               (use-modules (srfi srfi-1)
+                            (srfi srfi-26)
+                            (ice-9 ftw)
+                            (guix build utils))
+               (set-path-environment-variable
+                "PATH" '("bin" "sbin") '#+inputs)
+
+               (simple-format #t "\nrunning ~A\n" (string-join tar-command))
                (force-output)
+               (mkdir tmp-directory)
                (let ((status (apply system* tar-command)))
                  (unless (zero? status)
                    (exit 1))
-                 (rename-file (string-append "/gnu/store/" #$member) #$output)))))
+                 (let ((extracted-files
+                        (find-files tmp-directory)))
+                   (simple-format #t "extracted ~A\n" extracted-files)
+                   (if (eq? 1 (length extracted-files))
+                       (begin
+                         (let ((file (first extracted-files)))
+                           (rename-file file #$output)
+                           (simple-format #t "tar-extract of ~A produced ~A\n"
+                                          #$archive #$output)))
+                       (begin
+                         (display "\nMore than one file extracted:\n")
+                         (for-each (cut (simple-format #t " - ~A\n" <>)) extracted-files)
+                         (error "More than one file extracted"))))))))
 
        (gexp->derivation name build
                          #:system system
