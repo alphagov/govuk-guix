@@ -22,32 +22,34 @@
 
 (define mysql-extracts
   `(("mysql-backup-1.backend.integration"
-     ("collections_publisher_production" . #f)
-     ("contacts_production" . #f)
-     ("release_production" . #f)
-     ("search_admin_production" . #f)
-     ("signon_production" . #f)
+     ("collections_publisher_production" . (,collections-publisher-service-type))
+     ("contacts_production" . (,contacts-admin-service-type))
+     ("release_production" . (,release-service-type))
+     ("search_admin_production" . (,search-admin-service-type))
+     ("signon_production" . (,signon-service-type)))
     ("whitehall-mysql-backup-1.backend.integration"
-     ("whitehall_production" . #f))))
+     ("whitehall_production" . (,whitehall-service-type)))))
 
 (define mongodb-extracts
   `(("mongo-1.backend.integration"
-     ("govuk_assets_production" . #f)
+     ("govuk_assets_production" . (,asset-manager-service-type))
      ("publisher_production" . (,publisher-service-type))
-     ("govuk_content_production" . #f)
+     ("govuk_content_production" .
+      (,content-api-service-type ,specialist-publisher-service-type))
      ("govuk_needs_production" . (,need-api-service-type))
-     ("short_url_manager_production" . #f)
-     ("imminence_production" . #f)
-     ("licence_finder_production" . #f)
-     ("manuals_publisher_production" . #f)
+     ("short_url_manager_production" . (,short-url-manager-service-type))
+     ("imminence_production" . (,imminence-service-type))
+     ("licence_finder_production" . (,licence-finder-service-type))
+     ("manuals_publisher_production" . (,manuals-publisher-service-type))
      ("maslow_production" . (,maslow-service-type)))
     ("api-mongo-1.api.integration"
-     ("draft_content_store_production" . #f)
-     ("content_store_production" . #f))
+     ("draft_content_store_production" . (,draft-content-store-service-type))
+     ("content_store_production" . (,content-store-service-type)))
     ("router-backend-1.router.integration"
-     ("authenticating_proxy_production" . #f)
-     ("router" . #f)
-     ("draft_router" . #f))))
+     ("authenticating_proxy_production" . (,authenticating-proxy-service-type)))
+     ("router" . (,router-service-type ,router-api-service-type))
+     ("draft_router" .
+      (,draft-router-service-type ,draft-router-api-service-type))))
 
 (define (find-extracts backup-directory)
   (define (process-date-dir date stat . children)
