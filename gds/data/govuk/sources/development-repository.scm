@@ -99,7 +99,7 @@
                       (list backup-directory date database hostname "latest.tbz2")
                       "/")))
                    (member
-                    (string-append "latest/" extract-name))))
+                    (string-append "latest/" extract-name "_*.sql.gz"))))
                  ((equal? database "mysql")
                   (tar-extract
                    (name (string-append extract-name ".sql.bz2"))
