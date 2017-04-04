@@ -94,7 +94,7 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   "-d"
                   "|"
                   ,psql
-                  ,(simple-format #f "postgres://~A:~A/~A" #$host #$port #$database)
+                  ,(simple-format #f "postgres://~A@~A:~A/~A" #$user #$host #$port #$database)
                   "--quiet")
                 " ")))
            (simple-format #t "Running command: ~A\n" command)
