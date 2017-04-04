@@ -8,6 +8,7 @@
   #:use-module (guix store)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mongodb)
+  #:use-module (gds services utils databases mysql)
   #:export (<data-extract>
             data-extract
             data-extract?
@@ -73,6 +74,10 @@
               (data-extract-file extract)))
             ("mongo"
              (mongodb-restore-gexp
+              database-connection-config
+              (data-extract-file extract)))
+            ("mysql"
+             (mysql-run-file-gexp
               database-connection-config
               (data-extract-file extract)))))
          (script
