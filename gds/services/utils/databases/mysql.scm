@@ -66,6 +66,7 @@
                            ,(string-append #$mariadb "/bin/mysql")
                            "-h" #$host
                            "-u" "root"
+                           "--protocol=tcp"
                            "--password=''"
                            "-P" ,(number->string #$port))))
              (simple-format #t "Running command: ~A\n\n" (string-join command))
