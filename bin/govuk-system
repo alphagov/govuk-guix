@@ -31,6 +31,7 @@
  (guix derivations)
  (guix store)
  (gnu services)
+ (gnu services web)
  (gnu system)
  (gnu system linux-container)
  (gds services govuk)
@@ -55,7 +56,9 @@
            (if (null? args)
                (map service-kind govuk-services)
                (args->service-types args))
-           (map service-kind base-services))))
+           (cons*
+            nginx-service-type
+            (map service-kind base-services)))))
      (filter
       (lambda (service)
         (member (service-kind service) service-types-whitelist))
