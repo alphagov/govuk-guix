@@ -27,26 +27,18 @@
      ("release_production" . #f)
      ("search_admin_production" . #f)
      ("signon_production" . #f)
-     ("tariff_admin_production" . #f)
-     ("tariff_temporal_production" . #f))
     ("whitehall-mysql-backup-1.backend.integration"
      ("whitehall_production" . #f))))
 
 (define mongodb-extracts
   `(("mongo-1.backend.integration"
-     ("gov_delivery" . #f)
      ("govuk_assets_production" . #f)
      ("publisher_production" . (,publisher-service-type))
      ("govuk_content_production" . #f)
-     ("reviewomatic_production" . #f)
-     ("govuk_delivery" . #f)
-     ("share_sale_publisher_production" . #f)
      ("govuk_needs_production" . (,need-api-service-type))
      ("short_url_manager_production" . #f)
      ("imminence_production" . #f)
-     ("specialist_publisher_rebuild_production" . #f)
      ("licence_finder_production" . #f)
-     ("specialist_publisher_rebuild_standalone_production" . #f)
      ("manuals_publisher_production" . #f)
      ("maslow_production" . (,maslow-service-type)))
     ("api-mongo-1.api.integration"
