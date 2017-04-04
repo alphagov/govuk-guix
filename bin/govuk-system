@@ -80,7 +80,8 @@
   (define (sudo-path)
     (find
      file-exists?
-     '("/usr/bin/sudo")))
+     '("/run/setuid-programs/sudo"
+       "/usr/bin/sudo")))
 
   (exit
    (status:exit-val
