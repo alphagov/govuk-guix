@@ -410,6 +410,7 @@
             #:repository "manuals-publisher"
             #:commit-ish "release_744"
             #:hash (base32 "1zj6b0kbpf29g78q330p2chh04n8fzzy2587py5qr1zm9f8k4bvm"))
+           #:create-tmp-directory #t
            #:precompile-assets #f)))) ;; Asset precompilation fails
     (package
       (inherit pkg)
