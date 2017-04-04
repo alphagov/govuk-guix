@@ -143,7 +143,13 @@
   (lambda ()
     (let* ((development-repository-directory
             (or (getenv "GDS_GUIX_DEVELOPMENT_REPOSITORY")
-                "../../../development"))
+                (let ((govuk-guix-root
+                       (string-drop-right
+                        (current-filename)
+                        (string-length "gds/data/govuk/sources/development-repository.scm"))))
+                  (string-append
+                   (dirname govuk-guix-root)
+                   "/development"))))
            (backup-directory
             (string-append development-repository-directory
                            "/replication/backups")))
