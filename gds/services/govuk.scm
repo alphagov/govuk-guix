@@ -25,89 +25,22 @@
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk signon)
   #:use-module (gds services rails)
-  #:export (govuk-content-schemas-service-type
-            govuk-content-schemas-service
-
-            rails-app-service
-            rails-app-service-type
-
+  #:export (<signon-config>
             signon-config
             signon-config?
             signon-config-applications
             signon-config-users
 
+            <router-config>
             router-config
             router-config?
             router-config-public-port
             router-config-api-port
 
+            <router-api-config>
             router-api-config
             router-api-config?
-            router-api-nodes
-
-            authenticating-proxy-service-type
-            authenticating-proxy-service
-            publishing-api-service-type
-            publishing-api-service
-            content-store-service-type
-            content-store-service
-            draft-content-store-service-type
-            draft-content-store-service
-
-            specialist-publisher-service-type
-            specialist-publisher-service
-
-            specialist-frontend-service-type
-            specialist-frontend-service
-            publishing-e2e-tests-service-type
-            publishing-e2e-tests-service
-            router-service
-            router-service-type
-            draft-router-service
-            draft-router-service-type
-            router-api-service
-            router-api-service-type
-            draft-router-api-service
-            draft-router-api-service-type
-            maslow-service
-            maslow-service-type
-            need-api-service
-            need-api-service-type
-
-            whitehall-service-type
-            whitehall-service
-            email-alert-api-service-type
-            publisher-service-type
-            publisher-service
-
-            frontend-service-type
-            frontend-service
-
-            content-tagger-service-type
-            content-tagger-service
-
-            support-api-service-type
-            email-alert-api-service-type
-            policy-publisher-service-type
-            local-links-manager-service-type
-            service-manual-publisher-service-type
-
-            draft-frontend-service-type
-            draft-frontend-service
-
-            signon-service-type
-            signon-service
-            static-service-type
-            static-service
-            info-frontend-service-type
-            info-frontend-service
-
-            publishing-application-services
-            api-services
-            supporting-application-services
-            frontend-services
-            draft-frontend-services
-            govuk-services))
+            router-api-config-nodes))
 
 ;;;
 ;;; Utilities
@@ -202,7 +135,7 @@
 ;;; GOV.UK Content Schemas
 ;;;
 
-(define govuk-content-schemas-service-type
+(define-public govuk-content-schemas-service-type
   (shepherd-service-type
    'govuk-content-schemas
    (lambda (package)
@@ -223,7 +156,7 @@
              #f))
    (respawn? #f)))))
 
-(define govuk-content-schemas-service
+(define-public govuk-content-schemas-service
   (service govuk-content-schemas-service-type govuk-content-schemas))
 
 ;;;
@@ -240,7 +173,7 @@
   (api-users    signon-config-api-users
                 (default '())))
 
-(define signon-service-type
+(define-public signon-service-type
   (service-type
    (inherit
     (service-type-extensions-modify-parameters
@@ -300,7 +233,7 @@
     (password ""))
    (redis-connection-config)))
 
-(define signon-service
+(define-public signon-service
   (service
    signon-service-type
    (cons* (shepherd-service
@@ -318,10 +251,10 @@
 ;;; Asset Manager
 ;;;
 
-(define asset-manager-service-type
+(define-public asset-manager-service-type
   (make-rails-app-using-plek-and-signon-service-type 'asset-manager))
 
-(define asset-manager-service
+(define-public asset-manager-service
   (service
    asset-manager-service-type
    (list (shepherd-service
@@ -340,10 +273,10 @@
 ;;; Authenticating Proxy
 ;;;
 
-(define authenticating-proxy-service-type
+(define-public authenticating-proxy-service-type
   (make-rails-app-using-plek-and-signon-service-type 'authenticating-proxy))
 
-(define authenticating-proxy-service
+(define-public authenticating-proxy-service
   (service
    authenticating-proxy-service-type
    (list (shepherd-service
@@ -362,10 +295,10 @@
 ;;; Calculators
 ;;;
 
-(define calculators-service-type
+(define-public calculators-service-type
   (make-rails-app-using-plek-and-signon-service-type 'calculators))
 
-(define calculators-service
+(define-public calculators-service
   (service
    calculators-service-type
    (list (shepherd-service
@@ -384,10 +317,10 @@
 ;;; Calendars
 ;;;
 
-(define calendars-service-type
+(define-public calendars-service-type
   (make-rails-app-using-plek-and-signon-service-type 'calendars))
 
-(define calendars-service
+(define-public calendars-service
   (service
    calendars-service-type
    (list (shepherd-service
@@ -406,10 +339,10 @@
 ;;; Collections
 ;;;
 
-(define collections-service-type
+(define-public collections-service-type
   (make-rails-app-using-plek-and-signon-service-type 'collections))
 
-(define collections-service
+(define-public collections-service
   (service
    collections-service-type
    (list (shepherd-service
@@ -424,10 +357,10 @@
           (mongodb-connection-config
            (database "authenticating_proxy")))))
 
-(define draft-collections-service-type
+(define-public draft-collections-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
 
-(define draft-collections-service
+(define-public draft-collections-service
   (service
    draft-collections-service-type
    (list (shepherd-service
@@ -446,10 +379,10 @@
 ;;; Collections Publisher
 ;;;
 
-(define collections-publisher-service-type
+(define-public collections-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'collections-publisher))
 
-(define collections-publisher-service
+(define-public collections-publisher-service
   (service
    collections-publisher-service-type
    (list (shepherd-service
@@ -479,10 +412,10 @@
 ;;; Contacts Admin
 ;;;
 
-(define contacts-admin-service-type
+(define-public contacts-admin-service-type
   (make-rails-app-using-plek-and-signon-service-type 'contacts-admin))
 
-(define contacts-admin-service
+(define-public contacts-admin-service
   (service
    contacts-admin-service-type
    (list (shepherd-service
@@ -513,10 +446,10 @@
 ;;; Contacts Frontend
 ;;;
 
-(define contacts-frontend-service-type
+(define-public contacts-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'contacts-frontend))
 
-(define contacts-frontend-service
+(define-public contacts-frontend-service
   (service
    contacts-frontend-service-type
    (list (shepherd-service
@@ -543,10 +476,10 @@
            (password (random-base16-string 30))
            (database "contacts_frontend")))))
 
-(define draft-contacts-frontend-service-type
+(define-public draft-contacts-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-contacts-frontend))
 
-(define draft-contacts-frontend-service
+(define-public draft-contacts-frontend-service
   (service
    draft-contacts-frontend-service-type
    (list (shepherd-service
@@ -577,10 +510,10 @@
 ;;; Content Performance Manager
 ;;;
 
-(define content-performance-manager-service-type
+(define-public content-performance-manager-service-type
   (make-rails-app-using-plek-and-signon-service-type 'content-performance-manager))
 
-(define content-performance-manager-service
+(define-public content-performance-manager-service
   (service
    content-performance-manager-service-type
    (list (shepherd-service
@@ -610,10 +543,10 @@
 ;;; Design Principles
 ;;;
 
-(define design-principles-service-type
+(define-public design-principles-service-type
   (make-rails-app-using-plek-and-signon-service-type 'design-principles))
 
-(define design-principles-service
+(define-public design-principles-service
   (service
    design-principles-service-type
    (list (shepherd-service
@@ -627,10 +560,10 @@
 ;;; Email Alert API
 ;;;
 
-(define email-alert-api-service-type
+(define-public email-alert-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'email-alert-api))
 
-(define email-alert-api-service
+(define-public email-alert-api-service
   (service
    email-alert-api-service-type
    (list (shepherd-service
@@ -650,10 +583,10 @@
 ;;; Email Alert Frontend
 ;;;
 
-(define email-alert-frontend-service-type
+(define-public email-alert-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'email-alert-frontend))
 
-(define email-alert-frontend-service
+(define-public email-alert-frontend-service
   (service
    email-alert-frontend-service-type
    (list (shepherd-service
@@ -663,10 +596,10 @@
           (plek-config) (rails-app-config) email-alert-frontend
           (service-startup-config))))
 
-(define draft-email-alert-frontend-service-type
+(define-public draft-email-alert-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-email-alert-frontend))
 
-(define draft-email-alert-frontend-service
+(define-public draft-email-alert-frontend-service
   (service
    draft-email-alert-frontend-service-type
    (list (shepherd-service
@@ -680,10 +613,10 @@
 ;;; Email Alert Service
 ;;;
 
-(define email-alert-service-type
+(define-public email-alert-service-type
   (make-rails-app-using-plek-and-signon-service-type 'email-alert-service))
 
-(define email-alert-service-service
+(define-public email-alert-service-service
   (service
    email-alert-service-type
    (list (shepherd-service
@@ -698,10 +631,10 @@
 ;;; Feedback
 ;;;
 
-(define feedback-service-type
+(define-public feedback-service-type
   (make-rails-app-using-plek-and-signon-service-type 'feedback))
 
-(define feedback-service
+(define-public feedback-service
   (service
    feedback-service-type
    (list (shepherd-service
@@ -720,10 +653,10 @@
 ;;; Finder Frontend
 ;;;
 
-(define finder-frontend-service-type
+(define-public finder-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'finder-frontend))
 
-(define finder-frontend-service
+(define-public finder-frontend-service
   (service
    finder-frontend-service-type
    (list (shepherd-service
@@ -740,10 +673,10 @@
 ;;; HMRC Manuals API
 ;;;
 
-(define hmrc-manuals-api-service-type
+(define-public hmrc-manuals-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'hmrc-manuals-api))
 
-(define hmrc-manuals-api-service
+(define-public hmrc-manuals-api-service
   (service
    hmrc-manuals-api-service-type
    (list (shepherd-service
@@ -770,10 +703,10 @@
 ;;; Licence Finder
 ;;;
 
-(define licence-finder-service-type
+(define-public licence-finder-service-type
   (make-rails-app-using-plek-and-signon-service-type 'licence-finder))
 
-(define licence-finder-service
+(define-public licence-finder-service
   (service
    licence-finder-service-type
    (list (shepherd-service
@@ -801,10 +734,10 @@
 ;;; Local Links Manager
 ;;;
 
-(define local-links-manager-service-type
+(define-public local-links-manager-service-type
   (make-rails-app-using-plek-and-signon-service-type 'local-links-manager))
 
-(define local-links-manager-service
+(define-public local-links-manager-service
   (service
    local-links-manager-service-type
    (list (shepherd-service
@@ -834,10 +767,10 @@
 ;;; Imminence
 ;;;
 
-(define imminence-service-type
+(define-public imminence-service-type
   (make-rails-app-using-plek-and-signon-service-type 'imminence))
 
-(define imminence-service
+(define-public imminence-service
   (service
    imminence-service-type
    (list (shepherd-service
@@ -865,10 +798,10 @@
 ;;; Manuals Frontend
 ;;;
 
-(define manuals-frontend-service-type
+(define-public manuals-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'manuals-frontend))
 
-(define manuals-frontend-service
+(define-public manuals-frontend-service
   (service
    manuals-frontend-service-type
    (list (shepherd-service
@@ -892,10 +825,10 @@
           (mongodb-connection-config
            (database "manuals_frontend")))))
 
-(define draft-manuals-frontend-service-type
+(define-public draft-manuals-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-manuals-frontend))
 
-(define draft-manuals-frontend-service
+(define-public draft-manuals-frontend-service
   (service
    draft-manuals-frontend-service-type
    (list (shepherd-service
@@ -923,10 +856,10 @@
 ;;; Manuals Publisher
 ;;;
 
-(define manuals-publisher-service-type
+(define-public manuals-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'manuals-publisher))
 
-(define manuals-publisher-service
+(define-public manuals-publisher-service
   (service
    manuals-publisher-service-type
    (list (shepherd-service
@@ -954,10 +887,10 @@
 ;;; Multipage Frontend
 ;;;
 
-(define multipage-frontend-service-type
+(define-public multipage-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'multipage-frontend))
 
-(define multipage-frontend-service
+(define-public multipage-frontend-service
   (service
    multipage-frontend-service-type
    (list (shepherd-service
@@ -978,10 +911,10 @@
           (mongodb-connection-config
            (database "multipage_frontend")))))
 
-(define draft-multipage-frontend-service-type
+(define-public draft-multipage-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-multipage-frontend))
 
-(define draft-multipage-frontend-service
+(define-public draft-multipage-frontend-service
   (service
    draft-multipage-frontend-service-type
    (list (shepherd-service
@@ -1006,10 +939,10 @@
 ;;; Policy Publisher
 ;;;
 
-(define policy-publisher-service-type
+(define-public policy-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'policy-publisher))
 
-(define policy-publisher-service
+(define-public policy-publisher-service
   (service
    policy-publisher-service-type
    (list (shepherd-service
@@ -1038,10 +971,10 @@
 ;;; Release
 ;;;
 
-(define release-service-type
+(define-public release-service-type
   (make-rails-app-using-plek-and-signon-service-type 'release))
 
-(define release-service
+(define-public release-service
   (service
    release-service-type
    (list (shepherd-service
@@ -1064,10 +997,10 @@
 ;;; Search Admin
 ;;;
 
-(define search-admin-service-type
+(define-public search-admin-service-type
   (make-rails-app-using-plek-and-signon-service-type 'search-admin-publisher))
 
-(define search-admin-service
+(define-public search-admin-service
   (service
    search-admin-service-type
    (list (shepherd-service
@@ -1090,10 +1023,10 @@
 ;;; Service Manual Publisher
 ;;;
 
-(define service-manual-publisher-service-type
+(define-public service-manual-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'service-manual-publisher))
 
-(define service-manual-publisher-service
+(define-public service-manual-publisher-service
   (service
    service-manual-publisher-service-type
    (list (shepherd-service
@@ -1122,10 +1055,10 @@
 ;;; Service Manual Frontend
 ;;;
 
-(define service-manual-frontend-service-type
+(define-public service-manual-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'service-manual-frontend))
 
-(define service-manual-frontend-service
+(define-public service-manual-frontend-service
   (service
    service-manual-frontend-service-type
    (list (shepherd-service
@@ -1150,10 +1083,10 @@
            (user "service-manual-frontend")
            (database "service_manual_frontend")))))
 
-(define draft-service-manual-frontend-service-type
+(define-public draft-service-manual-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-service-manual-frontend))
 
-(define draft-service-manual-frontend-service
+(define-public draft-service-manual-frontend-service
   (service
    draft-service-manual-frontend-service-type
    (list (shepherd-service
@@ -1182,10 +1115,10 @@
 ;;; Short Url Manager
 ;;;
 
-(define short-url-manager-service-type
+(define-public short-url-manager-service-type
   (make-rails-app-using-plek-and-signon-service-type 'short-url-manager))
 
-(define short-url-manager-service
+(define-public short-url-manager-service
   (service
    short-url-manager-service-type
    (list (shepherd-service
@@ -1213,10 +1146,10 @@
 ;;; Smart Answers
 ;;;
 
-(define smart-answers-service-type
+(define-public smart-answers-service-type
   (make-rails-app-using-plek-and-signon-service-type 'smart-answers-publisher))
 
-(define smart-answers-service
+(define-public smart-answers-service
   (service
    smart-answers-service-type
    (list (shepherd-service
@@ -1233,10 +1166,10 @@
 ;;; Support
 ;;;
 
-(define support-service-type
+(define-public support-service-type
   (make-rails-app-using-plek-and-signon-service-type 'support))
 
-(define support-service
+(define-public support-service
   (service
    support-service-type
    (list (shepherd-service
@@ -1250,10 +1183,10 @@
 ;;; Support API
 ;;;
 
-(define support-api-service-type
+(define-public support-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'support-api))
 
-(define support-api-service
+(define-public support-api-service
   (service
    support-api-service-type
    (list (shepherd-service
@@ -1270,10 +1203,10 @@
 ;;; Travel Advice Publisher
 ;;;
 
-(define travel-advice-publisher-service-type
+(define-public travel-advice-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'travel-advice-publisher))
 
-(define travel-advice-publisher-service
+(define-public travel-advice-publisher-service
   (service
    travel-advice-publisher-service-type
    (list (shepherd-service
@@ -1379,7 +1312,7 @@
              (stop-service 'root)
              result))))))
 
-(define publishing-e2e-tests-service-type
+(define-public publishing-e2e-tests-service-type
   (service-type
    (name 'publishing-e2e-tests-service)
    (extensions
@@ -1401,7 +1334,7 @@
                  (start #~(make-forkexec-constructor #$start-script))
                  (stop #~(make-kill-destructor))))))))))))
 
-(define publishing-e2e-tests-service
+(define-public publishing-e2e-tests-service
   (service
    publishing-e2e-tests-service-type
    (list (plek-config) publishing-e2e-tests)))
@@ -1418,10 +1351,10 @@
     (database "publishing_api_production"))
    (redis-connection-config)))
 
-(define publishing-api-service-type
+(define-public publishing-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'publishing-api))
 
-(define publishing-api-service
+(define-public publishing-api-service
   (service
    publishing-api-service-type
    (cons* (shepherd-service
@@ -1449,10 +1382,10 @@
    (mongodb-connection-config
     (database "content-store"))))
 
-(define content-store-service-type
+(define-public content-store-service-type
   (make-rails-app-using-plek-and-signon-service-type 'content-store))
 
-(define content-store-service
+(define-public content-store-service
   (service
    content-store-service-type
    (cons* (shepherd-service
@@ -1468,10 +1401,10 @@
    (mongodb-connection-config
     (database "draft-content-store"))))
 
-(define draft-content-store-service-type
+(define-public draft-content-store-service-type
   (make-rails-app-using-plek-service-type 'draft-content-store))
 
-(define draft-content-store-service
+(define-public draft-content-store-service
   (service
    draft-content-store-service-type
    (cons* (shepherd-service
@@ -1492,10 +1425,10 @@
     (database "specialist_publisher"))
    (redis-connection-config)))
 
-(define specialist-publisher-service-type
+(define-public specialist-publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
 
-(define specialist-publisher-service
+(define-public specialist-publisher-service
   (service
    specialist-publisher-service-type
    (cons* (shepherd-service
@@ -1522,10 +1455,10 @@
 ;;; Government Frontend
 ;;;
 
-(define government-frontend-service-type
+(define-public government-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'government-frontend))
 
-(define government-frontend-service
+(define-public government-frontend-service
   (service
    government-frontend-service-type
    (list (shepherd-service
@@ -1537,10 +1470,10 @@
            '(("GOVUK_APP_NAME" . "government-frontend"))))
          (plek-config) (rails-app-config) government-frontend)))
 
-(define draft-government-frontend-service-type
+(define-public draft-government-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-government-frontend))
 
-(define draft-government-frontend-service
+(define-public draft-government-frontend-service
   (service
    draft-government-frontend-service-type
    (list (shepherd-service
@@ -1556,10 +1489,10 @@
 ;;; Specialist Frontend
 ;;;
 
-(define specialist-frontend-service-type
+(define-public specialist-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'specialist-frontend))
 
-(define specialist-frontend-service
+(define-public specialist-frontend-service
   (service
    specialist-frontend-service-type
    (list (shepherd-service
@@ -1571,10 +1504,10 @@
            '(("GOVUK_APP_NAME" . "specialist-frontend"))))
          (plek-config) (rails-app-config) specialist-frontend)))
 
-(define draft-specialist-frontend-service-type
+(define-public draft-specialist-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-specialist-frontend))
 
-(define draft-specialist-frontend-service
+(define-public draft-specialist-frontend-service
   (service
    draft-specialist-frontend-service-type
    (list (shepherd-service
@@ -1594,10 +1527,10 @@
   (mongodb-connection-config
    (database "govuk_content_production")))
 
-(define content-api-service-type
+(define-public content-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'contentapi))
 
-(define content-api-service
+(define-public content-api-service
   (service
    content-api-service-type
    (list (shepherd-service
@@ -1615,10 +1548,10 @@
 ;;; Frontend
 ;;;
 
-(define frontend-service-type
+(define-public frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'frontend))
 
-(define frontend-service
+(define-public frontend-service
   (service
    frontend-service-type
    (list (shepherd-service
@@ -1628,10 +1561,10 @@
          (service-startup-config)
          (plek-config) (rails-app-config) frontend)))
 
-(define draft-frontend-service-type
+(define-public draft-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-frontend))
 
-(define draft-frontend-service
+(define-public draft-frontend-service
   (service
    draft-frontend-service-type
    (list (shepherd-service
@@ -1645,10 +1578,10 @@
 ;;; Publisher
 ;;;
 
-(define publisher-service-type
+(define-public publisher-service-type
   (make-rails-app-using-plek-and-signon-service-type 'publisher))
 
-(define publisher-service
+(define-public publisher-service
   (service
    publisher-service-type
    (list (shepherd-service
@@ -1751,10 +1684,10 @@
    (mongodb-connection-config
     (database "router"))))
 
-(define router-service-type
+(define-public router-service-type
   (make-router-service-type 'router))
 
-(define router-service
+(define-public router-service
   (service
    router-service-type
    (cons* (router-config) router
@@ -1765,10 +1698,10 @@
    (mongodb-connection-config
     (database "draft-router"))))
 
-(define draft-router-service-type
+(define-public draft-router-service-type
   (make-router-service-type 'draft-router))
 
-(define draft-router-service
+(define-public draft-router-service
   (service
    draft-router-service-type
    (cons* (router-config) router
@@ -1784,10 +1717,10 @@
   (router-nodes router-api-config-router-nodes
                 (default '())))
 
-(define router-api-service-type
+(define-public router-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'router-api))
 
-(define router-api-service
+(define-public router-api-service
   (service
    router-api-service-type
    (cons* (shepherd-service
@@ -1799,10 +1732,10 @@
           (router-api-config)
           default-router-database-connection-configs)))
 
-(define draft-router-api-service-type
+(define-public draft-router-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-router-api))
 
-(define draft-router-api-service
+(define-public draft-router-api-service
   (service
    draft-router-api-service-type
    (cons* (shepherd-service
@@ -1825,10 +1758,10 @@
     (port "5432")
     (database "content_tagger"))))
 
-(define content-tagger-service-type
+(define-public content-tagger-service-type
   (make-rails-app-using-plek-and-signon-service-type 'content-tagger))
 
-(define content-tagger-service
+(define-public content-tagger-service
   (service
    content-tagger-service-type
    (cons* (shepherd-service
@@ -1860,10 +1793,10 @@
    (mongodb-connection-config
     (database "maslow"))))
 
-(define maslow-service-type
+(define-public maslow-service-type
   (make-rails-app-using-plek-and-signon-service-type 'maslow))
 
-(define maslow-service
+(define-public maslow-service
   (service
    maslow-service-type
    (cons* (shepherd-service
@@ -1895,10 +1828,10 @@
    (mongodb-connection-config
     (database "govuk_needs_development"))))
 
-(define need-api-service-type
+(define-public need-api-service-type
   (make-rails-app-using-plek-and-signon-service-type 'need-api))
 
-(define need-api-service
+(define-public need-api-service
   (service
    need-api-service-type
    (cons* (shepherd-service
@@ -1916,10 +1849,10 @@
 ;;; Rummager
 ;;;
 
-(define rummager-service-type
+(define-public rummager-service-type
   (make-rails-app-using-plek-service-type 'rummager))
 
-(define rummager-service
+(define-public rummager-service
   (service
    rummager-service-type
    (list (shepherd-service
@@ -1935,10 +1868,10 @@
 ;;; Info Frontend
 ;;;
 
-(define info-frontend-service-type
+(define-public info-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'info-frontend))
 
-(define info-frontend-service
+(define-public info-frontend-service
   (service
    info-frontend-service-type
    (list (shepherd-service
@@ -1965,10 +1898,10 @@
 ;;; Static service
 ;;;
 
-(define static-service-type
+(define-public static-service-type
   (make-rails-app-using-plek-service-type 'static))
 
-(define static-service
+(define-public static-service
   (service
    static-service-type
    (list (shepherd-service
@@ -1978,10 +1911,10 @@
          (service-startup-config) (plek-config) (rails-app-config)
          static)))
 
-(define draft-static-service-type
+(define-public draft-static-service-type
   (make-rails-app-using-plek-service-type 'draft-static))
 
-(define draft-static-service
+(define-public draft-static-service
   (service
    draft-static-service-type
    (list (shepherd-service
@@ -1997,10 +1930,10 @@
 ;;; Whitehall
 ;;;
 
-(define whitehall-service-type
+(define-public whitehall-service-type
   (make-rails-app-using-plek-and-signon-service-type 'whitehall))
 
-(define whitehall-service
+(define-public whitehall-service
   (service
    whitehall-service-type
    (list (shepherd-service
@@ -2040,7 +1973,7 @@
 ;;; Service Lists
 ;;;
 
-(define publishing-application-services
+(define-public publishing-application-services
   (list
    collections-publisher-service
    contacts-admin-service
@@ -2056,7 +1989,7 @@
    travel-advice-publisher-service
    whitehall-service))
 
-(define api-services
+(define-public api-services
   (list
    content-store-service
    draft-content-store-service
@@ -2075,7 +2008,7 @@
    ;; mapit-service
    ))
 
-(define supporting-application-services
+(define-public supporting-application-services
   (list
    ;; bouncer-service
    authenticating-proxy-service
@@ -2087,7 +2020,7 @@
    router-service
    draft-router-service))
 
-(define frontend-services
+(define-public frontend-services
   (list
    calculators-service
    calendars-service
@@ -2108,7 +2041,7 @@
    specialist-frontend-service
    static-service))
 
-(define draft-frontend-services
+(define-public draft-frontend-services
   (list
    draft-collections-service
    draft-contacts-frontend-service
@@ -2121,7 +2054,7 @@
    draft-static-service
    draft-specialist-frontend-service))
 
-(define govuk-services
+(define-public govuk-services
   (append
    publishing-application-services
    api-services
