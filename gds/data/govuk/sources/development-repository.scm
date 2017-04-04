@@ -92,7 +92,7 @@
           (file (cond
                  ((equal? database "postgresql")
                   (tar-extract
-                   (name extract-name)
+                   (name (string-append extract-name ".sql.gz"))
                    (archive
                     (local-file
                      (string-join
@@ -102,7 +102,7 @@
                     (string-append "latest/" extract-name))))
                  ((equal? database "mysql")
                   (tar-extract
-                   (name extract-name)
+                   (name (string-append extract-name ".sql.bz2"))
                    (archive
                     (local-file
                      (string-join
