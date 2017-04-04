@@ -108,7 +108,8 @@
                      (string-join
                       (list backup-directory date database hostname "latest.tbz2")
                       "/")))
-                   (member "latest/daily_*")))
+                   (member
+                    (string-append "latest/daily_" extract-name "*"))))
                  ((equal? database "mongo")
                   (let
                       ((filename
