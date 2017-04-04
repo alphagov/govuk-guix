@@ -17,7 +17,7 @@
      ("content_tagger_production" . (,content-tagger-service-type))
      ("email-alert-api_production" . (,email-alert-api-service-type))
      ("local-links-manager_production" . (,local-links-manager-service-type))
-     ("policy_publisher_production" . (,policy-publisher-service-type))
+     ("policy-publisher_production" . (,policy-publisher-service-type))
      ("publishing_api_production"  .(,publishing-api-service-type))
      ("service-manual-publisher_production" . (,service-manual-publisher-service-type))
      ("support_contacts_production" . (,support-api-service-type)))))
