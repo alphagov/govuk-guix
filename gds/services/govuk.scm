@@ -406,7 +406,7 @@
           (mysql-connection-config
            (user "collections-pub")
            (password (random-base16-string 30))
-           (database "collections_publisher")))))
+           (database "collections_publisher_production")))))
 
 ;;;
 ;;; Contacts Admin
