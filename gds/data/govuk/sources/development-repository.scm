@@ -12,13 +12,13 @@
 
 (define postgresql-extracts
   `(("postgresql-primary-1.backend.integration"
-     ("support_contacts_production" . (,support-api-service-type))
-     ("email-alert-api_production" . (,email-alert-api-service-type))
-     ("publishing_api_production"  .(,publishing-api-service-type))
-     ("policy_publisher_production" . (,policy-publisher-service-type))
-     ("local-links-manager_production" . (,local-links-manager-service-type))
      ("content_tagger_production" . (,content-tagger-service-type))
-     ("service-manual-publisher_production" . (,service-manual-publisher-service-type)))))
+     ("email-alert-api_production" . (,email-alert-api-service-type))
+     ("local-links-manager_production" . (,local-links-manager-service-type))
+     ("policy_publisher_production" . (,policy-publisher-service-type))
+     ("publishing_api_production"  .(,publishing-api-service-type))
+     ("service-manual-publisher_production" . (,service-manual-publisher-service-type))
+     ("support_contacts_production" . (,support-api-service-type)))))
 
 (define mysql-extracts
   `(("mysql-backup-1.backend.integration"
@@ -33,23 +33,23 @@
 (define mongodb-extracts
   `(("mongo-1.backend.integration"
      ("govuk_assets_production" . (,asset-manager-service-type))
-     ("publisher_production" . (,publisher-service-type))
      ("govuk_content_production" .
       (,content-api-service-type ,specialist-publisher-service-type))
      ("govuk_needs_production" . (,need-api-service-type))
-     ("short_url_manager_production" . (,short-url-manager-service-type))
      ("imminence_production" . (,imminence-service-type))
      ("licence_finder_production" . (,licence-finder-service-type))
      ("manuals_publisher_production" . (,manuals-publisher-service-type))
-     ("maslow_production" . (,maslow-service-type)))
+     ("maslow_production" . (,maslow-service-type))
+     ("publisher_production" . (,publisher-service-type))
+     ("short_url_manager_production" . (,short-url-manager-service-type)))
     ("api-mongo-1.api.integration"
-     ("draft_content_store_production" . (,draft-content-store-service-type))
-     ("content_store_production" . (,content-store-service-type)))
+     ("content_store_production" . (,content-store-service-type))
+     ("draft_content_store_production" . (,draft-content-store-service-type)))
     ("router-backend-1.router.integration"
      ("authenticating_proxy_production" . (,authenticating-proxy-service-type)))
-     ("router" . (,router-service-type ,router-api-service-type))
      ("draft_router" .
-      (,draft-router-service-type ,draft-router-api-service-type))))
+      (,draft-router-service-type ,draft-router-api-service-type))
+     ("router" . (,router-service-type ,router-api-service-type))))
 
 (define (find-extracts backup-directory)
   (define (process-date-dir date stat . children)
