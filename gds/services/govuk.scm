@@ -756,8 +756,8 @@
           (service-startup-config)
           (redis-connection-config)
           (postgresql-connection-config
-           (user "local-links-manager")
-           (database "local_links_manager")))))
+           (user "local_links_manager")
+           (database "local-links-manager_production")))))
 
 ;;;
 ;;; Imminence
@@ -960,8 +960,8 @@
               '("signin")))))
           (service-startup-config)
           (postgresql-connection-config
-           (user "policy-publisher")
-           (database "policy_publisher")))))
+           (user "policy_publisher")
+           (database "policy-publisher_production")))))
 
 ;;;
 ;;; Release
