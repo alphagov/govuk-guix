@@ -70,7 +70,10 @@
           (match (data-extract-database extract)
             ("postgresql"
              (postgresql-import-gexp
-              database-connection-config
+              (postgresql-connection-config
+               (inherit database-connection-config)
+               (user "postgres")
+               (database "postgres"))
               (data-extract-file extract)))
             ("mongo"
              (mongodb-restore-gexp
