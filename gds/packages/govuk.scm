@@ -445,15 +445,25 @@
     #:precompile-assets #f)))
 
 (define-public policy-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "029rdnjh0fdx7arijbi1gq3r1hc34xpdi386rfw857n40f1p1zwi")))
-   (package-rails-app
-    "policy-publisher"
-    (github-archive
-     #:repository "policy-publisher"
-     #:commit-ish "release_167"
-     #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "029rdnjh0fdx7arijbi1gq3r1hc34xpdi386rfw857n40f1p1zwi")))
+         (package-rails-app
+          "policy-publisher"
+          (github-archive
+           #:repository "policy-publisher"
+           #:commit-ish "release_167"
+           #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+                        ,(use-blank-database.yml)))))))))
 
 (define-public search-admin
   (package-with-bundler
