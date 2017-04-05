@@ -55,7 +55,8 @@
      `(("DATABASE_URL" .
         ,(simple-format
           #f
-          "postgres://~A:~A/~A"
+          "postgres://~A@~A:~A/~A"
+          user
           host
           port
           database))))
