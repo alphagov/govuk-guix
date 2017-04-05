@@ -1980,6 +1980,7 @@
   (list
    ;; bouncer-service
    authenticating-proxy-service
+   content-performance-manager-service
    search-admin-service
    signon-service
    support-service
