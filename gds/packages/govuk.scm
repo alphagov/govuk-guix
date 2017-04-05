@@ -515,13 +515,13 @@
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
+    (hash (base32 "0fbwnx7j4qvn4aj5vi4qr78n7n1a2mhhgj9ayhv8d5z8d3cpcwi8")))
    (package-rails-app
     "content-performance-manager"
     (github-archive
      #:repository "content-performance-manager"
      #:commit-ish "release_30"
-     #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))))
+     #:hash (base32 "12z9800nlm2vl5r7nznh8ah0sv1768id0xxhkn38m9wwjxlq53qj")))))
 
 (define-public content-store
   (package-with-bundler
