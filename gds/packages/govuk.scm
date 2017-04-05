@@ -378,6 +378,7 @@
             #:repository "local-links-manager"
             #:commit-ish "release_108"
             #:hash (base32 "11ykzxrrlx7lwjqnv45z0z5x1s26k354ksll0y2w88bnx79p4hg3"))
+           #:create-tmp-directory #t
            #:precompile-assets #f)))) ;; Asset precompilation fails
     (package
       (inherit pkg)
