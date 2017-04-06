@@ -280,9 +280,6 @@
            (provision '(authenticating-proxy))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) authenticating-proxy
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
           (service-startup-config)
           (mongodb-connection-config
            (database "authenticating_proxy")))))
@@ -302,12 +299,7 @@
            (provision '(calculators))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) calculators
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Calendars
@@ -324,12 +316,7 @@
            (provision '(calendars))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) calendars
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Collections
@@ -345,13 +332,10 @@
            (inherit default-shepherd-service)
            (provision '(collections))
            (requirement '(publishing-api signon)))
-          (plek-config) (rails-app-config) collections
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+         (plek-config) (rails-app-config) collections
+         (service-startup-config)
+         (mongodb-connection-config
+          (database "authenticating_proxy")))))
 
 (define-public draft-collections-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
@@ -364,12 +348,7 @@
            (provision '(draft-collections))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) collections
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Collections Publisher
@@ -453,24 +432,7 @@
            (provision '(contacts-frontend))
            (requirement '(publishing-api whitehall signon)))
           (plek-config) (rails-app-config) contacts-frontend
-          (signon-application
-           (name "Contacts Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Contacts Frontend")
-           (email "contacts-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (service-startup-config)
-          (redis-connection-config)
-          (mysql-connection-config
-           (user "contacts-frontend")
-           (password (random-base16-string 30))
-           (database "contacts_frontend")))))
+          (service-startup-config))))
 
 (define-public draft-contacts-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-contacts-frontend))
@@ -483,24 +445,7 @@
            (provision '(draft-contacts-frontend))
            (requirement '(publishing-api whitehall signon)))
           (plek-config) (rails-app-config) contacts-frontend
-          (signon-application
-           (name "Contacts Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Contacts Frontend")
-           (email "draft-contacts-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (service-startup-config)
-          (redis-connection-config)
-          (mysql-connection-config
-           (user "draft-contacts-frontend")
-           (password (random-base16-string 30))
-           (database "contacts_frontend")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Content Performance Manager
@@ -638,12 +583,7 @@
            (provision '(feedback))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) feedback
-          (signon-application
-           (name "Authenticating Proxy")
-           (supported-permissions '("signin")))
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Finder Frontend
@@ -660,10 +600,7 @@
            (provision '(finder-frontend))
            (requirement '()))
           (plek-config) (rails-app-config) finder-frontend
-          (service-startup-config)
-          (postgresql-connection-config
-           (user "finder-frontend")
-           (database "email_alert_api")))))
+          (service-startup-config))))
 
 ;;;
 ;;; HMRC Manuals API
@@ -710,9 +647,6 @@
            (provision '(licence-finder))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) licence-finder
-          (signon-application
-           (name "Licence Finder")
-           (supported-permissions '("signin" "gds_editor")))
           (signon-api-user
            (name "Licence Finder")
            (email "licence-finder@guix-dev.gov.uk")
@@ -741,9 +675,6 @@
            (provision '(local-links-manager))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) local-links-manager
-          (signon-application
-           (name "Local Links Manager")
-           (supported-permissions '("signin")))
           (signon-api-user
            (name "Local Links Manager")
            (email "local-links-manager@guix-dev.gov.uk")
@@ -777,15 +708,6 @@
           (signon-application
            (name "Imminence")
            (supported-permissions '("signin")))
-          (signon-api-user
-           (name "Imminence")
-           (email "imminence@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
            (database "imminence")))))
@@ -805,18 +727,6 @@
            (provision '(manuals-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) manuals-frontend
-          (signon-application
-           (name "Manuals Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Manuals Frontend")
-           (email "manuals-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
            (database "manuals_frontend")))))
@@ -832,18 +742,6 @@
            (provision '(draft-manuals-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) manuals-frontend
-          (signon-application
-           (name "Manuals Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Manuals Frontend")
-           (email "draft-manuals-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
            (database "manuals_frontend")))))
@@ -1062,18 +960,6 @@
            (provision '(service-manual-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) service-manual-frontend
-          (signon-application
-           (name "Service Manual Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Service Manual Frontend")
-           (email "service-manual-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (postgresql-connection-config
            (user "service-manual-frontend")
@@ -1090,18 +976,6 @@
            (provision '(draft-service-manual-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) service-manual-frontend
-          (signon-application
-           (name "Service Manual Frontend")
-           (supported-permissions '("signin" "gds_editor")))
-          (signon-api-user
-           (name "Service Manual Frontend")
-           (email "draft-service-manual-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (postgresql-connection-config
            (user "draft-service-manual-frontend")
@@ -1153,9 +1027,6 @@
            (provision '(smart-answers))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) smart-answers
-          (signon-application
-           (name "Smart Answers")
-           (supported-permissions '("signin")))
           (service-startup-config))))
 
 ;;;
