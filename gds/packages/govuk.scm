@@ -161,8 +161,8 @@
     "authenticating-proxy"
     (github-archive
      #:repository "authenticating-proxy"
-     #:commit-ish "release_35"
-     #:hash (base32 "1yivzr9lbpa1m2k2l9pl476vay34b9nswnfz9hdhsf4lz74yp378"))
+     #:commit-ish "release_37"
+     #:hash (base32 "1cxyrmr1klrh1kn9c4414g1k6whlk5hf0pv911q95zizvq4x6nyk"))
     #:precompile-assets #f)))
 
 (define-public asset-manager
@@ -436,13 +436,13 @@
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0hppfwyar1987jphr9kwzilr2mmr89xssa82kmzfb27hvzh682pq")))
+    (hash (base32 "1m0blbl0bjlzxp98851rkvff1s6j9k5iddh2jq1isgn87yigrrwq")))
    (package-rails-app
     "publishing-api"
     (github-archive
      #:repository "publishing-api"
-     #:commit-ish "release_758"
-     #:hash (base32 "0261kwc4qfix9xfhlnc8q4xmya7k10z9yh4xy8l1ll5clcpjfqnf"))
+     #:commit-ish "release_838"
+     #:hash (base32 "1j3v57z556ryyd1hskrhx88kfgc4pww2l264a7qg3bqfw3xacb9q"))
     #:precompile-assets #f)))
 
 (define-public policy-publisher
@@ -537,13 +537,13 @@
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "11l8r4mdip55xhgr0486dxg9qlvb6bpscw25lrns5a86cqxnrig5")))
+    (hash (base32 "1chs8dym0izp367cczbhqsdj2d2hvnx7pfb7bax60d1w040jyamh")))
    (package-rails-app
     "content-store"
     (github-archive
      #:repository "content-store"
-     #:commit-ish "release_607"
-     #:hash (base32 "0g2jykjyi5db4n1imffrr2isxsfqw5y0qaybdb5gkqn4hx381qlk"))
+     #:commit-ish "release_619"
+     #:hash (base32 "1zgb3fzjrv7rf9qh0vfzayjh77ch1zp6rbd8n74jsd4w959xy57n"))
     #:precompile-assets #f)))
 
 (define-public content-tagger
@@ -960,8 +960,8 @@
     (source
      (github-archive
       #:repository "govuk-content-schemas"
-      #:commit-ish "release_475"
-      #:hash (base32 "1an8qzbpsx10bk4wgwzrr2bnh2d769ig44fb5c0jynmj9121a9hn")))
+      #:commit-ish "release_583"
+      #:hash (base32 "0nwf7b7bw14v60c31800695ai5bny9ac51lr92i10dl4jkwc5rr8")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
