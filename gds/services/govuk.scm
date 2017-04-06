@@ -102,13 +102,15 @@
             (map
              (lambda (parameter)
                (if (signon-application? parameter)
-                   (signon-application
-                    (inherit parameter)
-                    (home-uri (service-uri-from-plek-config plek-config name))
-                    (redirect-uri
-                     (string-append
-                      (service-uri-from-plek-config plek-config name)
-                      "/auth/gds/callback")))
+                   (let ((service-uri
+                          (if (eq? name 'authenticating-proxy)
+                              (plek-config-draft-origin plek-config)
+                              (service-uri-from-plek-config plek-config name))))
+                     (signon-application
+                      (inherit parameter)
+                      (home-uri service-uri)
+                      (redirect-uri
+                       (string-append service-uri "/auth/gds/callback"))))
                    parameter))
              parameters)
             parameters)))
@@ -281,6 +283,9 @@
            (requirement '(signon)))
           (plek-config) (rails-app-config) authenticating-proxy
           (service-startup-config)
+          (signon-application
+           (name "Content Preview")
+           (supported-permissions '("signin")))
           (mongodb-connection-config
            (database "authenticating_proxy")))))
 

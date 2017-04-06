@@ -7,7 +7,9 @@
   (lambda* (service-and-ports
             router-config
             draft-router-config
-            server-aliases)
+            server-aliases
+            #:optional #:key
+            (authenticated-draft-origin #t))
     (nginx-service
      #:upstream-list
      (cons*
@@ -24,7 +26,9 @@
                  (string-append
                   "localhost:"
                   (number->string
-                   (router-config-public-port draft-router-config))))))
+                   (if authenticated-draft-origin
+                       (assq-ref service-and-ports 'authenticating-proxy)
+                       (router-config-public-port draft-router-config)))))))
       (map
        (match-lambda
          ((service . port)
@@ -59,7 +63,8 @@
           (list
            (nginx-location-configuration
             (uri "/")
-            (body '("proxy_pass http://draft-origin-proxy;")))
+            (body '("proxy_pass http://draft-origin-proxy;
+proxy_set_header Host $host:$server_port;")))
            (nginx-location-configuration
             (uri "/api/content")
             (body '("proxy_pass http://draft-content-store-proxy;")))))

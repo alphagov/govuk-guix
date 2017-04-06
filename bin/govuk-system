@@ -58,6 +58,7 @@
                (args->service-types args))
            (cons*
             nginx-service-type
+            authenticating-proxy-service-type
             (map service-kind base-services)))))
      (filter
       (lambda (service)
