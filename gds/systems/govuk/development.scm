@@ -374,6 +374,30 @@
    #:port 50080
    #:aliases '((rummager . (search)))))
 
+(define* (set-jwt-auth-secret services
+                              #:optional #:key
+                              (secret (random-base16-string 30)))
+  (define (add-environment-variable ssc)
+    (service-startup-config-with-additional-environment-variables
+     ssc
+     `(("JWT_AUTH_SECRET" . ,secret))))
+
+  (update-services-parameters
+   services
+   (list
+    (cons
+     authenticating-proxy-service-type
+     (list
+      (cons service-startup-config? add-environment-variable)))
+    (cons
+     publisher-service-type
+     (list
+      (cons service-startup-config? add-environment-variable)))
+    (cons
+     whitehall-service-type
+     (list
+      (cons service-startup-config? add-environment-variable))))))
+
 (define-public (setup-services services)
   (map
    (lambda (service)
@@ -425,7 +449,7 @@
     (update-routing-services-configuration
      (correct-services-package-source-from-environment
       (update-services-parameters
-       services
+       (set-jwt-auth-secret services)
        (list
         (cons
          authenticating-proxy-service-type
