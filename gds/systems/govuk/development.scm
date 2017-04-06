@@ -42,7 +42,7 @@
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk nginx))
 
-(define govuk-ports
+(define-public govuk-ports
   (let ((defaults '((publishing-api . 53039)
                     (content-store . 53000)
                     (draft-content-store . 53001)
@@ -116,12 +116,12 @@
                                        "/bin/sh"))))
    pretend-loopback-service))
 
-(define live-router-config
+(define-public live-router-config
   (router-config (public-port (port-for 'router))
                  (api-port 51002)
                  (debug? #t)))
 
-(define draft-router-config
+(define-public draft-router-config
   (router-config (public-port (port-for 'draft-router))
                  (api-port 51004)
                  (debug? #t)))
