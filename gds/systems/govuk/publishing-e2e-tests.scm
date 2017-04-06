@@ -12,14 +12,25 @@
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
+  #:use-module (gds services govuk nginx)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
 (define services
-  (setup-services
-   (cons
-    publishing-e2e-tests-service
-    (operating-system-user-services development-os))))
+  (map
+   (lambda (service)
+     (if (equal? (service-kind service)
+                 nginx-service-type)
+         (govuk-nginx-service govuk-ports
+                              live-router-config
+                              draft-router-config
+                              '((rummager . ("search")))
+                              #:authenticated-draft-origin #f)
+         service))
+   (setup-services
+    (cons
+     publishing-e2e-tests-service
+     (operating-system-user-services development-os)))))
 
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
