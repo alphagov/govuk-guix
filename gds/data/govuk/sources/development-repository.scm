@@ -101,7 +101,8 @@
                       (list backup-directory date database hostname "latest.tbz2")
                       "/")))
                    (member
-                    (string-append "latest/" extract-name "_*.sql.gz"))))
+                    (string-append "latest/" extract-name "_*.sql.gz"))
+                   (strip-components 1)))
                  ((equal? database "mysql")
                   (tar-extract
                    (name (string-append extract-name ".sql.bz2"))
@@ -111,7 +112,8 @@
                       (list backup-directory date database hostname "latest.tbz2")
                       "/")))
                    (member
-                    (string-append "latest/daily_" extract-name "*"))))
+                    (string-append "latest/daily_" extract-name "*"))
+                   (strip-components 1)))
                  ((equal? database "mongo")
                   (let
                       ((filename
@@ -127,7 +129,8 @@
                         (list backup-directory date database hostname filename)
                         "/")))
                      (member
-                      (string-append (string-drop-right filename 4) "/" extract-name)))))
+                      (string-append (string-drop-right filename 4) "/" extract-name))
+                     (strip-components 1))))
                  ((equal? database "elasticsearch")
                   '())
                  (else
