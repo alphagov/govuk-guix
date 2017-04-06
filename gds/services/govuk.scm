@@ -396,7 +396,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(contacts-admin))
-           (requirement '(publishing-api whitehall signon)))
+           (requirement '(publishing-api whitehall-admin signon)))
           (plek-config) (rails-app-config) contacts-admin
           (signon-application
            (name "Contacts Admin")
@@ -430,7 +430,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(contacts-frontend))
-           (requirement '(publishing-api whitehall signon)))
+           (requirement '(publishing-api whitehall-admin signon)))
           (plek-config) (rails-app-config) contacts-frontend
           (service-startup-config))))
 
@@ -443,7 +443,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(draft-contacts-frontend))
-           (requirement '(publishing-api whitehall signon)))
+           (requirement '(publishing-api whitehall-admin signon)))
           (plek-config) (rails-app-config) contacts-frontend
           (service-startup-config))))
 
@@ -460,7 +460,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-performance-manager))
-           (requirement '(publishing-api whitehall signon)))
+           (requirement '(publishing-api whitehall-admin signon)))
           (plek-config) (rails-app-config) content-performance-manager
           (signon-application
            (name "Content Performance Manager")
@@ -1770,14 +1770,14 @@
 ;;;
 
 (define-public whitehall-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'whitehall))
+  (make-rails-app-using-plek-and-signon-service-type 'whitehall-admin))
 
 (define-public whitehall-service
   (service
    whitehall-service-type
    (list (shepherd-service
           (inherit default-shepherd-service)
-          (provision '(whitehall))
+          (provision '(whitehall-admin))
           (requirement '(publishing-api signon static need-api maslow)))
          (service-startup-config)
          (plek-config) (rails-app-config) whitehall
