@@ -103,7 +103,25 @@
                             (create-tmp-directory #f))
   (let ((pkg (make-govuk-package name source))
         (phase-modifications
-         `((add-after
+         `((add-before
+            'wrap-bin-files-for-bundler 'replace-relative-spring-path
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (files
+                      (find-files
+                       (string-append out "/bin")
+                       (lambda (name stat)
+                         (or
+                          (access? name X_OK)
+                          (begin
+                            (simple-format
+                             #t
+                             "Skipping wrapping ~A as its not executable\n" name)
+                            #f))))))
+                (substitute* files
+                  (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
+                   "File.expand_path('../.spring-real', __FILE__)")))))
+           (add-after
             'wrap-bin-files-for-bundler 'wrap-with-relative-path
             (lambda* (#:key outputs #:allow-other-keys)
               (let* ((out (assoc-ref outputs "out"))
