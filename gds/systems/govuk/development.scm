@@ -99,6 +99,10 @@
     (elasticsearch . 59200)
     (mysql . 53306)))
 
+(define (port-for service)
+  (or (assq-ref govuk-ports service)
+      (assq-ref system-ports service)))
+
 (define-public base-services
   (list
    (syslog-service)
@@ -332,10 +336,6 @@
        commit-ish
        package)))
    package-commit-ish-list))
-
-(define (port-for service)
-  (or (assq-ref govuk-ports service)
-      (assq-ref system-ports service)))
 
 (define (set-random-rails-secret-token service)
   (update-service-parameters
