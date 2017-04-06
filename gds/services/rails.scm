@@ -155,7 +155,8 @@
        (root-directory
         (app-name->root-directory string-name))
        (service-startup-config
-        (find service-startup-config? rest))
+        (or (find service-startup-config? rest)
+            (error "Missing service-startup-config for ~A\n" name)))
        (run-pre-startup-scripts-program
         (if (null?
              (service-startup-config-pre-startup-scripts
