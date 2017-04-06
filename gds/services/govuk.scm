@@ -799,15 +799,6 @@
            (provision '(multipage-frontend))
            (requirement '(content-store static)))
           (plek-config) (rails-app-config) multipage-frontend
-          (signon-api-user
-           (name "Multipage Frontend")
-           (email "multipage-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
            (database "multipage_frontend")))))
@@ -823,15 +814,6 @@
            (provision '(draft-multipage-frontend))
            (requirement '(draft-content-store draft-static)))
           (plek-config) (rails-app-config) multipage-frontend
-          (signon-api-user
-           (name "Multipage Frontend")
-           (email "draft-multipage-frontend@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
            (database "multipage_frontend")))))
@@ -967,10 +949,7 @@
            (provision '(service-manual-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) service-manual-frontend
-          (service-startup-config)
-          (postgresql-connection-config
-           (user "service-manual-frontend")
-           (database "service_manual_frontend")))))
+          (service-startup-config))))
 
 (define-public draft-service-manual-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-service-manual-frontend))
@@ -983,10 +962,7 @@
            (provision '(draft-service-manual-frontend))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) service-manual-frontend
-          (service-startup-config)
-          (postgresql-connection-config
-           (user "draft-service-manual-frontend")
-           (database "service_manual_frontend")))))
+          (service-startup-config))))
 
 ;;;
 ;;; Short Url Manager
