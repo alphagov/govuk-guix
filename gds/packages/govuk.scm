@@ -691,13 +691,13 @@
       ((pkg
         (package-with-bundler
          (bundle-package
-          (hash (base32 "1ria1slkcbgvzfp072i3p47l2h8bwv4izxxg4gi75g5pfxgd91ci")))
+          (hash (base32 "00g07lnd16cz27h46r23pjgg7wjx12y2n0vgj19ch7480aq9va85")))
          (package-rails-app
           "publisher"
           (github-archive
            #:repository "publisher"
-           #:commit-ish "release_1696"
-           #:hash (base32 "1pnzbgfsg29icgi5li70895mlr2xj2vdhnnw9k6zg3xnq4w4smfn"))))))
+           #:commit-ish "release_1779"
+           #:hash (base32 "0qwli0c2hd3jqjr3rjlgl3xp4cn0q0g10zqjqczrnqal1nim0182"))))))
     (package
       (inherit pkg)
       (arguments
@@ -712,13 +712,13 @@
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0j15vj0rv7ydj62w3f8rwl72b6521alk3aq5s1nnv0rzb6zmwbn4")))
+    (hash (base32 "0vkasdpgvz368f924qfk57786qmc9m2ysxfd6gjziwrdbvkq877j")))
    (package-rails-app
     "frontend"
     (github-archive
      #:repository "frontend"
-     #:commit-ish "release_2024"
-     #:hash (base32 "0qh97i164akfmfjl7zqavl5iiknybr4cynsh6klcqjqr9lknd03m")))))
+     #:commit-ish "release_2120"
+     #:hash (base32 "02b8k1gvsr57k2kfjb6wdr8mn07yhh55c4pdb2adfdij0lb2rskl")))))
 
 (define-public signon
   (let ((pkg
