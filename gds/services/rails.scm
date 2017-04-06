@@ -104,7 +104,7 @@
          database-connection-config?
          parameters)))))
 
-(define (run-pre-startup-scripts-gexp pre-startup-scripts)
+(define (run-pre-startup-scripts-gexp name pre-startup-scripts)
   (let
       ((script-gexps
         (map
@@ -129,7 +129,9 @@
         #~(begin
             (simple-format
              #t
-             "Running ~A startup scripts\n" #$(length script-gexps))
+             "Running ~A startup scripts for ~A\n"
+             #$(length script-gexps)
+             '#$name)
             (for-each
              (lambda (key) (simple-format #t "  - ~A\n" key))
              '#$(map car pre-startup-scripts))
@@ -167,12 +169,14 @@
              (let
                  ((foo
                    (run-pre-startup-scripts-gexp
+                    name
                     (service-startup-config-pre-startup-scripts
                      service-startup-config))))
                #~(begin
                    (exit #$foo))))))
        (run-root-pre-startup-scripts
         (run-pre-startup-scripts-gexp
+         name
          (if service-startup-config
              (service-startup-config-root-pre-startup-scripts
               service-startup-config)
