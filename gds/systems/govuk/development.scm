@@ -117,12 +117,12 @@
    pretend-loopback-service))
 
 (define live-router-config
-  (router-config (public-port 51001)
+  (router-config (public-port (port-for 'router))
                  (api-port 51002)
                  (debug? #t)))
 
 (define draft-router-config
-  (router-config (public-port 51003)
+  (router-config (public-port (port-for 'draft-router))
                  (api-port 51004)
                  (debug? #t)))
 
