@@ -759,7 +759,9 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(manuals-publisher))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api
+                          signon
+                          whitehall-admin))) ;; Whitehall required for the Organisation API
           (plek-config) (rails-app-config) manuals-publisher
           (signon-application
            (name "Manuals Publisher")
