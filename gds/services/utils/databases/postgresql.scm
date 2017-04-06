@@ -35,25 +35,17 @@
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
            (let
-               ((pid (primitive-fork))
-                (postgres-user (getpwnam "postgres"))
-                (psql (string-append #$postgresql "/bin/psql")))
-             (if
-              (= 0 pid)
-              (dynamic-wind
-                (const #t)
-                (lambda ()
-                  (setgid (passwd:gid postgres-user))
-                  (setuid (passwd:uid postgres-user))
-                  (let ((p (open-pipe* OPEN_WRITE psql "-a" "-p" (number->string #$port))))
-                    (for-each
-                     (lambda (o) (o p))
-                     (list #$@operations))
-                    (close-pipe p))
-                  (primitive-exit 0))
-                (lambda ()
-                  (primitive-exit 1)))
-              (zero? (cdr (waitpid pid))))))))))
+               ((psql (string-append #$postgresql "/bin/psql")))
+             (let ((p (open-pipe*
+                       OPEN_WRITE psql
+                       (string-append "--user=" #$user)
+                       "-a"
+                       "-p" (number->string #$port))))
+               (for-each
+                (lambda (o) (o p))
+                (list #$@operations))
+               (close-pipe p)
+               #t)))))))
 
 (define (postgresql-ensure-user-exists-gexp user)
   #~(lambda (port)
