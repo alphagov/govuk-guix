@@ -36,11 +36,13 @@
   `(("mongo-1.backend.integration"
      ("govuk_assets_production" . (,asset-manager-service-type))
      ("govuk_content_production" .
-      (,content-api-service-type ,specialist-publisher-service-type))
+      (,content-api-service-type
+       ,specialist-publisher-service-type
+       ,manuals-publisher-service-type))
      ("govuk_needs_production" . (,need-api-service-type))
      ("imminence_production" . (,imminence-service-type))
      ("licence_finder_production" . (,licence-finder-service-type))
-     ("manuals_publisher_production" . (,manuals-publisher-service-type))
+     ;;("manuals_publisher_production" . (,manuals-publisher-service-type))
      ("maslow_production" . (,maslow-service-type))
      ("publisher_production" . (,publisher-service-type))
      ("short_url_manager_production" . (,short-url-manager-service-type)))
