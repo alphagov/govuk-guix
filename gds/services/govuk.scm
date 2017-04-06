@@ -278,7 +278,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(authenticating-proxy))
-           (requirement '(publishing-api signon)))
+           (requirement '(signon)))
           (plek-config) (rails-app-config) authenticating-proxy
           (service-startup-config)
           (mongodb-connection-config
