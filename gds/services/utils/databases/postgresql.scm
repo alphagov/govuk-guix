@@ -95,7 +95,10 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 (define (postgresql-create-user-and-database-for-database-connection
          database-connection)
   (run-with-psql-port
-   database-connection
+   (postgresql-connection-config
+    (inherit database-connection)
+    (user "postgres")) ;; The user in the database connection might
+                       ;; not exist, so use postgres instead
    (match database-connection
      (($ <postgresql-connection-config> host user port database)
       (list
