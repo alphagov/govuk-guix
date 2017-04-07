@@ -172,16 +172,26 @@
                ,@phase-modifications))))))))
 
 (define-public authenticating-proxy
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0al4dn0qjfhyap1cha4r7ix3vz3z0n2g3hb9004l5ifk520mmyi4")))
-   (package-rails-app
-    "authenticating-proxy"
-    (github-archive
-     #:repository "authenticating-proxy"
-     #:commit-ish "release_37"
-     #:hash (base32 "1cxyrmr1klrh1kn9c4414g1k6whlk5hf0pv911q95zizvq4x6nyk"))
-    #:precompile-assets #f)))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "0al4dn0qjfhyap1cha4r7ix3vz3z0n2g3hb9004l5ifk520mmyi4")))
+         (package-rails-app
+          "authenticating-proxy"
+          (github-archive
+           #:repository "authenticating-proxy"
+           #:commit-ish "release_37"
+           #:hash (base32 "1cxyrmr1klrh1kn9c4414g1k6whlk5hf0pv911q95zizvq4x6nyk"))
+          #:precompile-assets #f))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-mongoid.yml
+                        ,(replace-mongoid.yml)))))))))
 
 (define-public asset-manager
   (package-with-bundler
