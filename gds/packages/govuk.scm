@@ -565,15 +565,25 @@
      #:hash (base32 "1y504xxni3bhr6byjka9ls7m60h3vcakjk2khsyf9bs407kp6k79")))))
 
 (define-public content-performance-manager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0fbwnx7j4qvn4aj5vi4qr78n7n1a2mhhgj9ayhv8d5z8d3cpcwi8")))
-   (package-rails-app
-    "content-performance-manager"
-    (github-archive
-     #:repository "content-performance-manager"
-     #:commit-ish "release_30"
-     #:hash (base32 "12z9800nlm2vl5r7nznh8ah0sv1768id0xxhkn38m9wwjxlq53qj")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "0fbwnx7j4qvn4aj5vi4qr78n7n1a2mhhgj9ayhv8d5z8d3cpcwi8")))
+         (package-rails-app
+          "content-performance-manager"
+          (github-archive
+           #:repository "content-performance-manager"
+           #:commit-ish "release_30"
+           #:hash (base32 "12z9800nlm2vl5r7nznh8ah0sv1768id0xxhkn38m9wwjxlq53qj"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+                        ,(use-blank-database.yml)))))))))
 
 (define-public content-store
   (package-with-bundler
