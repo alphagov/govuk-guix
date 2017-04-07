@@ -317,16 +317,29 @@
      #:hash (base32 "0yxjc15dgnszy44zdvcqm84x8nq7y34jx282rylvs630wbd38gac")))))
 
 (define-public email-alert-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "17nswlp66kkx0vja4yf94zrccgpwzgr7x4nhrz46brbgnv226zn1")))
-   (package-rails-app
-    "email-alert-api"
-    (github-archive
-     #:repository "email-alert-api"
-     #:commit-ish "release_161"
-     #:hash (base32 "1bznicrxasrz7r7d0pz6iy388hy4jax5l05rg8j6c25p55bwk04p"))
-    #:precompile-assets #f)))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "17nswlp66kkx0vja4yf94zrccgpwzgr7x4nhrz46brbgnv226zn1")))
+         (package-rails-app
+          "email-alert-api"
+          (github-archive
+           #:repository "email-alert-api"
+           #:commit-ish "release_161"
+           #:hash (base32 "1bznicrxasrz7r7d0pz6iy388hy4jax5l05rg8j6c25p55bwk04p"))
+          #:precompile-assets #f))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after
+              'install 'replace-redis.yml
+              ,(replace-redis.yml))
+             (add-after 'install 'replace-database.yml
+               ,(use-blank-database.yml)))))))))
 
 (define-public email-alert-service
   (package-with-bundler
