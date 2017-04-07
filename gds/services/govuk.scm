@@ -1784,6 +1784,7 @@
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
+         (redis-connection-config)
          (mysql-connection-config
           (host "localhost")
           (user "whitehall")
