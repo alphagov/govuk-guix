@@ -263,7 +263,10 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
               (ruby ruby)))
      (build-system gnu-build-system)
      (arguments
-      `(#:phases
+      `(#:modules ((srfi srfi-1)
+                   (ice-9 ftw)
+                   ,@%gnu-build-system-modules)
+        #:phases
         (modify-phases %standard-phases
           (delete 'validate-runpath)
           (delete 'configure)
@@ -343,6 +346,30 @@ HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
                            (assoc-ref inputs "source")
                            "/vendor/cache")
                           (string-append out "/vendor/bundle/bundler/gems")))))
+          (add-after 'build 'patch-gem-bin-files
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let*
+                           ((prefix
+                             (string-append
+                              (assoc-ref outputs "out")
+                              "/vendor/bundle/ruby"))
+                            (ruby-version
+                             (first
+                              (scandir prefix
+                                       (negate
+                                        (lambda (f)
+                                          (member f '("." "..")))))))
+                            (gems
+                             (string-append prefix "/" ruby-version "/gems")))
+                         (for-each
+                          (lambda (gem)
+                            (let ((bin (string-append gems "/" gem "/bin")))
+                              (if (directory-exists? bin)
+                                  (for-each patch-shebang (find-files bin)))))
+                          (scandir gems
+                                   (negate
+                                    (lambda (f)
+                                      (member f '("." "..")))))))))
           (add-after 'build 'patch-tzinfo-data-source
                      (lambda* (#:key inputs outputs #:allow-other-keys)
                        (substitute* (find-files
