@@ -446,7 +446,11 @@
                  `((rails-db:setup
                     .
                     ,#~(lambda ()
-                         (if (file-exists? "bin/rake")
+                         (if (and (file-exists? "bin/rake")
+                                  ;; When spring is used, rake seems
+                                  ;; to need to be run with bundle
+                                  ;; exec
+                                  (not (file-exists? "bin/spring")))
                              (#$(run-command "rake" "db:setup"))
                              (#$(run-command "bundle" "exec" "rake" "db:setup")))))))
                 parameter))
