@@ -20,6 +20,7 @@
             rails-app-config-environment
             rails-app-config-secret-key-base
             rails-app-config-secret-token
+            rails-app-config-run-with
 
             update-rails-app-config-environment
             update-rails-app-config-with-random-secret-key-base
@@ -46,7 +47,9 @@
   (secret-key-base rails-app-config-secret-key-base
                    (default #f))
   (secret-token rails-app-config-secret-token
-                (default #f)))
+                (default #f))
+  (run-with     rails-app-config-run-with
+                (default 'unicorn)))
 
 (define (update-rails-app-config-environment environment config)
   (rails-app-config
@@ -195,15 +198,25 @@
           generic-rails-app-service-environment-variables
           root-directory
           rails-app-config
-          rest))))
+          rest)))
+       (pid-file
+        (if (eq? (rails-app-config-run-with rails-app-config)
+                 'unicorn)
+            (string-append "/tmp/" string-name ".pid")
+            #f))
+       (start-command
+        (match (rails-app-config-run-with rails-app-config)
+          ('unicorn
+           (list
+            (string-append root-directory "/bin/bundle")
+            "exec"
+            "unicorn"
+            "-p" string-port
+            "-P" pid-file))
+          ((and command string)
+           (list command)))))
     #~(lambda args
         (let ((user (getpwnam #$string-name))
-              (unicorn
-               (list
-                #$(string-append root-directory "/bin/bundle")
-                "exec" "unicorn"))
-              (pid-file #$(string-append
-                           "/tmp/" string-name ".pid"))
               (environment-variables '#$environment-variables))
 
           (use-modules (guix build utils)
@@ -226,15 +239,16 @@
                     (simple-format #t "~A: pre-startup-scripts failed\n"
                                    #$string-name)
                     #f))))
+           (begin (simple-format #t "starting ~A: ~A\n"
+                                 '#$name '#$start-command)
+                  #t)
            ((make-forkexec-constructor
-             `(,@unicorn
-               "-p" #$string-port
-               "-P" ,pid-file)
+             '#$start-command
              #:user (passwd:uid user)
              #:directory #$root-directory
-             #:pid-file pid-file
+             #:pid-file #$pid-file
              #:pid-file-timeout 10
-             #:log-file (string-append "/var/log/" #$string-name ".log")
+             #:log-file #$(string-append "/var/log/" string-name ".log")
              #:environment-variables environment-variables)))))))
 
 (define (gemrc ruby)
@@ -374,28 +388,36 @@
                (string-name (symbol->string name))
                (root-directory (app-name->root-directory string-name))
                (pidfile (string-append
-                         "/tmp/" (symbol->string sidekiq-service-name) ".pid")))
+                         "/tmp/" (symbol->string sidekiq-service-name) ".pid"))
+               (start-command
+                `(,(string-append root-directory "/bin/bundle")
+                  "exec"
+                  "sidekiq"
+                  ,@(if config-file `("-C" ,config-file) '())
+                  "--pidfile" ,pidfile)))
             (shepherd-service
              (inherit ss)
              (provision (list sidekiq-service-name))
              (documentation
               (simple-format #f "~A sidekiq service" name))
              (respawn? #f)
-             (start #~(make-forkexec-constructor
-                       `(,(string-append #$root-directory "/bin/bundle")
-                         "exec"
-                         "sidekiq"
-                         ,@(if #$config-file '("-C" #$config-file) '())
-                         "--pidfile" #$pidfile)
-                       #:user #$string-name
-                       #:pid-file #$pidfile
-                       #:pid-file-timeout 5
-                       #:log-file (string-append
-                                   "/var/log/"
-                                   (symbol->string '#$sidekiq-service-name)
-                                   ".log")
-                       #:directory #$root-directory
-                       #:environment-variables '#$environment-variables))
+             (start #~(lambda args
+                        (display
+                         #$(simple-format #f "starting ~A sidekiq service: ~A\n"
+                                          name (string-join start-command)))
+                        (apply
+                         #$#~(make-forkexec-constructor
+                              '#$start-command
+                              #:user #$string-name
+                              #:pid-file #$pidfile
+                              #:pid-file-timeout 5
+                              #:log-file #$(string-append
+                                            "/var/log/"
+                                            (symbol->string sidekiq-service-name)
+                                            ".log")
+                              #:directory #$root-directory
+                              #:environment-variables '#$environment-variables)
+                         args)))
              (stop #~(make-kill-destructor)))))
           '()))))
 
