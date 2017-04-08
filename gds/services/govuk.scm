@@ -559,6 +559,7 @@
 ;;; Email Alert Service
 ;;;
 
+;; TODO: This is not actually a Rails app...
 (define-public email-alert-service-type
   (make-rails-app-using-plek-and-signon-service-type 'email-alert-service))
 
