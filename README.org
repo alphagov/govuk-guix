@@ -1,5 +1,3 @@
--*- mode: org -*-
-
 [[http://www.gnu.org/software/guix/][GNU Guix]] (IPA: /ɡiːks/) is a purely functional package manager, and
 associated free software distribution, for the [[http://www.gnu.org/gnu/gnu.html][GNU system]].
 
