@@ -570,9 +570,12 @@
            (inherit default-shepherd-service)
            (provision '(email-alert-service))
            (requirement '()))
-          (plek-config) (rails-app-config) email-alert-service
-          (service-startup-config)
-          (redis-connection-config))))
+         (plek-config)
+         (rails-app-config
+          (run-with "bin/email_alert_service"))
+         email-alert-service
+         (service-startup-config)
+         (redis-connection-config))))
 
 ;;;
 ;;; Feedback
