@@ -100,7 +100,8 @@
 (define* (package-rails-app name source
                             #:optional #:key
                             (precompile-assets #t)
-                            (create-tmp-directory #f))
+                            (create-tmp-directory #f)
+                            (create-log-directory #f))
   (let ((pkg (make-govuk-package name source))
         (phase-modifications
          `((add-before
@@ -147,6 +148,15 @@
                   (mkdir (string-append
                           (assoc-ref outputs "out")
                           "/tmp")))))
+              '())
+           ,@(if
+              create-log-directory
+              '((add-after
+                 'install 'create-log-directory
+                 (lambda* (#:key outputs #:allow-other-keys)
+                   (mkdir (string-append
+                           (assoc-ref outputs "out")
+                           "/log")))))
               '())
            ,@(if
               precompile-assets
