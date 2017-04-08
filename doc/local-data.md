@@ -6,7 +6,7 @@
 
 ## Quickstart
 
-First, check you have the `[govuk-guix][govuk-guix]` repository on
+First, check you have the [govuk-guix][govuk-guix] repository on
 your machine. If you do not, clone it using Git.
 
 In the `bin` directory of the `govuk-guix` repository, there is a
@@ -59,4 +59,4 @@ These files, specifically only the downloaded archives, not any of the
 extracted files can be used by the local data source.
 
 
-[govuk-guix](https://github.com/alphagov/govuk-guix)
+[govuk-guix]: https://github.com/alphagov/govuk-guix

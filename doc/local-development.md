@@ -8,7 +8,7 @@
 
 ## Quickstart
 
-First, check you have the `[govuk-guix][govuk-guix]` repository on
+First, check you have the [govuk-guix][govuk-guix] repository on
 your machine. If you do not, clone it using Git.
 
 In the `bin` directory of the `govuk-guix` repository, there is a
@@ -130,6 +130,6 @@ address=/dev.gov.uk/127.0.0.1
 ```
 
 
-[govuk-guix](https://github.com/alphagov/govuk-guix)
-[guix](https://gnu.org/software/guix)
-[shepherd](https://www.gnu.org/software/shepherd/)
+[govuk-guix]: https://github.com/alphagov/govuk-guix
+[guix]: https://gnu.org/software/guix
+[shepherd]: https://www.gnu.org/software/shepherd/
