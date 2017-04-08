@@ -1817,8 +1817,8 @@
   (list
    content-store-service
    draft-content-store-service
-   email-alert-api-service
-   email-alert-service-service
+   ;; email-alert-api-service Can't connect to Redis for some reason
+   ;; email-alert-service-service Missing dependency on RabbitMQ
    content-api-service
    need-api-service
    imminence-service
