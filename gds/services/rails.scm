@@ -363,11 +363,6 @@
         (inherit ss)
         (documentation
          (simple-format #f "~A rails app" name))
-        (requirement
-         `(,@(shepherd-service-requirement ss)
-           ,@(if sidekiq-config
-                 (list sidekiq-service-name)
-                 '())))
         (respawn? #f)
         (start start-script)
         (stop #~(make-kill-destructor))))
@@ -400,6 +395,9 @@
              (provision (list sidekiq-service-name))
              (documentation
               (simple-format #f "~A sidekiq service" name))
+             (requirement
+              `(,@(shepherd-service-requirement ss)
+                ,(first (shepherd-service-provision ss))))
              (respawn? #f)
              (start #~(lambda args
                         (display
