@@ -690,6 +690,9 @@
               (signon-authorisation
                (application-name "Publishing API"))
               '("signin")))))
+          (signon-application
+           (name "Local Links Manager")
+           (supported-permissions '("signin")))
           (service-startup-config)
           (redis-connection-config)
           (postgresql-connection-config
@@ -1027,6 +1030,9 @@
           (inherit default-shepherd-service)
           (provision '(support))
           (requirement '(publishing-api signon)))
+         (signon-application
+          (name "Support")
+          (supported-permissions '("signin")))
          (plek-config) (rails-app-config) support
          (service-startup-config))))
 
