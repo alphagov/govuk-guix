@@ -353,15 +353,30 @@
                ,(use-blank-database.yml)))))))))
 
 (define-public email-alert-service
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1zp0wqjf721fg6fpnwhw30960ill070zpj4lh690s5cdwai1rfja")))
-   (make-govuk-package
-    "email-alert-service"
-    (github-archive
-     #:repository "email-alert-service"
-     #:commit-ish "release_65"
-     #:hash (base32 "0gvds70g8x8qnc13biqj121z0r3p6b9vjvbfhizffxi73zpdfw57")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1zp0wqjf721fg6fpnwhw30960ill070zpj4lh690s5cdwai1rfja")))
+         (make-govuk-package
+          "email-alert-service"
+          (github-archive
+           #:repository "email-alert-service"
+           #:commit-ish "release_65"
+           #:hash (base32 "0gvds70g8x8qnc13biqj121z0r3p6b9vjvbfhizffxi73zpdfw57"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after
+              'patch-bin-files 'wrap-with-relative-path
+              (lambda* (#:key outputs #:allow-other-keys)
+                (let* ((out (assoc-ref outputs "out")))
+                  (substitute* (find-files (string-append out "/bin"))
+                    (((string-append out "/bin"))
+                     "${BASH_SOURCE%/*}"))))))))))))
 
 (define-public feedback
   (package-with-bundler
