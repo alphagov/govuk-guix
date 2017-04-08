@@ -635,15 +635,25 @@
      #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))))
 
 (define-public release
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1mbhlvv6jigbd1v04nhcp31n1zbbdl4pb0d36ad29lynsp85ri5l")))
-   (package-rails-app
-    "release"
-    (github-archive
-     #:repository "release"
-     #:commit-ish "release_232"
-     #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))))
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "1mbhlvv6jigbd1v04nhcp31n1zbbdl4pb0d36ad29lynsp85ri5l")))
+         (package-rails-app
+          "release"
+          (github-archive
+           #:repository "release"
+           #:commit-ish "release_232"
+           #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws"))))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'install 'replace-database.yml
+                        ,(use-blank-database.yml)))))))))
 
 (define-public service-manual-publisher
   (package-with-bundler
