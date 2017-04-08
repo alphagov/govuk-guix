@@ -290,6 +290,7 @@
      #:repository "contacts-admin"
      #:commit-ish "release_343"
      #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk"))
+    #:create-tmp-directory #t
     #:precompile-assets #f))) ;; Asset precompilation fails
 
 (define-public contacts-frontend
