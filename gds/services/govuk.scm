@@ -515,7 +515,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(email-alert-api))
-           (requirement '()))
+           (requirement '(postgres)))
           (plek-config) (rails-app-config) email-alert-api
           (service-startup-config)
           (redis-connection-config)
