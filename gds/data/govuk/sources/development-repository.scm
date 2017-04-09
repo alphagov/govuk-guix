@@ -50,10 +50,10 @@
      ("content_store_production" . (,content-store-service-type))
      ("draft_content_store_production" . (,draft-content-store-service-type)))
     ("router-backend-1.router.integration"
-     ("authenticating_proxy_production" . (,authenticating-proxy-service-type)))
+     ("authenticating_proxy_production" . (,authenticating-proxy-service-type))
      ("draft_router" .
       (,draft-router-service-type ,draft-router-api-service-type))
-     ("router" . (,router-service-type ,router-api-service-type))))
+     ("router" . (,router-service-type ,router-api-service-type)))))
 
 (define (find-extracts backup-directory)
   (define (process-date-dir date stat . children)
