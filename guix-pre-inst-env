@@ -73,4 +73,4 @@ export SSL_CERT_DIR="$GUIX_ENVIRONMENT/etc/ssl/certs"
 
 export GIT_SSL_CAINFO="$SSL_CERT_FILE"
 
-bash ./pre-inst-env $@
+bash ./pre-inst-env "$@"
