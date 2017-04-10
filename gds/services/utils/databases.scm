@@ -21,6 +21,7 @@
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases mongodb)
+  #:use-module (gds services utils databases elasticsearch)
   #:export (<redis-connection-config>
             redis-connection-config
             redis-connection-config?
@@ -29,6 +30,7 @@
 
             database-connection-config?
             database-connection-config->environment-variables
+            update-database-connection-config-port
             setup-blank-databases-on-service-startup))
 
 (define-record-type* <redis-connection-config>
@@ -94,6 +96,30 @@
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
+
+(define (update-database-connection-config-port port-for config)
+  (cond
+   ((postgresql-connection-config? config)
+    (postgresql-connection-config
+     (inherit config)
+     (port (port-for 'postgresql))))
+   ((mysql-connection-config? config)
+    (mysql-connection-config
+     (inherit config)
+     (port (port-for 'mysql))))
+   ((mongodb-connection-config? config)
+    (mongodb-connection-config
+     (inherit config)
+     (port (port-for 'mongodb))))
+   ((elasticsearch-connection-config? config)
+    (elasticsearch-connection-config
+     (inherit config)
+     (port (port-for 'elasticsearch))))
+   ((redis-connection-config? config)
+    (redis-connection-config
+     (inherit config)
+     (port (port-for 'redis))))
+   (else (error "unknown database connection config " config))))
 
 (define (setup-blank-databases-on-service-startup s)
   (let
