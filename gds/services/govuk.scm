@@ -420,7 +420,7 @@
           (mysql-connection-config
            (user "contacts-admin")
            (password (random-base16-string 30))
-           (database "contacts_admin")))))
+           (database "contacts_production")))))
 
 ;;;
 ;;; Contacts Frontend
