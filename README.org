@@ -16,6 +16,32 @@ To run the end to end test container, run:
   make check-system
 #+END_SRC
 
+** Local Development
+
+You can use govuk-guix to run GOV.UK services on your computer, for
+example, to start a system with the Short URL Manager, Specialist
+Publisher and any of their dependencies, you would run:
+
+#+BEGIN_SRC shell
+  ./bin/govuk-system start short-url-manager specialist-publisher
+#+END_SRC
+
+To find out more, read the documentation on
+[[doc/local-development.md][local development]].
+
+** Local Data
+
+You can use govuk-guix to list, and load data downloaded through the
+replication scripts in the govuk-puppet repository, for example, to
+load the data for the short-url-manager service, you would run:
+
+#+BEGIN_SRC shell
+  ./bin/govuk-data load short-url-manager
+#+END_SRC
+
+To find out more, read the documentation on
+[[doc/local-data.md][local data]].
+
 * Hacking
 
 When developing locally, you may find it useful to use a local copy of
