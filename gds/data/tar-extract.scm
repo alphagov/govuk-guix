@@ -71,7 +71,7 @@
                                 (file-path (string-append tmp-directory "/" file)))
                            (if (directory-exists? file-path)
                                (copy-recursively file-path #$output)
-                               (rename-file file #$output))
+                               (copy-file file-path #$output))
                            (simple-format #t "tar-extract of ~A produced ~A\n"
                                           #$archive #$output)))
                        (begin
