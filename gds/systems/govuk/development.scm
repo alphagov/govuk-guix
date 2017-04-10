@@ -351,19 +351,24 @@
     (cons signon-application?
           update-signon-application-with-random-oauth))))
 
-(define (set-plek-config services)
+(define (update-database-connection-config-ports services)
   (map
    (lambda (service)
      (update-service-parameters
       service
       (list
        (cons
-        plek-config?
-        (const (make-custom-plek-config
-                govuk-ports
-                #:govuk-app-domain "guix-dev.gov.uk"
-                #:use-https? #f
-                #:port 50080))))))
+        database-connection-config?
+        (lambda (config)
+          (update-database-connection-config-port
+           (lambda (service)
+             (or (assq-ref system-ports service)
+                 (begin
+                   (display "ports: ")
+                   (display system-ports)
+                   (display "\n")
+                   (error "Missing port for " service))))
+           config))))))
    services))
 
 (define plek-config
@@ -373,6 +378,17 @@
    #:use-https? #f
    #:port 50080
    #:aliases '((rummager . (search)))))
+
+(define (set-services-plek-config services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        plek-config?
+        (const plek-config)))))
+   services))
 
 (define* (set-jwt-auth-secret services
                               #:optional #:key
@@ -398,16 +414,43 @@
      (list
       (cons service-startup-config? add-environment-variable))))))
 
-(define-public (setup-services services)
+(define (add-signon-dev-user services)
+  (update-services-parameters
+   services
+   (list
+    (cons
+     signon-service-type
+     (list
+      (cons
+       signon-config?
+       (lambda (config)
+         (signon-config
+          (inherit config)
+          (users
+           (list
+            (signon-user
+             (name "Dev")
+             (email "dev@example.com")
+             (passphrase "wies1Oc8Gi0uGaim")
+             (role "superadmin")
+             (application-permissions
+              (map
+               (lambda (app)
+                 (cons
+                  (signon-application-name app)
+                  (signon-application-supported-permissions app)))
+               (filter-map
+                (lambda (service)
+                  (and (list? (service-parameters service))
+                       (find signon-application? (service-parameters service))))
+                services))))))))))))))
+
+(define (update-services-with-random-signon-secrets services)
   (map
    (lambda (service)
      (update-service-parameters
       service
       (list
-       (cons
-        database-connection-config?
-        (lambda (config)
-          (update-database-connection-config-ports system-ports config)))
        (cons
         signon-application?
         (lambda (app)
@@ -415,60 +458,58 @@
        (cons
         signon-api-user?
         (lambda (api-user)
-          (update-signon-api-user-with-random-authorisation-tokens api-user)))
-       (cons
-        signon-config?
-        (lambda (config)
-          (signon-config
-           (inherit config)
-           (users
-            (list
-             (signon-user
-              (name "Dev")
-              (email "dev@example.com")
-              (passphrase "wies1Oc8Gi0uGaim")
-              (role "superadmin")
-              (application-permissions
-               (map
-                (lambda (app)
-                  (cons
-                   (signon-application-name app)
-                   (signon-application-supported-permissions app)))
-                (filter-map
-                 (lambda (service)
-                   (and (list? (service-parameters service))
-                        (find signon-application? (service-parameters service))))
-                 services)))))))))
+          (update-signon-api-user-with-random-authorisation-tokens api-user))))))
+   services))
+
+(define (services-in-rails-development-environment services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
        (cons
         rails-app-config?
         (lambda (config)
           (update-rails-app-config-environment
            "development"
            (update-rails-app-config-with-random-secret-key-base config)))))))
-   (use-gds-sso-strategy
-    (update-routing-services-configuration
-     (correct-services-package-source-from-environment
-      (update-services-parameters
-       (set-jwt-auth-secret services)
-       (list
-        (cons
-         authenticating-proxy-service-type
-         (list
-          (cons service-startup-config?
-                (lambda (ssc)
-                  (service-startup-config-with-additional-environment-variables
-                   ssc
-                   `(("GOVUK_UPSTREAM_URI"
-                      .
-                      ,(service-uri-from-plek-config
-                        plek-config 'draft-router))))))))
-        (cons
-         (const #t)
-         (list
-          (cons
-           plek-config?
-           (const plek-config))))))))
-    "real")))
+   services))
+
+(define (set-authenticating-proxy-upstream-url services)
+  (update-services-parameters
+   services
+   (list
+    (cons
+     authenticating-proxy-service-type
+     (list
+      (cons service-startup-config?
+            (lambda (ssc)
+              (service-startup-config-with-additional-environment-variables
+               ssc
+               `(("GOVUK_UPSTREAM_URI"
+                  .
+                  ,(service-uri-from-plek-config
+                    plek-config 'draft-router)))))))))))
+
+(define-public setup-services
+  (let
+      ((service-setup-functions
+        ;; Service setup functions, order alphabetically if possible,
+        ;; and add comments to indicate any interdependencies in the
+        ;; configuration
+        (list
+         add-signon-dev-user
+         correct-services-package-source-from-environment
+         services-in-rails-development-environment
+         set-authenticating-proxy-upstream-url
+         set-jwt-auth-secret
+         set-services-plek-config
+         update-database-connection-config-ports
+         update-routing-services-configuration
+         update-services-with-random-signon-secrets
+         (cut use-gds-sso-strategy <> "real"))))
+
+    (apply compose (reverse service-setup-functions))))
 
 (define development-os-services
   (setup-services services))
