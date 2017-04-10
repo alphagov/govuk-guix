@@ -24,6 +24,7 @@
 
 (use-modules
  (srfi srfi-1)
+ (srfi srfi-37)
  (ice-9 match)
  (guix ui)
  (guix monads)
@@ -34,11 +35,12 @@
  (gnu services web)
  (gnu system)
  (gnu system linux-container)
+ (gnu system file-systems)
  (gds services govuk)
  (gds systems utils)
  (gds systems govuk development))
 
-(define (args->service-types args)
+(define (service-names->service-types service-names)
   (map
    (lambda (service-name)
      (or (find (lambda (service-type)
@@ -47,15 +49,15 @@
                   (service-type-name service-type)))
                (map service-kind govuk-services))
          (leave (_ "Could not find service with name ~A") service-name)))
-   args))
+   service-names))
 
-(define (args->system args)
+(define (operating-system-for service-names)
   (system-without-unnecessary-services
    (let ((service-types-whitelist
           (append
-           (if (null? args)
+           (if (null? service-names)
                (map service-kind govuk-services)
-               (args->service-types args))
+               (service-names->service-types service-names))
            (cons*
             nginx-service-type
             authenticating-proxy-service-type
@@ -66,13 +68,30 @@
       (operating-system-user-services development-os)))
    development-os))
 
+(define options
+  ;; Specifications of the command-line options.
+  (list (option '("share") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'file-system-mapping
+                              (specification->file-system-mapping arg #t)
+                              result)))))
+
 (define (start . args)
-  (define (start-script)
+  (define (option-values opts key)
+    (reverse
+     (filter-map (match-lambda
+                   ((head . tail)
+                    (and (eq? key head) tail))
+                   (_ #f))
+                 opts)))
+
+  (define (start-script opts)
     (with-store store
       (run-with-store store
         (mlet* %store-monad
             ((sys (container-script
-                   (args->system args)
+                   (operating-system-for (option-values opts 'argument))
+                   #:mappings (option-values opts 'file-system-mapping)
                    #:container-shared-network? #t)))
           (mbegin %store-monad
             (built-derivations (list sys))
@@ -84,15 +103,16 @@
      '("/run/setuid-programs/sudo"
        "/usr/bin/sudo")))
 
-  (exit
-   (status:exit-val
-    (apply
-     system*
-     (if (eq? (getuid) 1)
-         (list (start-script))
-         (list
-          (sudo-path)
-          (start-script)))))))
+  (let* ((opts (parse-command-line args options '(()))))
+    (exit
+     (status:exit-val
+      (apply
+       system*
+       (if (eq? (getuid) 1)
+           (list (start-script opts))
+           (list
+            (sudo-path)
+            (start-script opts))))))))
 
 (define (govuk-system . args)
   (define commands
