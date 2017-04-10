@@ -1,4 +1,4 @@
-(define-module (gds data govuk sources development-repository)
+(define-module (gds data govuk sources govuk-puppet)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
@@ -8,7 +8,7 @@
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)
-  #:export (development-repository-data-source))
+  #:export (govuk-puppet-data-source))
 
 (define postgresql-extracts
   `(("postgresql-primary-1.backend.integration"
@@ -148,22 +148,22 @@
 
 (define list-extracts
   (lambda ()
-    (let* ((development-repository-directory
-            (or (getenv "GDS_GUIX_DEVELOPMENT_REPOSITORY")
+    (let* ((govuk-puppet-directory
+            (or (getenv "GDS_GUIX_GOVUK_PUPPET_REPOSITORY")
                 (let ((govuk-guix-root
                        (string-drop-right
                         (current-filename)
-                        (string-length "gds/data/govuk/sources/development-repository.scm"))))
+                        (string-length "gds/data/govuk/sources/govuk-puppet.scm"))))
                   (string-append
                    (dirname govuk-guix-root)
-                   "/development"))))
+                   "/govuk-puppet"))))
            (backup-directory
-            (string-append development-repository-directory
-                           "/replication/backups")))
+            (string-append govuk-puppet-directory
+                           "/development-vm/replication/backups")))
       (if (file-exists? backup-directory)
           (find-extracts backup-directory)
           (error "Directory does not exist ~A\n" backup-directory)))))
 
-(define-public development-repository-data-source
+(define-public govuk-puppet-data-source
   (data-source
    (list-extracts list-extracts)))

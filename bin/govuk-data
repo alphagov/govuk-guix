@@ -36,10 +36,10 @@
  (gds systems govuk development)
  (gds data data-source)
  (gds data data-extract)
- (gds data govuk sources development-repository))
+ (gds data govuk sources govuk-puppet))
 
 (define data-sources
-  (list development-repository-data-source))
+  (list govuk-puppet-data-source))
 
 (define (all-extracts)
   (concatenate
