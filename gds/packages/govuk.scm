@@ -44,11 +44,8 @@
     (source source)
     (build-system gnu-build-system)
     (inputs
-     `(("bash" ,bash)
-       ("ruby" ,ruby)
+     `(("ruby" ,ruby)
        ("tzdata" ,tzdata)
-       ("gnu-make" ,gnu-make)
-       ("gcc-toolchain" ,gcc-toolchain-5)
        ("linux-libre-headers" ,linux-libre-headers)
        ("nss-certs" ,nss-certs)
        ("postgresql" ,postgresql)
@@ -56,7 +53,6 @@
        ("openssl" ,openssl)
        ("zlib" ,zlib)
        ("libxml2" ,libxml2)
-       ("tzdata" ,tzdata)
        ("coreutils" ,coreutils) ;; just for ls
        ("libxslt" ,libxslt)
        ("libffi" ,libffi)
