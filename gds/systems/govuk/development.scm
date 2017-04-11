@@ -154,11 +154,7 @@
       (http-port (assq-ref system-ports 'elasticsearch))))
     (mysql-service #:config (mysql-configuration
                              (port (assq-ref system-ports 'mysql))))
-    govuk-content-schemas-service
-    ;; Position is significant for /usr/share/zoneinfo-service, as
-    ;; this needs to be activated before services which require it in
-    ;; their activation
-    (/usr/share/zoneinfo-service))
+    govuk-content-schemas-service)
    base-services))
 
 (define (update-routing-services-configuration

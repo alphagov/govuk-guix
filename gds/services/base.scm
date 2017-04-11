@@ -11,32 +11,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
-  #:export (/usr/share/zoneinfo-service-type
-            /usr/share/zoneinfo-service
-
-            pretend-loopback-service))
-
-(define (/usr/share/zoneinfo-service-type package)
-  (service-type
-   (name '/usr/share/zoneinfo)
-   (extensions
-    (list
-     (service-extension activation-service-type
-                        (const
-                         #~(begin
-                             (use-modules (guix build utils))
-
-                             (if (not (file-exists? "/usr/share/zoneinfo"))
-                                 (begin
-                                   (display "Creating /usr/share/zoneinfo symlink\n")
-                                   (mkdir-p "/usr/share")
-                                   (symlink (string-append
-                                             #$package
-                                             "/share/zoneinfo")
-                                            "/usr/share/zoneinfo"))))))))))
-
-(define* (/usr/share/zoneinfo-service #:optional (package tzdata))
-  (service (/usr/share/zoneinfo-service-type package) package))
+  #:export (pretend-loopback-service))
 
 (define pretend-loopback-service
   (service
