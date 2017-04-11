@@ -155,10 +155,9 @@
     (mysql-service #:config (mysql-configuration
                              (port (assq-ref system-ports 'mysql))))
     govuk-content-schemas-service
-    ;; Position is significant for /usr/bin/env-service and
-    ;; /usr/share/zoneinfo-service, as these need to be activated
-    ;; before services which require them in their activation
-    (/usr/bin/env-service)
+    ;; Position is significant for /usr/share/zoneinfo-service, as
+    ;; this needs to be activated before services which require it in
+    ;; their activation
     (/usr/share/zoneinfo-service))
    base-services))
 

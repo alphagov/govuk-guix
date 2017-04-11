@@ -11,40 +11,10 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
-  #:export (/usr/bin/env-service-type
-            /usr/bin/env-service
-
-            /usr/share/zoneinfo-service-type
+  #:export (/usr/share/zoneinfo-service-type
             /usr/share/zoneinfo-service
 
             pretend-loopback-service))
-
-(define /usr/bin/env-service-type
-  (shepherd-service-type
-   '/usr/bin/env
-   (lambda (package)
-     (shepherd-service
-      (provision (list '/usr/bin/env))
-      (documentation "Ensure /usr/bin/env exists")
-      (start
-       #~(lambda _
-           (use-modules (guix build utils))
-
-           (if (not (file-exists? "/usr/bin/env"))
-               (let ((path
-                      (string-append
-                       #$package
-                       "/bin/env")))
-                 (mkdir-p "/usr/bin")
-                 (symlink path
-                          "/usr/bin/env")))
-           #t))
-      (stop #~(lambda _
-                #f))
-      (respawn? #f)))))
-
-(define* (/usr/bin/env-service #:optional (package coreutils))
-  (service /usr/bin/env-service-type package))
 
 (define (/usr/share/zoneinfo-service-type package)
   (service-type
