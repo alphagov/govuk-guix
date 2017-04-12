@@ -365,17 +365,18 @@
         ;; configuration
         (list
          add-signon-dev-user
-         configure-rails-services-database-setup
          correct-services-package-source-from-environment
          services-in-rails-development-environment
          set-authenticating-proxy-upstream-url
          set-jwt-auth-secret
          set-services-plek-config
          update-database-connection-config-ports
-         ;; TODO: setup-blank-databases-where-necessary must happen
-         ;; after update-database-connection-config-ports, or the
-         ;; wrong database connection configuration is used.
+         ;; TODO: setup-blank-databases-where-necessary and
+         ;; configure-rails-services-database setup must happen after
+         ;; update-database-connection-config-ports, or the wrong
+         ;; database connection configuration is used.
          setup-blank-databases-where-necessary
+         configure-rails-services-database-setup
          update-routing-services-configuration
          update-services-with-random-signon-secrets
          (cut use-gds-sso-strategy <> "real"))))
