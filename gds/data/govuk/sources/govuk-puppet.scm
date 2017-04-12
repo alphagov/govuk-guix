@@ -37,6 +37,7 @@
      ("govuk_assets_production" . (,asset-manager-service-type))
      ("govuk_content_production" .
       (,content-api-service-type
+       ,publisher-service-type
        ,specialist-publisher-service-type
        ,manuals-publisher-service-type))
      ("govuk_needs_production" . (,need-api-service-type))
@@ -44,7 +45,6 @@
      ("licence_finder_production" . (,licence-finder-service-type))
      ;;("manuals_publisher_production" . (,manuals-publisher-service-type))
      ("maslow_production" . (,maslow-service-type))
-     ("publisher_production" . (,publisher-service-type))
      ("short_url_manager_production" . (,short-url-manager-service-type)))
     ("api-mongo-1.api.integration"
      ("content_store_production" . (,content-store-service-type))
