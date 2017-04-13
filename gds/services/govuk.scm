@@ -1007,7 +1007,7 @@
 ;;;
 
 (define-public smart-answers-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'smart-answers-publisher))
+  (make-rails-app-using-plek-and-signon-service-type 'smart-answers))
 
 (define-public smart-answers-service
   (service
