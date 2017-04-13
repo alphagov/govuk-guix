@@ -1015,7 +1015,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(smart-answers))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api signon content-store)))
           (plek-config) (rails-app-config) smart-answers
           (service-startup-config))))
 
