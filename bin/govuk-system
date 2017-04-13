@@ -36,6 +36,7 @@
  (gnu system)
  (gnu system linux-container)
  (gnu system file-systems)
+ (gds utils)
  (gds services govuk)
  (gds systems utils)
  (gds systems govuk development))
@@ -48,7 +49,19 @@
                   (string->symbol service-name)
                   (service-type-name service-type)))
                (map service-kind govuk-services))
-         (leave (_ "Could not find service with name ~A") service-name)))
+         (begin
+           (let
+               ((similarly-named-services
+                 (find-similar-strings service-name
+                                       (map (lambda (service)
+                                              (symbol->string
+                                               (service-type-name
+                                                (service-kind service))))
+                                            govuk-services))))
+             (if (null? similarly-named-services)
+                 (leave (_ "No service called ~A") service-name)
+                 (leave (_ "No called ~A, did you mean ~A?")
+                        service-name (first similarly-named-services)))))))
    service-names))
 
 (define (operating-system-for service-names)
