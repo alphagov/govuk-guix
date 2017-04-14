@@ -564,16 +564,28 @@
     #:precompile-assets #f))) ;; asset precompilation fails
 
 (define-public support
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
-   (package-rails-app
-    "support"
-    (github-archive
-     #:repository "support"
-     #:commit-ish "release_586"
-     #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc"))
-    #:precompile-assets #f))) ;; asset precompilation fails
+  (let
+      ((pkg
+        (package-with-bundler
+         (bundle-package
+          (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
+         (package-rails-app
+          "support"
+          (github-archive
+           #:repository "support"
+           #:commit-ish "release_586"
+           #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc"))
+          #:create-tmp-directory #t
+          #:precompile-assets #f)))) ;; asset precompilation fails
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after
+              'install 'replace-redis.yml
+              ,(replace-redis.yml)))))))))
 
 (define-public support-api
   (package-with-bundler
