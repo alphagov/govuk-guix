@@ -92,51 +92,47 @@
               '())))
       (filter-map
        (lambda (extract-name)
-         (let* ((get-extract-file
+         (let* ((get-extract-local-file
                  (assoc-ref
-                  `(("postgresql" . ,postgresql-extract-file)
-                    ("mysql" . ,mysql-extract-file)
-                    ("mongo" . ,mongo-extract-file)
+                  `(("postgresql" . ,postgresql-extract-local-file)
+                    ("mysql" . ,mysql-extract-local-file)
+                    ("mongo" . ,mongo-extract-local-file)
                     ("elasticsearch" . #f))
                   database))
-                (file
-                 (if get-extract-file
-                     (get-extract-file date database hostname extract-name)
+                (local-file
+                 (if get-extract-local-file
+                     (get-extract-local-file date database hostname)
                      #f)))
-           (if file
-               (data-extract
-                (file file)
-                (datetime date)
-                (database database)
-                (services (assoc-ref extract-name->services extract-name)))
+           (if local-file
+               (let ((get-extract-file
+                      (assoc-ref `(("postgresql" . ,postgresql-extract-file)
+                                   ("mysql" . ,mysql-extract-file)
+                                   ("mongo" . ,mongo-extract-file))
+                                 database)))
+                 (data-extract
+                  (file (get-extract-file local-file extract-name))
+                  (datetime date)
+                  (database database)
+                  (services (assoc-ref extract-name->services extract-name))))
                #f)))
        (map car extract-name->services))))
 
-  (define (postgresql-extract-file date database hostname extract-name)
-    (tar-extract
-     (name (string-append extract-name ".sql.gz"))
-     (archive
-      (local-file
-       (string-join
-        (list backup-directory date database hostname "latest.tbz2")
-        "/")))
-     (member
-      (string-append "latest/" extract-name "_*.sql.gz"))
-     (strip-components 1)))
+  (define (generic-latest.tbz2-local-file date database hostname)
+    (let ((path
+           (string-join
+            (list backup-directory date database hostname "latest.tbz2")
+            "/")))
+      (if (file-exists? path)
+          (local-file path)
+          #f)))
 
-  (define (mysql-extract-file date database hostname extract-name)
-    (tar-extract
-     (name (string-append extract-name ".sql.bz2"))
-     (archive
-      (local-file
-       (string-join
-        (list backup-directory date database hostname "latest.tbz2")
-        "/")))
-     (member
-      (string-append "latest/daily_" extract-name "*"))
-     (strip-components 1)))
+  (define postgresql-extract-local-file
+    generic-latest.tbz2-local-file)
 
-  (define (mongo-extract-file date database hostname extract-name)
+  (define mysql-extract-local-file
+    generic-latest.tbz2-local-file)
+
+  (define (mongo-extract-local-file date database hostname)
     (let
         ((files
           (scandir
@@ -144,17 +140,33 @@
            (lambda (name) (string-suffix? ".tgz" name)))))
       (if (null? files)
           #f
-          (let ((filename (first files)))
-            (tar-extract
-             (name extract-name)
-             (archive
-              (local-file
-               (string-join
-                (list backup-directory date database hostname filename)
-                "/")))
-             (member
-              (string-append (string-drop-right filename 4) "/" extract-name))
-             (strip-components 1))))))
+          (local-file
+           (string-join
+            (list backup-directory date database hostname (first files))
+            "/")))))
+
+  (define (postgresql-extract-file local-file extract-name)
+    (tar-extract
+     (name (string-append extract-name ".sql.gz"))
+     (archive local-file)
+     (member
+      (string-append "latest/" extract-name "_*.sql.gz"))
+     (strip-components 1)))
+
+  (define (mysql-extract-file local-file extract-name)
+    (tar-extract
+     (name (string-append extract-name ".sql.bz2"))
+     (archive local-file)
+     (member
+      (string-append "latest/daily_" extract-name "*"))
+     (strip-components 1)))
+
+  (define (mongo-extract-file local-file extract-name)
+    (tar-extract
+     (name extract-name)
+     (archive local-file)
+     (member (string-append "*/" extract-name))
+     (strip-components 1)))
 
   (let ((tree (file-system-tree backup-directory)))
     (concatenate
