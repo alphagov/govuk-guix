@@ -467,13 +467,13 @@
   (let ((pkg
          (package-with-bundler
           (bundle-package
-           (hash (base32 "0wc6gfffn1hfsxcp479icw1r4rlzz4wgj9hi1vmfs3kng0pyzxyn")))
+           (hash (base32 "1nl2lndhiw9x55z0chwz7ndg86sh67xhk1c13in7na5dcln8jyvn")))
           (package-rails-app
            "manuals-publisher"
            (github-archive
             #:repository "manuals-publisher"
-            #:commit-ish "release_744"
-            #:hash (base32 "1zj6b0kbpf29g78q330p2chh04n8fzzy2587py5qr1zm9f8k4bvm"))
+            #:commit-ish "release_850"
+            #:hash (base32 "040wwsiajqjpxlzrkahmhcyfsd7x8jljk92g8w4x762qbxzs0yvr"))
            #:create-tmp-directory #t
            #:precompile-assets #f)))) ;; Asset precompilation fails
     (package
@@ -483,7 +483,7 @@
          ((#:phases phases)
           `(modify-phases ,phases
              (add-after 'install 'replace-mongoid.yml
-                        ,(replace-mongoid.yml)))))))))
+                        ,(replace-mongoid.yml #:mongoid-version "3")))))))))
 
 (define-public multipage-frontend
   (package-with-bundler
