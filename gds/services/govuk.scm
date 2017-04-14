@@ -1037,6 +1037,7 @@
           (name "Support")
           (supported-permissions '("signin")))
          (plek-config) (rails-app-config) support
+         (redis-connection-config)
          (service-startup-config))))
 
 ;;;
