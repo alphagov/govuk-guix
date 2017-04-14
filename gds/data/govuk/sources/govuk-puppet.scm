@@ -133,8 +133,7 @@
                      (member
                       (string-append (string-drop-right filename 4) "/" extract-name))
                      (strip-components 1))))
-                 ((equal? database "elasticsearch")
-                  '())
+                 ((equal? database "elasticsearch") #f) ;; TODO: Add support for elasticsearch
                  (else
                   (error "Unknown database ~A\n" database))))
           (datetime date)
