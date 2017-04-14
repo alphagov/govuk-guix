@@ -90,7 +90,7 @@
                                     "/"))
                     '()))
               '())))
-      (map
+      (filter-map
        (lambda (extract-name)
          (data-extract
           (file (cond
