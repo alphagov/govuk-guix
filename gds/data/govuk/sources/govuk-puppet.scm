@@ -118,21 +118,23 @@
                    (strip-components 1)))
                  ((equal? database "mongo")
                   (let
-                      ((filename
-                        (first
-                         (scandir
-                          (string-join (list backup-directory date database hostname) "/")
-                          (lambda (name) (string-suffix? ".tgz" name))))))
-                    (tar-extract
-                     (name extract-name)
-                     (archive
-                      (local-file
-                       (string-join
-                        (list backup-directory date database hostname filename)
-                        "/")))
-                     (member
-                      (string-append (string-drop-right filename 4) "/" extract-name))
-                     (strip-components 1))))
+                      ((files
+                        (scandir
+                         (string-join (list backup-directory date database hostname) "/")
+                         (lambda (name) (string-suffix? ".tgz" name)))))
+                    (if (null? files)
+                        #f
+                        (let ((filename (first files)))
+                          (tar-extract
+                           (name extract-name)
+                           (archive
+                            (local-file
+                             (string-join
+                              (list backup-directory date database hostname filename)
+                              "/")))
+                           (member
+                            (string-append (string-drop-right filename 4) "/" extract-name))
+                           (strip-components 1))))))
                  ((equal? database "elasticsearch") #f) ;; TODO: Add support for elasticsearch
                  (else
                   (error "Unknown database ~A\n" database))))
