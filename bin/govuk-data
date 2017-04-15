@@ -76,9 +76,9 @@
                   (equal?
                    (string->symbol service-name)
                    (service-type-name (service-kind service))))
-                (operating-system-user-services development-os)) ;; TODO: Maybe this wants to be the
-                                ;; services from a particular system
-                                ;; instead?
+                ;; TODO: Maybe this wants to be the services from a
+                ;; particular system instead?
+                (operating-system-user-services development-os))
           (unless service
             (leave (_ "Could not find service with name ~A") service-name))))
        args)))
