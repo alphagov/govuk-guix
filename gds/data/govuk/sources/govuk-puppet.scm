@@ -1,5 +1,6 @@
 (define-module (gds data govuk sources govuk-puppet)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
@@ -140,7 +141,7 @@
                            database)))
            (data-extract
             (file (get-extract-file local-file extract-name))
-            (datetime date)
+            (datetime (string->date date "~Y-~m-~d"))
             (database database)
             (services (assoc-ref extract-name->services extract-name)))))
        (map car extract-name->services))))

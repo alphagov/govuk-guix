@@ -1,5 +1,6 @@
 (define-module (gds data data-extract)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-19)
   #:use-module (ice-9 match)
   #:use-module (guix gexp)
   #:use-module (guix monads)
@@ -30,12 +31,31 @@
   (database   data-extract-database)
   (services   data-extract-services))
 
-(define* (filter-extracts extracts #:optional #:key service-type)
+(define* (filter-extracts extracts
+                          #:optional #:key
+                          service-types
+                          databases
+                          before-date
+                          after-date)
   (filter
    (lambda (extract)
-     (let ((services (data-extract-services extract)))
-       (and services
-            (member service-type (data-extract-services extract)))))
+     (and
+      (let ((services (data-extract-services extract)))
+        (if services
+            (any (lambda (service-type)
+                   (member service-type (data-extract-services extract)))
+                 service-types)
+            #t))
+      (if databases
+          (member (data-extract-database extract) databases)
+          #t)
+      (if before-date
+          (time<? (date->time-utc (data-extract-datetime extract))
+                   (date->time-utc before-date))
+          #t)
+      (if after-date
+          (time>? (date->time-utc (data-extract-datetime extract))
+                   (date->time-utc after-date)))))
    extracts))
 
 (define (group-extracts field extracts)
@@ -63,7 +83,10 @@
         extracts))
 
 (define (sort-extracts extracts)
-  extracts)
+  (stable-sort extracts
+               (lambda (a b)
+                 (time<? (date->time-utc (data-extract-datetime a))
+                         (date->time-utc (data-extract-datetime b))))))
 
 (define (load-extract extract database-connection-config)
   (let* ((load-gexp

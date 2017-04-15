@@ -24,6 +24,9 @@
 
 (use-modules
  (srfi srfi-1)
+ (srfi srfi-11)
+ (srfi srfi-19)
+ (srfi srfi-37)
  (ice-9 match)
  (guix ui)
  (guix scripts)
@@ -48,40 +51,101 @@
                    (list-extracts)))
     data-sources)))
 
-(define (list-available-extracts . args)
-  (for-each
-   (match-lambda
-     ((service-type . extracts)
-      (simple-format #t "service: ~A\n" (if service-type
-                                            (service-type-name service-type)
-                                            "<unknown>"))
-      (for-each
-       (match-lambda
-         ((database . extracts)
-          (simple-format #t "  database: ~A\n" database)
-          (for-each
-           (lambda (extract)
-             (simple-format #t "    - ~A\n" (data-extract-datetime extract)))
-           extracts)))
-       (group-extracts data-extract-database extracts))))
-   (group-extracts data-extract-services (all-extracts))))
+(define (parse-date str)
+  (string->date str "~d/~m/~Y"))
 
-(define (parse-args args)
-  (if (null? args)
-      (leave (_ "To load data, specifiy a service"))
-      (map
-       (lambda (service-name)
-         (or
-          (find (lambda (service)
-                  (equal?
-                   (string->symbol service-name)
-                   (service-type-name (service-kind service))))
-                ;; TODO: Maybe this wants to be the services from a
-                ;; particular system instead?
-                (operating-system-user-services development-os))
-          (unless service
-            (leave (_ "Could not find service with name ~A") service-name))))
-       args)))
+(define options
+  ;; Specifications of the command-line options.
+  (list (option '("database") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'database
+                              arg
+                              result)))
+        (option '("before") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'before
+                              (parse-date arg)
+                              result)))
+        (option '("after") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'after
+                              (parse-date arg)
+                              result)))))
+
+(define (list-available-extracts . args)
+  (let-values
+      (((services data-extracts)
+        (arguments->services-and-data-extracts args)))
+    (for-each
+     (match-lambda
+      ((service-type . data-extracts)
+       (if (member service-type (map service-kind services))
+           (begin
+             (simple-format #t "service: ~A\n" (service-type-name
+                                                service-type))
+             (for-each
+              (match-lambda
+               ((database . data-extracts)
+                (simple-format #t "  database: ~A\n" database)
+                (for-each
+                 (lambda (data-extract)
+                   (simple-format
+                    #t "    - ~A\n"
+                    (date->string (data-extract-datetime data-extract)
+                                  "~d/~m/~Y")))
+                 data-extracts)))
+              (group-extracts data-extract-database data-extracts))))))
+     (stable-sort
+      (group-extracts data-extract-services
+                      (sort-extracts data-extracts))
+      (match-lambda* (((service-type1 . data-extracts1)
+                       (service-type2 . data-extracts2))
+                      (string<? (symbol->string
+                                 (service-type-name service-type1))
+                                (symbol->string
+                                 (service-type-name service-type2)))))))))
+
+(define (arguments->services-and-data-extracts args)
+  (let* ((opts (parse-command-line args options '(())))
+         (service-names
+          (filter-map (match-lambda
+                       (('argument . a) a)
+                       (_ #f))
+                      opts))
+         (databases
+          (filter-map (match-lambda
+                       (('database . d) d)
+                       (_ #f))
+                      opts))
+         (services (get-services service-names))
+         (service-types (map service-kind services))
+         (data-extracts
+          (filter-extracts
+           (all-extracts)
+           #:service-types service-types
+           #:databases (if (null? databases) #f databases)
+           #:before-date (assq-ref opts 'before)
+           #:after-date (assq-ref opts 'after))))
+    (values services data-extracts)))
+
+(define (get-services service-names)
+  (let ((all-services
+         ;; TODO: Maybe this wants to be the services from a
+         ;; particular system instead?
+         (operating-system-user-services development-os)))
+    (if (null? service-names)
+        all-services
+        (map
+         (lambda (service-name)
+           (or
+            (find (lambda (service)
+                    (equal?
+                     (string->symbol service-name)
+                     (service-type-name (service-kind service))))
+                  all-services)
+            (leave (_ "Could not find service with name ~A")
+                   service-name)))
+         service-names))))
 
 (define (database-connection-config service extract)
   (find
@@ -94,7 +158,7 @@
     (error "Unrecognised database type ~A" (data-extract-database extract)))
    (service-parameters service)))
 
-(define (get-extracts-and-database-connection-configs services databases)
+(define (get-extracts-and-database-connection-configs services extracts)
   (define (missing-connection-error service extract)
     (display (service-parameters service))
     (error
@@ -102,42 +166,47 @@
      (data-extract-database extract)
      (service-type-name (service-kind service))))
 
-  (let ((extracts (all-extracts)))
-    (concatenate
-     (map
-      (lambda (service)
-        (let ((service-extracts (filter-extracts
-                                 extracts
-                                 #:service-type (service-kind service))))
-          (if (null? service-extracts)
-              (leave (_ "No extracts found for service ~A")
-                     (service-type-name (service-kind service)))
-              (map
-               (match-lambda
-                 ((database . extracts)
-                  (let ((extract (first extracts)))
-                    (cons extract
-                          (list
-                           (or
-                            (database-connection-config service extract)
-                            (missing-connection-error service extract)))))))
-               (group-extracts data-extract-database service-extracts)))))
-      services))))
+  (concatenate
+   (map
+    (lambda (service)
+      (let ((service-extracts (filter-extracts
+                               extracts
+                               #:service-types (list
+                                                (service-kind
+                                                 service)))))
+        (map
+         (match-lambda
+          ((database . extracts)
+           ;; The appropriate extract is always last in the list due
+           ;; to sorting
+           (let ((extract (last (sort-extracts extracts))))
+             (cons extract
+                   (list
+                    (or
+                     (database-connection-config service extract)
+                     (missing-connection-error service extract)))))))
+         (group-extracts data-extract-database service-extracts))))
+    services)))
 
 (define (load . args)
-  (map
-   (match-lambda
-     ((extract . database-connection-configs)
-      (for-each
-       (lambda (database-connection-config)
-         (match extract
-           (($ <data-extract> file datetime database services)
-            (simple-format #t "Importing ~A in to ~A" datetime database)))
-         (display (load-extract extract database-connection-config)))
-       database-connection-configs)))
-   (get-extracts-and-database-connection-configs
-    (parse-args args)
-    #f)))
+  (let-values
+      (((services data-extracts)
+        (arguments->services-and-data-extracts args)))
+    (map
+     (match-lambda
+      ((data-extract . database-connection-configs)
+       (for-each
+        (lambda (database-connection-config)
+          (match data-extract
+                 (($ <data-extract> file datetime database services)
+                  (simple-format #t "Importing extract from ~A in to ~A\n"
+                                 (date->string datetime "~d/~m/~Y")
+                                 database)))
+          (display "\n")
+          (load-extract data-extract database-connection-config))
+        database-connection-configs)))
+     (get-extracts-and-database-connection-configs services
+                                                   data-extracts))))
 
 (define (govuk-data . args)
   (define commands
