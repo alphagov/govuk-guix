@@ -65,6 +65,22 @@
      (map (cut apply process-hostname-dir date database <>) children)))
 
   (define (process-hostname-dir date database hostname stat . children)
+    (let* ((get-extract-local-file
+            (assoc-ref
+             `(("postgresql" . ,postgresql-extract-local-file)
+               ("mysql" . ,mysql-extract-local-file)
+               ("mongo" . ,mongo-extract-local-file)
+               ("elasticsearch" . #f))
+             database))
+           (local-file
+            (if get-extract-local-file
+                (get-extract-local-file date database hostname)
+                #f)))
+      (if local-file
+          (process-local-file date database hostname local-file)
+          '())))
+
+  (define (process-local-file date database hostname local-file)
     (let*
         ((extracts-by-hostname
           (or
@@ -90,32 +106,19 @@
                                     "/"))
                     '()))
               '())))
-      (let* ((get-extract-local-file
-              (assoc-ref
-               `(("postgresql" . ,postgresql-extract-local-file)
-                 ("mysql" . ,mysql-extract-local-file)
-                 ("mongo" . ,mongo-extract-local-file)
-                 ("elasticsearch" . #f))
-               database))
-             (local-file
-              (if get-extract-local-file
-                  (get-extract-local-file date database hostname)
-                  #f)))
-        (if local-file
-            (filter-map
-             (lambda (extract-name)
-               (let ((get-extract-file
-                      (assoc-ref `(("postgresql" . ,postgresql-extract-file)
-                                   ("mysql" . ,mysql-extract-file)
-                                   ("mongo" . ,mongo-extract-file))
-                                 database)))
-                 (data-extract
-                  (file (get-extract-file local-file extract-name))
-                  (datetime date)
-                  (database database)
-                  (services (assoc-ref extract-name->services extract-name)))))
-             (map car extract-name->services))
-            '()))))
+      (filter-map
+       (lambda (extract-name)
+         (let ((get-extract-file
+                (assoc-ref `(("postgresql" . ,postgresql-extract-file)
+                             ("mysql" . ,mysql-extract-file)
+                             ("mongo" . ,mongo-extract-file))
+                           database)))
+           (data-extract
+            (file (get-extract-file local-file extract-name))
+            (datetime date)
+            (database database)
+            (services (assoc-ref extract-name->services extract-name)))))
+       (map car extract-name->services))))
 
   (define (generic-latest.tbz2-local-file date database hostname)
     (let ((path
