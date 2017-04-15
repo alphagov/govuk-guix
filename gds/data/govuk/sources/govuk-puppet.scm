@@ -84,20 +84,17 @@
     (let*
         ((extracts-by-hostname
           (or
-           (assoc-ref
-            `(("postgresql" . ,postgresql-extracts)
-              ("mysql" . ,mysql-extracts)
-              ("mongo" . ,mongodb-extracts)
-              ("elasticsearch" #f))
-            database)
+           (assoc-ref `(("postgresql" . ,postgresql-extracts)
+                        ("mysql" . ,mysql-extracts)
+                        ("mongo" . ,mongodb-extracts)
+                        ("elasticsearch" #f))
+                      database)
            (begin
              (simple-format #t "Warning, unknown database ~A\n" database)
              #f)))
          (extract-name->services
           (if extracts-by-hostname
-              (or (assoc-ref
-                   extracts-by-hostname
-                   hostname)
+              (or (assoc-ref extracts-by-hostname hostname)
                   (begin
                     (simple-format #t "Warning, unknown hostname ~A (~A)\n"
                                    hostname
