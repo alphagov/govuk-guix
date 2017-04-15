@@ -80,6 +80,34 @@
           (process-local-file date database hostname local-file)
           '())))
 
+  (define (generic-latest.tbz2-local-file date database hostname)
+    (let ((path
+           (string-join
+            (list backup-directory date database hostname "latest.tbz2")
+            "/")))
+      (if (file-exists? path)
+          (local-file path)
+          #f)))
+
+  (define postgresql-extract-local-file
+    generic-latest.tbz2-local-file)
+
+  (define mysql-extract-local-file
+    generic-latest.tbz2-local-file)
+
+  (define (mongo-extract-local-file date database hostname)
+    (let
+        ((files
+          (scandir
+           (string-join (list backup-directory date database hostname) "/")
+           (lambda (name) (string-suffix? ".tgz" name)))))
+      (if (null? files)
+          #f
+          (local-file
+           (string-join
+            (list backup-directory date database hostname (first files))
+            "/")))))
+
   (define (process-local-file date database hostname local-file)
     (let*
         ((extracts-by-hostname
@@ -116,34 +144,6 @@
             (database database)
             (services (assoc-ref extract-name->services extract-name)))))
        (map car extract-name->services))))
-
-  (define (generic-latest.tbz2-local-file date database hostname)
-    (let ((path
-           (string-join
-            (list backup-directory date database hostname "latest.tbz2")
-            "/")))
-      (if (file-exists? path)
-          (local-file path)
-          #f)))
-
-  (define postgresql-extract-local-file
-    generic-latest.tbz2-local-file)
-
-  (define mysql-extract-local-file
-    generic-latest.tbz2-local-file)
-
-  (define (mongo-extract-local-file date database hostname)
-    (let
-        ((files
-          (scandir
-           (string-join (list backup-directory date database hostname) "/")
-           (lambda (name) (string-suffix? ".tgz" name)))))
-      (if (null? files)
-          #f
-          (local-file
-           (string-join
-            (list backup-directory date database hostname (first files))
-            "/")))))
 
   (define (postgresql-extract-file local-file extract-name)
     (tar-extract
