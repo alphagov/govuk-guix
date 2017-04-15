@@ -90,20 +90,20 @@
                                     "/"))
                     '()))
               '())))
-      (filter-map
-       (lambda (extract-name)
-         (let* ((get-extract-local-file
-                 (assoc-ref
-                  `(("postgresql" . ,postgresql-extract-local-file)
-                    ("mysql" . ,mysql-extract-local-file)
-                    ("mongo" . ,mongo-extract-local-file)
-                    ("elasticsearch" . #f))
-                  database))
-                (local-file
-                 (if get-extract-local-file
-                     (get-extract-local-file date database hostname)
-                     #f)))
-           (if local-file
+      (let* ((get-extract-local-file
+              (assoc-ref
+               `(("postgresql" . ,postgresql-extract-local-file)
+                 ("mysql" . ,mysql-extract-local-file)
+                 ("mongo" . ,mongo-extract-local-file)
+                 ("elasticsearch" . #f))
+               database))
+             (local-file
+              (if get-extract-local-file
+                  (get-extract-local-file date database hostname)
+                  #f)))
+        (if local-file
+            (filter-map
+             (lambda (extract-name)
                (let ((get-extract-file
                       (assoc-ref `(("postgresql" . ,postgresql-extract-file)
                                    ("mysql" . ,mysql-extract-file)
@@ -113,9 +113,9 @@
                   (file (get-extract-file local-file extract-name))
                   (datetime date)
                   (database database)
-                  (services (assoc-ref extract-name->services extract-name))))
-               #f)))
-       (map car extract-name->services))))
+                  (services (assoc-ref extract-name->services extract-name)))))
+             (map car extract-name->services))
+            '()))))
 
   (define (generic-latest.tbz2-local-file date database hostname)
     (let ((path
