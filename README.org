@@ -7,13 +7,13 @@ Service]].
 
 * Getting started
 
-To generate and run the end to end test container, you'll need to have
-a working GNU Guix installation.
-
-To run the end to end test container, run:
+See [[doc/installation.md][doc/installation.md]] for a full list of [[doc/installation.md#prerequisites][prerequisites]] and
+[[doc/installation.md#steps][steps]]. The most reliable way to run the included scripts is via the
+included govuk script. The bin directory can be added to your PATH for
+easy access, for example:
 
 #+BEGIN_SRC shell
-  make check-system
+  export $PATH="$PATH:$PWD/bin"
 #+END_SRC
 
 ** Local Development
