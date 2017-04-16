@@ -938,8 +938,8 @@
               '("signin")))))
           (service-startup-config)
           (postgresql-connection-config
-           (user "service-manual-publisher")
-           (database "service_manual_publisher")))))
+           (user "service_manual_publisher")
+           (database "service-manual-publisher_production")))))
 
 ;;;
 ;;; Service Manual Frontend
