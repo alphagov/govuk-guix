@@ -111,7 +111,7 @@
             (run-with-store store
               (mlet* %store-monad
                   ((script (gexp->script
-                            "foo"
+                            "load-extract"
                             #~(begin (exit (#$load-gexp))))))
                 (mbegin %store-monad
                   (built-derivations (list script))
