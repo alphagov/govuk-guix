@@ -18,10 +18,10 @@ In the `bin` directory of the `govuk-guix` repository, there is a
 `govuk-data` script that can be used to download and use data related
 to GOV.UK services.
 
-To check what data is available, run `govuk-data list`.
+To check what data is available, run `govuk data list`.
 
 To load the latest available data for a specific service (e.g. the
-publishing-api), run the following command `govuk-data load
+publishing-api), run the following command `govuk data load
 publishing-api`.
 
 If the service has multiple databases, then use the `--database`

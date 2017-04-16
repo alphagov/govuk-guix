@@ -23,7 +23,7 @@ login to the development system.
 Start the system by running:
 
 ```
-./bin/govuk-system start
+govuk system start
 ```
 
 Now, open a web browser your machine, and enter the following url:

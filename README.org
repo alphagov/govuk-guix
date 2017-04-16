@@ -23,7 +23,7 @@ example, to start a system with the Short URL Manager, Specialist
 Publisher and any of their dependencies, you would run:
 
 #+BEGIN_SRC shell
-  ./bin/govuk-system start short-url-manager specialist-publisher
+  govuk system start short-url-manager specialist-publisher
 #+END_SRC
 
 To find out more, read the documentation on
@@ -36,7 +36,7 @@ replication scripts in the govuk-puppet repository, for example, to
 load the data for the short-url-manager service, you would run:
 
 #+BEGIN_SRC shell
-  ./bin/govuk-data load short-url-manager
+  govuk data load short-url-manager
 #+END_SRC
 
 To find out more, read the documentation on
