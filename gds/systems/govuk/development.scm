@@ -3,6 +3,7 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 rdelim)
   #:use-module (gnu)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
@@ -21,6 +22,7 @@
   #:use-module (gnu packages version-control)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (guix build utils)
   #:use-module (gds packages guix)
   #:use-module (gds packages utils custom-sources)
   #:use-module (gds packages third-party mongodb)
@@ -263,36 +265,68 @@
      (list
       (cons service-startup-config? add-environment-variable))))))
 
+(define (signon-dev-user-passphrase)
+  (define (new-passphrase)
+    (random-base16-string 16))
+
+  (or (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
+      (let ((data-dir (or (getenv "XDG_DATA_HOME")
+                            (and=> (getenv "HOME")
+                                   (cut string-append <> "/.local/share")))))
+        (if (file-exists? data-dir)
+            (let* ((govuk-guix-dir
+                    (string-append data-dir "/govuk-guix"))
+                   (system-dir
+                    (string-append govuk-guix-dir "/systems/development"))
+                   (passphrase-file
+                    (string-append system-dir "/passphrase")))
+              (if (file-exists? passphrase-file)
+                  (call-with-input-file passphrase-file read-line)
+                  (let ((passphrase (new-passphrase)))
+                    (mkdir-p system-dir)
+                    (call-with-output-file passphrase-file
+                      (cut display passphrase <>))
+                    passphrase)))
+            (let ((passphrase (new-passphrase)))
+              (simple-format #t "\nUnable to find directory to place
+the Signon Dev user passphrase in\n")
+              (simple-format #t "The following passphrase will be used, but this will not be persisted: ~A\n\n" passphrase)
+              passphrase)))))
+
 (define (add-signon-dev-user services)
-  (update-services-parameters
-   services
-   (list
-    (cons
-     signon-service-type
+  (let
+      ((dev-email (or (getenv "GOVUK_GUIX_DEVELOPMENT_EMAIL")
+                      "dev@dev.gov.uk"))
+       (dev-passphrase (signon-dev-user-passphrase)))
+    (update-services-parameters
+     services
      (list
       (cons
-       signon-config?
-       (lambda (config)
-         (signon-config
-          (inherit config)
-          (users
-           (list
-            (signon-user
-             (name "Dev")
-             (email "dev@example.com")
-             (passphrase "wies1Oc8Gi0uGaim")
-             (role "superadmin")
-             (application-permissions
-              (map
-               (lambda (app)
-                 (cons
-                  (signon-application-name app)
-                  (signon-application-supported-permissions app)))
-               (filter-map
-                (lambda (service)
-                  (and (list? (service-parameters service))
-                       (find signon-application? (service-parameters service))))
-                services))))))))))))))
+       signon-service-type
+       (list
+        (cons
+         signon-config?
+         (lambda (config)
+           (signon-config
+            (inherit config)
+            (users
+             (list
+              (signon-user
+               (name "Dev")
+               (email dev-email)
+               (passphrase dev-passphrase)
+               (role "superadmin")
+               (application-permissions
+                (map
+                 (lambda (app)
+                   (cons
+                    (signon-application-name app)
+                    (signon-application-supported-permissions app)))
+                 (filter-map
+                  (lambda (service)
+                    (and (list? (service-parameters service))
+                         (find signon-application? (service-parameters service))))
+                  services)))))))))))))))
 
 (define (update-services-with-random-signon-secrets services)
   (map
