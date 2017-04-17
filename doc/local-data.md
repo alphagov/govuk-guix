@@ -1,43 +1,39 @@
-***
-# __This documentation and the respective tooling is still being written, it does not currently represent reality__
-***
-<br>
-
 # Local Data
 
 ## Contents
 
  - [Quickstart](#quickstart)
+ - [Implementation](#implementation)
 
 ## Quickstart
 
-First, check you have the [govuk-guix][govuk-guix] repository on
-your machine. If you do not, clone it using Git.
+Currently, the only available source of data is the
+["govuk-puppet" data source](#govuk-puppet-data-source), so its
+necessary to have some files downloaded through the
+`replicate-data-local.sh` script for the `govuk data` command to be
+useful.
 
-In the `bin` directory of the `govuk-guix` repository, there is a
-`govuk-data` script that can be used to download and use data related
-to GOV.UK services.
+To check what data is available, run `govuk data list`. The results
+can be filtered by service name, as well as the database and date. For
+example, `govuk data list publishing-api --before=01/01/2017` will
+list data for the Publishing API that is dated before 01/01/2017.
 
-To check what data is available, run `govuk data list`.
+To load data, use the `load` command. It takes the same arguments as
+the `list` command, e.g. `govuk data list publishing-api
+--before=01/01/2017` will load the latest available data for the
+Publishing API, that is dated before 01/01/2017.
 
-To load the latest available data for a specific service (e.g. the
-publishing-api), run the following command `govuk data load
-publishing-api`.
+### Filtering
 
-If the service has multiple databases, then use the `--database`
-option to specifiy which you wish to load (this option can be
-speficied multiple times).
+Both the `load` and `list` commands supports `--database`, `--before`
+and `--after` filtering options.
+
+The `--database` option is used to filter by database, it can be
+speficied multiple times.
 
 Older dumps can be restored (if available) by using the `--after` or
-`--before` options, which will select the first dataset either before
-or after the specified date.
-
-### Listing
-
-The `list` command also supports the `--database`, `--before` and
-`--after` options.
-
-(TODO: Possibly use the rec format?)
+`--before` options, which will select the first dataset either after
+or before the specified date.
 
 ## Implementation
 
@@ -53,12 +49,13 @@ returned item must have:
  - services (e.g. publishing-api-service-type)
    - The services that can use this data.
 
-#### GOV.UK development repository data source
+#### govuk-puppet data source
 
-This data source is designed to be used with the private GOV.UK
-development repository. It contains scripts to download data from the
+This data source is designed to be used with the govuk-puppet
+repository. govuk-puppet contains scripts to download data from the
 GOV.UK integration environment. After these scripts are run, the
-downloaded files are stored in the `replication/backups` directory.
+downloaded files are stored in the
+`development-vm/replication/backups` directory.
 
 These files, specifically only the downloaded archives, not any of the
 extracted files can be used by the local data source.
