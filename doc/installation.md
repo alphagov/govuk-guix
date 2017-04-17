@@ -3,7 +3,6 @@
 ***
 __If you encounter any difficulties or problems with govuk-guix, please [open an issue][open-an-issue].__
 ***
-
 [open-an-issue]: https://github.com/alphagov/govuk-guix/issues
 
 ## Contents
