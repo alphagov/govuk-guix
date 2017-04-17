@@ -24,8 +24,10 @@
 
 (use-modules
  (srfi srfi-1)
+ (srfi srfi-26)
  (srfi srfi-37)
  (ice-9 match)
+ (ice-9 rdelim)
  (guix ui)
  (guix monads)
  (guix scripts)
@@ -127,9 +129,39 @@
             (sudo-path)
             (start-script opts))))))))
 
+(define (passphrase . args)
+  (or (and=> (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
+             (lambda (passphrase)
+               (simple-format
+                #t
+                "The passphrase (set through GOVUK_GUIX_DEVELOPMENT_PASSPHRASE) is: ~A"
+                passphrase)))
+      (let ((data-dir (or (getenv "XDG_DATA_HOME")
+                          (and=> (getenv "HOME")
+                                 (cut string-append <> "/.local/share")))))
+        (if (file-exists? data-dir)
+            (let* ((passphrase-file
+                    (string-append
+                     data-dir
+                     "/govuk-guix/systems/development/passphrase")))
+              (if (file-exists? passphrase-file)
+                  (let ((passphrase
+                         (call-with-input-file passphrase-file read-line)))
+                    (simple-format
+                     #t
+                     "The passphrase for the development system is recorded in ~A. It is:\n\n  ~A\n\n"
+                     passphrase-file
+                     passphrase))
+                  (leave
+                   (_ "The passphrase file could not be found at ~A")
+                   passphrase-file)))
+            (leave
+             (_ "The data directory could not be determined"))))))
+
 (define (govuk-system . args)
   (define commands
-    `(("start" . ,start)))
+    `(("start" . ,start)
+      ("passphrase" . ,passphrase)))
 
   (display "\n")
   (with-error-handling
