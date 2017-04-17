@@ -9,7 +9,8 @@
             draft-router-config
             server-aliases
             #:optional #:key
-            (authenticated-draft-origin #t))
+            (authenticated-draft-origin #t)
+            (domain "gov.uk"))
     (nginx-service
      #:upstream-list
      (cons*
@@ -56,7 +57,7 @@
            (nginx-location-configuration
             (uri "/api/content")
             (body '("proxy_pass http://content-store-proxy;")))))
-         (server-name (list "www.guix-dev.gov.uk")))
+         (server-name (list (string-append "www." domain))))
         (nginx-server-configuration
          (inherit base)
          (locations
@@ -68,7 +69,7 @@ proxy_set_header Host $host:$server_port;")))
            (nginx-location-configuration
             (uri "/api/content")
             (body '("proxy_pass http://draft-content-store-proxy;")))))
-         (server-name (list "draft-origin.guix-dev.gov.uk")))
+         (server-name (list (string-append "draft-origin." domain))))
         (nginx-server-configuration
          (inherit base)
          (locations
@@ -85,7 +86,7 @@ proxy_set_header Host $host:$server_port;")))
            (nginx-location-configuration
             (uri "/static")
             (body '("proxy_pass http://static-proxy;")))))
-         (server-name (list "assets.guix-dev.gov.uk")))
+         (server-name (list (string-append "assets." domain))))
         (map
          (match-lambda
            ((service . port)
@@ -103,9 +104,7 @@ proxy_set_header Host $host:$server_port;")))
                              "proxy_pass http://~A-proxy;
 proxy_set_header Host $host:$server_port;"
                              (symbol->string service)))))))
-             (server-name (cons (string-append
-                                 (symbol->string service)
-                                 ".guix-dev.gov.uk")
+             (server-name (cons (simple-format #f "~A.~A" service domain)
                                 (or (assq-ref server-aliases service)
                                     '())))
              (root (string-append "/var/apps/" (symbol->string service) "/public")))))

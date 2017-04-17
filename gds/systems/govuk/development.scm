@@ -138,7 +138,8 @@
      govuk-ports
      live-router-config
      draft-router-config
-     '((rummager . ("search"))))
+     '((rummager . ("search")))
+     #:domain "guix-dev.gov.uk")
     (service
      redis-service-type
      (redis-configuration
