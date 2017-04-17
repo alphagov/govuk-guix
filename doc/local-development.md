@@ -13,13 +13,6 @@
 
 ## Quickstart
 
-First, check you have the [govuk-guix][govuk-guix] repository on
-your machine. If you do not, clone it using Git.
-
-In the `bin` directory of the `govuk-guix` repository, there is a
-`govuk-system` script that can be used to start, stop and
-login to the development system.
-
 Start the system by running:
 
 ```
