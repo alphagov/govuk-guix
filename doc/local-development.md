@@ -1,73 +1,93 @@
-***
-# __This documentation and the respective tooling is still being written, it does not currently represent reality__
-***
-<br>
+# Local Development of GOV.UK related software
 
-# Local Development of GOV.UK
+***
+__If you encounter any difficulties or problems with govuk-guix, please [open an issue][open-an-issue].__
+***
+[open-an-issue]: https://github.com/alphagov/govuk-guix/issues
 
 ## Contents
 
  - [Quickstart](#quickstart)
- - [Introduction](#introduction)
+ - [Sharing files for local development](#sharing-files-for-local-development)
  - [DNS Setup](#dns-setup)
 
 ## Quickstart
 
-Start the system by running:
+To access locally running services, the local DNS configuration must
+resolve domains like `*.dev.gov.uk` to your local machine, if this is
+not setup, see the [DNS Setup](#dns-setup) section for guidence on how
+to do this.
+
+When using govuk-guix, you can either start all services, or a subset
+of all services and their dependencies. To start all services, run:
 
 ```
 govuk system start
 ```
 
-Now, open a web browser your machine, and enter the following url:
+To start only certain services, and their dependencies, list those
+services after the start command, for example:
 
 ```
-http://signon.dev.gov.uk (TODO: Check dns works in the development VM)
+govuk system start short-url-manager publisher
 ```
 
-If this does not work, ... (TODO: talk about DNS)
+The [Signon][signon] application is used for authentication by other
+applications, and also provides links to those applications to which
+you have access. A user is automaticaly created, with access to all
+applications with the email address `dev@dev.gov.uk`. The passphrase
+randomly generated and saved so that it is the same when `govuk
+system` is run again. You can find out what the passphrase is by
+running the `govuk system passphrase` command.
 
-The system start script will pick a random password for the
-devlelopment user, and this will be printed to the screen.
+[signon]: https://docs.publishing.service.gov.uk/apps/signon.html
 
-Login to signon using the email address `dev@dev.gov.uk` and the
-password shown by the start script.
+If local DNS is configigured, and the system started succesfully,
+Signon should now be reachable at:
+
+```
+http://signon.dev.gov.uk:50080/
+```
+
+The port is intentionally non-standard (50080 rather than 80) to avoid
+issues around binding to low ports, and conflicts with other services
+using ports on the default network interface. This is a temporary
+workaround until more complex networking support is available.
 
 At this point, you have a GOV.UK system running locally with many of
 the services that you might expect. The software behind these services
-sits within the `/gnu/store` and cannot be modified. To modify
-services running within this system, you can switch the service to run
-from software stored outside of the store.
+sits within the `/gnu/store` and cannot be modified. For guidence in
+starting systems for developing services, see the section on
+[sharing files for local development](#sharing-files-for-local-development).
 
-By default, the development system will mount the directory above the
-govuk-guix repository in to the development system, with the
-assumption that you have the software for the services that you want
-to develop in this directory. (TODO: Why mention this?)
+## Sharing files for local development
 
-Login to the devleopment system using the `login` command. Change
-(`cd`) to the `/home/dev/govuk/` directory. Check that the software
-for the services that you wish to modify are present in this
-directory, if not (TODO: do something).
-
-To switch a service to running from code in the `/home/dev/govuk/`
-directory, run the `TODO` command. To switch back, run the `TODO`
+The `govuk system start` command supports the `--share` option. This
+uses the same syntax that can be used with the `guix system container`
 command.
 
-## Introduction
+Modifying the code for a service within a running system depends on
+what service it is, and at the moment this may be infeasible for some
+services.
 
-govuk-guix provides packages, services and systems for working with
-software and data related to GOV.UK.
+### Services using Rails
 
-System definitions written using [Guix][guix] can be used to create
-containers (process or set of processes running with some isolation),
-virtual machines, or configure physical systems.
+For services using rails, it should be possible to share the source
+directory in to a running system, modify the files outside of the
+system, and for those changes to affect the running service.
 
-For development, you may find it convinient to run the GOV.UK
-development system provided by `govuk-guix` as a container on your
-local machine.
+For example, for the short-url-manager service if you share the source
+directory from the host system (assumed to be
+`/home/dev/govuk/short-url-manager`), in to the isolated system
+started by `govuk system start` at the `/var/apps/short-url-manager`
+location, the short-url-manager service will run using the code from
+the host system, rather than that contained within the /gnu/store.
 
-This container contains a service manager called [shepherd][shepherd],
-configured to run services within the container, both 
+To do this, the share option would be:
+
+```
+--share=/home/dev/govuk/short-url-manager=/var/apps/short-url-manager
+```
 
 ## DNS Setup
 
