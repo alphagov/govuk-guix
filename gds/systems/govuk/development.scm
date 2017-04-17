@@ -139,7 +139,7 @@
      live-router-config
      draft-router-config
      '((rummager . ("search")))
-     #:domain "guix-dev.gov.uk")
+     #:domain "dev.gov.uk")
     (service
      redis-service-type
      (redis-configuration
@@ -223,7 +223,7 @@
 (define plek-config
   (make-custom-plek-config
    govuk-ports
-   #:govuk-app-domain "guix-dev.gov.uk"
+   #:govuk-app-domain "dev.gov.uk"
    #:use-https? #f
    #:port 50080
    #:aliases '((rummager . (search)))))
