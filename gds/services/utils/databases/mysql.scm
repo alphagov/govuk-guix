@@ -90,7 +90,7 @@ CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';\n
         (apply simple-format p str args))
 
       (log-and-write port "
-CREATE DATABASE ~A;\n" #$database)
+CREATE DATABASE IF NOT EXISTS ~A;\n" #$database)
       (log-and-write port "
 GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
       (log-and-write port "EXIT\n")))
