@@ -25,6 +25,7 @@
                               live-router-config
                               draft-router-config
                               '((rummager . ("search")))
+                              #:domain "dev.gov.uk"
                               #:authenticated-draft-origin #f)
          service))
    (setup-services
@@ -84,7 +85,7 @@
           (cons
            (nginx-server-configuration
             (inherit (car (nginx-configuration-server-blocks parameter)))
-            (server-name '("publishing-e2e-tests.guix-dev.gov.uk"))
+            (server-name '("publishing-e2e-tests.dev.gov.uk"))
             (root "/var/apps/publishing-e2e-tests")
             (locations
              (list
