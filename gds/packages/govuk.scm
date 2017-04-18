@@ -504,8 +504,8 @@
     "publishing-api"
     (github-archive
      #:repository "publishing-api"
-     #:commit-ish "release_838"
-     #:hash (base32 "1j3v57z556ryyd1hskrhx88kfgc4pww2l264a7qg3bqfw3xacb9q"))
+     #:commit-ish "release_848"
+     #:hash (base32 "050qw6078f98wxc985qvmsnjb8zl0vpgvm6xx46sfa6l3ivmpb65"))
     #:precompile-assets #f)))
 
 (define-public policy-publisher
