@@ -1055,8 +1055,8 @@
     (source
      (github-archive
       #:repository "govuk-content-schemas"
-      #:commit-ish "release_583"
-      #:hash (base32 "0nwf7b7bw14v60c31800695ai5bny9ac51lr92i10dl4jkwc5rr8")))
+      #:commit-ish "release_587"
+      #:hash (base32 "13hx85nyvycd5nqw6a6ds68pyzw51ix54lnva1vnd5hgwgy4qqmq")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
