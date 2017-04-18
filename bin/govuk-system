@@ -33,6 +33,7 @@
  (guix scripts)
  (guix derivations)
  (guix store)
+ (guix build utils)
  (gnu services)
  (gnu services web)
  (gnu system)
@@ -42,6 +43,24 @@
  (gds services govuk)
  (gds systems utils)
  (gds systems govuk development))
+
+(define %default-options
+  (let ((data-dir (or (getenv "XDG_DATA_HOME")
+                      (and=> (getenv "HOME")
+                             (cut string-append <> "/.local/share")))))
+    `(,@(if (file-exists? data-dir)
+            (let ((var/lib-dir
+                   (string-append
+                    data-dir
+                    "/govuk-guix/systems/development/state/var/lib")))
+              (mkdir-p var/lib-dir)
+              (list
+               (cons
+                'file-system-mapping
+                (file-system-mapping (source var/lib-dir)
+                                     (target "/var/lib")
+                                     (writable? #t)))))
+            '()))))
 
 (define (service-names->service-types service-names)
   (map
@@ -89,7 +108,15 @@
                 (lambda (opt name arg result)
                   (alist-cons 'file-system-mapping
                               (specification->file-system-mapping arg #t)
-                              result)))))
+                              result)))
+        (option '("no-data-persistence") #f #f
+                (lambda (opt name arg result)
+                  (remove (match-lambda
+                           (('file-system-mapping . value)
+                            (equal? (file-system-mapping-target value)
+                                    "/var/lib"))
+                           ((key . value) #f))
+                          result)))))
 
 (define (start . args)
   (define (option-values opts key)
@@ -118,7 +145,7 @@
      '("/run/setuid-programs/sudo"
        "/usr/bin/sudo")))
 
-  (let* ((opts (parse-command-line args options '(()))))
+  (let* ((opts (parse-command-line args options (list %default-options))))
     (exit
      (status:exit-val
       (apply
