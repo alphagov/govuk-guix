@@ -7,7 +7,8 @@ if [ ! -n "$BASH" ] ; then
     exit 1;
 fi
 
-export GUIX_PACKAGE_PATH="$PWD/.guix-package-path"
+export GDS_GUIX_ROOT="$(dirname ${BASH_SOURCE[0]})"
+export GUIX_PACKAGE_PATH="$GDS_GUIX_ROOT/.guix-package-path"
 
 if [[ $# -eq 0 ]] ; then
     cat <<EOF
@@ -73,4 +74,4 @@ export SSL_CERT_DIR="$GUIX_ENVIRONMENT/etc/ssl/certs"
 
 export GIT_SSL_CAINFO="$SSL_CERT_FILE"
 
-bash ./pre-inst-env "$@"
+bash "$GDS_GUIX_ROOT/pre-inst-env" "$@"

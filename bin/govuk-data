@@ -17,7 +17,8 @@
       (apply
        system*
        "bash"
-       (string-append (getcwd) "/guix-pre-inst-env")
+       (string-append (dirname (dirname (current-filename)))
+                      "/guix-pre-inst-env")
        "guile"
        (current-filename)
        (cdr (command-line)))))))
