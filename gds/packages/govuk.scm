@@ -627,8 +627,8 @@
     "content-store"
     (github-archive
      #:repository "content-store"
-     #:commit-ish "release_619"
-     #:hash (base32 "1zgb3fzjrv7rf9qh0vfzayjh77ch1zp6rbd8n74jsd4w959xy57n"))
+     #:commit-ish "release_628"
+     #:hash (base32 "0rxb0gzzqp2fv1anjsi0xk9s05jvbf67g6a1195c7dnb2ziqwpmk"))
     #:precompile-assets #f)))
 
 (define-public content-tagger
