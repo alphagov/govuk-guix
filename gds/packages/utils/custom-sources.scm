@@ -97,12 +97,16 @@
     (map
      (match-lambda
        ((name value rest ...)
-        (if (equal? name "gems")
+        (if (equal? name "bundle-install")
             (cons*
              name
-             (bundle-package
-              (inherit value)
-              (source source))
+             (let ((bundle-pkg
+                    (bundle-package
+                     (inherit (package-source value))
+                     (source source))))
+               (package
+                 (inherit value)
+                 (source (bundle-package-to-store bundle-pkg))))
              rest)
             (cons* name value rest))))
      inputs))
@@ -123,8 +127,7 @@
         (package
           (inherit pkg)
           (source source)
-          (native-inputs
-           (update-inputs source (package-native-inputs pkg))))))
+          (inputs (update-inputs source (package-inputs pkg))))))
      (custom-path
       (let ((source
              (local-file
@@ -134,9 +137,6 @@
         (package
           (inherit pkg)
           (source source)
-          (native-inputs
-           (update-inputs
-            source
-            (package-native-inputs pkg))))))
+          (inputs (update-inputs source (package-inputs pkg))))))
      (else
       pkg))))
