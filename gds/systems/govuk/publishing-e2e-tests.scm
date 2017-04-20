@@ -28,10 +28,10 @@
                               #:domain "dev.gov.uk"
                               #:authenticated-draft-origin #f)
          service))
-   (setup-services
-    (cons
-     publishing-e2e-tests-service
-     (operating-system-user-services development-os)))))
+   (append
+    (setup-services
+     (list publishing-e2e-tests-service))
+    (operating-system-user-services development-os))))
 
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
