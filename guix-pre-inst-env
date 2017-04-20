@@ -7,7 +7,7 @@ if [ ! -n "$BASH" ] ; then
     exit 1;
 fi
 
-export GDS_GUIX_ROOT="$(dirname ${BASH_SOURCE[0]})"
+export GDS_GUIX_ROOT="$(readlink -f $(dirname ${BASH_SOURCE[0]}))"
 export GUIX_PACKAGE_PATH="$GDS_GUIX_ROOT/.guix-package-path"
 
 if [[ $# -eq 0 ]] ; then
