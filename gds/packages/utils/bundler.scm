@@ -20,6 +20,7 @@
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages certs)
   #:use-module (gds packages utils)
+  #:use-module (gds packages utils bundler-build)
   #:export (bundler
 
             <bundle-package>
@@ -87,154 +88,50 @@
   ;; "Compile" FILE by adding it to the store.
   (match bundle-package
     (($ <bundle-package> source name hash ruby without)
-     (run-bundle-package source name hash (patch-ruby ruby) without
-                         #:system system))))
+     (mlet %store-monad ((ca-certificates
+                          (ca-certificate-bundle
+                           (packages->manifest (list nss-certs)))))
+       (define inputs
+         (list ruby tar gzip bundler git))
+
+       (define search-paths
+         (map
+          search-path-specification->sexp
+          (delete-duplicates
+           (append-map
+            package-native-search-paths
+            inputs))))
+
+       (define ruby-version (package-version ruby))
+
+       (define build
+         (with-imported-modules `((guix build utils)
+                                  (guix build store-copy)
+                                  (gnu build install)
+                                  (gds packages utils bundler-build))
+           #~(begin
+               (use-modules (gds packages utils bundler-build))
+               (run-bundle-package #$source
+                                   #$output
+                                   (getcwd)
+                                   '#$inputs
+                                   #$ca-certificates
+                                   #$nss-certs
+                                   '#$search-paths
+                                   '#$without
+                                   #$ruby-version))))
+
+       (gexp->derivation name build
+                         #:system system
+                         #:local-build? #t
+                         #:hash-algo 'sha256
+                         #:hash hash
+                         #:recursive? #t
+                         #:local-build? #t)))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
                    "custom_shebang: " ruby "/bin/ruby\n"))
-
-(define* (run-bundle-package source name hash ruby without
-                    #:key (system (%current-system)) (guile (default-guile)))
-  "Return a fixed-output derivation that fetches REF, a <git-reference>
-object.  The output is expected to have recursive hash HASH of type
-HASH-ALGO (a symbol).  Use NAME as the file name, or a generic name if #f."
-  (mlet %store-monad ((ca-certificates
-                       (ca-certificate-bundle
-                        (packages->manifest (list nss-certs))))
-                      (guile (package->derivation guile system)))
-    (define inputs
-      (list ruby tar gzip bundler git))
-
-    (define search-paths
-      (map
-       search-path-specification->sexp
-       (delete-duplicates
-        (append-map
-         package-native-search-paths
-         inputs))))
-
-    (define ruby-version (package-version ruby))
-
-    (define build
-      (with-imported-modules `((guix build utils)
-                               (guix build store-copy)
-                               (gnu build install))
-        #~(begin
-            (use-modules (guix build utils)
-                         (srfi srfi-26)
-                         (gnu build install)
-                         (ice-9 match))
-            (define (run . args)
-              (simple-format #t "running ~A\n" (string-join args))
-              (force-output)
-              (zero? (apply system* args)))
-
-            (set-path-environment-variable "PATH" '("bin" "sbin") '#+inputs)
-
-            (for-each (match-lambda
-                        ((env-var (files ...) separator type pattern)
-                         (set-path-environment-variable
-                          env-var files
-                          '#+inputs
-                          #:separator separator
-                          #:type type
-                          #:pattern pattern)))
-                      '#$search-paths)
-
-            (if (not (null? '#$without))
-                (setenv "BUNDLE_WITHOUT"
-                        (string-join
-                         '#$without
-                         ":")))
-
-            (let* ((working-directory (getcwd))
-                   (home (string-append working-directory "/HOME"))
-                   (vendor/cache (string-append #$output "/vendor/cache"))
-                   (bundle (string-append #$bundler "/bin/bundle")))
-
-              (mkdir-p vendor/cache)
-
-              (mkdir-p home)
-              (setenv "HOME" home)
-              (setenv "GEM_HOME" home)
-
-              (setenv "GIT_SSL_CAINFO"
-                      (string-append
-                       #$ca-certificates
-                       "/etc/ssl/certs/ca-certificates.crt"))
-              (setenv "SSL_CERT_DIR"
-                      (string-append #$nss-certs "/etc/ssl/certs"))
-              (setenv "SSL_CERT_FILE"
-                      (string-append
-                       #$ca-certificates
-                       "/etc/ssl/certs/ca-certificates.crt"))
-
-              (if (directory-exists? #$source)
-                  (for-each
-                   (lambda (file)
-                     (copy-file (string-append #$source "/" file)
-                                (string-append #$output "/" file)))
-                   '("Gemfile" "Gemfile.lock"))
-                  (run "tar"
-                       "--extract"
-                       "--anchored"
-                       "--wildcards"
-                       "--no-wildcards-match-slash"
-                       "--strip-components=1"
-                       "-C" #$output
-                       "-x"
-                       "-f" #$source
-                       "*/Gemfile*"))
-              (simple-format #t "Using Gemfile ~A\n" (string-append
-                                                    #$output
-                                                    "/Gemfile\n"))
-              (simple-format #t "Using Gemfile.lock ~A\n" (string-append
-                                                         #$output
-                                                         "/Gemfile.lock\n"))
-
-              (simple-format #f "Setting .ruby-version to ~A\n" #$ruby-version)
-              (call-with-output-file (string-append #$output "/.ruby-version")
-                (lambda (port)
-                  (simple-format port "~A\n" #$ruby-version)))
-
-              (chdir #$output)
-              (run bundle
-                   "config"
-                   "build.nokogiri"
-                   "--use-system-libraries")
-              (let loop ((retry 0))
-                (unless (run bundle
-                             "package"
-                             "--all"
-                             "--no-install")
-                  (if (> retry 3)
-                      (exit 1)
-                      (loop (+ retry 1)))))
-
-              (let
-                  ((files
-                    (find-files #$output
-                                ".*\\.gemspec")))
-                (if (null? files)
-                    (simple-format #t "No gemspecs to substitute dates for\n")
-                    (begin
-                      (simple-format
-                       #t "Substituting dates in ~A\n"
-                       (string-join files ", "))
-                      (substitute* files
-                        ((".*s\\.date = \".*\"")
-                         "  # date removed by govuk-guix")))))
-               (reset-timestamps #$output)))))
-
-    (gexp->derivation name build
-                      #:system system
-                      #:local-build? #t
-                      #:hash-algo 'sha256
-                      #:hash hash
-                      #:recursive? #t
-                      #:guile-for-build guile
-                      #:local-build? #t)))
 
 (define (bundle-install-package
          bundle-pkg
