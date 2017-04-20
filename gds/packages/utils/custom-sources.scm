@@ -111,32 +111,28 @@
             (cons* name value rest))))
      inputs))
 
-  (let
+  (let*
       ((custom-path (assoc-ref package-path-list
                                (package-name pkg)))
        (custom-commit-ish (assoc-ref package-commit-ish-list
-                                     (package-name pkg))))
-    (cond
-     ((and custom-commit-ish custom-path)
-      (error "cannot specify custom-commit-ish and custom-path"))
-     (custom-commit-ish
-      (let ((source
-             (custom-github-archive-source-for-package
-              pkg
-              custom-commit-ish)))
+                                     (package-name pkg)))
+       (custom-source
+        (cond
+         ((and custom-commit-ish custom-path)
+          (error "cannot specify custom-commit-ish and custom-path"))
+         (custom-commit-ish
+          (custom-github-archive-source-for-package
+           pkg
+           custom-commit-ish))
+         (custom-path
+          (local-file
+           custom-path
+           #:recursive? #t
+           #:select? (git-predicate custom-path)))
+         (else #f))))
+    (if custom-source
         (package
           (inherit pkg)
-          (source source)
-          (inputs (update-inputs source (package-inputs pkg))))))
-     (custom-path
-      (let ((source
-             (local-file
-              custom-path
-              #:recursive? #t
-              #:select? (git-predicate custom-path))))
-        (package
-          (inherit pkg)
-          (source source)
-          (inputs (update-inputs source (package-inputs pkg))))))
-     (else
-      pkg))))
+          (source custom-source)
+          (inputs (update-inputs custom-source (package-inputs pkg))))
+        pkg)))
