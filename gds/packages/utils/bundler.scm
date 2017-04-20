@@ -155,7 +155,8 @@
      (version "0")
      (source (bundle-package
               (inherit bundle-pkg)
-              (source (package-source pkg))
+              (source (or (bundle-package-source bundle-pkg)
+                          (package-source pkg)))
               (name (string-append (package-name pkg) "-bundle-package"))
               (ruby ruby)))
      (build-system gnu-build-system)
