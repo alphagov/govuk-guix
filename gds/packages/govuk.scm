@@ -37,64 +37,6 @@
   #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party phantomjs))
 
-(define (make-govuk-package
-         name
-         source)
-  (package
-    (name name)
-    (version "0")
-    (source source)
-    (build-system gnu-build-system)
-    (inputs
-     `(("coreutils" ,coreutils) ;; just for ls
-       ("libffi" ,libffi)
-       ("libxml2" ,libxml2)
-       ("libxslt" ,libxslt)
-       ("linux-libre-headers" ,linux-libre-headers)
-       ("mysql" ,mysql)
-       ("node" ,node)
-       ("nss-certs" ,nss-certs)
-       ("openssl" ,openssl)
-       ("phantomjs" ,phantomjs)
-       ("pkg-config" ,pkg-config)
-       ("postgresql" ,postgresql)
-       ("ruby" ,ruby)
-       ("tzdata" ,tzdata)
-       ("zlib" ,zlib)))
-    (arguments
-     `(#:modules ((srfi srfi-1)
-                  (ice-9 ftw)
-                  ,@%gnu-build-system-modules)
-       #:phases
-       (modify-phases %standard-phases
-         (replace 'configure (lambda args #t))
-         (replace 'build (lambda args #t))
-         (replace 'check (lambda args #t))
-         (replace 'install
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out")))
-               (copy-recursively
-                "."
-                out
-                #:log (%make-void-port "w")))))
-         (add-after 'install 'patch-bin-files
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out")))
-               (substitute*
-                   (find-files
-                    (string-append out "/bin")
-                    (lambda (name stat)
-                      (or
-                       (access? name X_OK)
-                       (begin
-                         (simple-format #t "Skipping patching ~A as its not executable\n" name)
-                         #f))))
-                 (("/usr/bin/env") (which "env")))))))))
-    (synopsis name)
-    (description name)
-    (license #f)
-    (home-page #f)))
-
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
