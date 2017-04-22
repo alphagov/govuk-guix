@@ -1256,11 +1256,11 @@ content, as well as broadcasting changes to a message queue.")
 (define-public govuk-content-schemas
   (package
     (name "govuk-content-schemas")
-    (version "0")
+    (version "release_587")
     (source
      (github-archive
-      #:repository "govuk-content-schemas"
-      #:commit-ish "release_587"
+      #:repository name
+      #:commit-ish version
       #:hash (base32 "13hx85nyvycd5nqw6a6ds68pyzw51ix54lnva1vnd5hgwgy4qqmq")))
     (build-system gnu-build-system)
     (arguments
