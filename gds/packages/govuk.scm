@@ -1070,48 +1070,51 @@ content, as well as broadcasting changes to a message queue.")
      (home-page "https://github.com/alphagov/router-api"))))
 
 (define-public router
-    (package
-      (name "router")
-      (version "release_144")
-      (source
-       (github-archive
-        #:repository name
-        #:commit-ish version
-        #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
-      (build-system gnu-build-system)
-      (native-inputs
-       `(("go" ,go)))
-      (arguments
-       `(#:phases
-         (modify-phases %standard-phases
-           (delete 'configure)
-           (delete 'install)
-           (delete 'check)
-           (replace 'build
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let* ((out (assoc-ref outputs "out"))
-                      (cwd (getcwd)))
-                 (copy-recursively cwd "../router-copy")
-                 (mkdir-p "__build/src/github.com/alphagov")
-                 (mkdir-p "__build/bin")
-                 (setenv "GOPATH" (string-append cwd "/__build"))
-                 (setenv "BINARY" (string-append cwd "/router"))
-                 (rename-file "../router-copy"
-                              "__build/src/github.com/alphagov/router")
-                 (and
-                  (with-directory-excursion
-                      "__build/src/github.com/alphagov/router"
-                    (and
-                     (zero? (system* "make" "build" (string-append "RELEASE_VERSION=" ,version)))
-                     (mkdir-p (string-append out "/bin"))))
-                  (begin
-                    (copy-file "router"
-                               (string-append out "/bin/router"))
-                    #t))))))))
-      (synopsis "")
-      (description "")
-      (license "")
-      (home-page "https://github.com/alphagov/router")))
+  (package
+    (name "router")
+    (version "release_144")
+    (source
+     (github-archive
+      #:repository name
+      #:commit-ish version
+      #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
+    (build-system gnu-build-system)
+    (native-inputs
+     `(("go" ,go)))
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'install)
+         (delete 'check)
+         (replace 'build
+                  (lambda* (#:key inputs outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (cwd (getcwd)))
+                      (copy-recursively cwd "../router-copy")
+                      (mkdir-p "__build/src/github.com/alphagov")
+                      (mkdir-p "__build/bin")
+                      (setenv "GOPATH" (string-append cwd "/__build"))
+                      (setenv "BINARY" (string-append cwd "/router"))
+                      (rename-file "../router-copy"
+                                   "__build/src/github.com/alphagov/router")
+                      (and
+                       (with-directory-excursion
+                           "__build/src/github.com/alphagov/router"
+                         (and
+                          (zero? (system*
+                                  "make" "build"
+                                          (string-append "RELEASE_VERSION="
+                                                         ,version)))
+                          (mkdir-p (string-append out "/bin"))))
+                       (begin
+                         (copy-file "router"
+                                    (string-append out "/bin/router"))
+                         #t))))))))
+    (synopsis "")
+    (description "")
+    (license "")
+    (home-page "https://github.com/alphagov/router")))
 
 (define-public rummager
   (package-with-bundler
