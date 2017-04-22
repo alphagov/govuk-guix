@@ -1143,15 +1143,13 @@ content, as well as broadcasting changes to a message queue.")
    #:extra-inputs (list libffi)))
 
 (define-public metadata-api
-  (let
-      ((release "release_70"))
     (package
       (name "metadata-api")
-      (version release)
+      (version "release_70")
       (source
        (github-archive
-        #:repository "metadata-api"
-        #:commit-ish release
+        #:repository name
+        #:commit-ish version
         #:hash (base32 "0jdwvx546f4fd7gvablvpg38srja04klw9m9hv9ix2zp94wdrlns")))
       (build-system gnu-build-system)
       (native-inputs
@@ -1191,7 +1189,7 @@ content, as well as broadcasting changes to a message queue.")
       (synopsis "")
       (description "")
       (license "")
-      (home-page "https://github.com/alphagov/metadata-api"))))
+      (home-page "https://github.com/alphagov/metadata-api")))
 
 (define-public publishing-e2e-tests
   (package-with-bundler
