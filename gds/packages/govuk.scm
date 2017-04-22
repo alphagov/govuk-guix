@@ -37,6 +37,24 @@
   #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party phantomjs))
 
+(define-public asset-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1v9mf7qzkrq0lapfag897x59b3ng2md9gwm2xvj3c3252315qbgf")))
+   (package
+     (name "asset-manager")
+     (version "release_92")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0b7qxzckzckwgvvw1wq3sgzkf0yj2yp947gz1d4jndz5g4b5j57r")))
+     (build-system rails-build-system)
+     (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
+     (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/asset-manager"))))
+
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
@@ -61,24 +79,6 @@ written in Ruby that performs authentication using gds-sso, and then
 proxies requests to some upstream")
      (license #f)
      (home-page "https://github.com/alphagov/authenticating-proxy"))))
-
-(define-public asset-manager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1v9mf7qzkrq0lapfag897x59b3ng2md9gwm2xvj3c3252315qbgf")))
-   (package
-     (name "asset-manager")
-     (version "release_92")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0b7qxzckzckwgvvw1wq3sgzkf0yj2yp947gz1d4jndz5g4b5j57r")))
-     (build-system rails-build-system)
-     (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
-     (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
-     (license license:expat)
-     (home-page "https://github.com/alphagov/asset-manager"))))
 
 (define-public bouncer
   (package-with-bundler
@@ -217,6 +217,93 @@ proxies requests to some upstream")
      (license license:expat)
      (home-page "https://github.com/alphagov/contacts-frontend"))))
 
+(define-public content-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0csjlacjx7r9iv8j82vl2fbki824bq76hvsjzvbxmabpwwbyn0zk")))
+   (package
+     (name "content-api")
+     (version "release_397")
+     (source
+      (github-archive
+       #:repository "govuk_content_api"
+       #:commit-ish version
+       #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-mongoid.yml
+                     ,(replace-mongoid.yml #:path "/mongoid.yml")))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/content-api"))
+   #:extra-inputs (list libffi)))
+
+(define-public content-performance-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0fbwnx7j4qvn4aj5vi4qr78n7n1a2mhhgj9ayhv8d5z8d3cpcwi8")))
+   (package
+     (name "content-performance-manager")
+     (version "release_30")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "12z9800nlm2vl5r7nznh8ah0sv1768id0xxhkn38m9wwjxlq53qj")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/content-performance-manager"))
+   #:extra-inputs (list postgresql libffi)))
+
+(define-public content-store
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1chs8dym0izp367cczbhqsdj2d2hvnx7pfb7bax60d1w040jyamh")))
+   (package
+     (name "content-store")
+     (version "release_628")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0rxb0gzzqp2fv1anjsi0xk9s05jvbf67g6a1195c7dnb2ziqwpmk")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/content-store"))))
+
+(define-public content-tagger
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1q1h9bpshrijrzzrzgfgsrqs017rfmzn4zxrdvqbz0cnj3igj1af")))
+   (package
+     (name "content-tagger")
+     (version "release_341")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/content-tagger"))
+   #:extra-inputs (list postgresql)))
+
 (define-public design-principles
   (package-with-bundler
    (bundle-package
@@ -236,24 +323,6 @@ proxies requests to some upstream")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/design-principles"))))
-
-(define-public email-alert-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "13x9n88f56x4cx18fl409dzkhdr6k8rc2sbvx85jbydwyvvbqy5c")))
-   (package
-     (name "email-alert-frontend")
-     (version "release_30")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0yxjc15dgnszy44zdvcqm84x8nq7y34jx282rylvs630wbd38gac")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/email-alert-frontend"))))
 
 (define-public email-alert-api
   (package-with-bundler
@@ -280,6 +349,24 @@ proxies requests to some upstream")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/email-alert-api"))))
+
+(define-public email-alert-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "13x9n88f56x4cx18fl409dzkhdr6k8rc2sbvx85jbydwyvvbqy5c")))
+   (package
+     (name "email-alert-frontend")
+     (version "release_30")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0yxjc15dgnszy44zdvcqm84x8nq7y34jx282rylvs630wbd38gac")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/email-alert-frontend"))))
 
 (define-public email-alert-service
   (package-with-bundler
@@ -357,6 +444,118 @@ proxies requests to some upstream")
      (license #f)
      (home-page "https://github.com/alphagov/finder-frontend"))))
 
+(define-public frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0vkasdpgvz368f924qfk57786qmc9m2ysxfd6gjziwrdbvkq877j")))
+   (package
+     (name "frontend")
+     (version "release_2120")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "02b8k1gvsr57k2kfjb6wdr8mn07yhh55c4pdb2adfdij0lb2rskl")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/frontend"))))
+
+(define-public government-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1nwb9qdz4iybf640rbdfg6v155gh0358c4ly77zzkds9sg79a3c4")))
+   (package
+     (name "government-frontend")
+     (version "release_244")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0zlxr1340ax3xpvnry48v3jr9sv6vlr268h647svg2y86a2avm0i")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'bundle-install 'replace-ruby-version
+                      ,(replace-ruby-version (package-version ruby))))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/government-frontend"))))
+
+(define-public govuk-content-schemas
+  (package
+    (name "govuk-content-schemas")
+    (version "release_587")
+    (source
+     (github-archive
+      #:repository name
+      #:commit-ish version
+      #:hash (base32 "13hx85nyvycd5nqw6a6ds68pyzw51ix54lnva1vnd5hgwgy4qqmq")))
+    (build-system gnu-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'build)
+         (delete 'check)
+         (replace 'install
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out")))
+               (copy-recursively "." out)
+               #t))))))
+    (synopsis "govuk-content-schemas")
+    (description "govuk-content-schemas")
+    (license #f)
+    (home-page #f)))
+
+(define-public govuk-setenv
+  (package
+   (name "govuk-setenv")
+   (version "1")
+   (source #f)
+   (build-system trivial-build-system)
+   (arguments
+    `(#:modules ((guix build utils))
+      #:builder (begin
+                  (use-modules (guix build utils))
+                  (let
+                      ((bash (string-append
+                              (assoc-ref %build-inputs "bash")
+                              "/bin/bash"))
+                       (sudo (string-append
+                              (assoc-ref %build-inputs "sudo")
+                              "/bin/sudo")))
+                    (mkdir-p (string-append %output "/bin"))
+                    (call-with-output-file (string-append
+                                            %output
+                                            "/bin/govuk-setenv")
+                      (lambda (port)
+                        (simple-format port "#!~A
+set -exu
+APP=\"$1\"
+shift
+source \"/tmp/env.d/$APP\"
+cd \"/var/apps/$APP\"
+~A --preserve-env -u \"$APP\" \"$@\"
+" bash sudo)))
+                    (chmod (string-append %output "/bin/govuk-setenv") #o555)
+                    #t))))
+   (native-inputs
+    `(("bash" ,bash)
+      ("sudo" ,sudo)))
+   (synopsis "govuk-setenv script for running commands in the service environment")
+   (description "This script runs the specified command in an
+environment similar to that which the service is running. For example,
+running govuk-setenv @code{publishing-api rails console} runs the
+@code{rails console} command as the user associated with the
+Publishing API service, and with the environment variables for this
+service setup.")
+   (license #f)
+   (home-page #f)))
+
 (define-public hmrc-manuals-api
   (package-with-bundler
    (bundle-package
@@ -393,6 +592,25 @@ proxies requests to some upstream")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/imminence"))))
+
+(define-public info-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "10c8npzfidrs9wk29nb4b1vba2islkf83i57c410a3z0xm2hm51k")))
+   (package
+     (name "info-frontend")
+     (version "release_71")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0qj5q7fv4x122x41j2ln4zg1sk017930ap51650pn5g6jdb3pcyx")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/info-frontend"))))
 
 (define-public licence-finder
   (package-with-bundler
@@ -482,620 +700,30 @@ proxies requests to some upstream")
      (license #f)
      (home-page "https://github.com/alphagov/manuals-publisher"))))
 
-(define-public multipage-frontend
+(define-public maslow
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0h7g4s2yzwp9a77fd5rpwj7sbsj0vfy0216g98j2175nx75b8ic7")))
+    (hash (base32 "0911wcbx3ixbw3l2yqsmcjqxx8lsfqja3skbj17ah8dr22pszs5d")))
    (package
-     (name "multipage-frontend")
-     (version "release_55")
+     (name "maslow")
+     (version "release_194")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "055ga8s0z9ljmcfkrwhl6if6qshq4bn303dhqr5476a10mgdghf7")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/multipage-frontend"))))
-
-(define-public publishing-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1m0blbl0bjlzxp98851rkvff1s6j9k5iddh2jq1isgn87yigrrwq")))
-   (package
-     (name "publishing-api")
-     (version "release_848")
-     (source
-      (github-archive
-       #:repository "publishing-api"
-       #:commit-ish version
-       #:hash (base32 "050qw6078f98wxc985qvmsnjb8zl0vpgvm6xx46sfa6l3ivmpb65")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "Service for storing and providing workflow for GOV.UK content")
-     (description
-      "The Publishing API is a service that provides a HTTP API for
-managing content for GOV.UK.  Publishing applications can use the
-Publishing API to manage their content, and the Publishing API will
-populate the appropriate Content Stores (live or draft) with that
-content, as well as broadcasting changes to a message queue.")
-     (license license:expat)
-     (home-page "https://github.com/alphagov/publishing-api"))
-   #:extra-inputs (list
-                   ;; Required by the pg gem
-                   postgresql)))
-
-(define-public policy-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "029rdnjh0fdx7arijbi1gq3r1hc34xpdi386rfw857n40f1p1zwi")))
-   (package
-     (name "policy-publisher")
-     (version "release_167")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/policy-publisher"))
-   #:extra-inputs (list postgresql)))
-
-(define-public search-admin
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "06wy96q5przv7pnc1wxxkl606jyayhyn3si3fi93v9c3rwaiv0sk")))
-   (package
-     (name "search-admin")
-     (version "release_91")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1kr3rlwiydnpdrcw809rmy1xspz9m5i8a1dsqm7fpfyyyn2v4is5")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/search-admin"))
-   #:extra-inputs (list mariadb)))
-
-(define-public service-manual-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "023jq5606gvj0wa8v8v7maxhqm8z0k3fkz2bbnajv6wcjd5dm0hf")))
-   (package
-     (name "service-manual-frontend")
-     (version "release_99")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1fsgx2p91j43n70mwzdi31s7gi1smdm5y0q9zyp8nby1dxf5qhpf")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/service-manual-frontend"))))
-
-(define-public smart-answers
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0k91z124p6x17wpnvy23bfr9x24hvp04v0cblg8xg0xi32imb0bh")))
-   (package
-     (name "smart-answers")
-     (version "release_3521")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1q3fnbvw86c4ca4brwlr0igi01a9dd2szb6n5gz7q0fmnd19304m")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/smart-answers"))))
-
-(define-public support
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
-   (package
-     (name "support")
-     (version "release_586")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f ;; Asset precompilation fails
-        #:phases
-        (modify-phases %standard-phases
-          (add-after
-           'install 'replace-redis.yml
-           ,(replace-redis.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/support"))))
-
-(define-public support-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1n9fgi7hsyzbdx06nmfqswvz199g0gy4x3izmb1jpx8ijlzsj0cg")))
-   (package
-     (name "support-api")
-     (version "release_123")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1y504xxni3bhr6byjka9ls7m60h3vcakjk2khsyf9bs407kp6k79")))
-     (build-system rails-build-system)
-     (inputs
-      `(;; hostname is needed by the redis-lock gem
-        ("inetutils" ,inetutils)
-        ;; Loading the database structure uses psql
-        ("postgresql" ,postgresql)))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/support-api"))
-   #:extra-inputs (list postgresql)))
-
-(define-public content-performance-manager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0fbwnx7j4qvn4aj5vi4qr78n7n1a2mhhgj9ayhv8d5z8d3cpcwi8")))
-   (package
-     (name "content-performance-manager")
-     (version "release_30")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "12z9800nlm2vl5r7nznh8ah0sv1768id0xxhkn38m9wwjxlq53qj")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-performance-manager"))
-   #:extra-inputs (list postgresql libffi)))
-
-(define-public content-store
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1chs8dym0izp367cczbhqsdj2d2hvnx7pfb7bax60d1w040jyamh")))
-   (package
-     (name "content-store")
-     (version "release_628")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0rxb0gzzqp2fv1anjsi0xk9s05jvbf67g6a1195c7dnb2ziqwpmk")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-store"))))
-
-(define-public content-tagger
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1q1h9bpshrijrzzrzgfgsrqs017rfmzn4zxrdvqbz0cnj3igj1af")))
-   (package
-     (name "content-tagger")
-     (version "release_341")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "17xgyq9ir72v63f3xfkvjjlsq8w2s0psx9frxg32jv167m0fy801")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-tagger"))
-   #:extra-inputs (list postgresql)))
-
-(define-public release
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1mbhlvv6jigbd1v04nhcp31n1zbbdl4pb0d36ad29lynsp85ri5l")))
-   (package
-     (name "release")
-     (version "release_232")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/release"))
-   #:extra-inputs (list mariadb)))
-
-(define-public service-manual-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0anh8zkprbxs2rikwf9xbygxj9fg0x0dysjy3dbhw8f9lq4zhr9z")))
-   (package
-     (name "service-manual-publisher")
-     (version "release_284")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0hgmk3y9x7nnq9amy5sy5sk71cqvdmc950vv8mvdr1r8mc2hzvr1")))
-     (build-system rails-build-system)
-     (inputs
-      `(;; Loading the database structure uses psql
-        ("postgresql" ,postgresql)))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/service-manual-publisher"))
-   #:extra-inputs (list postgresql)))
-
-(define-public short-url-manager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "155mp2xi968hhzkk3rk6rj5rd4qgcp0rb6n01aim01515xzy84il")))
-   (package
-     (name "short-url-manager")
-     (version "release_103")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1ll9kq17iaa5jkj7k0ck9r2gydw79j27jjvplbaadk31jsmh87jy")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/short-url-manager"))))
-
-(define-public specialist-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0iwgfd6ppv40iwps1m3li1al6glh2ckinfby8vs7ckay5yr1bg7v"))
-    (without '("development" "test")))
-   (package
-     (name "specialist-publisher")
-     (version "release_751")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1l2ncdw3p1a4kygp5gc2gjzbdh2prdygaqrhvp78q5fr1pk315lv")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after
-           'install 'alter-secrets.yml
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* (string-append
-                           (assoc-ref outputs "out")
-                           "/config/secrets.yml")
-               (("SECRET_TOKEN")
-                "SECRET_KEY_BASE")))))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/specialist-publisher"))))
-
-(define-public specialist-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0j0sms0d5dwgdlj6y9cfq7ay2r7szk5ih5cs04hrhlqplilk7q1d")))
-   (package
-     (name "specialist-frontend")
-     (version "release_174")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/specialist-frontend"))))
-
-(define-public transition
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
-   (package
-     (name "transition")
-     (version "release_786")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/transition"))))
-
-(define-public travel-advice-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1gjd5bf1h3xgy2j449sinzpgbmmird3a75spwfv5vhicw25ij4id")))
-   (package
-     (name "travel-advice-publisher")
-     (version "release_238")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1rp6chk0d2yjb1zbl2yzksid01l9hik0vw03cw2cl5i7dkfb5zy7")))
+       #:hash (base32 "0npk0nj9mfw7fgs5rarhd8fig3359c6vnj6614jvmpwspqraqdxv")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/travel-advice-publisher"))))
-
-(define-public content-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0csjlacjx7r9iv8j82vl2fbki824bq76hvsjzvbxmabpwwbyn0zk")))
-   (package
-     (name "content-api")
-     (version "release_397")
-     (source
-      (github-archive
-       #:repository "govuk_content_api"
-       #:commit-ish version
-       #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:path "/mongoid.yml")))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-api"))
-   #:extra-inputs (list libffi)))
-
-(define-public publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "00g07lnd16cz27h46r23pjgg7wjx12y2n0vgj19ch7480aq9va85")))
-   (package
-     (name "publisher")
-     (version "release_1779")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0qwli0c2hd3jqjr3rjlgl3xp4cn0q0g10zqjqczrnqal1nim0182")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml))
+                     ,(replace-mongoid.yml #:mongoid-version "3"))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
                      ,(replace-gds-sso-initializer)))))
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/publisher"))))
-
-(define-public frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0vkasdpgvz368f924qfk57786qmc9m2ysxfd6gjziwrdbvkq877j")))
-   (package
-     (name "frontend")
-     (version "release_2120")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "02b8k1gvsr57k2kfjb6wdr8mn07yhh55c4pdb2adfdij0lb2rskl")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/frontend"))))
-
-(define-public signon
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0vidm9aikp74yvdnh2infmf45xyx9sfiya27h4g8s6lj06dx6p2f"))
-    (without '("development" "test")))
-   (package
-     (name "signon")
-     (version "release_896")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0bsg7pk5g4h2if6x1253rv48hssnm1xsqfjiyyg46w5ag5m13dl1")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/signon"))
-   #:extra-inputs (list mariadb
-                        postgresql
-                        openssl)))
-
-(define-public static
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "179brwqjg8hxkqc4r0ga194nc5alfajyp9ms21hbqx7ykh9vwhan")))
-   (package
-     (name "static")
-     (version "release_2441")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/static"))))
-
-(define-public info-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "10c8npzfidrs9wk29nb4b1vba2islkf83i57c410a3z0xm2hm51k")))
-   (package
-     (name "info-frontend")
-     (version "release_71")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0qj5q7fv4x122x41j2ln4zg1sk017930ap51650pn5g6jdb3pcyx")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/info-frontend"))))
-
-(define-public router-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "18xi02azlxjqll2h9fqhy3rgqm41zhkkh464psli0d6h3hgw3phk")))
-   (package
-     (name "router-api")
-     (version "release_106")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/router-api"))))
-
-(define-public router
-  (package
-    (name "router")
-    (version "release_144")
-    (source
-     (github-archive
-      #:repository name
-      #:commit-ish version
-      #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
-    (build-system gnu-build-system)
-    (native-inputs
-     `(("go" ,go)))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (delete 'configure)
-         (delete 'install)
-         (delete 'check)
-         (replace 'build
-                  (lambda* (#:key inputs outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (cwd (getcwd)))
-                      (copy-recursively cwd "../router-copy")
-                      (mkdir-p "__build/src/github.com/alphagov")
-                      (mkdir-p "__build/bin")
-                      (setenv "GOPATH" (string-append cwd "/__build"))
-                      (setenv "BINARY" (string-append cwd "/router"))
-                      (rename-file "../router-copy"
-                                   "__build/src/github.com/alphagov/router")
-                      (and
-                       (with-directory-excursion
-                           "__build/src/github.com/alphagov/router"
-                         (and
-                          (zero? (system*
-                                  "make" "build"
-                                          (string-append "RELEASE_VERSION="
-                                                         ,version)))
-                          (mkdir-p (string-append out "/bin"))))
-                       (begin
-                         (copy-file "router"
-                                    (string-append out "/bin/router"))
-                         #t))))))))
-    (synopsis "")
-    (description "")
-    (license "")
-    (home-page "https://github.com/alphagov/router")))
-
-(define-public rummager
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1905s1pw9l1jv71z2paqahdy6hdbywprxq7n64929vz927zwykq9")))
-   (package
-     (name "rummager")
-     (version "release_1328")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "19a896x7sv5y468ya51cp84p7s9npbgw1i9sh6nzda37sxfdism5")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-after
-           'install 'replace-redis.yml
-           ,(replace-redis.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/rummager"))
+     (home-page "https://github.com/alphagov/maslow"))
    #:extra-inputs (list libffi)))
 
 (define-public metadata-api
@@ -1147,6 +775,124 @@ content, as well as broadcasting changes to a message queue.")
     (license "")
     (home-page "https://github.com/alphagov/metadata-api")))
 
+(define-public multipage-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0h7g4s2yzwp9a77fd5rpwj7sbsj0vfy0216g98j2175nx75b8ic7")))
+   (package
+     (name "multipage-frontend")
+     (version "release_55")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "055ga8s0z9ljmcfkrwhl6if6qshq4bn303dhqr5476a10mgdghf7")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/multipage-frontend"))))
+
+(define-public need-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0kfxvx2cw42zkc07vayymra5a6sssbqlppsnh73q7hvmr20ykyq8")))
+   (package
+     (name "need-api")
+     (version "release_141")
+     (source
+      (github-archive
+       #:repository "govuk_need_api"
+       #:commit-ish "release_141"
+       #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-mongoid.yml
+                     ,(replace-mongoid.yml #:mongoid-version "3")))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/need-api"))))
+
+(define-public policy-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "029rdnjh0fdx7arijbi1gq3r1hc34xpdi386rfw857n40f1p1zwi")))
+   (package
+     (name "policy-publisher")
+     (version "release_167")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0gzbm31xbkw66bmjxjifxwvhpshf1bvnyl2d8frgd6kwjzi7x3qr")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/policy-publisher"))
+   #:extra-inputs (list postgresql)))
+
+(define-public publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "00g07lnd16cz27h46r23pjgg7wjx12y2n0vgj19ch7480aq9va85")))
+   (package
+     (name "publisher")
+     (version "release_1779")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0qwli0c2hd3jqjr3rjlgl3xp4cn0q0g10zqjqczrnqal1nim0182")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-mongoid.yml
+                     ,(replace-mongoid.yml))
+          (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
+                     ,(replace-gds-sso-initializer)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/publisher"))))
+
+(define-public publishing-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1m0blbl0bjlzxp98851rkvff1s6j9k5iddh2jq1isgn87yigrrwq")))
+   (package
+     (name "publishing-api")
+     (version "release_848")
+     (source
+      (github-archive
+       #:repository "publishing-api"
+       #:commit-ish version
+       #:hash (base32 "050qw6078f98wxc985qvmsnjb8zl0vpgvm6xx46sfa6l3ivmpb65")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "Service for storing and providing workflow for GOV.UK content")
+     (description
+      "The Publishing API is a service that provides a HTTP API for
+managing content for GOV.UK.  Publishing applications can use the
+Publishing API to manage their content, and the Publishing API will
+populate the appropriate Content Stores (live or draft) with that
+content, as well as broadcasting changes to a message queue.")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/publishing-api"))
+   #:extra-inputs (list
+                   ;; Required by the pg gem
+                   postgresql)))
+
 (define-public publishing-e2e-tests
   (package-with-bundler
    (bundle-package
@@ -1187,126 +933,403 @@ content, as well as broadcasting changes to a message queue.")
                    libxml2
                    libxslt)))
 
-(define-public maslow
+(define-public release
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0911wcbx3ixbw3l2yqsmcjqxx8lsfqja3skbj17ah8dr22pszs5d")))
+    (hash (base32 "1mbhlvv6jigbd1v04nhcp31n1zbbdl4pb0d36ad29lynsp85ri5l")))
    (package
-     (name "maslow")
-     (version "release_194")
+     (name "release")
+     (version "release_232")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0npk0nj9mfw7fgs5rarhd8fig3359c6vnj6614jvmpwspqraqdxv")))
+       #:hash (base32 "1lp18bzf2x9gsi12h8kfnn3rz4snyp6b3lp8b51nrmi8zy036xws")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
         (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:mongoid-version "3"))
-          (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
-                     ,(replace-gds-sso-initializer)))))
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/maslow"))
-   #:extra-inputs (list libffi)))
+     (home-page "https://github.com/alphagov/release"))
+   #:extra-inputs (list mariadb)))
 
-(define-public need-api
+(define-public router
+  (package
+    (name "router")
+    (version "release_144")
+    (source
+     (github-archive
+      #:repository name
+      #:commit-ish version
+      #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
+    (build-system gnu-build-system)
+    (native-inputs
+     `(("go" ,go)))
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'install)
+         (delete 'check)
+         (replace 'build
+                  (lambda* (#:key inputs outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (cwd (getcwd)))
+                      (copy-recursively cwd "../router-copy")
+                      (mkdir-p "__build/src/github.com/alphagov")
+                      (mkdir-p "__build/bin")
+                      (setenv "GOPATH" (string-append cwd "/__build"))
+                      (setenv "BINARY" (string-append cwd "/router"))
+                      (rename-file "../router-copy"
+                                   "__build/src/github.com/alphagov/router")
+                      (and
+                       (with-directory-excursion
+                           "__build/src/github.com/alphagov/router"
+                         (and
+                          (zero? (system*
+                                  "make" "build"
+                                          (string-append "RELEASE_VERSION="
+                                                         ,version)))
+                          (mkdir-p (string-append out "/bin"))))
+                       (begin
+                         (copy-file "router"
+                                    (string-append out "/bin/router"))
+                         #t))))))))
+    (synopsis "")
+    (description "")
+    (license "")
+    (home-page "https://github.com/alphagov/router")))
+
+(define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0kfxvx2cw42zkc07vayymra5a6sssbqlppsnh73q7hvmr20ykyq8")))
+    (hash (base32 "18xi02azlxjqll2h9fqhy3rgqm41zhkkh464psli0d6h3hgw3phk")))
    (package
-     (name "need-api")
-     (version "release_141")
+     (name "router-api")
+     (version "release_106")
      (source
       (github-archive
-       #:repository "govuk_need_api"
-       #:commit-ish "release_141"
-       #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9")))
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1f2gycb51mi7cfvm83lldczi56l9j6ra9c5db4b6hmm2wigwh53d")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/router-api"))))
+
+(define-public rummager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1905s1pw9l1jv71z2paqahdy6hdbywprxq7n64929vz927zwykq9")))
+   (package
+     (name "rummager")
+     (version "release_1328")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "19a896x7sv5y468ya51cp84p7s9npbgw1i9sh6nzda37sxfdism5")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
         #:phases
         (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:mongoid-version "3")))))
+          (add-after
+           'install 'replace-redis.yml
+           ,(replace-redis.yml)))))
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/need-api"))))
+     (home-page "https://github.com/alphagov/rummager"))
+   #:extra-inputs (list libffi)))
 
-(define-public govuk-content-schemas
-  (package
-    (name "govuk-content-schemas")
-    (version "release_587")
-    (source
-     (github-archive
-      #:repository name
-      #:commit-ish version
-      #:hash (base32 "13hx85nyvycd5nqw6a6ds68pyzw51ix54lnva1vnd5hgwgy4qqmq")))
-    (build-system gnu-build-system)
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (delete 'configure)
-         (delete 'build)
-         (delete 'check)
-         (replace 'install
+(define-public search-admin
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "06wy96q5przv7pnc1wxxkl606jyayhyn3si3fi93v9c3rwaiv0sk")))
+   (package
+     (name "search-admin")
+     (version "release_91")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1kr3rlwiydnpdrcw809rmy1xspz9m5i8a1dsqm7fpfyyyn2v4is5")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/search-admin"))
+   #:extra-inputs (list mariadb)))
+
+(define-public service-manual-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "023jq5606gvj0wa8v8v7maxhqm8z0k3fkz2bbnajv6wcjd5dm0hf")))
+   (package
+     (name "service-manual-frontend")
+     (version "release_99")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1fsgx2p91j43n70mwzdi31s7gi1smdm5y0q9zyp8nby1dxf5qhpf")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/service-manual-frontend"))))
+
+(define-public service-manual-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0anh8zkprbxs2rikwf9xbygxj9fg0x0dysjy3dbhw8f9lq4zhr9z")))
+   (package
+     (name "service-manual-publisher")
+     (version "release_284")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0hgmk3y9x7nnq9amy5sy5sk71cqvdmc950vv8mvdr1r8mc2hzvr1")))
+     (build-system rails-build-system)
+     (inputs
+      `(;; Loading the database structure uses psql
+        ("postgresql" ,postgresql)))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/service-manual-publisher"))
+   #:extra-inputs (list postgresql)))
+
+(define-public short-url-manager
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "155mp2xi968hhzkk3rk6rj5rd4qgcp0rb6n01aim01515xzy84il")))
+   (package
+     (name "short-url-manager")
+     (version "release_103")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1ll9kq17iaa5jkj7k0ck9r2gydw79j27jjvplbaadk31jsmh87jy")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/short-url-manager"))))
+
+(define-public signon
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0vidm9aikp74yvdnh2infmf45xyx9sfiya27h4g8s6lj06dx6p2f"))
+    (without '("development" "test")))
+   (package
+     (name "signon")
+     (version "release_896")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0bsg7pk5g4h2if6x1253rv48hssnm1xsqfjiyyg46w5ag5m13dl1")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/signon"))
+   #:extra-inputs (list mariadb
+                        postgresql
+                        openssl)))
+
+(define-public smart-answers
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0k91z124p6x17wpnvy23bfr9x24hvp04v0cblg8xg0xi32imb0bh")))
+   (package
+     (name "smart-answers")
+     (version "release_3521")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1q3fnbvw86c4ca4brwlr0igi01a9dd2szb6n5gz7q0fmnd19304m")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/smart-answers"))))
+
+(define-public specialist-frontend
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0j0sms0d5dwgdlj6y9cfq7ay2r7szk5ih5cs04hrhlqplilk7q1d")))
+   (package
+     (name "specialist-frontend")
+     (version "release_174")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/specialist-frontend"))))
+
+(define-public specialist-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0iwgfd6ppv40iwps1m3li1al6glh2ckinfby8vs7ckay5yr1bg7v"))
+    (without '("development" "test")))
+   (package
+     (name "specialist-publisher")
+     (version "release_751")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1l2ncdw3p1a4kygp5gc2gjzbdh2prdygaqrhvp78q5fr1pk315lv")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after
+           'install 'alter-secrets.yml
            (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out")))
-               (copy-recursively "." out)
-               #t))))))
-    (synopsis "govuk-content-schemas")
-    (description "govuk-content-schemas")
-    (license #f)
-    (home-page #f)))
+             (substitute* (string-append
+                           (assoc-ref outputs "out")
+                           "/config/secrets.yml")
+               (("SECRET_TOKEN")
+                "SECRET_KEY_BASE")))))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/specialist-publisher"))))
 
-(define-public govuk-setenv
-  (package
-   (name "govuk-setenv")
-   (version "1")
-   (source #f)
-   (build-system trivial-build-system)
-   (arguments
-    `(#:modules ((guix build utils))
-      #:builder (begin
-                  (use-modules (guix build utils))
-                  (let
-                      ((bash (string-append
-                              (assoc-ref %build-inputs "bash")
-                              "/bin/bash"))
-                       (sudo (string-append
-                              (assoc-ref %build-inputs "sudo")
-                              "/bin/sudo")))
-                    (mkdir-p (string-append %output "/bin"))
-                    (call-with-output-file (string-append
-                                            %output
-                                            "/bin/govuk-setenv")
-                      (lambda (port)
-                        (simple-format port "#!~A
-set -exu
-APP=\"$1\"
-shift
-source \"/tmp/env.d/$APP\"
-cd \"/var/apps/$APP\"
-~A --preserve-env -u \"$APP\" \"$@\"
-" bash sudo)))
-                    (chmod (string-append %output "/bin/govuk-setenv") #o555)
-                    #t))))
-   (native-inputs
-    `(("bash" ,bash)
-      ("sudo" ,sudo)))
-   (synopsis "govuk-setenv script for running commands in the service environment")
-   (description "This script runs the specified command in an
-environment similar to that which the service is running. For example,
-running govuk-setenv @code{publishing-api rails console} runs the
-@code{rails console} command as the user associated with the
-Publishing API service, and with the environment variables for this
-service setup.")
-   (license #f)
-   (home-page #f)))
+(define-public static
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "179brwqjg8hxkqc4r0ga194nc5alfajyp9ms21hbqx7ykh9vwhan")))
+   (package
+     (name "static")
+     (version "release_2441")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "05rbf7x2n2kzz0n1bww0190l7ly9cvvl10j3mdy9gb891sm74n2h")))
+     (build-system rails-build-system)
+     (arguments `(#:precompile-rails-assets? #f))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/static"))))
+
+(define-public support
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
+   (package
+     (name "support")
+     (version "release_586")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "144g3vkc9nvwfjgbxx5c5xanwj2b7k7f64sy13114fz0r3mxcjkc")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:precompile-rails-assets? #f ;; Asset precompilation fails
+        #:phases
+        (modify-phases %standard-phases
+          (add-after
+           'install 'replace-redis.yml
+           ,(replace-redis.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/support"))))
+
+(define-public support-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1n9fgi7hsyzbdx06nmfqswvz199g0gy4x3izmb1jpx8ijlzsj0cg")))
+   (package
+     (name "support-api")
+     (version "release_123")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1y504xxni3bhr6byjka9ls7m60h3vcakjk2khsyf9bs407kp6k79")))
+     (build-system rails-build-system)
+     (inputs
+      `(;; hostname is needed by the redis-lock gem
+        ("inetutils" ,inetutils)
+        ;; Loading the database structure uses psql
+        ("postgresql" ,postgresql)))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/support-api"))
+   #:extra-inputs (list postgresql)))
+
+(define-public transition
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1rg9889j8mqrhz78n6hn7csph625090dvzri6kx5yp55vhwk7m8z")))
+   (package
+     (name "transition")
+     (version "release_786")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1vk2spmc7h6afq7q15qh39ahhy4k2a45zs6micdq9qilzd3kjhkk")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/transition"))))
+
+(define-public travel-advice-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1gjd5bf1h3xgy2j449sinzpgbmmird3a75spwfv5vhicw25ij4id")))
+   (package
+     (name "travel-advice-publisher")
+     (version "release_238")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1rp6chk0d2yjb1zbl2yzksid01l9hik0vw03cw2cl5i7dkfb5zy7")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'replace-mongoid.yml
+                     ,(replace-mongoid.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/travel-advice-publisher"))))
 
 (define-public whitehall
   (package-with-bundler
@@ -1347,26 +1370,3 @@ service setup.")
                         libffi
                         curl
                         imagemagick)))
-
-(define-public government-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1nwb9qdz4iybf640rbdfg6v155gh0358c4ly77zzkds9sg79a3c4")))
-   (package
-     (name "government-frontend")
-     (version "release_244")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "0zlxr1340ax3xpvnry48v3jr9sv6vlr268h647svg2y86a2avm0i")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-before 'bundle-install 'replace-ruby-version
-                      ,(replace-ruby-version (package-version ruby))))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/government-frontend"))))
