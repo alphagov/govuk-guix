@@ -239,22 +239,6 @@
                             (out (assoc-ref outputs "out")))
                        (setenv "GEMRC"  (assoc-ref %build-inputs "gemrc"))
                        (setenv "CC" "gcc")
-                       ;; (if (catch
-                       ;;       'system-error
-                       ;;       (lambda ()
-                       ;;         (lstat (string-append cwd "/vendor/cache"))
-                       ;;         #t)
-                       ;;       (lambda (key . args)
-                       ;;         #f))
-                       ;;     (delete-file (string-append cwd "/vendor/cache")))
-                       ;; (if (catch
-                       ;;       'system-error
-                       ;;       (lambda ()
-                       ;;         (lstat (string-append cwd "/vendor/bundle"))
-                       ;;         #t)
-                       ;;       (lambda (key . args)
-                       ;;         #f))
-                       ;;     (delete-file (string-append cwd "/vendor/bundle")))
                        (if (file-exists? (string-append cwd "/.bundle/config"))
                            (chmod (string-append cwd "/.bundle/config") #o644))
                        (and
