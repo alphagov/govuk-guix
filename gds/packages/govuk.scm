@@ -1196,12 +1196,40 @@ content, as well as broadcasting changes to a message queue.")
    (bundle-package
     (hash
      (base32 "1bcs0j60pz620jn19n94sbkvp6drzanw60mmd361vqhgnzj8pmff")))
-   (make-govuk-package
-    "publishing-e2e-tests"
-    (github-archive
-     #:repository "publishing-e2e-tests"
-     #:commit-ish "44058ef1421b81a9c4c11f5a7dba40d0404de29a"
-     #:hash (base32 "1xlgs4a7k49h54nv19ax3cd4a17jv74g13zn05hbrv041css3my9")))))
+   (package
+     (name "publishing-e2e-tests")
+     (version "0")
+     (source
+      (github-archive
+       #:repository "publishing-e2e-tests"
+       #:commit-ish "44058ef1421b81a9c4c11f5a7dba40d0404de29a"
+       #:hash (base32 "1xlgs4a7k49h54nv19ax3cd4a17jv74g13zn05hbrv041css3my9")))
+     (build-system gnu-build-system)
+     (inputs
+      `(("ruby" ,ruby)
+        ("phantomjs" ,phantomjs)))
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (replace 'configure (lambda args #t))
+          (replace 'build (lambda args #t))
+          (replace 'check (lambda args #t))
+          (replace 'install
+                   (lambda* (#:key inputs outputs #:allow-other-keys)
+                     (let* ((out (assoc-ref outputs "out")))
+                       (copy-recursively
+                        "."
+                        out
+                        #:log (%make-void-port "w"))))))))
+     (synopsis "Suite of end-to-end tests for GOV.UK")
+     (description "")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/publishing-e2e-tests"))
+   #:extra-inputs (list
+                   ;; For nokogiri
+                   pkg-config
+                   libxml2
+                   libxslt)))
 
 (define-public maslow
   (package-with-bundler
