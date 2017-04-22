@@ -1070,15 +1070,13 @@ content, as well as broadcasting changes to a message queue.")
      (home-page "https://github.com/alphagov/router-api"))))
 
 (define-public router
-  (let
-      ((release "release_144"))
     (package
       (name "router")
-      (version release)
+      (version "release_144")
       (source
        (github-archive
-        #:repository "router"
-        #:commit-ish release
+        #:repository name
+        #:commit-ish version
         #:hash (base32 "0lq5zhvsahs436aagsf89bzs9b7ydhysng4kj88is7p69i6f1h2i")))
       (build-system gnu-build-system)
       (native-inputs
@@ -1104,7 +1102,7 @@ content, as well as broadcasting changes to a message queue.")
                   (with-directory-excursion
                       "__build/src/github.com/alphagov/router"
                     (and
-                     (zero? (system* "make" "build" (string-append "RELEASE_VERSION=" ,release)))
+                     (zero? (system* "make" "build" (string-append "RELEASE_VERSION=" ,version)))
                      (mkdir-p (string-append out "/bin"))))
                   (begin
                     (copy-file "router"
@@ -1113,7 +1111,7 @@ content, as well as broadcasting changes to a message queue.")
       (synopsis "")
       (description "")
       (license "")
-      (home-page "https://github.com/alphagov/router"))))
+      (home-page "https://github.com/alphagov/router")))
 
 (define-public rummager
   (package-with-bundler
