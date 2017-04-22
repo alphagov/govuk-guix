@@ -340,30 +340,44 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/email-alert-api"))))
 
 (define-public email-alert-service
-  (let
-      ((pkg
-        (package-with-bundler
-         (bundle-package
-          (hash (base32 "1zp0wqjf721fg6fpnwhw30960ill070zpj4lh690s5cdwai1rfja")))
-         (make-govuk-package
-          "email-alert-service"
-          (github-archive
-           #:repository "email-alert-service"
-           #:commit-ish "release_65"
-           #:hash (base32 "0gvds70g8x8qnc13biqj121z0r3p6b9vjvbfhizffxi73zpdfw57"))))))
-    (package
-      (inherit pkg)
-      (arguments
-       (substitute-keyword-arguments (package-arguments pkg)
-         ((#:phases phases)
-          `(modify-phases ,phases
-             (add-after
-              'patch-bin-files 'wrap-with-relative-path
-              (lambda* (#:key outputs #:allow-other-keys)
-                (let* ((out (assoc-ref outputs "out")))
-                  (substitute* (find-files (string-append out "/bin"))
-                    (((string-append out "/bin"))
-                     "${BASH_SOURCE%/*}"))))))))))))
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1zp0wqjf721fg6fpnwhw30960ill070zpj4lh690s5cdwai1rfja")))
+   (package
+     (name "email-alert-service")
+     (version "release_65")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0gvds70g8x8qnc13biqj121z0r3p6b9vjvbfhizffxi73zpdfw57")))
+     (build-system gnu-build-system)
+     (inputs
+      `(("ruby" ,ruby)))
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (replace 'configure (lambda args #t))
+          (replace 'build (lambda args #t))
+          (replace 'check (lambda args #t))
+          (replace 'install
+                   (lambda* (#:key inputs outputs #:allow-other-keys)
+                     (let* ((out (assoc-ref outputs "out")))
+                       (copy-recursively
+                        "."
+                        out
+                        #:log (%make-void-port "w")))))
+          (add-after 'patch-bin-files 'wrap-with-relative-path
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out")))
+                         (substitute* (find-files
+                                       (string-append out "/bin"))
+                           (((string-append out "/bin"))
+                            "${BASH_SOURCE%/*}"))))))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/email-alert-service/"))))
 
 (define-public feedback
   (package-with-bundler
