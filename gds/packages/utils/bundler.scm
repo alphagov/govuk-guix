@@ -20,6 +20,9 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages certs)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages xml)
+  #:use-module (gds build-system rails)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler-build)
   #:export (bundler
@@ -180,23 +183,11 @@
   (mixed-text-file "gemrc"
                    "custom_shebang: " ruby "/bin/ruby\n"))
 
-(define (bundle-install-package
-         bundle-pkg
-         pkg)
-  (let
-      ((ruby
-        (let
-            ((ruby-input
-              (find
-               (match-lambda ((name pkg rest ...)
-                              (equal? name "ruby")))
-               (package-inputs pkg))))
-          (match
-              ruby-input
-            ((#f)
-             #f)
-            ((name pkg rest ...)
-             pkg)))))
+(define* (bundle-install-package
+          bundle-pkg
+          pkg
+          #:key
+          (extra-inputs '()))
     (package
      (name (string-append (package-name pkg) "-bundle-install"))
      (version "0")
@@ -204,8 +195,7 @@
               (inherit bundle-pkg)
               (source (or (bundle-package-source bundle-pkg)
                           (package-source pkg)))
-              (name (string-append (package-name pkg) "-bundle-package"))
-              (ruby ruby)))
+              (name (string-append (package-name pkg) "-bundle-package"))))
      (build-system gnu-build-system)
      (arguments
       `(#:modules ((srfi srfi-1)
@@ -241,7 +231,8 @@
                         '("lib")
                         (map cdr inputs))))
           (add-after 'set-ld-library-path 'replace-ruby-version
-                     ,(replace-ruby-version (package-version ruby)))
+                     ,(replace-ruby-version (package-version
+                                             (bundle-package-ruby bundle-pkg))))
           (replace 'build
                    (lambda* (#:key inputs outputs #:allow-other-keys)
                      (let* ((cwd (getcwd))
@@ -329,37 +320,44 @@
                                       "'].freeze"))))))))
     (inputs
      (cons*
+      (list "ruby" (bundle-package-ruby bundle-pkg))
       (list "bundler" bundler)
-      (list "gemrc" (gemrc ruby))
-      (package-inputs pkg)))
-    (native-inputs
-     (package-native-inputs pkg))
+      (list "gemrc" (gemrc (bundle-package-ruby bundle-pkg)))
+      (list "tzdata" tzdata)
+      (map (lambda (package)
+             (list (package-name package) package))
+           extra-inputs)))
     (synopsis "")
     (license "")
     (description "")
-    (home-page ""))))
+    (home-page "")))
 
-(define (package-with-bundler
-         bundle-pkg
-         pkg)
+(define* (package-with-bundler
+          bundle-pkg
+          pkg
+          #:key
+          (extra-inputs '()))
   (let
-      ((ruby
-        (let
-            ((ruby-input
-              (find
-               (match-lambda ((name pkg rest ...)
-                              (equal? name "ruby")))
-               (package-inputs pkg))))
-          (match
-              ruby-input
-            ((#f)
-             #f)
-            ((name pkg rest ...)
-             pkg)))))
+      ((ruby (bundle-package-ruby bundle-pkg)))
     (package
       (inherit pkg)
       (arguments
-       (substitute-keyword-arguments (package-arguments pkg)
+       (substitute-keyword-arguments
+           (default-keyword-arguments
+             (package-arguments pkg)
+             `(#:modules
+               ,(or
+                 (assq-ref
+                  `((,gnu-build-system . ,%gnu-build-system-modules)
+                    (,rails-build-system . ,%rails-build-system-modules))
+                  (package-build-system pkg))
+                 (error "package-with-bundler, unsupported build system ~A"
+                        (package-build-system pkg)))
+               #:phases %standard-phases))
+         ((#:modules modules)
+          `((srfi srfi-1)
+            (ice-9 ftw)
+            ,@modules))
          ((#:phases phases)
           `(modify-phases ,phases
              (delete 'set-bundle-without)
@@ -415,6 +413,8 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                         ,(replace-ruby-version (package-version ruby)))
              (add-before 'configure 'add-bundle-install-bin-to-path
                          (lambda* (#:key inputs #:allow-other-keys)
+                           (use-modules (srfi srfi-1)
+                                        (ice-9 ftw))
                            (let*
                                ((prefix
                                  (string-append
@@ -503,7 +503,20 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
     (inputs
      (cons*
       (list "bundler" bundler)
-      (list "bundle-install" (bundle-install-package bundle-pkg pkg))
+      (list "bundle-install" (bundle-install-package
+                              bundle-pkg pkg
+                              #:extra-inputs (append
+                                              extra-inputs
+                                              (cond
+                                               ((eq? (package-build-system pkg)
+                                                     rails-build-system)
+                                                (list
+                                                 ;; Dependencies of nokogiri
+                                                 pkg-config
+                                                 libxml2
+                                                 libxslt))
+                                               (else '())))))
+      (list "nss-certs" nss-certs)
       (list "gemrc" (gemrc ruby))
       (filter
        (match-lambda
