@@ -1143,53 +1143,53 @@ content, as well as broadcasting changes to a message queue.")
    #:extra-inputs (list libffi)))
 
 (define-public metadata-api
-    (package
-      (name "metadata-api")
-      (version "release_70")
-      (source
-       (github-archive
-        #:repository name
-        #:commit-ish version
-        #:hash (base32 "0jdwvx546f4fd7gvablvpg38srja04klw9m9hv9ix2zp94wdrlns")))
-      (build-system gnu-build-system)
-      (native-inputs
-       `(("go" ,go)))
-      (arguments
-       `(#:phases
-         (modify-phases %standard-phases
-           (delete 'configure)
-           (delete 'install)
-           (delete 'check)
-           (replace 'build
-             (lambda* (#:key inputs outputs #:allow-other-keys)
-               (let* ((out (assoc-ref outputs "out"))
-                      (cwd (getcwd))
-                      (gopath (string-append cwd "/__build/"))
-                      (repo "alphagov/metadata-api")
-                      (build-path (string-append
-                                   gopath
-                                   "src/github.com/"
-                                   repo)))
-                 (copy-recursively cwd "../metadata-api-copy"
-                                   #:log (%make-void-port "w"))
-                 (mkdir-p "__build/src/github.com/alphagov")
-                 (mkdir-p "__build/bin")
-                 (setenv "GOPATH" gopath)
-                 (rename-file "../metadata-api-copy"
-                              "__build/src/github.com/alphagov/metadata-api")
-                 (and
-                  (with-directory-excursion
-                   "__build/src/github.com/alphagov/metadata-api"
-                   (zero? (system* "make" "build")))
-                  (begin
-                    (mkdir-p (string-append out "/bin"))
-                    (copy-file (string-append build-path "/metadata-api")
-                               (string-append out "/bin/metadata-api"))
-                    #t))))))))
-      (synopsis "")
-      (description "")
-      (license "")
-      (home-page "https://github.com/alphagov/metadata-api")))
+  (package
+    (name "metadata-api")
+    (version "release_70")
+    (source
+     (github-archive
+      #:repository name
+      #:commit-ish version
+      #:hash (base32 "0jdwvx546f4fd7gvablvpg38srja04klw9m9hv9ix2zp94wdrlns")))
+    (build-system gnu-build-system)
+    (native-inputs
+     `(("go" ,go)))
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (delete 'configure)
+         (delete 'install)
+         (delete 'check)
+         (replace 'build
+                  (lambda* (#:key inputs outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (cwd (getcwd))
+                           (gopath (string-append cwd "/__build/"))
+                           (repo "alphagov/metadata-api")
+                           (build-path (string-append
+                                        gopath
+                                        "src/github.com/"
+                                        repo)))
+                      (copy-recursively cwd "../metadata-api-copy"
+                                        #:log (%make-void-port "w"))
+                      (mkdir-p "__build/src/github.com/alphagov")
+                      (mkdir-p "__build/bin")
+                      (setenv "GOPATH" gopath)
+                      (rename-file "../metadata-api-copy"
+                                   "__build/src/github.com/alphagov/metadata-api")
+                      (and
+                       (with-directory-excursion
+                           "__build/src/github.com/alphagov/metadata-api"
+                         (zero? (system* "make" "build")))
+                       (begin
+                         (mkdir-p (string-append out "/bin"))
+                         (copy-file (string-append build-path "/metadata-api")
+                                    (string-append out "/bin/metadata-api"))
+                         #t))))))))
+    (synopsis "")
+    (description "")
+    (license "")
+    (home-page "https://github.com/alphagov/metadata-api")))
 
 (define-public publishing-e2e-tests
   (package-with-bundler
