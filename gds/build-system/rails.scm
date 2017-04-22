@@ -15,9 +15,9 @@
 
 (define %rails-build-system-modules
   ;; Build side modules imported by default
-  `((gds build rails-build-system)
-    (guix build syscalls)
-    ,@%gnu-build-system-modules))
+  `((guix build syscalls)
+    ,@%gnu-build-system-modules
+    (gds build rails-build-system)))
 
 (define (default-ruby)
   (let ((ruby-mod (resolve-interface '(gnu packages ruby))))
