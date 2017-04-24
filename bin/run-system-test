@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -o pipefail
+
 RESULTS_DIRECTORY="$(dirname $(dirname ${BASH_SOURCE[0]}))/test-results"
 
 mkdir -p "$RESULTS_DIRECTORY"
