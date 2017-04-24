@@ -1,0 +1,130 @@
+#!/usr/bin/guile --no-auto-compile
+-*- scheme -*-
+!#
+
+;; To allow this script to be run directly, even from the Git
+;; repository, check if the environment is setup by checking if the
+;; (gds services) module is loadable. If it's not loadable, start this
+;; script again, but use the guix-pre-inst-env helper to setup the
+;; environment.
+(catch
+  #t
+  (lambda ()
+    (resolve-interface '(gds services)))
+  (lambda args
+    (exit
+     (status:exit-val
+      (apply
+       system*
+       "bash"
+       (string-append (dirname (dirname (current-filename)))
+                      "/guix-pre-inst-env")
+       "guile"
+       (current-filename)
+       (cdr (command-line)))))))
+
+(use-modules
+ (srfi srfi-1)
+ (srfi srfi-11)
+ (srfi srfi-26)
+ (srfi srfi-37)
+ (ice-9 match)
+ (guix ui)
+ (guix hash)
+ (guix store)
+ (guix scripts)
+ (guix packages)
+ (guix upstream)
+ (gds packages utils bundler))
+
+(define updaters
+  (list (@ (guix import github) %github-updater)))
+
+(define (all-packages)
+  (filter
+   package?
+   (module-map
+    (lambda (name var)
+      (variable-ref var))
+    (resolve-interface '(gds packages govuk)))))
+
+(define (get-matching-packages args)
+  (map (lambda (name)
+         (or (find (lambda (pkg)
+                     (equal? name
+                             (package-name pkg)))
+                   (all-packages))
+             (leave (_ "Could not find a package matching ~A")
+                    name)))
+       args))
+
+(define (commit-version-change package new-version)
+  (define (run . args)
+    (unless (zero? (apply system* args))
+      (leave (_ "command failed: ~A")
+             (string-join args))))
+
+  (let ((name "Package Updater")
+        (email "govuk-guix-package-updater@digital.cabinet-office.gov.uk")
+        (repo-location (dirname (dirname (current-filename)))))
+    (run "git" "-C" repo-location "add" "gds/packages/govuk.scm")
+    (setenv "GIT_COMMITTER_NAME" name)
+    (setenv "GIT_COMMITTER_EMAIL" email)
+    (run "git"
+         "-C" repo-location
+         "commit"
+         (simple-format #f "--author=~A <~A>" name email)
+         "-m"
+         (simple-format
+          #f "Update ~A from ~A to ~A"
+          (package-name package) (package-version package) new-version))))
+
+(define (refresh-package store package commit?)
+  (simple-format #t "\nChecking lastest release of ~A\n"
+                 (package-name package))
+  (let-values (((version tarball)
+                (package-update store package updaters)))
+    (if version
+        (let ((hash (call-with-input-file tarball
+                      port-sha256)))
+          (and=> (extract-bundle-package-from-package package)
+                 (lambda (bundle-pkg)
+                   (update-bundle-package-source
+                    (bundle-package
+                     (inherit bundle-pkg)
+                     (location (bundle-package-location bundle-pkg))
+                     (source tarball)))))
+          (update-package-source package version hash)
+          (if commit?
+              (commit-version-change package version))))))
+
+(define %default-options
+  '((commit? . #f)))
+
+(define options
+  ;; Specifications of the command-line options.
+  (list (option '("commit") #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'commit? #t
+                              (alist-delete 'commit? result))))))
+
+(define (option-values opts key)
+  (reverse
+   (filter-map (match-lambda
+                 ((head . tail)
+                  (and (eq? key head) tail))
+                 (_ #f))
+               opts)))
+
+(define (govuk-refresh . args)
+  (display "\n")
+  (with-error-handling
+   (let* ((opts (parse-command-line (cdr args) options (list %default-options))))
+     (with-store store
+      (for-each (cut refresh-package store <> (assoc-ref opts 'commit?))
+                (let ((package-names (option-values opts 'argument)))
+                  (if (null? package-names)
+                      (all-packages)
+                      (get-matching-packages package-names))))))))
+
+(apply govuk-refresh (command-line))
