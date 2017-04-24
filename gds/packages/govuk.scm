@@ -803,7 +803,7 @@ service setup.")
      (source
       (github-archive
        #:repository "govuk_need_api"
-       #:commit-ish "release_141"
+       #:commit-ish version
        #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9")))
      (build-system rails-build-system)
      (arguments
