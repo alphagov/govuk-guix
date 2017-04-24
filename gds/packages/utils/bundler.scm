@@ -9,6 +9,7 @@
   #:use-module (guix profiles)
   #:use-module (guix store)
   #:use-module (guix utils)
+  #:use-module (guix base32)
   #:use-module (guix download)
   #:use-module (guix derivations)
   #:use-module (guix search-paths)
@@ -38,7 +39,9 @@
             bundle-package-location
 
             bundle-package-to-store
-            package-with-bundler))
+            package-with-bundler
+            extract-bundle-package-from-package
+            update-bundle-package-source))
 
 (define (patch-ruby ruby)
   (package
@@ -517,3 +520,41 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                 (cut string= name <>)
                 '("bundler" "gemrc" "bundle-install")))))
        (package-inputs pkg)))))))
+
+(define (extract-bundle-package-from-package pkg)
+  (and=> (find (match-lambda ((name value rest ...)
+                              (equal? name "bundle-install")))
+               (package-inputs pkg))
+         (match-lambda
+           (("bundle-install" value rest ...)
+            (package-source value)))))
+
+(define (compute-bundle-package-hash bundle-pkg)
+  (with-store store
+    (query-path-hash store
+                     (bundle-package-to-store bundle-pkg))))
+
+(define (update-bundle-package-source bundle-pkg)
+  (define (update-expression expr old-hash hash)
+    ;; Update package expression EXPR, replacing occurrences of
+    ;; OLD-HASH by HASH (base32 representation thereof).
+    (let ((old-hash (bytevector->nix-base32-string old-hash))
+          (hash     (bytevector->nix-base32-string hash)))
+      (string-replace-substring expr old-hash hash)))
+
+  (let ((new-hash (compute-bundle-package-hash bundle-pkg)))
+    (if (equal? new-hash (bundle-package-hash bundle-pkg))
+        #t
+        (let* ((loc (bundle-package-location bundle-pkg))
+               (file (and=> (location-file loc)
+                            (cut search-path %load-path <>))))
+          (if file
+              (let ((old-hash (bundle-package-hash bundle-pkg)))
+                (edit-expression
+                 (assq-set! (location->source-properties loc)
+                            'filename file)
+                 (cut update-expression <> old-hash new-hash)))
+              (begin
+                (warning (_ "~a: could not locate source file")
+                         (location-file loc))
+                #f))))))
