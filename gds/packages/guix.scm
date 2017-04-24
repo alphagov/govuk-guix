@@ -37,10 +37,9 @@
                    ;; Note that when changing the treeish, you will
                    ;; need to change the sha256 hash such that Guix
                    ;; thinks that it has not built this
-                   (commit "release_4")))
+                   (commit "release_5")))
              (sha256
-              (base32
-               "11mfqgzjaip1iid4sr2gb5jd80cfink6z29lp8r0c897ww1bl0jq"))
+              (base32 "0mgv1sjzgjkdbpxln6fkjyssjbvkg5yf9r99jszwk15w0mqclsld"))
              (file-name (string-append
                          "guix-"
                          (package-version gnu:guix)
