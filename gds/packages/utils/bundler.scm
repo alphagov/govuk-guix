@@ -35,6 +35,7 @@
             bundle-package-hash
             bundle-package-ruby
             bundle-package-without
+            bundle-package-location
 
             bundle-package-to-store
             package-with-bundler))
@@ -86,7 +87,11 @@
   (ruby bundle-package-ruby
         (default guix:ruby))
   (without bundle-package-without
-           (default '())))
+           (default '()))
+  (location bundle-package-location
+            (default (and=> (current-source-location)
+                            source-properties->location))
+            (innate)))
 
 (define-gexp-compiler (bundle-package-for-source-compiler
                        (bundle-package <bundle-package>) system target)
@@ -193,6 +198,7 @@
     (version "0")
     (source (bundle-package
              (inherit bundle-pkg)
+             (location (bundle-package-location bundle-pkg))
              (source (or (bundle-package-source bundle-pkg)
                          (package-source pkg)))
              (name (string-append (package-name pkg) "-bundle-package"))))
@@ -325,6 +331,8 @@
       ((ruby (bundle-package-ruby bundle-pkg)))
     (package
       (inherit pkg)
+      ;; Pass through the original location
+      (location (package-location pkg))
       (arguments
        (substitute-keyword-arguments
            (default-keyword-arguments
