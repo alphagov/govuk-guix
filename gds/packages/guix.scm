@@ -12,10 +12,7 @@
   #:use-module ((gnu packages package-management) #:prefix gnu:))
 
 (define-public guix
-  ;; Note that when changing the treeish, you will need to change the
-  ;; sha256 hash such that Guix thinks that it has not built this
-  (let ((treeish "release_4")
-        (select? (delay (git-predicate
+  (let ((select? (delay (git-predicate
                          (getenv "GDS_GNU_GUIX_PATH"))))
         (local-source (string? (getenv "GDS_GNU_GUIX_PATH"))))
     (package
@@ -37,7 +34,10 @@
              (method git-fetch)
              (uri (git-reference
                    (url "https://github.com/alphagov/gnu-guix.git")
-                   (commit treeish)))
+                   ;; Note that when changing the treeish, you will
+                   ;; need to change the sha256 hash such that Guix
+                   ;; thinks that it has not built this
+                   (commit "release_4")))
              (sha256
               (base32
                "11mfqgzjaip1iid4sr2gb5jd80cfink6z29lp8r0c897ww1bl0jq"))
