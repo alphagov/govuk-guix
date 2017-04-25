@@ -781,12 +781,12 @@ service setup.")
     (hash (base32 "0h7g4s2yzwp9a77fd5rpwj7sbsj0vfy0216g98j2175nx75b8ic7")))
    (package
      (name "multipage-frontend")
-     (version "release_55")
+     (version "release_56")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "055ga8s0z9ljmcfkrwhl6if6qshq4bn303dhqr5476a10mgdghf7")))
+       #:hash (base32 "17wybzky3ykcrfgxrphiqgbnnhh2lm4cxa7vkrac55i3xwcrsvca")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
