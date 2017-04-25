@@ -1176,15 +1176,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public specialist-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0j0sms0d5dwgdlj6y9cfq7ay2r7szk5ih5cs04hrhlqplilk7q1d")))
+    (hash (base32 "12nc71g807ryi5ywvzcj8r0c5fd3fyc8rx1nj32m3kk5xp07gwx5")))
    (package
      (name "specialist-frontend")
-     (version "release_174")
+     (version "release_186")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "19dhk18as5w709rpyjncvk99ym1x12bpch25a1r6r858c71gia44")))
+       #:hash (base32 "19drxh24yv04pcxkj473x65nwybymscm3bvhk3rylgdkxllmrrhf")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
