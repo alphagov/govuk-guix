@@ -307,15 +307,15 @@ proxies requests to some upstream")
 (define-public design-principles
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1y3az4pqy8a3i712niccvsib3932bzpj99pvfqij9r8ha6v5a78i")))
+    (hash (base32 "0n1bz9c3nmc571wmb0n96hbbfzk3mfgsw4d6bhla22p96sfjpam9")))
    (package
      (name "design-principles")
-     (version "release_870")
+     (version "release_871")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1b4kqpjn5dnxa8y6f7ncazz1sclbrkkhklk8dzrjsfgsq062js31")))
+       #:hash (base32 "0n9bh0lx8s9l95m0caffnyygh6fggglk8x6wlqyax3ycx8jyzbdy")))
      (build-system rails-build-system)
      (arguments `(;; Asset precompilation fails
                   #:precompile-rails-assets? #f))
