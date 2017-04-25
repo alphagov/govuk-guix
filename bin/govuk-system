@@ -17,7 +17,11 @@
       (apply
        system*
        "bash"
-       (string-append (dirname (dirname (current-filename)))
+       (string-append (or (and=> (current-filename)
+                                 (lambda (x)
+                                   (dirname (dirname x))))
+                          (getenv "GOVUK_GUIX_ROOT")
+                          (error "Unable to locate the govuk-guix root"))
                       "/guix-pre-inst-env")
        "guile"
        (current-filename)

@@ -52,6 +52,12 @@ for var in $(env -0 | tr -d '\n' | tr '\0' '\n' | cut -d '=' -f 1); do
        continue
     fi
 
+    if [[ $var == GOVUK_GUIX* ]]
+    then
+       continue
+    fi
+
+
     for var_to_skip in "${INCLUDED_VARIABLES[@]}"
     do
         if [ "$var" == "$var_to_skip" ]

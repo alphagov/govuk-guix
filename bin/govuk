@@ -58,7 +58,7 @@ if [ ! -f /usr/bin/guile ]; then
     if [ "$GUILE" = "" ]; then
         log "guile is not on the PATH"
 
-        GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
+        export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
         log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
 
         GUILE="$GOVUK_GUIX_ROOT/guix-pre-inst-env guile --no-auto-compile"
