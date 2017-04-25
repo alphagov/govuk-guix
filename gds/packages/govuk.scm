@@ -220,15 +220,15 @@ proxies requests to some upstream")
 (define-public content-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0csjlacjx7r9iv8j82vl2fbki824bq76hvsjzvbxmabpwwbyn0zk")))
+    (hash (base32 "1iaf3vyiff00sybr0ysqx20j68ml0kzzkb9sv05w4xy612shbyva")))
    (package
      (name "content-api")
-     (version "release_397")
+     (version "release_402")
      (source
       (github-archive
        #:repository "govuk_content_api"
        #:commit-ish version
-       #:hash (base32 "0smvrqf81c5xhcrw6bf9b28hj848d4yqibh5chlkm8hflj2d14bv")))
+       #:hash (base32 "1hhabbbvma9pk13hf38c5jx9zm3zdi2683sifghg8hg9wx79f946")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
