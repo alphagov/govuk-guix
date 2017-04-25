@@ -31,7 +31,8 @@
                 #:pattern pattern)))
             search-paths)
 
-  (if (not (null? bundle-without))
+  (if (null? bundle-without)
+      (unsetenv "BUNDLE_WITHOUT")
       (setenv "BUNDLE_WITHOUT" (string-join bundle-without ":")))
 
   (let* ((home (string-append working-directory "/HOME"))
