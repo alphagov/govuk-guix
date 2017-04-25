@@ -796,15 +796,15 @@ service setup.")
 (define-public need-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0kfxvx2cw42zkc07vayymra5a6sssbqlppsnh73q7hvmr20ykyq8")))
+    (hash (base32 "0h5rfpc2xcf30grrklzb3grcnglhag1rfc3h7a6mvnzas6sv1dw0")))
    (package
      (name "need-api")
-     (version "release_141")
+     (version "release_145")
      (source
       (github-archive
        #:repository "govuk_need_api"
        #:commit-ish version
-       #:hash (base32 "1ds6mp42fflmqm7jx5aw2jfgwr33hc6r8p1krfj0jczsll7r70f9")))
+       #:hash (base32 "1m19rix2mb89lz195v02n56vq4452g18klbws27zwrwrj8yd9b1f")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
