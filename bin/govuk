@@ -41,7 +41,12 @@ if [ "$COMMAND" = "" ]; then
 fi
 
 COMMAND_FULL_NAME="govuk-$COMMAND"
-COMMAND_FULL_PATH=$(type -p "$COMMAND_FULL_NAME")
+COMMAND_FULL_PATH=$(type -p "$COMMAND_FULL_NAME" || echo "")
+
+if [ "$COMMAND_FULL_PATH" = "" ]; then
+    echo "Command $COMMAND not found"
+    exit 1
+fi
 
 log "COMMAND_FULL_PATH is $COMMAND_FULL_PATH"
 
