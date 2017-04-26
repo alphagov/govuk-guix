@@ -24,11 +24,9 @@ node("ci-agent-2") {
       }
     }
 
-    if (env.BRANCH_NAME == "master") {
-      stage("git push") {
-        sshagent(['govuk-ci-ssh-key']) {
-          sh("git push origin HEAD:master")
-        }
+    stage("git push") {
+      sshagent(['govuk-ci-ssh-key']) {
+        sh("git push origin HEAD:master")
       }
     }
   } catch (e) {
