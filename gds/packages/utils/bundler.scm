@@ -403,7 +403,13 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                           (set-path-environment-variable
                            "LD_LIBRARY_PATH"
                            '("lib")
-                           (map cdr inputs))))
+                           (filter-map
+                            (lambda (input)
+                              (if (member (car input)
+                                          ',(map car (package-inputs pkg)))
+                                  (cdr input)
+                                  #f))
+                            inputs))))
              (add-after 'set-ld-library-path 'replace-ruby-version
                         ,(replace-ruby-version (package-version ruby)))
              (add-before 'configure 'add-bundle-install-bin-to-path
@@ -484,7 +490,9 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
                       `("BUNDLE_PATH" = (,(getenv "BUNDLE_PATH")))
                       `("BUNDLE_WITHOUT" ":" prefix (,(getenv "BUNDLE_WITHOUT")))
-                      `("LD_LIBRARY_PATH" ":" prefix (,(getenv "LD_LIBRARY_PATH")))))
+                      `("LD_LIBRARY_PATH" ":" prefix
+                        ,(or (and=> (getenv "LD_LIBRARY_PATH") list)
+                             '()))))
                   (find-files
                    (string-append out "/bin")
                    (lambda (name stat)
