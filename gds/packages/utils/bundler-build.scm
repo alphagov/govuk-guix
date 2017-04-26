@@ -25,7 +25,9 @@
               ((env-var (files ...) separator type pattern)
                (set-path-environment-variable
                 env-var files
-                input-store-paths
+                (cons*
+                 ca-certificates-path
+                 input-store-paths)
                 #:separator separator
                 #:type type
                 #:pattern pattern)))
@@ -44,9 +46,6 @@
     (setenv "HOME" home)
     (setenv "GEM_HOME" home)
 
-    (setenv "GIT_SSL_CAINFO" (string-append
-                              ca-certificates-path
-                              "/etc/ssl/certs/ca-certificates.crt"))
     (setenv "SSL_CERT_DIR" (string-append
                             nss-certs-path "/etc/ssl/certs"))
     (setenv "SSL_CERT_FILE" (string-append
