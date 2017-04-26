@@ -53,7 +53,7 @@ log "COMMAND_FULL_PATH is $COMMAND_FULL_PATH"
 # Determine if guile is available
 GUILE=""
 if [ ! -f /usr/bin/guile ]; then
-    GUILE=$(type -pf guile)
+    GUILE=$(type -pf guile || echo "")
 
     if [ "$GUILE" = "" ]; then
         log "guile is not on the PATH"
