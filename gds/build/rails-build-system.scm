@@ -75,6 +75,23 @@
      out
      #:log (%make-void-port "w"))))
 
+(define* (wrap-bin-files-for-rails #:key inputs outputs #:allow-other-keys)
+  (for-each
+   (lambda (script)
+     (wrap-program
+         script
+       `("PATH" ":" prefix (,(string-append
+                              (assoc-ref inputs "node")
+                              "/bin")))))
+   (find-files
+    (string-append (assoc-ref outputs "out") "/bin")
+    (lambda (name stat)
+      (or
+       (access? name X_OK)
+       (begin
+         (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
+         #f))))))
+
 (define* (patch-bin-files #:key inputs outputs #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out")))
     (substitute*
@@ -94,6 +111,8 @@
     (replace 'build (lambda args #t))
     (replace 'check (lambda args #t))
     (replace 'install install)
+    (add-after 'install 'wrap-bin-files-for-rails
+               wrap-bin-files-for-rails)
     (add-after 'install 'create-tmp-directory
                create-tmp-directory)
     (add-after 'create-tmp-directory 'create-log-directory
