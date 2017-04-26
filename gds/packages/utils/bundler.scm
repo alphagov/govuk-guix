@@ -484,7 +484,34 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                     (chmod script #o777)
                     (wrap-program
                         script
-                      `("PATH" = (,(getenv "PATH")))
+                      `("PATH" ":" prefix
+                        ,(let*
+                            ((prefix
+                              (string-append
+                               (assoc-ref %build-inputs "bundle-install")
+                               "/vendor/bundle/ruby/"))
+                             (ruby-version
+                              (first
+                               (scandir prefix
+                                        (negate
+                                         (lambda (f)
+                                           (member f '("." "..")))))))
+                             (bin
+                              (string-append
+                               prefix
+                               ruby-version
+                               "/bin")))
+                          (cons*
+                           bin
+                           (search-path-as-list
+                            '("bin" "sbin")
+                            (filter-map
+                             (lambda (input)
+                               (if (member (car input)
+                                           ',(map car (package-inputs pkg)))
+                                   (cdr input)
+                                   #f))
+                             inputs)))))
                       `("SSL_CERT_DIR" = (,(string-append (assoc-ref %build-inputs "nss-certs")
                                                           "/etc/ssl/certs")))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
