@@ -40,15 +40,15 @@
                               `(("source" ,source))
                               '())
                         ,@inputs
+                        ("ruby" ,ruby)
+                        ("node" ,node) ;; Rails seems to have a
+                                       ;; transtive dependency on
+                                       ;; node, or some Javascript
+                                       ;; interpreter
 
                         ;; Keep the standard inputs of 'gnu-build-system'.
                         ,@(standard-packages)))
-         (build-inputs `(("ruby" ,ruby)
-                         ("node" ,node) ;; Rails seems to have a
-                                        ;; transtive dependency on
-                                        ;; node, or some Javascript
-                                        ;; interpreter
-                         ,@native-inputs))
+         (build-inputs native-inputs)
          (outputs outputs)
          (build rails-build)
          (arguments (strip-keyword-arguments private-keywords arguments)))))
