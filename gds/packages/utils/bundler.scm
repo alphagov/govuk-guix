@@ -175,6 +175,11 @@
               (working-directory (tmpnam))
               (output (string-append working-directory "/output")))
 
+         (build-derivations store `(,@(or source-derivation '())
+                                    ,nss-certs-derivation
+                                    ,ca-certificates-derivation
+                                    ,@input-derivations))
+
          (run-bundle-package source-store-path
                              output
                              working-directory
