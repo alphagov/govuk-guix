@@ -12,20 +12,23 @@
   (lambda ()
     (resolve-interface '(gds services)))
   (lambda args
-    (exit
-     (status:exit-val
-      (apply
-       system*
-       "bash"
-       (string-append (or (and=> (current-filename)
-                                 (lambda (x)
-                                   (dirname (dirname x))))
-                          (getenv "GOVUK_GUIX_ROOT")
-                          (error "Unable to locate the govuk-guix root"))
-                      "/guix-pre-inst-env")
-       "guile"
-       (current-filename)
-       (cdr (command-line)))))))
+    (let* ((govuk-guix-root
+            (or (and=> (current-filename)
+                       (lambda (x)
+                         (dirname (dirname x))))
+                (getenv "GOVUK_GUIX_ROOT")
+                (error "Unable to locate the govuk-guix root")))
+           (command-full-path
+            (string-append govuk-guix-root "/bin/govuk-data")))
+      (exit
+       (status:exit-val
+        (apply
+         system*
+         "bash"
+         (string-append govuk-guix-root "/guix-pre-inst-env")
+         "guile"
+         command-full-path
+         (cdr (command-line))))))))
 
 (use-modules
  (srfi srfi-1)
