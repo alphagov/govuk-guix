@@ -113,6 +113,11 @@
    (guix-service
     (guix-configuration
      (guix guix)))
+   (service
+    set-file-ownership-service-type
+    '(("/var/lib/mysql" "mysql" "mysql" #:recursive)
+      ("/var/lib/postgresql" "postgres" "postgres" #:recursive)
+      ("/var/lib/mongodb" "mongodb" "mongodb" #:recursive)))
    (service special-files-service-type
             `(("/bin/sh" ,(file-append (canonical-package bash)
                                        "/bin/sh"))))
