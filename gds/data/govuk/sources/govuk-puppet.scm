@@ -178,9 +178,14 @@
     (let* ((govuk-puppet-directory
             (or (getenv "GDS_GUIX_GOVUK_PUPPET_REPOSITORY")
                 (let ((govuk-guix-root
-                       (string-drop-right
-                        (current-filename)
-                        (string-length "gds/data/govuk/sources/govuk-puppet.scm"))))
+                       (or (and=>
+                            (current-filename)
+                            (lambda (x)
+                              (string-drop-right
+                               x
+                               (string-length "gds/data/govuk/sources/govuk-puppet.scm"))))
+                           (getenv "GOVUK_GUIX_ROOT")
+                           (error "Unable to locate the govuk-guix root"))))
                   (string-append
                    (dirname govuk-guix-root)
                    "/govuk-puppet"))))
