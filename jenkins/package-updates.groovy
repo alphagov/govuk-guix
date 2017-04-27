@@ -10,7 +10,13 @@ properties([
 node("ci-agent-2") {
   try {
     stage("Checkout") {
-      checkout(scm)
+      checkout([$class: 'GitSCM',
+        branches: scm.branches,
+        userRemoteConfigs: [[
+          credentialsId: 'govuk-ci-ssh-key',
+          url: "git@github.com:alphagov/govuk-guix.git"
+        ]]
+      ])
     }
 
     stage("govuk refresh") {
