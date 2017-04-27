@@ -199,24 +199,6 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/contacts-admin"))
    #:extra-inputs (list mariadb)))
 
-(define-public contacts-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0pabhmanjs1m0b5zdkwng7p2fpjmwjipvwraimywyq8dikvxl8jh")))
-   (package
-     (name "contacts-frontend")
-     (version "release_73")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "00bvw3jadh4c97g7j14q1p4m2q9bygxbb5xkvqns5kgxyys7d762")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license license:expat)
-     (home-page "https://github.com/alphagov/contacts-frontend"))))
-
 (define-public content-api
   (package-with-bundler
    (bundle-package
