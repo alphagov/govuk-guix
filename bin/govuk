@@ -50,6 +50,9 @@ fi
 
 log "COMMAND_FULL_PATH is $COMMAND_FULL_PATH"
 
+export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
+log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
+
 # Determine if guile is available
 GUILE=""
 if [ ! -f /usr/bin/guile ]; then
@@ -57,10 +60,6 @@ if [ ! -f /usr/bin/guile ]; then
 
     if [ "$GUILE" = "" ]; then
         log "guile is not on the PATH"
-
-        export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
-        log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
-
         GUILE="bash $GOVUK_GUIX_ROOT/guix-pre-inst-env guile --no-auto-compile"
     else
         GUILE="$GUILE --no-auto-compile"
