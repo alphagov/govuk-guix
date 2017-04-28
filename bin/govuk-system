@@ -89,7 +89,7 @@
                                             govuk-services))))
              (if (null? similarly-named-services)
                  (leave (_ "No service called ~A") service-name)
-                 (leave (_ "No called ~A, did you mean ~A?")
+                 (leave (_ "No service called ~A, did you mean ~A?")
                         service-name (first similarly-named-services)))))))
    service-names))
 
