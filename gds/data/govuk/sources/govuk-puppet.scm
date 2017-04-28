@@ -46,7 +46,9 @@
      ("licence_finder_production" . (,licence-finder-service-type))
      ;;("manuals_publisher_production" . (,manuals-publisher-service-type))
      ("maslow_production" . (,maslow-service-type))
-     ("short_url_manager_production" . (,short-url-manager-service-type)))
+     ("short_url_manager_production" . (,short-url-manager-service-type))
+     ("travel_advice_publisher_production" .
+      (,travel-advice-publisher-service-type)))
     ("api-mongo-1.api.integration"
      ("content_store_production" . (,content-store-service-type))
      ("draft_content_store_production" . (,draft-content-store-service-type)))
