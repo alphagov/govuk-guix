@@ -118,7 +118,9 @@
     (add-after 'create-tmp-directory 'create-log-directory
                create-log-directory)
     (add-after 'create-log-directory 'patch-bin-files
-               patch-bin-files)))
+               patch-bin-files)
+    (add-after 'patch-bin-files 'wrap-with-relative-path
+               wrap-with-relative-path)))
 
 (define* (rails-build #:key
                       inputs
