@@ -528,11 +528,13 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                   (find-files
                    (string-append out "/bin")
                    (lambda (name stat)
-                     (or
-                      (access? name X_OK)
-                      (begin
-                        (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
-                        #f)))))
+                     (and
+                      (not (string-prefix? "." (last (string-split name #\/))))
+                      (or
+                       (access? name X_OK)
+                       (begin
+                         (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
+                         #f))))))
                #t)))))))
     (inputs
      (cons*

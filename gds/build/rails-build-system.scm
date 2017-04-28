@@ -86,11 +86,13 @@
    (find-files
     (string-append (assoc-ref outputs "out") "/bin")
     (lambda (name stat)
-      (or
-       (access? name X_OK)
-       (begin
-         (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
-         #f))))))
+      (and
+       (not (string-prefix? "." (last (string-split name #\/))))
+       (or
+        (access? name X_OK)
+        (begin
+          (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
+          #f)))))))
 
 (define* (patch-bin-files #:key inputs outputs #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out")))
