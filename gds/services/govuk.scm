@@ -1015,7 +1015,11 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(smart-answers))
-           (requirement '(publishing-api signon content-store)))
+           (requirement '(publishing-api
+                          signon
+                          content-store
+                          static
+                          whitehall-admin)))
           (plek-config) (rails-app-config) smart-answers
           (service-startup-config))))
 
