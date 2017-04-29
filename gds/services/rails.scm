@@ -130,7 +130,9 @@
          pre-startup-scripts)))
     (if (null? script-gexps)
         #~#t
+        (with-imported-modules '((gds build utils))
         #~(begin
+            (use-modules (gds build utils))
             (simple-format
              #t
              "Running ~A startup scripts for ~A\n"
@@ -146,7 +148,7 @@
                       ((result ((car scripts))))
                     (if (eq? result #t)
                         (run (cdr scripts))
-                        #f))))))))
+                        #f)))))))))
 
 (define (generic-rails-app-start-script
          name
@@ -215,6 +217,7 @@
             "-P" pid-file))
           ((and command string)
            (list command)))))
+    (with-imported-modules '((gds build utils))
     #~(lambda args
         (let ((user (getpwnam #$string-name))
               (environment-variables '#$environment-variables))
@@ -249,7 +252,7 @@
              #:pid-file #$pid-file
              #:pid-file-timeout 10
              #:log-file #$(string-append "/var/log/" string-name ".log")
-             #:environment-variables environment-variables)))))))
+             #:environment-variables environment-variables))))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
@@ -465,13 +468,15 @@
                  (find service-startup-config? parameters)
                  `((rails-db:setup
                     .
-                    ,#~(lambda ()
-                         (if (and (file-exists? "bin/rake")
-                                  ;; When spring is used, rake seems
-                                  ;; to need to be run with bundle
-                                  ;; exec
-                                  (not (file-exists? "bin/spring")))
-                             (#$(run-command "rake" "db:setup"))
-                             (#$(run-command "bundle" "exec" "rake" "db:setup")))))))
+                    ,(with-imported-modules '((gds build utils))
+                      #~(lambda ()
+                          (use-modules (gds build utils))
+                          (if (and (file-exists? "bin/rake")
+                                   ;; When spring is used, rake seems
+                                   ;; to need to be run with bundle
+                                   ;; exec
+                                   (not (file-exists? "bin/spring")))
+                              (run-command "rake" "db:setup")
+                              (run-command "bundle" "exec" "rake" "db:setup")))))))
                 parameter))
           parameters)))))

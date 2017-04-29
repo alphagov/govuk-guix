@@ -1,5 +1,6 @@
 (define-module (gds systems govuk publishing-e2e-tests)
   #:use-module (srfi srfi-1)
+  #:use-module (guix gexp)
   #:use-module (gnu system)
   #:use-module (gnu services)
   #:use-module (gnu services web)
@@ -72,9 +73,11 @@
             (service-startup-config-add-pre-startup-scripts
              parameter
              `((db-seed
-                . ,(run-command "rake" "db:seed"))
+                . ,#~(lambda ()
+                       (run-command "rake" "db:seed")))
                (publish-finders
-                . ,(run-command "rake" "publishing_api:publish_finders"))))
+                . ,#~(lambda ()
+                       (run-command "rake" "publishing_api:publish_finders")))))
             parameter))
          parameters))
        (nginx-service-type

@@ -189,22 +189,28 @@
                  parameter
                  `((signon-setup-applications
                     .
-                    ,(run-command
-                      "rails" "runner" (signon-setup-applications-script
-                                        (signon-config-applications config))))
-                   (signon-setup-users
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-applications-script
+                             (signon-config-applications config)))))
+                    (signon-setup-users
                     .
-                    ,(run-command
-                      "rails" "runner" (signon-setup-users-script
-                                        (map
-                                         (cut filter-signon-user-application-permissions
-                                           <> (signon-config-applications config))
-                                         (signon-config-users config)))))
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-users-script
+                             (map
+                              (cut filter-signon-user-application-permissions
+                                <> (signon-config-applications config))
+                              (signon-config-users config))))))
                    (signon-setup-api-users
                     .
-                    ,(run-command
-                      "rails" "runner" (signon-setup-api-users-script
-                                        (signon-config-api-users config))))))
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-api-users-script
+                             (signon-config-api-users config)))))))
                 parameter))
           parameters)))))
    (compose concatenate)
@@ -1727,7 +1733,8 @@
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((publish-special-routes
-             . ,(run-command "rake" "publishing_api:publish_special_routes"))))
+             . ,#~(lambda ()
+                    (run-command "rake" "publishing_api:publish_special_routes")))))
          (plek-config) (rails-app-config)
          info-frontend)))
 
