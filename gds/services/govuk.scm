@@ -429,36 +429,6 @@
            (database "contacts_production")))))
 
 ;;;
-;;; Contacts Frontend
-;;;
-
-(define-public contacts-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'contacts-frontend))
-
-(define-public contacts-frontend-service
-  (service
-   contacts-frontend-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(contacts-frontend))
-           (requirement '(publishing-api whitehall-admin signon)))
-          (plek-config) (rails-app-config) contacts-frontend
-          (service-startup-config))))
-
-(define-public draft-contacts-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-contacts-frontend))
-
-(define-public draft-contacts-frontend-service
-  (service
-   draft-contacts-frontend-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(draft-contacts-frontend))
-           (requirement '(publishing-api whitehall-admin signon)))
-          (plek-config) (rails-app-config) contacts-frontend
-          (service-startup-config))))
-
-;;;
 ;;; Content Performance Manager
 ;;;
 
@@ -1871,7 +1841,6 @@
    calculators-service
    calendars-service
    collections-service
-   contacts-frontend-service
    design-principles-service
    email-alert-frontend-service
    feedback-service
@@ -1890,7 +1859,6 @@
 (define-public draft-frontend-services
   (list
    draft-collections-service
-   draft-contacts-frontend-service
    draft-email-alert-frontend-service
    draft-frontend-service
    draft-government-frontend-service
