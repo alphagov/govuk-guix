@@ -24,7 +24,7 @@ example, `govuk data list publishing-api --before=01/01/2017` will
 list data for the Publishing API that is dated before 01/01/2017.
 
 To load data, use the `load` command. It takes the same arguments as
-the `list` command, e.g. `govuk data list publishing-api
+the `list` command, e.g. `govuk data load publishing-api
 --before=01/01/2017` will load the latest available data for the
 Publishing API, that is dated before 01/01/2017.
 
