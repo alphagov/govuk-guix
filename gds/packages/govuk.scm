@@ -1161,12 +1161,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "12nc71g807ryi5ywvzcj8r0c5fd3fyc8rx1nj32m3kk5xp07gwx5")))
    (package
      (name "specialist-frontend")
-     (version "release_186")
+     (version "release_187")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "19drxh24yv04pcxkj473x65nwybymscm3bvhk3rylgdkxllmrrhf")))
+       #:hash (base32 "10xgf5pksq6q4rvnlwvi609p63fx4x13brn33xgrq40vbjybh7fj")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
