@@ -11,6 +11,7 @@
   #:use-module (gds services utils databases)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
+  #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk nginx)
@@ -52,7 +53,8 @@
                  (any
                   (lambda (p)
                     (or (postgresql-connection-config? p)
-                        (mysql-connection-config? p)))
+                        (mysql-connection-config? p)
+                        (mongodb-connection-config? p)))
                   (service-parameters s)))
                 (rails-run-db:setup s)
                 s))
