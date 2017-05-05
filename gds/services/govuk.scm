@@ -1169,8 +1169,12 @@
                 (shepherd-service
                  (provision (list 'publishing-e2e-tests))
                  (documentation "publishing-e2e-tests")
-                 (requirement '(specialist-publisher specialist-frontend
-                                draft-specialist-frontend nginx asset-manager))
+                 (requirement '(specialist-publisher
+                                government-frontend
+                                draft-government-frontend
+                                travel-advice-publisher
+                                nginx
+                                asset-manager))
                  (respawn? #f)
                  (start #~(make-forkexec-constructor #$start-script))
                  (stop #~(make-kill-destructor))))))))))))
