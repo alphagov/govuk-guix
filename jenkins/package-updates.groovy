@@ -3,7 +3,7 @@
 properties([
   pipelineTriggers([
     upstream(upstreamProjects: 'integration-app-deploy'),
-    cron('0 8-18 * * 1-5')
+    cron('H/30 7-19 * * 1-5')
   ])
 ])
 
