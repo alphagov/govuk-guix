@@ -23,6 +23,7 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk plek)
   #:use-module (gds services sidekiq)
+  #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
   #:use-module (gds services rails)
   #:export (<signon-config>
@@ -266,6 +267,7 @@
            (provision '(asset-manager))
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) asset-manager
+          (delayed-job-config)
           (signon-application
            (name "Asset Manager")
            (supported-permissions '("signin")))
