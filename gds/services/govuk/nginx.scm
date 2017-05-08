@@ -73,19 +73,17 @@ proxy_set_header Host $host:$server_port;")))
         (nginx-server-configuration
          (inherit base)
          (locations
-          (list
+          (cons*
            (nginx-location-configuration
-            (uri "/frontend")
-            (body '("proxy_pass http://frontend-proxy;")))
-           (nginx-location-configuration
-            (uri "/info-frontend")
-            (body '("proxy_pass http://info-frontend-proxy;")))
-           (nginx-location-configuration
-            (uri "/specialist-frontend")
-            (body '("proxy_pass http://specialist-frontend-proxy;")))
-           (nginx-location-configuration
-            (uri "/static")
-            (body '("proxy_pass http://static-proxy;")))))
+            (uri "/media")
+            (body '("proxy_pass http://asset-manager-proxy;")))
+           (map
+            (match-lambda
+              ((service . port)
+               (nginx-location-configuration
+                (uri (simple-format #f "/~A" service))
+                (body (list (simple-format #f "proxy_pass http://~A-proxy;" service))))))
+            service-and-ports)))
          (server-name (list (string-append "assets." domain))))
         (map
          (match-lambda
