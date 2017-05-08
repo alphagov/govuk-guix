@@ -348,12 +348,7 @@
         (app-name->root-directory (symbol->string name)))
        (ss (or (find shepherd-service? rest)
                (error "Missing shepherd service for ~A\n" name)))
-       (rails-app-config (find rails-app-config? rest))
-       (sidekiq-config (find sidekiq-config? rest))
-       (sidekiq-service-name
-        (symbol-append
-         (first (shepherd-service-provision ss))
-         '-sidekiq)))
+       (rails-app-config (find rails-app-config? rest)))
     (delete
      #f
      (list
@@ -384,57 +379,20 @@
                        root-directory
                        rails-app-config
                        rest))))
-      (if sidekiq-config
-          (let*
-              ((environment-variables
-                (map
-                 (match-lambda
-                   ((key . value)
-                    (string-append key "=" value)))
-                 (apply
-                  generic-rails-app-service-environment-variables
-                  root-directory
-                  rails-app-config
-                  rest)))
-               (config-file (sidekiq-config-file sidekiq-config))
-               (string-name (symbol->string name))
-               (root-directory (app-name->root-directory string-name))
-               (pidfile (string-append
-                         "/tmp/" (symbol->string sidekiq-service-name) ".pid"))
-               (start-command
-                `(,(string-append root-directory "/bin/bundle")
-                  "exec"
-                  "sidekiq"
-                  ,@(if config-file `("-C" ,config-file) '())
-                  "--pidfile" ,pidfile)))
-            (shepherd-service
-             (inherit ss)
-             (provision (list sidekiq-service-name))
-             (documentation
-              (simple-format #f "~A sidekiq service" name))
-             (requirement
-              `(,@(shepherd-service-requirement ss)
-                ,(first (shepherd-service-provision ss))))
-             (respawn? #f)
-             (start #~(lambda args
-                        (display
-                         #$(simple-format #f "starting ~A sidekiq service: ~A\n"
-                                          name (string-join start-command)))
-                        (apply
-                         #$#~(make-forkexec-constructor
-                              '#$start-command
-                              #:user #$string-name
-                              #:pid-file #$pidfile
-                              #:pid-file-timeout 5
-                              #:log-file #$(string-append
-                                            "/var/log/"
-                                            (symbol->string sidekiq-service-name)
-                                            ".log")
-                              #:directory #$root-directory
-                              #:environment-variables '#$environment-variables)
-                         args)))
-             (stop #~(make-kill-destructor))))
-          #f)))))
+      (and=> (find sidekiq-config? rest)
+             (lambda (sidekiq-config)
+               (sidekiq-shepherd-service
+                (simple-format #f "~A-sidekiq"
+                               (first (shepherd-service-provision ss)))
+                sidekiq-config
+                (cons* (first (shepherd-service-provision ss))
+                       (shepherd-service-requirement ss))
+                (app-name->root-directory (symbol->string name))
+                (symbol->string name)
+                (apply generic-rails-app-service-environment-variables
+                       root-directory
+                       rails-app-config
+                       rest))))))))
 
 (define (generic-rails-app-service-account
          username)
