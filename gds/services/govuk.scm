@@ -271,7 +271,22 @@
           (signon-application
            (name "Asset Manager")
            (supported-permissions '("signin")))
-          (service-startup-config)
+          (service-startup-config
+           (root-pre-startup-scripts
+            `((mount-uploads
+               .
+               ,(with-imported-modules '((guix build utils)
+                                         (guix build bournish)
+                                         (gnu build file-systems))
+                  #~(lambda ()
+                      (use-modules (gds build utils)
+                                   (gnu build file-systems))
+                      (let ((app-dir "/var/apps/asset-manager/uploads")
+                            (storage-dir "/var/lib/asset-manager-uploads"))
+                        (mkdir-p storage-dir)
+                        (bind-mount storage-dir app-dir)
+                        (chmod app-dir #o777)
+                        #t)))))))
           (mongodb-connection-config
            (database "asset_manager")))))
 
