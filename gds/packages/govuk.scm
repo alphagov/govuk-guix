@@ -50,6 +50,36 @@
        #:commit-ish "66574074ded971daa96b1a3c97b50d50c29c2c10"
        #:hash (base32 "02rich8mfivxgcv41a0284m6521gg0wv9c01gfgph419syf1nin5")))
      (build-system rails-build-system)
+     (inputs
+      `(("govuk_clamscan"
+         ,
+         (package
+           (name "fake-govuk-clamscan")
+           (version "1")
+           (source #f)
+           (build-system trivial-build-system)
+           (arguments
+            `(#:modules ((guix build utils))
+              #:builder (begin
+                          (use-modules (guix build utils))
+                          (let
+                              ((bash (string-append
+                                      (assoc-ref %build-inputs "bash")
+                                      "/bin/bash")))
+                            (mkdir-p (string-append %output "/bin"))
+                            (call-with-output-file (string-append
+                                                    %output
+                                                    "/bin/govuk_clamscan")
+                              (lambda (port)
+                                (simple-format port "#!~A\nexit 0\n" bash)))
+                            (chmod (string-append %output "/bin/govuk_clamscan") #o555)
+                            #t))))
+           (native-inputs
+            `(("bash" ,bash)))
+           (synopsis "")
+           (description "")
+           (license #f)
+           (home-page #f)))))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
