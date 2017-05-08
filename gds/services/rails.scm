@@ -12,6 +12,7 @@
                 #:select (shadow))
   #:use-module (gds services)
   #:use-module (gds services sidekiq)
+  #:use-module (gds services delayed-job)
   #:use-module (gds services utils)
   #:use-module (gds services utils databases)
   #:export (<rails-app-config>
@@ -371,6 +372,18 @@
          (respawn? #f)
          (start start-script)
          (stop #~(make-kill-destructor))))
+      (and=> (find delayed-job-config? rest)
+             (lambda (delayed-job-config)
+               (delayed-job-worker-shepherd-service
+                (simple-format #f "~A-delayed-job-worker" name)
+                delayed-job-config
+                (shepherd-service-requirement ss)
+                root-directory
+                (symbol->string name)
+                (apply generic-rails-app-service-environment-variables
+                       root-directory
+                       rails-app-config
+                       rest))))
       (if sidekiq-config
           (let*
               ((environment-variables
