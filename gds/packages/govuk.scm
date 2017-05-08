@@ -748,12 +748,12 @@ service setup.")
 (define-public metadata-api
   (package
     (name "metadata-api")
-    (version "release_76")
+    (version "release_77")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "1fc1sih5cd6r50m8zgyz3rz19hv4m5893q1n2nwy35hsynn56a9h")))
+      #:hash (base32 "1kaxff3q7d3yl2ff5plj7b9n2ppkxkkvgamqn77rgrlpxsc4sh3v")))
     (build-system gnu-build-system)
     (native-inputs
      `(("go" ,go)))
