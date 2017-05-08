@@ -1055,7 +1055,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(travel-advice-publisher))
-           (requirement '(publishing-api signon static rummager)))
+           (requirement '(publishing-api signon static rummager asset-manager)))
           (plek-config) (rails-app-config) travel-advice-publisher
           (signon-application
            (name "Travel Advice Publisher")
@@ -1263,7 +1263,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(specialist-publisher))
-          (requirement '(publishing-api signon mongodb nginx)))
+          (requirement '(publishing-api asset-manager signon mongodb nginx)))
          (plek-config) (rails-app-config) specialist-publisher
          (signon-application
           (name "Specialist Publisher")
