@@ -1068,6 +1068,10 @@
              (cons
               (signon-authorisation
                (application-name "Publishing API"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Asset Manager"))
               '("signin")))))
           (service-startup-config)
           (redis-connection-config)
@@ -1276,6 +1280,10 @@
             (cons
              (signon-authorisation
               (application-name "Publishing API"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Asset Manager"))
              '("signin")))))
          (service-startup-config)
          (mongodb-connection-config
