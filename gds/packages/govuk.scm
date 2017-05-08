@@ -40,15 +40,15 @@
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1v9mf7qzkrq0lapfag897x59b3ng2md9gwm2xvj3c3252315qbgf")))
+    (hash (base32 "1xzrsf3bx666x21q78smj46wb7fh7v5c1dxqxmx8syljjql9s77j")))
    (package
      (name "asset-manager")
-     (version "release_92")
+     (version "release_92+4")
      (source
       (github-archive
        #:repository name
-       #:commit-ish version
-       #:hash (base32 "0b7qxzckzckwgvvw1wq3sgzkf0yj2yp947gz1d4jndz5g4b5j57r")))
+       #:commit-ish "66574074ded971daa96b1a3c97b50d50c29c2c10"
+       #:hash (base32 "02rich8mfivxgcv41a0284m6521gg0wv9c01gfgph419syf1nin5")))
      (build-system rails-build-system)
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
