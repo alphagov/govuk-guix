@@ -353,30 +353,31 @@
         (symbol-append
          (first (shepherd-service-provision ss))
          '-sidekiq)))
-    (cons
-     (let
-         ((start-script
-           (apply
-            generic-rails-app-start-script
-            name
-            package
-            rails-app-config
-            rest)))
-       (shepherd-service
-        (inherit ss)
-        (documentation
-         (simple-format #f "~A rails app" name))
-        (respawn? #f)
-        (start start-script)
-        (stop #~(make-kill-destructor))))
-     (if sidekiq-config
-         (list
+    (delete
+     #f
+     (list
+      (let
+          ((start-script
+            (apply
+             generic-rails-app-start-script
+             name
+             package
+             rails-app-config
+             rest)))
+        (shepherd-service
+         (inherit ss)
+         (documentation
+          (simple-format #f "~A rails app" name))
+         (respawn? #f)
+         (start start-script)
+         (stop #~(make-kill-destructor))))
+      (if sidekiq-config
           (let*
               ((environment-variables
                 (map
                  (match-lambda
-                  ((key . value)
-                   (string-append key "=" value)))
+                   ((key . value)
+                    (string-append key "=" value)))
                  (apply
                   generic-rails-app-service-environment-variables
                   root-directory
@@ -419,8 +420,8 @@
                               #:directory #$root-directory
                               #:environment-variables '#$environment-variables)
                          args)))
-             (stop #~(make-kill-destructor)))))
-          '()))))
+             (stop #~(make-kill-destructor))))
+          #f)))))
 
 (define (generic-rails-app-service-account
          username)
