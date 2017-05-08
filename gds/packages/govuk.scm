@@ -80,6 +80,13 @@
            (description "")
            (license #f)
            (home-page #f)))))
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'create-uploads-directory
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let ((out (assoc-ref outputs "out")))
+                         (mkdir-p (string-append out "/uploads"))))))))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
