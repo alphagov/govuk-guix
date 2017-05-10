@@ -190,7 +190,10 @@
                              without
                              (package-version ruby))
 
-         (add-to-store store name #t "sha256" output))))))
+         (let ((path
+                (add-to-store store name #t "sha256" output)))
+           (delete-file-recursively working-directory)
+           path))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
