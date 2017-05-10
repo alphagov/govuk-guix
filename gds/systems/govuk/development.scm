@@ -53,8 +53,6 @@
                     (specialist-publisher . 53064)
                     (need-api . 53052)
                     (maslow . 53053)
-                    (specialist-frontend . 53065)
-                    (draft-specialist-frontend . 53066)
                     (government-frontend . 53090)
                     (draft-government-frontend . 53091)
                     (contentapi . 53022)

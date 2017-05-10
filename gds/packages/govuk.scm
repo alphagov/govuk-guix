@@ -794,24 +794,6 @@ service setup.")
     (license "")
     (home-page "https://github.com/alphagov/metadata-api")))
 
-(define-public multipage-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0h7g4s2yzwp9a77fd5rpwj7sbsj0vfy0216g98j2175nx75b8ic7")))
-   (package
-     (name "multipage-frontend")
-     (version "release_56")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "17wybzky3ykcrfgxrphiqgbnnhh2lm4cxa7vkrac55i3xwcrsvca")))
-     (build-system rails-build-system)
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/multipage-frontend"))))
-
 (define-public need-api
   (package-with-bundler
    (bundle-package
@@ -1191,25 +1173,6 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/smart-answers"))))
-
-(define-public specialist-frontend
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "12nc71g807ryi5ywvzcj8r0c5fd3fyc8rx1nj32m3kk5xp07gwx5")))
-   (package
-     (name "specialist-frontend")
-     (version "release_187")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "10xgf5pksq6q4rvnlwvi609p63fx4x13brn33xgrq40vbjybh7fj")))
-     (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/specialist-frontend"))))
 
 (define-public specialist-publisher
   (package-with-bundler
