@@ -785,40 +785,6 @@
            (database "manuals_publisher")))))
 
 ;;;
-;;; Multipage Frontend
-;;;
-
-(define-public multipage-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'multipage-frontend))
-
-(define-public multipage-frontend-service
-  (service
-   multipage-frontend-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(multipage-frontend))
-           (requirement '(content-store static)))
-          (plek-config) (rails-app-config) multipage-frontend
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "multipage_frontend")))))
-
-(define-public draft-multipage-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-multipage-frontend))
-
-(define-public draft-multipage-frontend-service
-  (service
-   draft-multipage-frontend-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(draft-multipage-frontend))
-           (requirement '(draft-content-store draft-static)))
-          (plek-config) (rails-app-config) multipage-frontend
-          (service-startup-config)
-          (mongodb-connection-config
-           (database "multipage_frontend")))))
-
-;;;
 ;;; Policy Publisher
 ;;;
 
@@ -1340,40 +1306,6 @@
          (plek-config) (rails-app-config) government-frontend)))
 
 ;;;
-;;; Specialist Frontend
-;;;
-
-(define-public specialist-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'specialist-frontend))
-
-(define-public specialist-frontend-service
-  (service
-   specialist-frontend-service-type
-   (list (shepherd-service
-          (inherit default-shepherd-service)
-          (provision '(specialist-frontend))
-          (requirement '(content-store static)))
-         (service-startup-config
-          (environment-variables
-           '(("GOVUK_APP_NAME" . "specialist-frontend"))))
-         (plek-config) (rails-app-config) specialist-frontend)))
-
-(define-public draft-specialist-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-specialist-frontend))
-
-(define-public draft-specialist-frontend-service
-  (service
-   draft-specialist-frontend-service-type
-   (list (shepherd-service
-          (inherit default-shepherd-service)
-          (provision '(draft-specialist-frontend))
-          (requirement '(draft-content-store draft-static)))
-         (service-startup-config
-          (environment-variables
-           '(("GOVUK_APP_NAME" . "draft-specialist-frontend"))))
-         (plek-config) (rails-app-config) specialist-frontend)))
-
-;;;
 ;;; Content API
 ;;;
 
@@ -1879,10 +1811,8 @@
    info-frontend-service
    licence-finder-service
    manuals-frontend-service
-   multipage-frontend-service
    service-manual-frontend-service
    smart-answers-service
-   specialist-frontend-service
    static-service))
 
 (define-public draft-frontend-services
@@ -1892,10 +1822,8 @@
    draft-frontend-service
    draft-government-frontend-service
    draft-manuals-frontend-service
-   draft-multipage-frontend-service
    draft-service-manual-frontend-service
-   draft-static-service
-   draft-specialist-frontend-service))
+   draft-static-service))
 
 (define-public govuk-services
   (append
