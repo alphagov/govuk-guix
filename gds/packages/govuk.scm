@@ -1266,12 +1266,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "19sda3i4x1idpja036bnwdvs9l00pim0g1wxhmfh2lkgrakfhmld")))
    (package
      (name "support")
-     (version "release_588")
+     (version "release_589")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0hcjq43i9hnaswqkjhr37kfscz6gwqifqqpiypgl65dz701zb7v2")))
+       #:hash (base32 "0r1299wlpsd4ihly1arh0k4ib3wzsyliafj076kyw7a6b8kbnfha")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f ;; Asset precompilation fails
