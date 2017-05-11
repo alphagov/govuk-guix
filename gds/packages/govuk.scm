@@ -600,12 +600,12 @@ service setup.")
     (hash (base32 "098nlzs8vsrmm78ilmajqw06hilgxvb9580ggck8c6xbgm6bfirm")))
    (package
      (name "imminence")
-     (version "release_314")
+     (version "release_315")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "12hclkfc3app4g4jwh2kpglcb9l0q805q0zrqmb04kak4pk150lj")))
+       #:hash (base32 "1wq6hrxvzkw4p4hd8kwj0gf85lyg37lg8caqcnz3labhg6hd5l03")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
