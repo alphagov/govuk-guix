@@ -242,12 +242,12 @@ proxies requests to some upstream")
     (hash (base32 "1iaf3vyiff00sybr0ysqx20j68ml0kzzkb9sv05w4xy612shbyva")))
    (package
      (name "content-api")
-     (version "release_403")
+     (version "release_404")
      (source
       (github-archive
        #:repository "govuk_content_api"
        #:commit-ish version
-       #:hash (base32 "1rj8j9ca8x4k4dlv3f2dx1j5klsf0ldhbp5pz2s2xys2n7h9k6m1")))
+       #:hash (base32 "1j1gzhvdg7avvkq9ciw5x9k3lhr8fp42c78v6ra4q4dh3iqif1hk")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
