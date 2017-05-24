@@ -55,7 +55,6 @@
                     (maslow . 53053)
                     (government-frontend . 53090)
                     (draft-government-frontend . 53091)
-                    (contentapi . 53022)
                     (frontend . 53005)
                     (draft-frontend . 53007)
                     (rummager . 53009)
