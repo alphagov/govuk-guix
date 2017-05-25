@@ -37,8 +37,7 @@
   `(("mongo-1.backend.integration"
      ("govuk_assets_production" . (,asset-manager-service-type))
      ("govuk_content_production" .
-      (,content-api-service-type
-       ,publisher-service-type
+      (,publisher-service-type
        ,specialist-publisher-service-type
        ,manuals-publisher-service-type))
      ("govuk_needs_production" . (,need-api-service-type))

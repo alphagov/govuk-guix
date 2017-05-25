@@ -236,31 +236,6 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/contacts-admin"))
    #:extra-inputs (list mariadb)))
 
-(define-public content-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1iaf3vyiff00sybr0ysqx20j68ml0kzzkb9sv05w4xy612shbyva")))
-   (package
-     (name "content-api")
-     (version "release_404")
-     (source
-      (github-archive
-       #:repository "govuk_content_api"
-       #:commit-ish version
-       #:hash (base32 "1j1gzhvdg7avvkq9ciw5x9k3lhr8fp42c78v6ra4q4dh3iqif1hk")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:path "/mongoid.yml")))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-api"))
-   #:extra-inputs (list libffi)))
-
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package

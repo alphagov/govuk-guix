@@ -1306,31 +1306,6 @@
          (plek-config) (rails-app-config) government-frontend)))
 
 ;;;
-;;; Content API
-;;;
-
-(define govuk-content-database-connection
-  (mongodb-connection-config
-   (database "govuk_content_production")))
-
-(define-public content-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'contentapi))
-
-(define-public content-api-service
-  (service
-   content-api-service-type
-   (list (shepherd-service
-          (inherit default-shepherd-service)
-          (provision '(contentapi))
-          (requirement '()))
-         (service-startup-config)
-         (signon-application
-          (name "Content API")
-          (supported-permissions '("signin" "access_unpublished")))
-         (plek-config) (rails-app-config) content-api
-         govuk-content-database-connection)))
-
-;;;
 ;;; Frontend
 ;;;
 
@@ -1343,7 +1318,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(frontend))
-          (requirement '(contentapi static rummager content-store)))
+          (requirement '(static rummager content-store)))
          (service-startup-config)
          (plek-config) (rails-app-config) frontend)))
 
@@ -1356,7 +1331,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(draft-frontend))
-          (requirement '(contentapi draft-static rummager draft-content-store)))
+          (requirement '(draft-static rummager draft-content-store)))
          (service-startup-config)
          (plek-config) (rails-app-config) frontend)))
 
@@ -1373,7 +1348,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(publisher))
-          (requirement '(contentapi publishing-api frontend draft-frontend
+          (requirement '(publishing-api frontend draft-frontend
                          rummager signon)))
          (service-startup-config)
          (plek-config) (rails-app-config) publisher
@@ -1771,7 +1746,6 @@
    draft-content-store-service
    ;; email-alert-api-service Can't connect to Redis for some reason
    ;; email-alert-service-service Missing dependency on RabbitMQ
-   content-api-service
    need-api-service
    imminence-service
    publishing-api-service
