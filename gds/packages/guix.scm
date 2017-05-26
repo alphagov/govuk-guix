@@ -41,7 +41,4 @@
                    (commit version)))
              (sha256
               (base32 "1wkp9l6prbbqi2zyym2i71l5pk268cn2v50dvb55pd2ri5g28hsc"))
-             (file-name (string-append
-                         "guix-"
-                         (package-version gnu:guix)
-                         "-checkout"))))))))
+             (file-name (string-append "guix-" version "-checkout"))))))))
