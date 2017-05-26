@@ -15,6 +15,9 @@
   (let ((select? (delay (git-predicate
                          (getenv "GDS_GNU_GUIX_PATH"))))
         (local-source (string? (getenv "GDS_GNU_GUIX_PATH"))))
+    (if (and local-source
+             (not (file-exists? (getenv "GDS_GNU_GUIX_PATH"))))
+        (error "GDS_GNU_GUIX_PATH directory does not exist"))
     (package
       (inherit gnu:guix)
       (name "guix-gds")
