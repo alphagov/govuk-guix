@@ -18,6 +18,7 @@
     (package
       (inherit gnu:guix)
       (name "guix-gds")
+      (version "release_6")
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ((#:tests? tests)
@@ -37,7 +38,7 @@
                    ;; Note that when changing the treeish, you will
                    ;; need to change the sha256 hash such that Guix
                    ;; thinks that it has not built this
-                   (commit "release_6")))
+                   (commit version)))
              (sha256
               (base32 "1wkp9l6prbbqi2zyym2i71l5pk268cn2v50dvb55pd2ri5g28hsc"))
              (file-name (string-append
