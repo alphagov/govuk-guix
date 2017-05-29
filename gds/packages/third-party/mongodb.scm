@@ -33,14 +33,14 @@
 (define-public mongodb
   (package
     (name "mongodb")
-    (version "3.3.8")
+    (version "3.4.4")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://github.com/mongodb/mongo/archive/r"
                                   version ".tar.gz"))
               (file-name (string-append name "-" version ".tar.gz"))
               (sha256
-               (base32 "0p0hzxzyyi4q936lzc5bllq5lis2zvbb2lqvmx4dn12i2nzmgygz"))
+               (base32 "1ccd6azplqpi9pp3l6fsi8240kkgagq5j6c2dksppjn7slk1kdy8"))
               (patches (list (search-patch "mongodb-add-version-file.patch")))))
     (build-system gnu-build-system)
     (native-inputs
