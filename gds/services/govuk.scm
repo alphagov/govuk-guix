@@ -1367,7 +1367,8 @@
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
-         govuk-content-database-connection)))
+         (mongodb-connection-config
+          (database "govuk_content_production")))))
 
 ;;;
 ;;; Router
