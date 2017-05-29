@@ -791,7 +791,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/need-api"))))
+     (home-page "https://github.com/alphagov/need-api"))
+   #:extra-inputs (list libffi)))
 
 (define-public policy-publisher
   (package-with-bundler
