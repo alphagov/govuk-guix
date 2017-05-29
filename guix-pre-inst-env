@@ -40,7 +40,7 @@ GDS_GUIX_SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc coreutils g
 eval "$GDS_GUIX_SEARCH_PATHS"
 
 # To avoid $XDG_CONFIG_HOME/guix/latest from being used
-export XDG_CONFIG_HOME="${GDS_GUIX_CUSTOM_XDG_CONFIG_HOME:-"/dev/null"}"
+export GUIX_UNINSTALLED="true"
 
 SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile git --search-paths)"
 
@@ -79,5 +79,7 @@ export SSL_CERT_FILE="$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt"
 export SSL_CERT_DIR="$GUIX_ENVIRONMENT/etc/ssl/certs"
 
 export GIT_SSL_CAINFO="$SSL_CERT_FILE"
+
+export GUIX_UNINSTALLED="true"
 
 bash "$GDS_GUIX_ROOT/pre-inst-env" "$@"

@@ -22,8 +22,5 @@ export GUIX_PACKAGE_PATH="$GDS_GUIX_ROOT/.guix-package-path${GUIX_PACKAGE_PATH:+
 
 # If this is being run as a script
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    # To avoid $XDG_CONFIG_HOME/guix/latest from being used
-    export XDG_CONFIG_HOME="${GDS_GUIX_CUSTOM_XDG_CONFIG_HOME:-"/dev/null"}"
-
     "$@"
 fi
