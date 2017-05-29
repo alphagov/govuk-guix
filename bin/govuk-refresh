@@ -61,14 +61,14 @@
                      (equal? name
                              (package-name pkg)))
                    (all-packages))
-             (leave (_ "Could not find a package matching ~A")
+             (leave (G_ "Could not find a package matching ~A")
                     name)))
        args))
 
 (define (commit-version-change package new-version)
   (define (run . args)
     (unless (zero? (apply system* args))
-      (leave (_ "command failed: ~A")
+      (leave (G_ "command failed: ~A")
              (string-join args))))
 
   (let ((name "Package Updater")

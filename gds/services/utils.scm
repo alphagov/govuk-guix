@@ -3,6 +3,7 @@
   #:use-module (ice-9 match)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
+  #:use-module (guix base16)
   #:use-module (guix gcrypt)
   #:use-module (guix utils)
   #:use-module (guix gexp)

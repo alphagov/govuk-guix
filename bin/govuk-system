@@ -88,8 +88,8 @@
                                                 (service-kind service))))
                                             govuk-services))))
              (if (null? similarly-named-services)
-                 (leave (_ "No service called ~A") service-name)
-                 (leave (_ "No service called ~A, did you mean ~A?")
+                 (leave (G_ "No service called ~A") service-name)
+                 (leave (G_ "No service called ~A, did you mean ~A?")
                         service-name (first similarly-named-services)))))))
    service-names))
 
@@ -188,10 +188,10 @@
                      passphrase-file
                      passphrase))
                   (leave
-                   (_ "The passphrase file could not be found at ~A")
+                   (G_ "The passphrase file could not be found at ~A")
                    passphrase-file)))
             (leave
-             (_ "The data directory could not be determined"))))))
+             (G_ "The data directory could not be determined"))))))
 
 (define (govuk-system . args)
   (define commands
@@ -201,12 +201,12 @@
   (display "\n")
   (with-error-handling
     (if (= (length args) 1)
-        (leave (_ "no command specified"))
+        (leave (G_ "no command specified"))
         (let* ((command (second args))
                (handler
                 (assoc-ref commands command)))
           (if handler
               (apply handler (cddr args))
-              (leave (_ "command ~A is not recognised") command))))))
+              (leave (G_ "command ~A is not recognised") command))))))
 
 (apply govuk-system (command-line))

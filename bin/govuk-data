@@ -151,7 +151,7 @@
                      (string->symbol service-name)
                      (service-type-name (service-kind service))))
                   all-services)
-            (leave (_ "Could not find service with name ~A")
+            (leave (G_ "Could not find service with name ~A")
                    service-name)))
          service-names))))
 
@@ -224,12 +224,12 @@
   (display "\n")
   (with-error-handling
     (if (= (length args) 1)
-        (leave (_ "no command specified"))
+        (leave (G_ "no command specified"))
         (let* ((command (second args))
                (handler
                 (assoc-ref commands command)))
           (if handler
               (apply handler (cddr args))
-              (leave (_ "command ~A is not recognised") command))))))
+              (leave (G_ "command ~A is not recognised") command))))))
 
 (apply govuk-data (command-line))

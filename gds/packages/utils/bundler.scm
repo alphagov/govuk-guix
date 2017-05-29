@@ -599,6 +599,6 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                             'filename file)
                  (cut update-expression <> old-hash new-hash)))
               (begin
-                (warning (_ "~a: could not locate source file")
+                (warning (G_ "~a: could not locate source file")
                          (location-file loc))
                 #f))))))
