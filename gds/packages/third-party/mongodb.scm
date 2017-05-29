@@ -65,6 +65,7 @@
            (lambda _
              (zero? (system* "scons"
                              (format #f "--jobs=~a" (parallel-job-count))
+                             "--disable-warnings-as-errors"
                              "mongod" "mongo" "mongos"))))
          (replace 'install
            (lambda _
