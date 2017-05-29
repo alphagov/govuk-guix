@@ -40,6 +40,7 @@
  (guix monads)
  (guix scripts)
  (guix derivations)
+ (guix grafts)
  (guix store)
  (guix build utils)
  (gnu services)
@@ -138,14 +139,16 @@
   (define (start-script opts)
     (with-store store
       (run-with-store store
-        (mlet* %store-monad
-            ((sys (container-script
-                   (operating-system-for (option-values opts 'argument))
-                   #:mappings (option-values opts 'file-system-mapping)
-                   #:container-shared-network? #t)))
-          (mbegin %store-monad
-            (built-derivations (list sys))
-            (return (derivation->output-path sys)))))))
+        (mbegin %store-monad
+          (set-grafting #f)
+          (mlet* %store-monad
+              ((sys (container-script
+                     (operating-system-for (option-values opts 'argument))
+                     #:mappings (option-values opts 'file-system-mapping)
+                     #:container-shared-network? #t)))
+            (mbegin %store-monad
+              (built-derivations (list sys))
+              (return (derivation->output-path sys))))))))
 
   (define (sudo-path)
     (find
