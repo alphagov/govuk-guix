@@ -477,8 +477,8 @@
           (service-startup-config)
           (redis-connection-config)
           (postgresql-connection-config
-           (user "content-performance-manager")
-           (database "content-performance_manager")))))
+           (user "content_performance_manager")
+           (database "content_performance_manager_production")))))
 
 ;;;
 ;;; Design Principles
