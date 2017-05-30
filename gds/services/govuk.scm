@@ -459,6 +459,8 @@
            (inherit default-shepherd-service)
            (provision '(content-performance-manager))
            (requirement '(publishing-api whitehall-admin signon)))
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           (plek-config) (rails-app-config) content-performance-manager
           (signon-application
            (name "Content Performance Manager")
