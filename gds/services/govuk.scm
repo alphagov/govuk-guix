@@ -1690,7 +1690,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(whitehall-admin))
-          (requirement '(publishing-api signon static need-api maslow)))
+          (requirement '(publishing-api signon static need-api)))
          (service-startup-config)
          (plek-config) (rails-app-config) whitehall
          (signon-application
