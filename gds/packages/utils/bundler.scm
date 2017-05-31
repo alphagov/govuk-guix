@@ -5,6 +5,7 @@
   #:use-module (guix monads)
   #:use-module (guix records)
   #:use-module (guix gexp)
+  #:use-module (guix grafts)
   #:use-module (guix packages)
   #:use-module (guix profiles)
   #:use-module (guix store)
@@ -145,6 +146,7 @@
 (define bundle-package-to-store
   (match-lambda
     (($ <bundle-package> source name hash ruby without)
+     (parameterize ((%graft? #f))
      (with-store store
        (let* ((inputs (list ruby bundler gzip tar git))
               (input-derivations (map (cut package-derivation store <>)
@@ -193,7 +195,7 @@
          (let ((path
                 (add-to-store store name #t "sha256" output)))
            (delete-file-recursively working-directory)
-           path))))))
+           path)))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
