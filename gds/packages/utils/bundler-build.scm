@@ -80,19 +80,19 @@
       (lambda (port)
         (simple-format port "~A\n" ruby-version)))
 
-    (chdir output-path)
-    (run "bundle"
-         "config"
-         "build.nokogiri"
-         "--use-system-libraries")
-    (let loop ((retry 0))
-      (unless (run "bundle"
-                   "package"
-                   "--all"
-                   "--no-install")
-        (if (> retry 3)
-            (exit 1)
-            (loop (+ retry 1)))))
+    (with-directory-excursion output-path
+      (run "bundle"
+           "config"
+           "build.nokogiri"
+           "--use-system-libraries")
+      (let loop ((retry 0))
+        (unless (run "bundle"
+                     "package"
+                     "--all"
+                     "--no-install")
+          (if (> retry 3)
+              (exit 1)
+              (loop (+ retry 1))))))
 
     (let ((files (find-files output-path".*\\.gemspec")))
       (if (null? files)
