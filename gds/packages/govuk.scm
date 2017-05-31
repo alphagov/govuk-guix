@@ -177,12 +177,12 @@ proxies requests to some upstream")
     (hash (base32 "0czdqayhbz3vh8p4k5pqi97a1g9nl1hw4axrcbkymwj0r7n9cskp")))
    (package
      (name "collections")
-     (version "release_327")
+     (version "release_328")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1fawnqbby8niz59ixgz4pxljfsp9vjrdz9vd2n3hb03hwbksbkgr")))
+       #:hash (base32 "0g26a4ca70q6lv9rzzh5kfsxr3bs5gm206dbpdj598dxnzyb5k12")))
      (build-system rails-build-system)
      (synopsis "Collections serves the new GOV.UK navigation and other pages")
      (description "")
