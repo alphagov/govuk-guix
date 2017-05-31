@@ -1091,12 +1091,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "155mp2xi968hhzkk3rk6rj5rd4qgcp0rb6n01aim01515xzy84il")))
    (package
      (name "short-url-manager")
-     (version "release_107")
+     (version "release_108")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dh9fshhk93vh1s2xlwv2xkrkq7vn8n4w93k9zm199hnmq0v2siz")))
+       #:hash (base32 "106izjki844w0bk87ds1v49n4d9bvp1rn97aqknfrsz497ckk8v5")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
      (synopsis "")
