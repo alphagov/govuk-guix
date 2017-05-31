@@ -147,55 +147,55 @@
   (match-lambda
     (($ <bundle-package> source name hash ruby without)
      (parameterize ((%graft? #f))
-     (with-store store
-       (let* ((inputs (list ruby bundler gzip tar git))
-              (input-derivations (map (cut package-derivation store <>)
-                                      inputs))
-              (input-store-outputs (map derivation->output-path
-                                        input-derivations))
-              (source-derivation (and (not (string? source))
-                                      ((store-lower lower-object)
-                                       store source %current-system)))
-              (source-store-path (if (string? source)
-                                     source
-                                     (derivation->output-path source-derivation)))
-              (nss-certs-derivation (package-derivation store nss-certs))
-              (nss-certs-store-output (derivation->output-path
-                                       nss-certs-derivation))
-              (ca-certificates-derivation
-               ((ca-certificate-bundle
-                 (packages->manifest (list nss-certs)))
-                store))
-              (ca-certificates-store-output (derivation->output-path
-                                             ca-certificates-derivation))
-              (search-paths
-               (map
-                search-path-specification->sexp
-                (delete-duplicates
-                 (append-map package-native-search-paths
-                             inputs))))
-              (working-directory (tmpnam))
-              (output (string-append working-directory "/output")))
+       (with-store store
+        (let* ((inputs (list ruby bundler gzip tar git))
+               (input-derivations (map (cut package-derivation store <>)
+                                       inputs))
+               (input-store-outputs (map derivation->output-path
+                                         input-derivations))
+               (source-derivation (and (not (string? source))
+                                       ((store-lower lower-object)
+                                        store source %current-system)))
+               (source-store-path (if (string? source)
+                                      source
+                                      (derivation->output-path source-derivation)))
+               (nss-certs-derivation (package-derivation store nss-certs))
+               (nss-certs-store-output (derivation->output-path
+                                        nss-certs-derivation))
+               (ca-certificates-derivation
+                ((ca-certificate-bundle
+                  (packages->manifest (list nss-certs)))
+                 store))
+               (ca-certificates-store-output (derivation->output-path
+                                              ca-certificates-derivation))
+               (search-paths
+                (map
+                 search-path-specification->sexp
+                 (delete-duplicates
+                  (append-map package-native-search-paths
+                              inputs))))
+               (working-directory (tmpnam))
+               (output (string-append working-directory "/output")))
 
-         (build-derivations store `(,@(or source-derivation '())
-                                    ,nss-certs-derivation
-                                    ,ca-certificates-derivation
-                                    ,@input-derivations))
+          (build-derivations store `(,@(or source-derivation '())
+                                     ,nss-certs-derivation
+                                     ,ca-certificates-derivation
+                                     ,@input-derivations))
 
-         (run-bundle-package source-store-path
-                             output
-                             working-directory
-                             input-store-outputs
-                             ca-certificates-store-output
-                             nss-certs-store-output
-                             search-paths
-                             without
-                             (package-version ruby))
+          (run-bundle-package source-store-path
+                              output
+                              working-directory
+                              input-store-outputs
+                              ca-certificates-store-output
+                              nss-certs-store-output
+                              search-paths
+                              without
+                              (package-version ruby))
 
-         (let ((path
-                (add-to-store store name #t "sha256" output)))
-           (delete-file-recursively working-directory)
-           path)))))))
+          (let ((path
+                 (add-to-store store name #t "sha256" output)))
+            (delete-file-recursively working-directory)
+            path)))))))
 
 (define (gemrc ruby)
   (mixed-text-file "gemrc"
