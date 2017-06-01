@@ -567,7 +567,9 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/hmrc-manuals-api"))))
+     (home-page "https://github.com/alphagov/hmrc-manuals-api"))
+   #:extra-inputs (list libffi)))
+
 
 (define-public imminence
   (package-with-bundler
@@ -1222,7 +1224,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/support"))))
+     (home-page "https://github.com/alphagov/support"))
+   #:extra-inputs (list libffi)))
 
 (define-public support-api
   (package-with-bundler
@@ -1246,7 +1249,7 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/support-api"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list postgresql libffi)))
 
 (define-public transition
   (package-with-bundler
