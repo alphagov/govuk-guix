@@ -27,7 +27,8 @@
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
-            extend-service-type-with-plek))
+            extend-service-type-with-plek
+            make-rails-app-using-plek-service-type))
 
 (define-record-type* <plek-config>
   plek-config make-plek-config
@@ -257,3 +258,7 @@
              (service-type-name type)
              parameters))))))
      (service-type-extensions type)))))
+
+(define (make-rails-app-using-plek-service-type name)
+  (extend-service-type-with-plek
+   (make-rails-app-service-type name)))

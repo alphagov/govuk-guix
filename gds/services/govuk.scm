@@ -47,9 +47,6 @@
 ;;; Utilities
 ;;;
 
-(define (make-rails-app-using-plek-service-type name)
-  (extend-service-type-with-plek
-   (make-rails-app-service-type name)))
 
 (define (make-rails-app-using-plek-and-signon-service-type name)
   (let ((base-service-type
