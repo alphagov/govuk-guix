@@ -423,7 +423,7 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qwkxrark1lnq5w6n856kqn49dz45z9yf0gcgcnxxr5xgwk9mg4z")))
+    (hash (base32 "0mxs91wzfkn8wxck2fgi2njjq5amqygh2vv4r33p6lg0nz1pw9p8")))
    (package
      (name "finder-frontend")
      (version "release_308")
@@ -673,7 +673,7 @@ service setup.")
 (define-public manuals-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "16pa32famdjz36iy64cdfsl7ih7sqjy53wl4f1kfyfqv1ld7lqnw")))
+    (hash (base32 "1nyxa2hz3xbsirv3cprm7yl729zmcljbf0p7mm1ibw9s0nz8qgy7")))
    (package
      (name "manuals-publisher")
      (version "release_968")
