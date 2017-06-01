@@ -1557,7 +1557,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(maslow))
-          (requirement '(publishing-api need-api signon)))
+          (requirement '(publishing-api signon)))
          (service-startup-config)
          (signon-application
           (name "Maslow")
