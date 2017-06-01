@@ -26,13 +26,7 @@
   #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
   #:use-module (gds services rails)
-  #:export (<signon-config>
-            signon-config
-            signon-config?
-            signon-config-applications
-            signon-config-users
-
-            <router-config>
+  #:export (<router-config>
             router-config
             router-config?
             router-config-public-port
@@ -162,72 +156,6 @@
 ;;;
 ;;; Signon
 ;;;
-
-(define-record-type* <signon-config>
-  signon-config make-signon-config
-  signon-config?
-  (applications signon-config-applications
-                (default '()))
-  (users        signon-config-users
-                (default '()))
-  (api-users    signon-config-api-users
-                (default '())))
-
-(define-public signon-service-type
-  (service-type
-   (inherit
-    (service-type-extensions-modify-parameters
-     (make-rails-app-using-plek-service-type 'signon)
-     (lambda (parameters)
-       (let ((config (find signon-config? parameters)))
-         (map
-          (lambda (parameter)
-            (if (service-startup-config? parameter)
-                (service-startup-config-add-pre-startup-scripts
-                 parameter
-                 `((signon-setup-applications
-                    .
-                    ,#~(lambda ()
-                         (run-command
-                          "rails" "runner"
-                          #$(signon-setup-applications-script
-                             (signon-config-applications config)))))
-                    (signon-setup-users
-                    .
-                    ,#~(lambda ()
-                         (run-command
-                          "rails" "runner"
-                          #$(signon-setup-users-script
-                             (map
-                              (cut filter-signon-user-application-permissions
-                                <> (signon-config-applications config))
-                              (signon-config-users config))))))
-                   (signon-setup-api-users
-                    .
-                    ,#~(lambda ()
-                         (run-command
-                          "rails" "runner"
-                          #$(signon-setup-api-users-script
-                             (signon-config-api-users config)))))))
-                parameter))
-          parameters)))))
-   (compose concatenate)
-   (extend (lambda (parameters extension-parameters)
-             (map
-              (lambda (parameter)
-                (if (signon-config? parameter)
-                    (signon-config
-                     (inherit parameter)
-                     (applications (append
-                                    (signon-config-applications parameter)
-                                    (filter signon-application?
-                                            extension-parameters)))
-                     (api-users (append
-                                 (signon-config-api-users parameter)
-                                 (filter signon-api-user?
-                                         extension-parameters))))
-                    parameter))
-              parameters)))))
 
 (define-public signon-service
   (service

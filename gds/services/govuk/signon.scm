@@ -1,4 +1,5 @@
 (define-module (gds services govuk signon)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-26)
   #:use-module (guix records)
@@ -6,6 +7,7 @@
   #:use-module (gnu services)
   #:use-module (gds services)
   #:use-module (gds services utils)
+  #:use-module (gds services govuk plek)
   #:export (<signon-application>
             signon-application
             signon-application?
@@ -44,7 +46,13 @@
             filter-signon-user-application-permissions
             signon-setup-users-script
             signon-setup-api-users-script
-            signon-setup-applications-script))
+            signon-setup-applications-script
+
+            <signon-config>
+            signon-config
+            signon-config?
+            signon-config-applications
+            signon-config-users))
 
 (define-record-type* <signon-application>
   signon-application make-signon-application
@@ -328,3 +336,69 @@ apps.each do |name, description, redirect_uri, home_uri, supported_permissions, 
   end
 end")
     "\n")))
+
+(define-record-type* <signon-config>
+  signon-config make-signon-config
+  signon-config?
+  (applications signon-config-applications
+                (default '()))
+  (users        signon-config-users
+                (default '()))
+  (api-users    signon-config-api-users
+                (default '())))
+
+(define-public signon-service-type
+  (service-type
+   (inherit
+    (service-type-extensions-modify-parameters
+     (make-rails-app-using-plek-service-type 'signon)
+     (lambda (parameters)
+       (let ((config (find signon-config? parameters)))
+         (map
+          (lambda (parameter)
+            (if (service-startup-config? parameter)
+                (service-startup-config-add-pre-startup-scripts
+                 parameter
+                 `((signon-setup-applications
+                    .
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-applications-script
+                             (signon-config-applications config)))))
+                    (signon-setup-users
+                    .
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-users-script
+                             (map
+                              (cut filter-signon-user-application-permissions
+                                <> (signon-config-applications config))
+                              (signon-config-users config))))))
+                   (signon-setup-api-users
+                    .
+                    ,#~(lambda ()
+                         (run-command
+                          "rails" "runner"
+                          #$(signon-setup-api-users-script
+                             (signon-config-api-users config)))))))
+                parameter))
+          parameters)))))
+   (compose concatenate)
+   (extend (lambda (parameters extension-parameters)
+             (map
+              (lambda (parameter)
+                (if (signon-config? parameter)
+                    (signon-config
+                     (inherit parameter)
+                     (applications (append
+                                    (signon-config-applications parameter)
+                                    (filter signon-application?
+                                            extension-parameters)))
+                     (api-users (append
+                                 (signon-config-api-users parameter)
+                                 (filter signon-api-user?
+                                         extension-parameters))))
+                    parameter))
+              parameters)))))
