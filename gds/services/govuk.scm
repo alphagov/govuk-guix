@@ -904,6 +904,7 @@
            (requirement '(publishing-api
                           signon
                           content-store
+                          imminence
                           static
                           whitehall-admin)))
           (plek-config) (rails-app-config) smart-answers
