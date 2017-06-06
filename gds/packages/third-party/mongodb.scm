@@ -40,15 +40,12 @@
                                   version ".tar.gz"))
               (file-name (string-append name "-" version ".tar.gz"))
               (sha256
-               (base32 "1ccd6azplqpi9pp3l6fsi8240kkgagq5j6c2dksppjn7slk1kdy8"))
-              (patches (list (search-patch "mongodb-add-version-file.patch")))))
+               (base32 "1ccd6azplqpi9pp3l6fsi8240kkgagq5j6c2dksppjn7slk1kdy8"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("scons" ,scons)
        ("python" ,python-2)
-       ("perl" ,perl)
-       ;; MongoDB requires GCC 5.3.0 or later.
-       ("gcc" ,gcc-5)))
+       ("perl" ,perl)))
     (arguments
      `(#:tests? #f ; There is no 'check' target.
        #:phases
@@ -61,6 +58,13 @@
              (substitute* "SConstruct"
                (("^env = Environment\\(")
                 "env = Environment(ENV=os.environ, "))))
+         (add-after 'unpack 'create-version-file
+           (lambda _
+             (call-with-output-file "version.json"
+               (lambda (port)
+                 (display ,(simple-format #f "{
+    \"version\": \"~A\"
+}" version) port)))))
          (replace 'build
            (lambda _
              (zero? (system* "scons"
@@ -87,7 +91,7 @@ traditional RDBMS systems (which are deep in functionality).")
     (version "3.4.0")
     (source
      (origin (method url-fetch)
-             (uri (string-append "https://github.com/mongodb/" name
+             (uri (string-append "https://github.com/mongodb/mongo-tools"
                                  "/archive/r" version ".tar.gz"))
              (file-name (string-append name "-" version ".tar.gz"))
              (sha256
@@ -102,9 +106,7 @@ traditional RDBMS systems (which are deep in functionality).")
          (delete 'install)
          (replace 'build
            (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let ((bash (string-append
-                          (assoc-ref inputs "bash")
-                          "/bin/bash"))
+             (let ((bash (which "bash"))
                    (out (assoc-ref outputs "out")))
                (and
                 (zero? (system* bash "set_gopath.sh"))
@@ -117,24 +119,48 @@ traditional RDBMS systems (which are deep in functionality).")
                   (mkdir-p (string-append out "/bin"))
                   (setenv "GOBIN" (string-append out "/bin"))
                   #t)
-                (and
-                 (map
-                  (lambda (tool)
-                    (zero?
-                     (system*
-                      "go"
-                      "install"
-                      "-v"
-                      "-tags=\"ssl sasl\""
-                      "-ldflags"
-                      "-extldflags=-Wl,-z,now,-z,relro"
-                      (string-append tool "/main/" tool ".go"))))
-                  '("bsondump" "mongodump" "mongoexport" "mongofiles" "mongoimport"
-                    "mongooplog" "mongorestore" "mongostat" "mongotop"))))))))))
+                (let build ((tools
+                             '("bsondump" "mongodump" "mongoexport" "mongofiles"
+                               "mongoimport" "mongooplog" "mongorestore"
+                               "mongostat" "mongotop")))
+                  (if (null? tools)
+                      #t
+                      (if (let* ((tool (car tools))
+                                 (command
+                                  `("go" "install" "-v"
+                                    "-tags=\"ssl sasl\""
+                                    "-ldflags"
+                                    "-extldflags=-Wl,-z,now,-z,relro"
+                                    ,(string-append tool "/main/" tool ".go"))))
+                            (simple-format #t "build: running ~A\n"
+                                           (string-join command))
+                            (zero? (apply system* command)))
+                          (build (cdr tools))
+                          #f))))))))))
     (native-inputs
-     `(("go" ,go)
-       ("bash" ,bash)))
+     `(("go" ,go)))
     (home-page "https://github.com/mongodb/mongo-tools")
-    (synopsis "")
-    (description "")
+    (synopsis "Various tools for interacting with MongoDB and BSON")
+    (description
+     "This package includes a collection of tools related to MongoDB.
+@table @code
+@item bsondump
+Display BSON files in a human-readable format
+@item mongoimport
+Convert data from JSON, TSV or CSV and insert them into a collection
+@item mongoexport
+Write an existing collection to CSV or JSON format
+@item mongodump/mongorestore
+Dump MongoDB backups to disk in the BSON format
+@item mongorestore
+Read MongoDB backups in the BSON format, and restore them to a live database
+@item mongostat
+Monitor live MongoDB servers, replica sets, or sharded clusters
+@item mongofiles
+Read, write, delete, or update files in GridFS
+@item mongooplog
+Replay oplog entries between MongoDB servers
+@item mongotop
+Monitor read/write activity on a mongo server
+@end table")
     (license "expat")))
