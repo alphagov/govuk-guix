@@ -6,6 +6,7 @@
   #:use-module (ice-9 ftw)
   #:use-module (guix gexp)
   #:use-module (gds services govuk)
+  #:use-module (gds services govuk signon)
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)
