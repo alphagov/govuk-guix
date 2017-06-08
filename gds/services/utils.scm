@@ -109,17 +109,19 @@
    services))
 
 (define-public (correct-services-package-source-from-environment
-         services)
-  (let
-      ((package-commit-ish-list
-        (get-package-source-config-list-from-environment
-         environment-variable-commit-ish-regex))
-       (package-path-list
-        (get-package-source-config-list-from-environment
-         environment-variable-path-regex)))
-    (log-package-path-list package-path-list)
-    (log-package-commit-ish-list package-commit-ish-list)
-    (correct-services-package-source
-     package-path-list
-     package-commit-ish-list
-     services)))
+                services)
+  (let* ((package-commit-ish-list
+          (get-package-source-config-list-from-environment
+           environment-variable-commit-ish-regex))
+         (package-path-list
+          (get-package-source-config-list-from-environment
+           environment-variable-path-regex))
+         (new-services
+          (correct-services-package-source
+           package-path-list
+           package-commit-ish-list
+           services)))
+      (log-package-path-list package-path-list)
+      (log-package-commit-ish-list package-commit-ish-list)
+      new-services))
+
