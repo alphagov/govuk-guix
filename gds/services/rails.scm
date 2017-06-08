@@ -314,6 +314,11 @@
                                          (access? name X_OK)))
                            (((string-append #$package "/bin"))
                             "${BASH_SOURCE%/*}"))
+              (substitute* (find-files (string-append #$root-directory "/bin")
+                                       (lambda (name stat)
+                                         (access? name X_OK)))
+                (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
+                 "File.expand_path('../.spring-real', __FILE__)"))
               (for-each
                (lambda (path)
                  (mkdir-p (string-append #$root-directory path))
