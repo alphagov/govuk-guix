@@ -3,7 +3,9 @@
   #:use-module (ice-9 match)
   #:use-module (ice-9 vlist)
   #:export (levenshtein-distance
-            find-similar-strings))
+            find-similar-strings
+            alist-add
+            alist-add-no-duplicates))
 
 (define (levenshtein-distance s1 s2)
   ;; Implementation using dynamic programming, which can be visualised
@@ -108,4 +110,26 @@
                      strings)
                     sort-pairs)))
 
+(define (alist-add key value alist)
+  (if (null? alist)
+      (list (cons key (list value)))
+      (if (equal? (caar alist) key)
+          (cons (cons key
+                      (cons value
+                            (cdr (first alist))))
+                (cdr alist))
+          (cons (car alist)
+                (alist-add key value (cdr alist))))))
 
+(define* (alist-add-no-duplicates key value alist #:optional (= equal?))
+  (if (null? alist)
+      (list (cons key (list value)))
+      (if (equal? (caar alist) key)
+          (cons (cons key
+                      (delete-duplicates
+                       (cons value
+                             (cdr (first alist)))
+                       =))
+                (cdr alist))
+          (cons (car alist)
+                (alist-add key value (cdr alist))))))
