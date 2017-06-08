@@ -45,23 +45,20 @@ To find out more, read the documentation on
 * Hacking
 
 When developing locally, you may find it useful to use a local copy of
-GNU Guix, this can be done by setting the $GDS_GNU_GUIX_PATH
+GNU Guix, this can be done by setting the $GDS_GNU_GUIX_MODULE_PATH
 environment variable, for example:
 
 #+BEGIN_SRC shell
-  export GDS_GNU_GUIX_PATH="../gnu-guix"
+  export GDS_GNU_GUIX_MODULE_PATH="../gnu-guix"
 #+END_SRC
 
-This will be quite slow, as it builds the whole package again when any
-changes are made, for quicker development, you can setup
-$XDG_CONFIG_HOME/.local/guix/latest to link to the local copy of Guix
-that you which to use. This will be done in the pre-inst-env script
-with the value of $GDS_GUIX_CUSTOM_XDG_CONFIG_HOME if it is set, for
-example:
+The value of GDS_GNU_GUIX_MODULE_PATH will be prepended to the
+GUILE_LOAD_PATH and GUILE_LOAD_COMPILED_PATH.
+
+To replace the package source for the guix package within the
+govuk-guix repository, you can set the GDS_GNU_GUIX_PATH environment
+variable.
 
 #+BEGIN_SRC shell
-  # Where $HOME/govuk/.config/guix/latest is the copy of Guix you wish
-  # to use
-
-  export GDS_GUIX_CUSTOM_XDG_CONFIG_HOME="$HOME/govuk/.config"
+  export GDS_GNU_GUIX_PATH="../gnu-guix"
 #+END_SRC
