@@ -31,7 +31,8 @@
             database-connection-config?
             database-connection-config->environment-variables
             update-database-connection-config-port
-            setup-blank-databases-on-service-startup))
+            setup-blank-databases-on-service-startup
+            database-connection-config->database-name))
 
 (define-record-type* <redis-connection-config>
   redis-connection-config make-redis-connection-config
@@ -93,6 +94,16 @@
        ,@(if namespace
              `("REDIS_NAMESPACE" . ,namespace)
              '())))
+    (unmatched
+     (error "get-database-environment-variables no match for ~A"
+            unmatched))))
+
+(define database-connection-config->database-name
+  (match-lambda
+    (($ <postgresql-connection-config> host user port database) database)
+    (($ <mysql-connection-config> host user port database) database)
+    (($ <mongodb-connection-config> user password host port database) database)
+    (($ <redis-connection-config> host port db-number namespace) database)
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
