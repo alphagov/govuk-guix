@@ -82,6 +82,8 @@
       (lambda (port)
         (simple-format port "~A\n" ruby-version)))
 
+    (chmod (string-append output-path "/Gemfile.lock") #o644)
+
     (with-directory-excursion output-path
       (run "bundle"
            "config"
