@@ -40,7 +40,9 @@
  (guix scripts)
  (gnu services)
  (gnu system)
+ (gds utils)
  (gds services govuk)
+ (gds services utils databases)
  (gds services utils databases mysql)
  (gds services utils databases mongodb)
  (gds services utils databases postgresql)
@@ -130,7 +132,9 @@
          (data-extracts
           (filter-extracts
            (all-extracts)
-           #:service-types service-types
+           #:service-types (if (null? service-types)
+                               #f
+                               service-types)
            #:databases (if (null? databases) #f databases)
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))
@@ -156,65 +160,97 @@
          service-names))))
 
 (define (database-connection-config service extract)
-  (find
-   (or
-    (assoc-ref
-     `(("postgresql" . ,postgresql-connection-config?)
-       ("mongo"      . ,mongodb-connection-config?)
-       ("mysql"      . ,mysql-connection-config?))
-     (data-extract-database extract))
-    (error "Unrecognised database type ~A" (data-extract-database extract)))
-   (service-parameters service)))
+  (or
+   (find
+    (or
+     (assoc-ref
+      `(("postgresql" . ,postgresql-connection-config?)
+        ("mongo"      . ,mongodb-connection-config?)
+        ("mysql"      . ,mysql-connection-config?))
+      (data-extract-database extract))
+     (error "Unrecognised database type ~A" (data-extract-database extract)))
+    (service-parameters service))
+   (begin
+     (display (service-parameters service))
+     (error
+      "Couldn't find a database connection configuration for ~A for the ~A service"
+      (data-extract-database extract)
+      (service-type-name (service-kind service))))))
 
 (define (get-extracts-and-database-connection-configs services extracts)
-  (define (missing-connection-error service extract)
-    (display (service-parameters service))
-    (error
-     "Couldn't find a database connection configuration for ~A for the ~A service"
-     (data-extract-database extract)
-     (service-type-name (service-kind service))))
-
-  (concatenate
-   (map
-    (lambda (service)
-      (let ((service-extracts (filter-extracts
-                               extracts
-                               #:service-types (list
-                                                (service-kind
-                                                 service)))))
-        (map
-         (match-lambda
-          ((database . extracts)
+  (fold
+   (lambda (service data-extracts-and-database-connection-configs)
+     (let ((service-extracts (filter-extracts
+                              extracts
+                              #:service-types (list
+                                               (service-kind
+                                                service)))))
+       (fold
+        (match-lambda*
+          (((database . extracts) data-extracts-and-database-connection-configs)
            ;; The appropriate extract is always last in the list due
            ;; to sorting
            (let ((extract (last (sort-extracts extracts))))
-             (cons extract
-                   (list
-                    (or
-                     (database-connection-config service extract)
-                     (missing-connection-error service extract)))))))
-         (group-extracts data-extract-database service-extracts))))
-    services)))
+             (alist-add
+              extract
+              (database-connection-config service extract)
+              data-extracts-and-database-connection-configs))))
+        data-extracts-and-database-connection-configs
+        (group-extracts data-extract-database service-extracts))))
+   '()
+   services))
 
 (define (load . args)
   (let-values
       (((services data-extracts)
         (arguments->services-and-data-extracts args)))
-    (map
-     (match-lambda
-      ((data-extract . database-connection-configs)
-       (for-each
-        (lambda (database-connection-config)
-          (match data-extract
-                 (($ <data-extract> file datetime database services)
-                  (simple-format #t "Importing extract from ~A in to ~A\n"
-                                 (date->string datetime "~d/~m/~Y")
-                                 database)))
-          (display "\n")
-          (load-extract data-extract database-connection-config))
-        database-connection-configs)))
-     (get-extracts-and-database-connection-configs services
-                                                   data-extracts))))
+    (let ((extracts-and-database-connection-configs
+           (get-extracts-and-database-connection-configs services
+                                                         data-extracts)))
+
+      (display "Extracts selected:\n")
+      (map
+       (match-lambda
+         ((data-extract . database-connection-configs)
+          (for-each
+           (lambda (database-connection-config)
+             (match data-extract
+               (($ <data-extract> file datetime database services)
+                (simple-format
+                 #t " - ~A extract from ~A into the ~A database for"
+                 database
+                 (date->string datetime "~d/~m/~Y")
+                 (database-connection-config->database-name
+                  database-connection-config))
+                (if (eq? 1 (length services))
+                    (simple-format #t " the ~A service\n"
+                                   (service-type-name (first services)))
+                    (begin
+                      (display ":\n")
+                      (for-each
+                       (lambda (service)
+                         (simple-format #t "   - ~A\n"
+                                        (service-type-name service)))
+                       services))))))
+           database-connection-configs)))
+       extracts-and-database-connection-configs)
+      (display "\n")
+
+      (map
+       (match-lambda
+         ((data-extract . database-connection-configs)
+          (for-each
+           (lambda (database-connection-config)
+             (match data-extract
+               (($ <data-extract> file datetime database services)
+                (simple-format #t "Importing extract from ~A in to ~A\n"
+                               (date->string datetime "~d/~m/~Y")
+                               (database-connection-config->database-name
+                                database-connection-config))))
+             (display "\n")
+             (load-extract data-extract database-connection-config))
+           database-connection-configs)))
+       extracts-and-database-connection-configs))))
 
 (define (govuk-data . args)
   (define commands
