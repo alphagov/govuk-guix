@@ -40,7 +40,7 @@ SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less 
 INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER GUIX_GITHUB_TOKEN)
 
 for var in $(env -0 | tr -d '\n' | tr '\0' '\n' | cut -d '=' -f 1); do
-    if [[ $var == GDS_GUIX* ]]
+    if [[ $var == GDS_* ]]
     then
        continue
     fi
