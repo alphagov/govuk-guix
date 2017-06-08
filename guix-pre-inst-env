@@ -26,13 +26,6 @@ EOF
     exit 1
 fi
 
-if [ -n "$GDS_GUIX_CUSTOM_XDG_CONFIG_HOME" ]
-then
-    # Use the custom guix if specified, as this might save some work
-    # compiling guix later on?
-    export XDG_CONFIG_HOME="$GDS_GUIX_CUSTOM_XDG_CONFIG_HOME"
-fi
-
 # Put the right version of guix on the path, and coreutils as env and
 # cut are used by this script
 GDS_GUIX_SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc coreutils guile guix-gds git --search-paths)"
