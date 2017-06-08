@@ -269,11 +269,11 @@ users.each do |name, email, authorisation_permissions|
 
     u.grant_application_permissions(app, permissions)
 
-    authorisation = u.authorisations.build(
-      expires_in: ApiUser::DEFAULT_TOKEN_LIFE
+    authorisation = u.authorisations.first_or_initialize(
+      application_id: app.id
     )
-    authorisation.application_id = app.id
-    authorisation.save!
+
+    authorisation.expires_in = ApiUser::DEFAULT_TOKEN_LIFE
 
     authorisation.token = token
     authorisation.save!
