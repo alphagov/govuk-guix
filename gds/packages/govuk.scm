@@ -713,7 +713,7 @@ service setup.")
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:mongoid-version "3"))
+                     ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
                      ,(replace-gds-sso-initializer)))))
      (synopsis "")
