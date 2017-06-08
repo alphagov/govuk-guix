@@ -55,8 +55,10 @@
     (if (directory-exists? source)
         (for-each
          (lambda (file)
-           (copy-file (string-append source "/" file)
-                      (string-append output-path "/" file)))
+           (let ((from (string-append source "/" file))
+                 (to   (string-append output-path "/" file)))
+           (simple-format #t "Copying ~A from ~A to ~A\n" file from to)
+           (copy-file from to)))
          '("Gemfile" "Gemfile.lock"))
         (run "tar"
              "--extract"
