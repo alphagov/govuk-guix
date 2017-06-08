@@ -20,6 +20,16 @@ export GDS_GUIX_ROOT="$(dirname ${BASH_SOURCE[0]})"
 export GUILE_LOAD_PATH="$GDS_GUIX_ROOT${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
 export GUIX_PACKAGE_PATH="$GDS_GUIX_ROOT/.guix-package-path${GUIX_PACKAGE_PATH:+:}$GUIX_PACKAGE_PATH"
 
+# Strip the trailing slash, otherwise, this causes issues with the
+# %patch-path in Guix.
+GDS_GNU_GUIX_MODULE_PATH="${GDS_GNU_GUIX_MODULE_PATH%/}"
+
+if [ -n "$GDS_GNU_GUIX_MODULE_PATH" ]; then
+    export GUILE_LOAD_PATH="$GDS_GNU_GUIX_MODULE_PATH:$GUILE_LOAD_PATH"
+    export GUILE_LOAD_COMPILED_PATH="$GDS_GNU_GUIX_MODULE_PATH:$GUILE_LOAD_COMPILED_PATH"
+fi
+
+
 # If this is being run as a script
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     "$@"
