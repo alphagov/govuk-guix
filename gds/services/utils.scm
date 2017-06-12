@@ -93,7 +93,17 @@
 ;;; Service package sources
 ;;;
 
-(define-public (correct-services-package-source package-path-list package-commit-ish-list services)
+(define-public (correct-services-package-source package-path-list
+                                                package-commit-ish-list services)
+  (validate-custom-source-data package-path-list
+                               package-commit-ish-list
+                               (filter-map
+                                (lambda (service)
+                                  (let ((parameters (service-parameters service)))
+                                    (if (list? parameters)
+                                        (find package? parameters)
+                                        #f)))
+                                services))
   (map
    (lambda (service)
      (update-service-parameters
