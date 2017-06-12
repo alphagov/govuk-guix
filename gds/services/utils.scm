@@ -102,10 +102,9 @@
        (cons
         package?
         (lambda (pkg)
-          (correct-source-of
-           package-path-list
-           package-commit-ish-list
-           pkg))))))
+          (correct-source-of package-path-list
+                             package-commit-ish-list
+                             pkg))))))
    services))
 
 (define-public (correct-services-package-source-from-environment
