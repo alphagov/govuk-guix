@@ -158,7 +158,9 @@
                                         store source %current-system)))
                (source-store-path (if (string? source)
                                       source
-                                      (derivation->output-path source-derivation)))
+                                      (if (string? source-derivation)
+                                          source-derivation
+                                          (derivation->output-path source-derivation))))
                (nss-certs-derivation (package-derivation store nss-certs))
                (nss-certs-store-output (derivation->output-path
                                         nss-certs-derivation))
@@ -177,7 +179,9 @@
                (working-directory (tmpnam))
                (output (string-append working-directory "/output")))
 
-          (build-derivations store `(,@(or source-derivation '())
+          (build-derivations store `(,@(if (derivation? source-derivation)
+                                           (list source-derivation)
+                                           '())
                                      ,nss-certs-derivation
                                      ,ca-certificates-derivation
                                      ,@input-derivations))
