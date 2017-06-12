@@ -115,6 +115,8 @@
     (replace 'install install)
     (add-after 'install 'wrap-bin-files-for-rails
                wrap-bin-files-for-rails)
+    (add-after 'wrap-bin-files-for-rails 'replace-relative-spring-path
+               replace-relative-spring-path)
     (add-after 'install 'create-tmp-directory
                create-tmp-directory)
     (add-after 'create-tmp-directory 'create-log-directory
