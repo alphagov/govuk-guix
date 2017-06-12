@@ -159,7 +159,7 @@
                    service-name)))
          service-names))))
 
-(define (database-connection-config service extract)
+(define (database-connection-config-from-service-for-extract service extract)
   (or
    (find
     (or
@@ -193,7 +193,8 @@
            (let ((extract (last (sort-extracts extracts))))
              (alist-add
               extract
-              (database-connection-config service extract)
+              (database-connection-config-from-service-for-extract service
+                                                                   extract)
               data-extracts-and-database-connection-configs))))
         data-extracts-and-database-connection-configs
         (group-extracts data-extract-database service-extracts))))
