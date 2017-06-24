@@ -39,6 +39,7 @@
  (guix ui)
  (guix monads)
  (guix scripts)
+ (guix scripts build)
  (guix derivations)
  (guix grafts)
  (guix store)
@@ -52,6 +53,14 @@
  (gds services govuk)
  (gds systems utils)
  (gds systems govuk development))
+
+(define %build-default-options
+  ;; Alist of default option values.
+  `((graft? . #t)
+    (substitutes? . #t)
+    (build-hook? . #t)
+    (print-build-trace? . #t)
+    (verbosity . 0)))
 
 (define %default-options
   (let ((data-dir (or (getenv "XDG_DATA_HOME")
@@ -69,7 +78,8 @@
                 (file-system-mapping (source var/lib-dir)
                                      (target "/var/lib")
                                      (writable? #t)))))
-            '()))))
+            '())
+      ,@%build-default-options)))
 
 (define (service-names->service-types service-names)
   (map
@@ -113,19 +123,20 @@
 
 (define options
   ;; Specifications of the command-line options.
-  (list (option '("share") #t #f
-                (lambda (opt name arg result)
-                  (alist-cons 'file-system-mapping
-                              (specification->file-system-mapping arg #t)
-                              result)))
-        (option '("no-data-persistence") #f #f
-                (lambda (opt name arg result)
-                  (remove (match-lambda
-                           (('file-system-mapping . value)
-                            (equal? (file-system-mapping-target value)
-                                    "/var/lib"))
-                           ((key . value) #f))
-                          result)))))
+  (cons* (option '("share") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'file-system-mapping
+                               (specification->file-system-mapping arg #t)
+                               result)))
+         (option '("no-data-persistence") #f #f
+                 (lambda (opt name arg result)
+                   (remove (match-lambda
+                             (('file-system-mapping . value)
+                              (equal? (file-system-mapping-target value)
+                                      "/var/lib"))
+                             ((key . value) #f))
+                           result)))
+         %standard-build-options))
 
 (define (start . args)
   (define (option-values opts key)
@@ -138,6 +149,8 @@
 
   (define (start-script opts)
     (with-store store
+      (set-build-options-from-command-line store opts)
+
       (run-with-store store
         (mbegin %store-monad
           (set-grafting #f)
