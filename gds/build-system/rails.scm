@@ -30,7 +30,7 @@
                 #:rest arguments)
   "Return a bag for NAME."
   (define private-keywords
-    '(#:source #:target #:inputs #:native-inputs))
+    '(#:source #:target #:ruby #:inputs #:native-inputs))
 
   (and (not target)                               ;XXX: no cross-compilation
        (bag
