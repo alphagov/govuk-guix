@@ -145,6 +145,7 @@ production:
        (call-with-output-file location
          (lambda (port)
            (simple-format port "~A" ,version)))
+       (simple-format #t "\"~A\" written to .ruby-version\n" ,version)
        #t)))
 
 (define-public replace-gds-sso-initializer
