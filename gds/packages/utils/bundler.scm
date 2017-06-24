@@ -39,6 +39,7 @@
             bundle-package-without
             bundle-package-location
 
+            ruby-for-package
             bundle-package-to-store
             package-with-bundler
             extract-bundle-package-from-package
@@ -62,7 +63,17 @@
                 (("current_value = self\\.send\\(attr_name\\)")
                  "current_value = self.send(attr_name)\n      current_value = current_value.sort if %i(files test_files).include? attr_name  # patched through govuk-guix"))))))))))
 
-(define bundler
+(define default-ruby guix:ruby)
+
+(define (ruby-for-package pkg)
+  (define* (ruby-from-package-arguments #:key (ruby default-ruby)
+                                        #:allow-other-keys)
+    ruby)
+
+  (apply ruby-from-package-arguments
+         (package-arguments pkg)))
+
+(define (bundler ruby)
   (package
     (inherit guix:bundler)
     (version "1.13.5")
@@ -73,12 +84,9 @@
                (base32
                 "0fxr7aq7qhlga423mygy7q96cwxmvqlcy676v2x5swlw8rlha2in"))))
     (arguments
-     (substitute-keyword-arguments
-         (default-keyword-arguments
-           (package-arguments guix:bundler)
-           `(#:ruby ,guix:ruby))
-       ((#:ruby ruby)
-        (patch-ruby ruby))))))
+     (ensure-keyword-arguments
+      (package-arguments guix:bundler)
+      `(#:ruby ,(patch-ruby ruby))))))
 
 (define-record-type* <bundle-package>
   bundle-package make-bundle-package
@@ -89,7 +97,7 @@
         (default "bundle-package"))
   (hash bundle-package-hash)
   (ruby bundle-package-ruby
-        (default guix:ruby))
+        (default default-ruby))
   (without bundle-package-without
            (default '()))
   (location bundle-package-location
@@ -106,7 +114,7 @@
                           (ca-certificate-bundle
                            (packages->manifest (list nss-certs)))))
        (define inputs
-         (list ruby tar gzip bundler git))
+         (list ruby tar gzip (bundler ruby) git))
 
        (define search-paths
          (map
@@ -148,7 +156,7 @@
     (($ <bundle-package> source name hash ruby without)
      (parameterize ((%graft? #f))
        (with-store store
-        (let* ((inputs (list ruby bundler gzip tar git))
+        (let* ((inputs (list ruby (bundler ruby) gzip tar git))
                (input-derivations (map (cut package-derivation store <>)
                                        inputs))
                (input-store-outputs (map derivation->output-path
@@ -328,7 +336,7 @@
     (inputs
      (cons*
       (list "ruby" (bundle-package-ruby bundle-pkg))
-      (list "bundler" bundler)
+      (list "bundler" (bundler (bundle-package-ruby bundle-pkg)))
       (list "gemrc" (gemrc (bundle-package-ruby bundle-pkg)))
       (list "tzdata" tzdata)
       (map (lambda (package)
@@ -345,7 +353,7 @@
           #:key
           (extra-inputs '()))
   (let
-      ((ruby (bundle-package-ruby bundle-pkg)))
+      ((ruby (ruby-for-package pkg)))
     (package
       (inherit pkg)
       ;; Pass through the original location
@@ -547,9 +555,12 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                #t)))))))
     (inputs
      (cons*
-      (list "bundler" bundler)
+      (list "bundler" (bundler ruby))
       (list "bundle-install" (bundle-install-package
-                              bundle-pkg pkg
+                              (bundle-package
+                               (inherit bundle-pkg)
+                               (ruby ruby))
+                              pkg
                               #:extra-inputs (append
                                               extra-inputs
                                               (cond
