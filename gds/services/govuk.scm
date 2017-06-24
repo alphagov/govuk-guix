@@ -389,7 +389,7 @@
           (plek-config) (rails-app-config) content-performance-manager
           (signon-application
            (name "Content Performance Manager")
-           (supported-permissions '("signin")))
+           (supported-permissions '("signin" "inventory_management")))
           (signon-api-user
            (name "Content Performance Manager")
            (email "content-performance-manager@guix-dev.gov.uk")
