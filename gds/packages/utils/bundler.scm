@@ -163,7 +163,7 @@
                                          input-derivations))
                (source-derivation (and (not (string? source))
                                        ((store-lower lower-object)
-                                        store source %current-system)))
+                                        store source)))
                (source-store-path (if (string? source)
                                       source
                                       (if (string? source-derivation)
