@@ -63,7 +63,7 @@ absolute file name and STAT is the result of 'lstat'."
     (package
       (inherit gnu:guix)
       (name "guix-gds")
-      (version "release_7")
+      (version "release_8")
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ((#:tests? tests)
@@ -85,5 +85,5 @@ absolute file name and STAT is the result of 'lstat'."
                    ;; thinks that it has not built this
                    (commit version)))
              (sha256
-              (base32 "1vlkmcfv4z8aij63896is751lizcl6cp1pi0bk6i556swx437239"))
+              (base32 "1hq80kk4in6c381w2zh70z8byqg8nxdi2f9qnxd4d9m0fg2q5i35"))
              (file-name (string-append "guix-" version "-checkout"))))))))
