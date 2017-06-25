@@ -86,34 +86,61 @@
           #f "Update ~A from ~A to ~A"
           (package-name package) (package-version package) new-version))))
 
-(define (refresh-package store package commit?)
-  (simple-format #t "\nChecking lastest release of ~A\n"
+(define (refresh-package store package commit? force?)
+  (define (refresh-package-source package version tarball)
+    (update-package-source package
+                           version
+                           (call-with-input-file
+                               tarball
+                             port-sha256)))
+
+  (define (refresh-bundle-package-if-present package tarball)
+    (and=> (extract-bundle-package-from-package package)
+           (lambda (bundle-pkg)
+             (update-bundle-package-source
+              (bundle-package
+               (inherit bundle-pkg)
+               (location (bundle-package-location bundle-pkg))
+               (source tarball))))))
+
+  (simple-format #t "\nChecking latest release of ~A\n"
                  (package-name package))
   (let-values (((version tarball)
                 (package-update store package updaters)))
-    (if version
-        (let ((hash (call-with-input-file tarball
-                      port-sha256)))
-          (and=> (extract-bundle-package-from-package package)
-                 (lambda (bundle-pkg)
-                   (update-bundle-package-source
-                    (bundle-package
-                     (inherit bundle-pkg)
-                     (location (bundle-package-location bundle-pkg))
-                     (source tarball)))))
-          (update-package-source package version hash)
-          (if commit?
-              (commit-version-change package version))))))
+    (if (and (let ((source-tarball-changed
+                    (if version
+                        (refresh-package-source package version tarball)
+                        #f))
+                   (bundle-package-changed
+                    (if (or version force?)
+                        (refresh-bundle-package-if-present
+                         package
+                         (or tarball
+                             ;; When force? is true, tarball could be #f
+                             ;; if no new version is available, in which
+                             ;; case, fallback to the package source.
+                             (package-source package)))
+                        #f)))
+               (or source-tarball-changed
+                   bundle-package-changed))
+             commit?)
+        (commit-version-change package version))))
 
 (define %default-options
-  '((commit? . #f)))
+  '((commit? . #f)
+    (force? . #f)))
 
 (define options
   ;; Specifications of the command-line options.
   (list (option '("commit") #f #f
                 (lambda (opt name arg result)
                   (alist-cons 'commit? #t
-                              (alist-delete 'commit? result))))))
+                              (alist-delete 'commit? result))))
+        (option '("force") #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'force? #t
+                              (alist-delete 'force? result))))))
+
 
 (define (option-values opts key)
   (reverse
@@ -128,10 +155,14 @@
   (with-error-handling
    (let* ((opts (parse-command-line (cdr args) options (list %default-options))))
      (with-store store
-      (for-each (cut refresh-package store <> (assoc-ref opts 'commit?))
-                (let ((package-names (option-values opts 'argument)))
-                  (if (null? package-names)
-                      (all-packages)
-                      (get-matching-packages package-names))))))))
+       (for-each (cut refresh-package
+                   store
+                   <>
+                   (assoc-ref opts 'commit?)
+                   (assoc-ref opts 'force?))
+                 (let ((package-names (option-values opts 'argument)))
+                   (if (null? package-names)
+                       (all-packages)
+                       (get-matching-packages package-names))))))))
 
 (apply govuk-refresh (command-line))
