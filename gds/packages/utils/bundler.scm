@@ -561,6 +561,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
       (list "bundle-install" (bundle-install-package
                               (bundle-package
                                (inherit bundle-pkg)
+                               (location (bundle-package-location bundle-pkg))
                                (ruby ruby))
                               pkg
                               #:extra-inputs (append
