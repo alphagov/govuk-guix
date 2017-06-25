@@ -445,6 +445,7 @@ the Signon Dev user passphrase in\n")
                   "\n")))
     (packages
      (cons*
+      smokey
       govuk-setenv
       strace
       (specification->package+output "bind" "utils")

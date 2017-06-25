@@ -941,6 +941,137 @@
           (service-startup-config))))
 
 ;;;
+;;; Smokey
+;;;
+
+
+(define (smokey-start-script environment-variables package)
+  (program-file
+   (string-append "start-publishing-e2e-tests")
+   (with-imported-modules '((guix build utils)
+                            (gnu services herd)
+                            (srfi srfi-26)
+                            (ice-9 popen)
+                            (ice-9 rw)
+                            (ice-9 rdelim))
+    #~(let ((bundle (string-append #$package "/bin/bundle")))
+        (use-modules (guix build utils)
+                     (gnu services herd)
+                     (srfi srfi-26)
+                     (ice-9 popen)
+                     (ice-9 rw)
+                     (ice-9 rdelim))
+
+        (mkdir-p "/var/apps/smokey")
+
+        (for-each
+         (lambda (env-var)
+           (setenv (car env-var) (cdr env-var)))
+         '#$environment-variables)
+        (chdir #$package)
+        (let
+            ((result
+              (zero? (system*
+                      bundle
+                      "exec"
+                      "rake"))))
+
+          result)))))
+
+(define (smokey-activation environment-variables package)
+  (with-imported-modules `((guix build syscalls)
+                           (guix build bournish)
+                           (gnu build file-systems))
+    #~(begin
+        (use-modules (guix build utils)
+                     (gnu build file-systems)
+                     (guix build syscalls)
+                     (ice-9 match)
+                     (ice-9 ftw)
+                     (srfi srfi-26))
+        (let* ((root-directory "/var/apps/smokey"))
+          (if (file-exists? root-directory)
+              (begin
+                (mkdir-p (string-append root-directory "/bin"))
+                (mount "tmpfs" (string-append root-directory "/bin") "tmpfs")
+                (copy-recursively
+                 (string-append #$package "/bin")
+                 (string-append root-directory "/bin")
+                 #:log (%make-void-port "w")
+                 #:follow-symlinks? #f)
+                (substitute* (find-files (string-append root-directory "/bin")
+                                         (lambda (name stat)
+                                           (access? name X_OK)))
+                  (((string-append #$package "/bin"))
+                   "${BASH_SOURCE%/*}"))
+                (substitute* (find-files (string-append root-directory "/bin")
+                                         (lambda (name stat)
+                                           (access? name X_OK)))
+                  (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
+                   "File.expand_path('../.spring-real', __FILE__)"))
+                (for-each
+                 (lambda (path)
+                   (mkdir-p (string-append root-directory path))
+                   (chmod (string-append root-directory path) #o777))
+                 '("/tmp" "/log")))
+              (begin
+                (mkdir-p root-directory)
+                (bind-mount #$package root-directory)
+
+                (for-each
+                 (lambda (file)
+                   (if (file-exists? file)
+                       (mount "tmpfs" file "tmpfs")))
+                 (map
+                  (lambda (dir)
+                    (string-append root-directory "/" dir))
+                  '("log" "public")))))
+
+          (let* ((dir (string-append "/tmp/env.d/"))
+                 (file (string-append dir "smokey")))
+            (mkdir-p dir)
+            (call-with-output-file file
+              (lambda (port)
+                (for-each
+                 (lambda (env-var)
+                   (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+                 '#$environment-variables))))))))
+
+(define-public smokey-service-type
+  (service-type
+   (name 'smokey)
+   (extensions
+    (list
+     (service-extension
+      activation-service-type
+      (match-lambda
+        ((plek-config package)
+         (smokey-activation
+          (plek-config->environment-variables plek-config)
+          package))))
+     (service-extension
+      shepherd-root-service-type
+      (match-lambda
+        ((plek-config package)
+         (let* ((start-script
+                 (smokey-start-script
+                  (plek-config->environment-variables plek-config)
+                  package)))
+           (list
+            (shepherd-service
+             (provision (list 'smokey))
+             (documentation "Smokey")
+             (requirement '(smart-answers))
+             (respawn? #f)
+             (start #~(make-forkexec-constructor #$start-script))
+             (stop #~(make-kill-destructor))))))))))))
+
+(define-public smokey-service
+  (service
+   smokey-service-type
+   (list (plek-config) smokey)))
+
+;;;
 ;;; Support
 ;;;
 
@@ -1746,6 +1877,7 @@
    manuals-frontend-service
    service-manual-frontend-service
    smart-answers-service
+   smokey-service
    static-service))
 
 (define-public draft-frontend-services

@@ -1204,6 +1204,52 @@ content, as well as broadcasting changes to a message queue.")
      (license #f)
      (home-page "https://github.com/alphagov/specialist-publisher"))))
 
+(define-public smokey
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0dlvrdbd1ywmyygpfp7bcn1vnyawih513faaxvzgm4v2yxcya1bn")))
+   (package
+     (name "smokey")
+     (version "0")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish "61cd5a70ca48eb9a6e5ca2522d608db75dbb6582"
+       #:hash (base32 "1n1ah83nps1bkqgpq8rd1v6c988w9mvkacrphwg7zz1d6k8fqska")))
+     (build-system gnu-build-system)
+     (inputs
+      `(("ruby" ,ruby)
+        ("phantomjs" ,phantomjs)))
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (replace 'configure (lambda args #t))
+          (replace 'build (lambda args #t))
+          (replace 'check (lambda args #t))
+          (replace 'install
+                   (lambda* (#:key inputs outputs #:allow-other-keys)
+                     (let* ((out (assoc-ref outputs "out")))
+                       (copy-recursively
+                        "."
+                        out
+                        #:log (%make-void-port "w")))))
+          (add-after 'patch-bin-files 'wrap-with-relative-path
+                     (lambda* (#:key outputs #:allow-other-keys)
+                       (let* ((out (assoc-ref outputs "out")))
+                         (substitute* (find-files
+                                       (string-append out "/bin"))
+                           (((string-append out "/bin"))
+                            "${BASH_SOURCE%/*}"))))))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/smokey/"))
+   #:extra-inputs (list
+                   ;; For nokogiri
+                   pkg-config
+                   libxml2
+                   libxslt)))
+
 (define-public static
   (package-with-bundler
    (bundle-package
