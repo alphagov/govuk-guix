@@ -206,6 +206,8 @@
 
           (let ((path
                  (add-to-store store name #t "sha256" output)))
+            (simple-format #t "bundle-package-to-store: output path: ~A\n"
+                           path)
             (delete-file-recursively working-directory)
             path)))))))
 
