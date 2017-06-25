@@ -37,6 +37,16 @@
   #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party phantomjs))
 
+;; TODO: The native search paths in the ruby-2.3 package from GNU Guix
+;; are wrong in the version currently in use, so fix this here.
+(define ruby-2.3
+  (package
+    (inherit (@ (gnu packages ruby) ruby-2.3))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "GEM_PATH")
+            (files (list "lib/ruby/gems/2.3.0")))))))
+
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
