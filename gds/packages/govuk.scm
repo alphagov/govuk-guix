@@ -50,7 +50,7 @@
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1xzrsf3bx666x21q78smj46wb7fh7v5c1dxqxmx8syljjql9s77j")))
+    (hash (base32 "1zplvxyh193xmhlvd3s7f720z0zwzdymy2ikijzjabkhmyq4b91p")))
    (package
      (name "asset-manager")
      (version "release_92+4")
@@ -96,7 +96,8 @@
           (add-after 'install 'create-uploads-directory
                      (lambda* (#:key outputs #:allow-other-keys)
                        (let ((out (assoc-ref outputs "out")))
-                         (mkdir-p (string-append out "/uploads"))))))))
+                         (mkdir-p (string-append out "/uploads"))))))
+        #:ruby ,ruby-2.3))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
@@ -105,7 +106,7 @@
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0al4dn0qjfhyap1cha4r7ix3vz3z0n2g3hb9004l5ifk520mmyi4")))
+    (hash (base32 "1wagrzk07fks423pdjsk29b2y7786cp6z3gnqpcpvm53xb5g1cy2")))
    (package
      (name "authenticating-proxy")
      (version "release_37")
@@ -130,7 +131,7 @@ proxies requests to some upstream")
 (define-public bouncer
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1v6bcgmfsb1ffa6071qz7kqj5g8ihq5rryxl25k9dv6rx3n4knds")))
+    (hash (base32 "0lv0ar6hi3cb1mh5nn453gy94gc50pgqzglaxpdpyraqzcq3a3c2")))
    (package
      (name "bouncer")
      (version "release_205")
@@ -148,33 +149,35 @@ proxies requests to some upstream")
 (define-public calculators
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1a6ffra7dlp681x8wx0ipj5c3ibpmqq2bf58icd4sdsgbcf8w96c")))
+    (hash (base32 "1k7hxrr84l8gsi9six5njghhwy4i7msa6mfw1f7dy2jnxfcip1zz")))
    (package
      (name "calculators")
-     (version "release_187")
+     (version "release_195")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "07004a5c2l93vkg737033fj0dwh3pkcad6i0pad6995bf2rwqm97")))
+       #:hash (base32 "02dm0zkgxx5sja02cmcbwg66bps5czqpsbc2pmrrvvr4yn3cz6c8")))
      (build-system rails-build-system)
      (synopsis "Calculators provides the Child benefit tax calculator")
      (description "")
      (license license:expat)
-     (home-page "https://github.com/alphagov/calculators"))))
+     (home-page "https://github.com/alphagov/calculators"))
+   #:extra-inputs (list libffi)))
+
 
 (define-public calendars
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0n5vzakccjy4bbw9lrvszakaximcq7sa9g6ayzd8imhs6j1xnml9")))
+    (hash (base32 "1fwwildg81wxnngmhrq3a19f2l26m8a3vjqzr70myw6gx3aprvxn")))
    (package
      (name "calendars")
-     (version "release_422")
+     (version "release_424")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1y3y4s1scrq9h0idas2v54hn5y6pd1r65ar24y2jw4lvlls7syq1")))
+       #:hash (base32 "127g7i5bs2n346wgb27ya2rxm92l8s4klw3l061ghzh5gg6yxliz")))
      (build-system rails-build-system)
      (synopsis "Serves calendars on GOV.UK")
      (description "")
@@ -184,7 +187,7 @@ proxies requests to some upstream")
 (define-public collections
   (package-with-bundler
    (bundle-package
-    (hash (base32 "11y6ivbx6ljqi6zx5yyfm2babialxcwj5c5kwi2559n02ivnsxpa")))
+    (hash (base32 "0fv9lv91l97dfff49h60hngdqmpxp9xpkp36x73kvc52khvhyvzs")))
    (package
      (name "collections")
      (version "release_335")
@@ -202,7 +205,7 @@ proxies requests to some upstream")
 (define-public collections-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "19px7wgq1mp9ryrv7p8s1a0icln6lx35hpjk021y4xf9yiwhsza8")))
+    (hash (base32 "1icwbrnbp1i45jmic71winw271vg6sf3dsk0k0hcdgjksva55v2x")))
    (package
      (name "collections-publisher")
      (version "release_260")
@@ -226,7 +229,7 @@ proxies requests to some upstream")
 (define-public contacts-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "05gi6jcaprvbwfi2nrhyw9hsml5nycndqwp7c098dghk7mq1mpxb")))
+    (hash (base32 "10h2vbjf3xw3xh8da2n6y3751rmbmnk5r03xnh0a06yy94j6lq6b")))
    (package
      (name "contacts-admin")
      (version "release_351")
@@ -249,15 +252,15 @@ proxies requests to some upstream")
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1snza9nmb79yw543k7pxxyiklrgvaqly69mshf218smgmr0q3j91")))
+    (hash (base32 "1apwm91ps21fnpc2vg5zj2rjy1xn8mkp5ahl0ji5xddnf9f63li3")))
    (package
      (name "content-performance-manager")
-     (version "release_99")
+     (version "release_136")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "13ay5gdlybkw15dp718plmil9wv6x36ibfyqbadycqy07j2q2v1j")))
+       #:hash (base32 "0sv62qpqqjni9cly9rc3z1d9rvm18hzqm8c30h96yj4br6qz171x")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -273,7 +276,7 @@ proxies requests to some upstream")
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "024l67my3qw27vrys9mw1yl8cx564sq6c1qnimj692lahv8h5d4d")))
+    (hash (base32 "0ygmb79rb1cb8gampgyy51jda7s6hfmr7nga937zr92nvfpmldwy")))
    (package
      (name "content-store")
      (version "release_644")
@@ -292,7 +295,7 @@ proxies requests to some upstream")
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1niyy0raigfq9jf9ayy4r7v2lldnsn2x795sblfn1q6jx5awcj1b")))
+    (hash (base32 "1njasng87d45jyp5krmaw22vdw26njw20j6gvs56dvp3wdlnhc6n")))
    (package
      (name "content-tagger")
      (version "release_434")
@@ -311,7 +314,7 @@ proxies requests to some upstream")
 (define-public design-principles
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0n1bz9c3nmc571wmb0n96hbbfzk3mfgsw4d6bhla22p96sfjpam9")))
+    (hash (base32 "1zd74v5dvywahq83ih2jkcsbxmcksn9ql3vcs3w3qvpbbscnpxsq")))
    (package
      (name "design-principles")
      (version "release_871")
@@ -322,7 +325,8 @@ proxies requests to some upstream")
        #:hash (base32 "0n9bh0lx8s9l95m0caffnyygh6fggglk8x6wlqyax3ycx8jyzbdy")))
      (build-system rails-build-system)
      (arguments `(;; Asset precompilation fails
-                  #:precompile-rails-assets? #f))
+                  #:precompile-rails-assets? #f
+                  #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -331,7 +335,7 @@ proxies requests to some upstream")
 (define-public email-alert-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "132fq8d1cwzdsi5rh1jbwsm1rh0rkggsrs74d7fii5xmlmp328xi")))
+    (hash (base32 "0dbw1z8ww1ydidvra1ljgvh8cbk900m9vbnf9nfz2awkp4ia5h6s")))
    (package
      (name "email-alert-api")
      (version "release_181")
@@ -357,7 +361,7 @@ proxies requests to some upstream")
 (define-public email-alert-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1c6qnaklid2vsg2iyc21nsza7my7vsvxh2lp5s0x18d9dwqd9d31")))
+    (hash (base32 "04cbcds7j6rw2bhi54fjmxs6v7b6scizr879lvfizd3sy0dl50vg")))
    (package
      (name "email-alert-frontend")
      (version "release_44")
@@ -375,7 +379,7 @@ proxies requests to some upstream")
 (define-public email-alert-service
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0jfl2a0sdn9qvp0xkfxd7c4cpbn73gqnzcnpcy7r057px2bj8plm")))
+    (hash (base32 "0fhn3fxkb56i0h15np740g8k5mgacshxv5cidvniknnrx22aks0d")))
    (package
      (name "email-alert-service")
      (version "release_78")
@@ -415,7 +419,7 @@ proxies requests to some upstream")
 (define-public feedback
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0c40z42zlh0aj1gbapqzr71hhlc4m23yadi9jw3l42cqgwh3w6wx")))
+    (hash (base32 "0088x2am7q2zwm6b9kahml6y9hvkrfajl8aal6la4sb8qypnjl9f")))
    (package
      (name "feedback")
      (version "release_301")
@@ -425,6 +429,7 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "118znn3b63i5pcbk4p262yryjdhx8bwvqa8sri4n8jidwai6hc0p")))
      (build-system rails-build-system)
+     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -433,7 +438,7 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mxs91wzfkn8wxck2fgi2njjq5amqygh2vv4r33p6lg0nz1pw9p8")))
+    (hash (base32 "1kf29sqb997pqrqvdzjilxddzl68s50hmyr99ri6mpky14r2aw27")))
    (package
      (name "finder-frontend")
      (version "release_309")
@@ -451,16 +456,17 @@ proxies requests to some upstream")
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0gqvw1dyaypfr6cqichq5zmqg7k0454734mw6ryl74ncdq8ywy5z")))
+    (hash (base32 "15g5bkpjhp8nnhlfvgsh13q1nlk7c2kg89h1z82ls45m26kp3pcc")))
    (package
      (name "frontend")
-     (version "release_2151")
+     (version "release_2162")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0x9dgcqwpcnpkbsdjib4wd5xjg0cq42a8z86nj1n8l8s32mv824s")))
+       #:hash (base32 "0whs3qr75bvj7nd2ijb3zv1k1dgjnrn9c4f8cwmv0bd1bk9fi3j4")))
      (build-system rails-build-system)
+     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -469,7 +475,7 @@ proxies requests to some upstream")
 (define-public government-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1lxvrrl5hym84zij2k8qy5jdzlzlq7s5zh127p7zgmq910rkw002")))
+    (hash (base32 "03h422qhp7fnpsrrj43310yhs4gc0g7ykp6gkil94rkmmknnbshw")))
    (package
      (name "government-frontend")
      (version "release_367")
@@ -563,7 +569,7 @@ service setup.")
 (define-public hmrc-manuals-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qbjqy3yxxnqg8lxnnm9qj6dmhjspbcy9cisf1hwrc5v9m09wc7c")))
+    (hash (base32 "0wxqylhp5rfmkhd9aylg6wb1m2iqjfrap3f8p6nmykbqwld5sy4w")))
    (package
      (name "hmrc-manuals-api")
      (version "release_181")
@@ -584,7 +590,7 @@ service setup.")
 (define-public imminence
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1fsmkmwgzblgwl5y4f68xy1kk5jp64hrz2f9q1rv00hz37x3mfjp")))
+    (hash (base32 "15p4lndw5mfr2z1daagi4wsjcqgl0fzgn487swzvcs5dm4si7ygn")))
    (package
      (name "imminence")
      (version "release_318")
@@ -602,7 +608,7 @@ service setup.")
 (define-public info-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "10c8npzfidrs9wk29nb4b1vba2islkf83i57c410a3z0xm2hm51k")))
+    (hash (base32 "08dfadiwx0r4d0jxx4n6rrydqalhhfpmfc0fqzzka7wgski4n5kp")))
    (package
      (name "info-frontend")
      (version "release_76")
@@ -621,7 +627,7 @@ service setup.")
 (define-public licence-finder
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1bbnig6i77d22d24xl36p4hyb1gyn836875mxpchpzb82y81i43f")))
+    (hash (base32 "0r2hhnbkans7sylj0dxra1dm9lc3idgandfh9zqhl1jpp7nxp7k8")))
    (package
      (name "licence-finder")
      (version "release_286")
@@ -631,6 +637,7 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "1spcp77bppjmmk8gs4g5fl6wv89ynkcn343f5sr5nsnkw48mmsjg")))
      (build-system rails-build-system)
+     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -639,7 +646,7 @@ service setup.")
 (define-public local-links-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ga8dz194gf5l7xxdacgqj298wvlgfhkh36lba18jlk8ja5mx45k")))
+    (hash (base32 "0xr40xqj2skwrqz5pgh72ppgygyr2qpvp6l2aj2x83kkmk1qqzpd")))
    (package
      (name "local-links-manager")
      (version "release_118")
@@ -657,7 +664,8 @@ service setup.")
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml)))
+        #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -667,7 +675,7 @@ service setup.")
 (define-public manuals-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1q67vq78r3k4gnvigjshvsmyjfynzbcicag3h7xzwji9ix6lk6jw")))
+    (hash (base32 "068kpz528jiyzva1481n6qdxl4h0d9mrqyfqsmcm9118kmvw6826")))
    (package
      (name "manuals-frontend")
      (version "release_202")
@@ -685,7 +693,7 @@ service setup.")
 (define-public manuals-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1vr5a3lkfvbskfqcry3f3kjkky3y9y7jh841h8ngdm0y7jgp9cqr")))
+    (hash (base32 "0f8ls9p55nhrzmb37x8x77lpzmqm9hh71akjmj487g6rdfrbpafp")))
    (package
      (name "manuals-publisher")
      (version "release_972")
@@ -709,7 +717,7 @@ service setup.")
 (define-public maslow
   (package-with-bundler
    (bundle-package
-    (hash (base32 "07mxwq9rcv471qz0r7pc7dmrrmryzhy6g8sxy00wvwvfvag84dbh")))
+    (hash (base32 "1nwl8nvsyljb5vn6gpz85zhv9l04m09zfxn972fabdc64vir0kya")))
    (package
      (name "maslow")
      (version "release_198")
@@ -784,7 +792,7 @@ service setup.")
 (define-public need-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0ibaajh3z5i921lsqlm94xgc5lvhbr1b6c7yc2r99cahygcwhj8j")))
+    (hash (base32 "0w62ydia3j5d0s045dsk1bl88gv5vrhyvbri370al81v8zrrrabi")))
    (package
      (name "need-api")
      (version "release_146")
@@ -809,7 +817,7 @@ service setup.")
 (define-public policy-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "03ipdp9zk36mb7rlqm0wa4vl469j60yd60iaivprn8h5dl8niiyv")))
+    (hash (base32 "0r02dfl7rgccbm3kggcyacyfndybzvj6ljliqga7zx1ciqff3ydn")))
    (package
      (name "policy-publisher")
      (version "release_175")
@@ -833,7 +841,7 @@ service setup.")
 (define-public publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1yisaa4dcvqbcly1am0q6cq39b61y7vqfbhjlim808x4mkxki44h")))
+    (hash (base32 "1s8clpgc3ggzlf4zhmlwnzpvr0fi2kadg3n69fv325gl4k675lbx")))
    (package
      (name "publisher")
      (version "release_1798")
@@ -858,17 +866,18 @@ service setup.")
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "06gki259z2b2zivxrjf5k8cpwmx8qhmaaw25acj6dy605gpyhm09")))
+    (hash (base32 "19hh5488y1fsn1ckdr2cvg3cn997lf8swv84jjshv2bw6jg5q8l1")))
    (package
      (name "publishing-api")
-     (version "release_910")
+     (version "release_930")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "0qbcaynbvhd5561n3d8mpj8y4rms5nz3kggirglr28n3ap62lnkc")))
+       #:hash (base32 "0yf0y9nh1ks156mkml3idjvff20ycnghx8g4m7c16xnc3sxgf25m")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments `(#:precompile-rails-assets? #f
+                  #:ruby ,ruby-2.3))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
      (description
       "The Publishing API is a service that provides a HTTP API for
@@ -886,7 +895,7 @@ content, as well as broadcasting changes to a message queue.")
   (package-with-bundler
    (bundle-package
     (hash
-     (base32 "17svvb2g3g3s06v16y5pm7jz3anrjn2yg9xjwvkn7s754v6xswbi")))
+     (base32 "1lngabhlnymaxilc6ixdy8pxp6w669dg1n75v8agxlkgsqrkcvrz")))
    (package
      (name "publishing-e2e-tests")
      (version "0")
@@ -925,7 +934,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public release
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qynlzmxm25g2h7wc4mm72z62mq50gfpyzz4ingdy17rvwdrrnqr")))
+    (hash (base32 "04kimq4w7yrhlcnmmqw4brr6kwppq2igpiy9z2gqlcppss2b16nz")))
    (package
      (name "release")
      (version "release_258")
@@ -996,7 +1005,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "18xi02azlxjqll2h9fqhy3rgqm41zhkkh464psli0d6h3hgw3phk")))
+    (hash (base32 "0ymfjvf37fg7w4zz8jg3nsgrjxllg6mjj0d287zzhxky75wnl9mn")))
    (package
      (name "router-api")
      (version "release_116")
@@ -1006,7 +1015,8 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "01ny27vkshiwhkav5h52bkclkzlvnxdawalkmb9sw8y3c32shal7")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments `(#:precompile-rails-assets? #f
+                  #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -1015,7 +1025,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public rummager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1zzr0sj9pmhrfyjlfhxyfk0hh6177xyi2w17sln6sdljz8m3hpz9")))
+    (hash (base32 "1plpgni5nc8lnmjvc4rhyrvhg0h3hphnq6ld58qg55qyamimmdwk")))
    (package
      (name "rummager")
      (version "release_1369")
@@ -1031,7 +1041,8 @@ content, as well as broadcasting changes to a message queue.")
         (modify-phases %standard-phases
           (add-after
            'install 'replace-redis.yml
-           ,(replace-redis.yml)))))
+           ,(replace-redis.yml)))
+        #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -1041,7 +1052,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1yqjh9hf2j4phkmyp3pmpgc8x70hl33yfnypkjqgzj5s9rb1m4wi")))
+    (hash (base32 "18m2y66ww28k8zqm5js1wlh6xls2359z3k0yn9d0vcf5bdxs7jka")))
    (package
      (name "search-admin")
      (version "release_96")
@@ -1060,7 +1071,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "114g4mk8mcfg9szbxr6avpp4skw8b5nd3j2rfvm0v11pwn65010i")))
+    (hash (base32 "13fpbgqnbr4i8qz71ws846n146ffsvvdy6d5ai39n4imxph49kg5")))
    (package
      (name "service-manual-frontend")
      (version "release_102")
@@ -1078,7 +1089,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0vxji9g2vkwncm6m4l2057071m6802nyzy2lvdhpg28p756k7hc4")))
+    (hash (base32 "0p28dsiw5zr19pwsd30xs9xa9bygzvb5af5xl083q0d39zf7r5jw")))
    (package
      (name "service-manual-publisher")
      (version "release_298")
@@ -1100,7 +1111,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public short-url-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "155mp2xi968hhzkk3rk6rj5rd4qgcp0rb6n01aim01515xzy84il")))
+    (hash (base32 "1gbk8lfzba07cakxf6jpn70qn32kz6arlk2bgn89ydgmczq2div8")))
    (package
      (name "short-url-manager")
      (version "release_108")
@@ -1119,7 +1130,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public signon
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mqxak5bglmkaiqyz05jcsk61qbx9z6yl88yyclhws8fffsnp18x"))
+    (hash (base32 "14n8ialjsasj0cjwmqy446kw7d194lqi3v1j6d3yhm1bsqhrldq1"))
     (without '("development" "test")))
    (package
      (name "signon")
@@ -1134,7 +1145,8 @@ content, as well as broadcasting changes to a message queue.")
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+                     ,(use-blank-database.yml)))
+        #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -1146,15 +1158,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public smart-answers
   (package-with-bundler
    (bundle-package
-    (hash (base32 "12r00p47pmylfac87ch3i3l3f9cfkc2k6c1p9cf5ib3mprqvcdan")))
+    (hash (base32 "16pwx40cknngjnx0d2b02rhm5ywzd09vs110f47n5sv0ya7mm338")))
    (package
      (name "smart-answers")
-     (version "release_3629")
+     (version "release_3633")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0k7glvr4jqzprngyk89ghhyr9r96zp3ib0wqwpi2ik2khwqhygk3")))
+       #:hash (base32 "02smanz8k4i0xhbax4123330zdvdjljkkfsjv0qcn1ds770nfxl2")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
      (synopsis "")
@@ -1165,7 +1177,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01d1v3ays6r7raac5b66a77p4bmiyfbym4737wizjp8sm0ywk7ia"))
+    (hash (base32 "08vvhppxmqq0g4dlys52m8dy4w0b6nvhn0w175p3q8ik3kagqfz2"))
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
@@ -1195,7 +1207,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0ck3pv5mn0d2ksmkb7la8b2wmrzq8bmxlk9083sz5x45hbbm0bih")))
+    (hash (base32 "04c0p4xy16675qm6b3x0y1pgak3q6mx67iw1hxkrg5hvyx74hm31")))
    (package
      (name "static")
      (version "release_2605")
@@ -1205,7 +1217,8 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1sa53fgs5l2k0pxc2ijmj0zpagjdr5kxyqlx8jjl83r8jibw3280")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments `(#:precompile-rails-assets? #f
+                  #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -1214,7 +1227,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "06i55afi48lhr6cz46cxm80gdf08zm9b9rdcl1696afrmx5mjgg0")))
+    (hash (base32 "074gwgwnmz7irgazjngflh8rcsk2krv6ksq73zk1jwazh4w9xdhl")))
    (package
      (name "support")
      (version "release_591")
@@ -1240,16 +1253,17 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1gndr0jpd0qqic6lanbgm0xk6pqk1ljzjlkrb51bw6gmp28hiy6w")))
+    (hash (base32 "1r8igna3pz5xgmb6ym8j3y5mn2czmn8vl1kan2rp1n79wa0kwl55")))
    (package
      (name "support-api")
-     (version "release_126")
+     (version "release_128")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0mxqdbkm6m8ifd05xsprvikjq9g62j13lhjlyffrj5gxsc8mbf67")))
+       #:hash (base32 "18738czqk1pzfr57c5am1fjhnrwqzlzp62iicsl9bc87n54nl03i")))
      (build-system rails-build-system)
+     (arguments `(#:ruby ,ruby-2.3))
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)
@@ -1264,7 +1278,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0hvx8piz9sj1dq2ky6q22zzsjknw7x11ysbzipwhn9a0agd316qp")))
+    (hash (base32 "0ik7a4v2dq6yvbbaq464yr78kvap4q76izbzjpjhxbrqnafb53pc")))
    (package
      (name "transition")
      (version "release_788")
@@ -1282,7 +1296,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public travel-advice-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0biin2wsjl6gbcnxxfmsyfqg0lcz2nfz3r215nc1kq39pmaf1nf5")))
+    (hash (base32 "11agks9i1szrnyz08130lgkvrg10kdqcisdn11dvqwkghhf66ki7")))
    (package
      (name "travel-advice-publisher")
      (version "release_256")
@@ -1305,7 +1319,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public whitehall
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0d77gj0k6l24bhs8pbi2lwd0hsi5jgfkq06wfzsbqwc8qh7786wk")))
+    (hash (base32 "06bvbkw085xj8yvm38hdh1gvqfly1rv3g2pwsxawsrg7m7bcqksf")))
    (package
      (name "whitehall")
      (version "release_12847")
