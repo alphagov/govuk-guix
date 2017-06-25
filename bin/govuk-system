@@ -51,6 +51,7 @@
  (gnu system file-systems)
  (gds utils)
  (gds services govuk)
+ (gds services govuk tailon)
  (gds systems utils)
  (gds systems govuk development))
 
@@ -113,6 +114,13 @@
                (service-names->service-types service-names))
            (cons*
             nginx-service-type
+            (or (and=> (find (lambda (service)
+                               (eq? 'tailon
+                                    (service-type-name
+                                     (service-kind service))))
+                             (operating-system-user-services development-os))
+                       service-kind)
+                (error "Could not find tailon"))
             authenticating-proxy-service-type
             (map service-kind base-services)))))
      (filter

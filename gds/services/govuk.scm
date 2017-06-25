@@ -25,6 +25,7 @@
   #:use-module (gds services sidekiq)
   #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
+  #:use-module (gds services govuk tailon)
   #:use-module (gds services rails)
   #:export (<router-config>
             router-config
@@ -107,11 +108,28 @@
              parameters)
             parameters)))
 
+    (define (generic-rails-app-log-files name . rest)
+      (let*
+          ((string-name (symbol->string name))
+           (ss (find shepherd-service? rest))
+           (sidekiq-config (find sidekiq-config? rest))
+           (sidekiq-service-name
+            (string-append
+             (symbol->string
+              (first (shepherd-service-provision ss)))
+             "-sidekiq")))
+        (cons
+         (string-append "/var/log/" string-name ".log")
+         (if sidekiq-config
+             (list
+              (string-append "/var/log/" sidekiq-service-name ".log"))
+             '()))))
+
     (service-type-extensions-modify-parameters
      (service-type
       (inherit base-service-type)
       (extensions
-       (cons
+       (cons*
         (service-extension signon-service-type
                            (lambda (parameters)
                              (filter
@@ -119,6 +137,18 @@
                                 (or (signon-application? parameter)
                                     (signon-api-user? parameter)))
                               parameters)))
+        (service-extension govuk-tailon-service-type
+                           (lambda (parameters)
+                             (let ((log-files
+                                    (apply
+                                     generic-rails-app-log-files
+                                     name
+                                     parameters)))
+                               (if (eq? (length log-files) 1)
+                                   log-files
+                                   (list
+                                    (cons (symbol->string name)
+                                          log-files))))))
         (service-type-extensions base-service-type))))
      (lambda (parameters)
        (update-service-startup-config-for-signon-application

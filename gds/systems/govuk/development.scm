@@ -42,6 +42,7 @@
   #:use-module (gds services govuk)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk signon)
+  #:use-module (gds services govuk tailon)
   #:use-module (gds services govuk nginx))
 
 (define-public govuk-ports
@@ -159,7 +160,13 @@
       (http-port (assq-ref system-ports 'elasticsearch))))
     (mysql-service #:config (mysql-configuration
                              (port (assq-ref system-ports 'mysql))))
-    govuk-content-schemas-service)
+    govuk-content-schemas-service
+    (service govuk-tailon-service-type
+             (tailon-configuration
+              (config-file
+               (tailon-configuration-file
+                (bind "localhost:54001")
+                (paths '("/var/log/shepherd.log")))))))
    base-services))
 
 (define (update-routing-services-configuration
