@@ -605,7 +605,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
 
   (let ((new-hash (compute-bundle-package-hash bundle-pkg)))
     (if (equal? new-hash (bundle-package-hash bundle-pkg))
-        #t
+        #f
         (let* ((loc (bundle-package-location bundle-pkg))
                (file (and=> (location-file loc)
                             (cut search-path %load-path <>))))
