@@ -1380,7 +1380,9 @@ content, as well as broadcasting changes to a message queue.")
         ;; TODO Adding curl here is unusual as ideally the gem
         ;; requiring it would link against the exact location of the
         ;; library at compile time.
-        ("curl" ,curl)))
+        ("curl" ,curl)
+        ;; hostname is needed by the redis-lock gem
+        ("inetutils" ,inetutils)))
      (arguments
       `(#:phases
         (modify-phases %standard-phases
