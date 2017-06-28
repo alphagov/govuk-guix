@@ -1302,12 +1302,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "1r8igna3pz5xgmb6ym8j3y5mn2czmn8vl1kan2rp1n79wa0kwl55")))
    (package
      (name "support-api")
-     (version "release_128")
+     (version "release_129")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "18738czqk1pzfr57c5am1fjhnrwqzlzp62iicsl9bc87n54nl03i")))
+       #:hash (base32 "0kn3pkfywik5k85mz3zk9r12xyypvwp0jrc7q2nm0q50a1pr9xfa")))
      (build-system rails-build-system)
      (arguments `(#:ruby ,ruby-2.3))
      (inputs
