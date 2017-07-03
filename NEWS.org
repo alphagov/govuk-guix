@@ -1,0 +1,154 @@
+#+TITLE: govuk-guix News
+#+STARTUP: content hidestars
+
+* 2017
+** July
+** June
+*** Update Guix release_7 -> release_8
+*** Add support for using Tailon in the development system
+*** New packages
+ - smokey
+*** New services
+ - smokey
+** May
+*** Update Guix
+ - release_5 -> release_6 -> release 7
+*** Removed services
+ - contacts-frontend
+ - specialist-frontend
+ - multipage-frontend
+ - content-api
+*** Asset manager service improvements
+ - Add a dummy govuk_clamscan script
+ - Add support for delayed jobs
+** April
+*** Update Guix release_4 -> release_5
+*** Add govuk-refresh
+*** Start automatically updating packages
+** March
+*** Upgrade Guix release_3 -> release_4
+*** Patch rubygems to avoid reproducibility issues
+*** govuk-system added
+*** govuk-data added
+*** New packages
+ - collections-publisher
+ - contacts-admin
+ - local-links-manager
+ - manuals-publisher
+ - policy-publisher
+ - service-manual-publisher
+ - short-url-manager
+ - travel-advice-publisher
+ - authenticating-proxy
+ - bouncer
+ - calculators
+ - calendars
+ - collections
+ - contacts-frontend
+ - design-principles
+ - email-alert-frontend
+ - email-alert-api
+ - email-alert-service
+ - finder-frontend
+ - imminence
+ - licence-finder
+ - manuals-frontend
+ - multipage-frontend
+ - service-manual-frontend
+ - search-admin
+ - smart-answers
+ - support
+ - release
+ - transition
+ - asset-manager
+ - hmrc-manuals-api
+ - support-api
+ - content-performance-manager
+*** New services
+ - collections-publisher
+ - contacts-admin
+ - local-links-manager
+ - manuals-publisher
+ - policy-publisher
+ - service-manual-publisher
+ - short-url-manager
+ - travel-advice-publisher
+ - asset-manager
+ - authenticating-proxy
+ - calculators
+ - calendars
+ - collections
+ - draft-collections
+ - contacts-frontend
+ - draft-contacts-frontend
+ - content-performance-manager
+ - design-principles
+ - email-alert-api
+ - email-alert-frontend
+ - draft-email-alert-frontend
+ - email-alert-service
+ - feedback
+ - finder-frontend
+ - hmrc-manuals-api
+ - licence-finder
+ - imminence
+ - manuals-frontend
+ - draft-manuals-frontend
+ - multipage-frontend
+ - release
+ - search-admin
+ - service-manual-frontend
+ - draft-service-manual-frontend
+ - smart-answers
+ - support
+ - support-api
+*** Removed services
+ - private-frontend
+** Febuary
+*** Add support for configuring signon users and applications
+*** Switch to using unicorn to serve rails applications
+*** New packages
+ - content-api
+ - publisher
+ - frontend
+ - metadata-api
+ - whitehall
+ - government-frontend
+*** New services
+ - content-api
+ - publisher
+ - frontend
+ - government-frontend
+ - whitehall
+** January
+*** New packages
+ - signonotron2
+ - static
+ - specialist-frontend
+ - router-api
+ - router
+ - mongo-tools
+*** New services
+ - signon
+ - static
+ - maslow
+ - router
+ - specialist-frontend
+*** New modules
+ - (gds services sidekiq)
+ - (gds services govuk plek)
+* 2016
+** December
+*** New packages
+ - need-api
+*** New services
+ - need-api
+*** New modules
+ - (gds services utils)
+** November
+*** Project starts
+
+Investigation within the Publishing API team.
+
+To determine viability for generating an isolated environment within
+which to run end to end tests of GOV.UK.
