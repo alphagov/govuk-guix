@@ -269,11 +269,14 @@ users.each do |name, email, authorisation_permissions|
 
     u.grant_application_permissions(app, permissions)
 
-    authorisation = u.authorisations.first_or_initialize(
+    authorisation = u.authorisations.where(
+      application_id: app.id
+    ).first_or_initialize(
       application_id: app.id
     )
 
     authorisation.expires_in = ApiUser::DEFAULT_TOKEN_LIFE
+    authorisation.save!
 
     authorisation.token = token
     authorisation.save!
