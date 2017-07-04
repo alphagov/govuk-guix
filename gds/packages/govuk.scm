@@ -1121,7 +1121,8 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0vnjzln4cp1lprk067b84r1iak3jlaxdmdgf0yh4kqryi4whj6m5")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
+     (arguments `(#:precompile-rails-assets? #f ;; Asset precompilation fails
+                  #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
