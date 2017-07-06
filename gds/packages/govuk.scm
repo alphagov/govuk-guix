@@ -459,12 +459,12 @@ proxies requests to some upstream")
     (hash (base32 "15g5bkpjhp8nnhlfvgsh13q1nlk7c2kg89h1z82ls45m26kp3pcc")))
    (package
      (name "frontend")
-     (version "release_2164")
+     (version "release_2165")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0hin6hlsdzhijxaijca08848c1r2yj4f11pql0fv54df2jkz2sg5")))
+       #:hash (base32 "0sg4f4c4pm33jsx0bjpqhhzb9cjg7klrxym4xbxm3l6jf8sdi0h6")))
      (build-system rails-build-system)
      (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
