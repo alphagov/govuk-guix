@@ -40,6 +40,7 @@
   #:use-module (gds services utils databases elasticsearch)
   #:use-module (gds services third-party elasticsearch)
   #:use-module (gds services govuk)
+  #:use-module (gds services govuk router)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk tailon)
