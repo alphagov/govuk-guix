@@ -19,9 +19,55 @@
   #:use-module (gds systems govuk development))
 
 (define services
-  (append
-   (setup-services (list publishing-e2e-tests-service))
-   (operating-system-user-services development-os)))
+  (modify-services
+      (use-gds-sso-strategy
+       (append
+        (setup-services (list publishing-e2e-tests-service))
+        (operating-system-user-services development-os))
+       "mock") ;; This is not a real value that the gds-sso gem uses,
+               ;; as it just checks if the value is "real" or not.
+    (travel-advice-publisher-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+         (service-startup-config-add-pre-startup-scripts
+          parameter
+          `((db-seed . ,#~(lambda ()
+                            (run-command "rake" "db:seed")))))
+         parameter))
+      parameters))
+    (specialist-publisher-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-add-pre-startup-scripts
+             parameter
+             `((db-seed
+                . ,#~(lambda ()
+                       (run-command "rake" "db:seed")))
+               (publish-finders
+                . ,#~(lambda ()
+                       (run-command "rake" "publishing_api:publish_finders")))))
+            parameter))
+      parameters))
+    (govuk-nginx-service-type
+     parameter =>
+     (govuk-nginx-configuration
+      (inherit parameter)
+      (authenticated-draft-origin? #f)
+      (additional-nginx-server-blocks
+       (list
+        (nginx-server-configuration
+         (inherit (govuk-nginx-server-configuration-base))
+         (server-name '("publishing-e2e-tests.dev.gov.uk"))
+         (root "/var/apps/publishing-e2e-tests")
+         (locations
+          (list
+           (nginx-location-configuration
+            (uri "/")
+            (body '("autoindex on;"))))))))))))
 
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
@@ -37,60 +83,6 @@
           base-services)
    (operating-system
     (inherit development-os)
-    (services
-     (modify-services
-         (map
-          (lambda (s)
-            (if (and
-                 (list? (service-parameters s))
-                 (find rails-app-config? (service-parameters s))
-                 (any
-                  (lambda (p)
-                    (or (postgresql-connection-config? p)
-                        (mysql-connection-config? p)
-                        (mongodb-connection-config? p)))
-                  (service-parameters s)))
-                (rails-run-db:setup s)
-                s))
-          (use-gds-sso-strategy
-           (map
-            setup-blank-databases-on-service-startup
-            services)
-           "mock")) ;; This is not a real value that the gds-sso gem
-                    ;; uses, as it just checks if the value is "real" or
-                    ;; not.
-       (specialist-publisher-service-type
-        parameters =>
-        (map
-         (lambda (parameter)
-           (if
-            (service-startup-config?
-             parameter)
-            (service-startup-config-add-pre-startup-scripts
-             parameter
-             `((db-seed
-                . ,#~(lambda ()
-                       (run-command "rake" "db:seed")))
-               (publish-finders
-                . ,#~(lambda ()
-                       (run-command "rake" "publishing_api:publish_finders")))))
-            parameter))
-         parameters))
-       (govuk-nginx-service-type
-        parameter =>
-        (govuk-nginx-configuration
-         (inherit parameter)
-         (authenticated-draft-origin? #f)
-         (additional-nginx-server-blocks
-          (list
-           (nginx-server-configuration
-            (inherit (govuk-nginx-server-configuration-base))
-            (server-name '("publishing-e2e-tests.dev.gov.uk"))
-            (root "/var/apps/publishing-e2e-tests")
-            (locations
-             (list
-              (nginx-location-configuration
-               (uri "/")
-               (body '("autoindex on;")))))))))))))))
+    (services services))))
 
 publishing-e2e-tests-os
