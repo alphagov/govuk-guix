@@ -19,21 +19,9 @@
   #:use-module (gds systems govuk development))
 
 (define services
-  (map
-   (lambda (service)
-     (if (equal? (service-kind service)
-                 nginx-service-type)
-         (govuk-nginx-service govuk-ports
-                              live-router-config
-                              draft-router-config
-                              '((rummager . ("search")))
-                              #:domain "dev.gov.uk"
-                              #:authenticated-draft-origin #f)
-         service))
-   (append
-    (setup-services
-     (list publishing-e2e-tests-service))
-    (operating-system-user-services development-os))))
+  (append
+   (setup-services (list publishing-e2e-tests-service))
+   (operating-system-user-services development-os)))
 
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
@@ -88,21 +76,21 @@
                        (run-command "rake" "publishing_api:publish_finders")))))
             parameter))
          parameters))
-       (nginx-service-type
+       (govuk-nginx-service-type
         parameter =>
-        (nginx-configuration
+        (govuk-nginx-configuration
          (inherit parameter)
-         (server-blocks
-          (cons
+         (authenticated-draft-origin? #f)
+         (additional-nginx-server-blocks
+          (list
            (nginx-server-configuration
-            (inherit (car (nginx-configuration-server-blocks parameter)))
+            (inherit (govuk-nginx-server-configuration-base))
             (server-name '("publishing-e2e-tests.dev.gov.uk"))
             (root "/var/apps/publishing-e2e-tests")
             (locations
              (list
               (nginx-location-configuration
                (uri "/")
-               (body '("autoindex on;"))))))
-           (nginx-configuration-server-blocks parameter))))))))))
+               (body '("autoindex on;")))))))))))))))
 
 publishing-e2e-tests-os

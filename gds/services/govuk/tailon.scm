@@ -2,6 +2,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services admin)
   #:use-module (gnu services web)
+  #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk signon))
 
 (define-public govuk-tailon-service-type
@@ -19,14 +20,11 @@
                            (redirect-uri "http://logs.dev.gov.uk:50080")
                            (oauth-id "none")
                            (oauth-secret "none")))))
-     (service-extension nginx-service-type
+     (service-extension govuk-nginx-service-type
                         (const
                          (list
                           (nginx-server-configuration
-                           (http-port 50080)
-                           (https-port 50443)
-                           (ssl-certificate #f)
-                           (ssl-certificate-key #f)
+                           (inherit (govuk-nginx-server-configuration-base))
                            (locations
                             (list
                              (nginx-location-configuration

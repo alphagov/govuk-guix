@@ -52,6 +52,7 @@
  (gds utils)
  (gds services govuk)
  (gds services govuk tailon)
+ (gds services govuk nginx)
  (gds systems utils)
  (gds systems govuk development))
 
@@ -113,7 +114,7 @@
                (map service-kind govuk-services)
                (service-names->service-types service-names))
            (cons*
-            nginx-service-type
+            govuk-nginx-service-type
             (or (and=> (find (lambda (service)
                                (eq? 'tailon
                                     (service-type-name

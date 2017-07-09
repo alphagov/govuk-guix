@@ -1,8 +1,23 @@
 (define-module (gds services govuk nginx)
   #:use-module (ice-9 match)
   #:use-module (gnu services web)
+  #:use-module (guix records)
+  #:use-module (gnu services)
+  #:use-module (gnu services shepherd)
   #:use-module (gds services govuk)
-  #:export (govuk-nginx-service))
+  #:use-module (gds services govuk router)
+  #:export (<govuk-nginx-configuration>
+            govuk-nginx-configuration
+            make-govuk-nginx-configuration
+            govuk-nginx-configuration-service-and-ports
+            govuk-nginx-configuration-router-config
+            govuk-nginx-configuration-draft-router-config
+            govuk-nginx-configuration-server-aliases
+            govuk-nginx-configuration-authenticated-draft-origin?
+            govuk-nginx-configuration-domain
+
+            govuk-nginx-service-type
+            govuk-nginx-server-configuration-base))
 
 (define (nginx-upstream-configurations service-and-ports
                                        router-config
@@ -34,15 +49,17 @@
                  (string-append "localhost:" (number->string port)))))))
     service-and-ports)))
 
+(define (govuk-nginx-server-configuration-base)
+  (nginx-server-configuration
+   (http-port 50080)
+   (https-port 50443)
+   (ssl-certificate #f)
+   (ssl-certificate-key #f)))
 
 (define (nginx-server-configurations service-and-ports
                                      server-aliases
                                      domain)
-  (let ((base (nginx-server-configuration
-               (http-port 50080)
-               (https-port 50443)
-               (ssl-certificate #f)
-               (ssl-certificate-key #f))))
+  (let ((base (govuk-nginx-server-configuration-base)))
     (cons*
      (nginx-server-configuration
       (inherit base)
@@ -105,20 +122,65 @@ proxy_set_header Host $host:$server_port;"
          (root (string-append "/var/apps/" (symbol->string service) "/public")))))
       service-and-ports))))
 
+(define-record-type* <govuk-nginx-configuration>
+  govuk-nginx-configuration make-govuk-nginx-configuration
+  govuk-nginx-configuration?
+  (service-and-ports              govuk-nginx-configuration-service-and-ports)
+  (router-config                  govuk-nginx-configuration-router-config)
+  (draft-router-config            govuk-nginx-configuration-draft-router-config)
+  (server-aliases                 govuk-nginx-configuration-server-aliases)
+  (authenticated-draft-origin?    govuk-nginx-configuration-authenticated-draft-origin?
+                                  (default #t))
+  (domain                         govuk-nginx-configuration-domain
+                                  (default "gov.uk"))
+  (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
+                                  (default '())))
 
-(define* (govuk-nginx-service service-and-ports
-                              router-config
-                              draft-router-config
-                              server-aliases
-                              #:optional #:key
-                              (authenticated-draft-origin #t)
-                              (domain "gov.uk"))
-  (nginx-service #:upstream-list
-                 (nginx-upstream-configurations service-and-ports
-                                                router-config
-                                                draft-router-config
-                                                authenticated-draft-origin)
-                 #:server-list
-                 (nginx-server-configurations service-and-ports
-                                              server-aliases
-                                              domain)))
+
+(define govuk-nginx-configuration->nginx-configuration
+  (match-lambda
+   (($ <govuk-nginx-configuration> service-and-ports
+                                   router-config
+                                   draft-router-config
+                                   server-aliases
+                                   authenticated-draft-origin?
+                                   domain)
+    (nginx-configuration
+     (server-blocks
+      (nginx-server-configurations service-and-ports
+                                   server-aliases
+                                   domain))
+     (upstream-blocks
+      (nginx-upstream-configurations service-and-ports
+                                     router-config
+                                     draft-router-config
+                                     authenticated-draft-origin?))))))
+
+(define (maybe-convert-to-nginx-configuration config)
+  (if (govuk-nginx-configuration? config)
+      (govuk-nginx-configuration->nginx-configuration config)
+      config))
+
+(define govuk-nginx-service-type
+  (service-type
+   (inherit nginx-service-type)
+   (extensions
+    (map (lambda (se)
+           (let ((target (service-extension-target se))
+                 (compute (service-extension-compute se)))
+             (cond ((eq? target shepherd-root-service-type)
+                    (service-extension
+                     target
+                     (compose (@@ (gnu services web) nginx-shepherd-service)
+                              maybe-convert-to-nginx-configuration)))
+                   ((eq? target activation-service-type)
+                    (service-extension
+                     target
+                     (compose (@@ (gnu services web) nginx-activation)
+                              maybe-convert-to-nginx-configuration)))
+                   (else (service-extension target compute)))))
+         (service-type-extensions nginx-service-type)))
+   (extend (lambda (config servers)
+             ((service-type-extend nginx-service-type)
+              (govuk-nginx-configuration->nginx-configuration config)
+              servers)))))

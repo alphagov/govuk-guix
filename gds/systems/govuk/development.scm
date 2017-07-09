@@ -140,12 +140,13 @@
    frontend-services
    draft-frontend-services
    (list
-    (govuk-nginx-service
-     govuk-ports
-     live-router-config
-     draft-router-config
-     '((rummager . ("search")))
-     #:domain "dev.gov.uk")
+    (service govuk-nginx-service-type
+             (govuk-nginx-configuration
+              (service-and-ports govuk-ports)
+              (router-config live-router-config)
+              (draft-router-config draft-router-config)
+              (server-aliases '((rummager . ("search"))))
+              (domain "dev.gov.uk")))
     (service
      redis-service-type
      (redis-configuration
