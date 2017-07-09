@@ -1357,7 +1357,8 @@ content, as well as broadcasting changes to a message queue.")
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml)))))
+            ,(replace-mongoid.yml)))
+        #:ruby ,ruby-2.3)) ;; There might be issues with Mongoid 2 and ruby 2.4
      (synopsis "")
      (description "")
      (license #f)
