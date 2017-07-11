@@ -720,12 +720,12 @@ service setup.")
     (hash (base32 "1nwl8nvsyljb5vn6gpz85zhv9l04m09zfxn972fabdc64vir0kya")))
    (package
      (name "maslow")
-     (version "release_198")
+     (version "release_199")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "07vqva3a9pkqm67wwn3wsk9jdlys3f27xky9hxna5bhj6cy66fpk")))
+       #:hash (base32 "0cpn46n5qz8bqp524j9fcpdpbilf7f39hy0vvrn272l1grgr823p")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
