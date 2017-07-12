@@ -4,7 +4,9 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system)
-  #:export (system-without-unnecessary-services))
+  #:use-module (gds services utils)
+  #:export (system-without-unnecessary-services
+            update-system-services-package-source-from-environment))
 
 (define-public (shepherd-services-from-service service)
   (let ((shepherd-root-service-type-extension
@@ -108,3 +110,10 @@
      (operating-system-user-services system)
      (get-requirement->service-alist
       (operating-system-user-services system))))))
+
+(define (update-system-services-package-source-from-environment system)
+  (operating-system
+   (inherit system)
+   (services
+    (correct-services-package-source-from-environment
+     (operating-system-user-services system)))))
