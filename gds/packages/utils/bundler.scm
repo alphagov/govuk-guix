@@ -541,6 +541,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                       `("GEM_PATH" ":" prefix (,(getenv "GEM_PATH")))
                       `("BUNDLE_PATH" = (,(getenv "BUNDLE_PATH")))
                       `("BUNDLE_WITHOUT" ":" prefix (,(getenv "BUNDLE_WITHOUT")))
+                      '("BUNDLE_APP_CONFIG" = ("/dev/null"))
                       `("LD_LIBRARY_PATH" ":" prefix
                         ,(or (and=> (getenv "LD_LIBRARY_PATH") list)
                              '()))))
