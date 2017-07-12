@@ -107,6 +107,7 @@
    service-names))
 
 (define (operating-system-for service-names)
+  (update-system-services-package-source-from-environment
   (system-without-unnecessary-services
    (let ((service-types-whitelist
           (append
@@ -128,7 +129,7 @@
       (lambda (service)
         (member (service-kind service) service-types-whitelist))
       (operating-system-user-services development-os)))
-   development-os))
+   development-os)))
 
 (define options
   ;; Specifications of the command-line options.

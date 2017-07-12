@@ -411,7 +411,6 @@ the Signon Dev user passphrase in\n")
         ;; configuration
         (list
          add-signon-dev-user
-         correct-services-package-source-from-environment
          services-in-rails-development-environment
          set-authenticating-proxy-upstream-url
          set-jwt-auth-secret
