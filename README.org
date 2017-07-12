@@ -1,9 +1,5 @@
-[[http://www.gnu.org/software/guix/][GNU Guix]] (IPA: /ɡiːks/) is a purely functional package manager, and
-associated free software distribution, for the [[http://www.gnu.org/gnu/gnu.html][GNU system]].
-
-This repository contains Guix packages and system definitions for
-software and systems specifically related to the [[https://www.gov.uk/government/organisations/government-digital-service][Government Digital
-Service]].
+This repository contains Guix package, service and system definitions
+for software and systems specifically related to the [[https://www.gov.uk/][GOV.UK]].
 
 * Getting started
 
@@ -41,6 +37,23 @@ load the data for the short-url-manager service, you would run:
 
 To find out more, read the documentation on
 [[doc/local-data.md][local data]].
+
+* Why Guix?
+
+[[http://www.gnu.org/software/guix/][GNU Guix]] (abbreviated to Guix) (IPA: /ɡiːks/) is a package manager,
+and associated free software distribution, for the [[http://www.gnu.org/gnu/gnu.html][GNU system]].
+
+Guix is a state of the art package manager, providing many features,
+such as reproducible build environments, unprivileged package
+management, transparent source/binary deployment and per-user
+profiles.
+
+The design and low level mechanisms of Guix come from the Nix package
+manager, on top of which Guix provides a hackable set of tooling using
+Guile.
+
+This project leverages Guix, building on top of its toolingto provide
+packages, services and systems relevant to GOV.UK.
 
 * Hacking
 
