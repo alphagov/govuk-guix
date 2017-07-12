@@ -108,28 +108,28 @@
 
 (define (operating-system-for service-names)
   (update-system-services-package-source-from-environment
-  (system-without-unnecessary-services
-   (let ((service-types-whitelist
-          (append
-           (if (null? service-names)
-               (map service-kind govuk-services)
-               (service-names->service-types service-names))
-           (cons*
-            govuk-nginx-service-type
-            (or (and=> (find (lambda (service)
-                               (eq? 'tailon
-                                    (service-type-name
-                                     (service-kind service))))
-                             (operating-system-user-services development-os))
-                       service-kind)
-                (error "Could not find tailon"))
-            authenticating-proxy-service-type
-            (map service-kind base-services)))))
-     (filter
-      (lambda (service)
-        (member (service-kind service) service-types-whitelist))
-      (operating-system-user-services development-os)))
-   development-os)))
+   (system-without-unnecessary-services
+    (let ((service-types-whitelist
+           (append
+            (if (null? service-names)
+                (map service-kind govuk-services)
+                (service-names->service-types service-names))
+            (cons*
+             govuk-nginx-service-type
+             (or (and=> (find (lambda (service)
+                                (eq? 'tailon
+                                     (service-type-name
+                                      (service-kind service))))
+                              (operating-system-user-services development-os))
+                        service-kind)
+                 (error "Could not find tailon"))
+             authenticating-proxy-service-type
+             (map service-kind base-services)))))
+      (filter
+       (lambda (service)
+         (member (service-kind service) service-types-whitelist))
+       (operating-system-user-services development-os)))
+    development-os)))
 
 (define options
   ;; Specifications of the command-line options.
