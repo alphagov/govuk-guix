@@ -1,5 +1,5 @@
 This repository contains Guix package, service and system definitions
-for software and systems specifically related to the [[https://www.gov.uk/][GOV.UK]].
+for software and systems specifically related to [[https://www.gov.uk/][GOV.UK]].
 
 * Getting started
 
@@ -22,12 +22,11 @@ Publisher and any of their dependencies, you would run:
   govuk system start short-url-manager specialist-publisher
 #+END_SRC
 
-To find out more, read the documentation on
-[[doc/local-development.md][local development]].
+To find out more, read the documentation on [[doc/local-development.md][local development]].
 
 ** Local Data
 
-You can use govuk-guix to list, and load data downloaded through the
+You can use govuk-guix to list and load data downloaded through the
 replication scripts in the govuk-puppet repository, for example, to
 load the data for the short-url-manager service, you would run:
 
@@ -35,8 +34,7 @@ load the data for the short-url-manager service, you would run:
   govuk data load short-url-manager
 #+END_SRC
 
-To find out more, read the documentation on
-[[doc/local-data.md][local data]].
+To find out more, read the documentation on [[doc/local-data.md][local data]].
 
 * Why Guix?
 
@@ -52,13 +50,13 @@ The design and low level mechanisms of Guix come from the Nix package
 manager, on top of which Guix provides a hackable set of tooling using
 Guile.
 
-This project leverages Guix, building on top of its toolingto provide
+This project leverages Guix, building on top of its tooling to provide
 packages, services and systems relevant to GOV.UK.
 
 * Hacking
 
 When developing locally, you may find it useful to use a local copy of
-GNU Guix, this can be done by setting the $GDS_GNU_GUIX_MODULE_PATH
+GNU Guix, this can be done by setting the GDS_GNU_GUIX_MODULE_PATH
 environment variable, for example:
 
 #+BEGIN_SRC shell
