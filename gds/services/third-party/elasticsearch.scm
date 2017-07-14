@@ -59,7 +59,7 @@
             (lambda (path)
               (mkdir-p path)
               (chown path (passwd:uid user) (passwd:gid user)))
-            '(#$data-path #$logs-path)))))))
+            '(#$data-path #$logs-path "/var/run/elasticsearch")))))))
 
 (define elasticsearch-shepherd-service
   (match-lambda
@@ -77,10 +77,10 @@
                         (list
                          (string-append #$elasticsearch "/bin/elasticsearch")
                          "-d"
-                         "-p" "/var/run/elasticsearch"
+                         "-p" "/var/run/elasticsearch/pid"
                          (string-append "-Des.config=" #$elasticsearch.yml))
                         #:user "elasticsearch"
-                        #:pid-file "/var/run/elasticsearch"))
+                        #:pid-file "/var/run/elasticsearch/pid"))
               (stop #~(make-kill-destructor))))))))
 
 (define elasticsearch-service-type
