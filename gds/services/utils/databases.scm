@@ -50,7 +50,8 @@
   (or (postgresql-connection-config? config)
       (mysql-connection-config? config)
       (mongodb-connection-config? config)
-      (redis-connection-config? config)))
+      (redis-connection-config? config)
+      (elasticsearch-connection-config? config)))
 
 (define database-connection-config->environment-variables
   (match-lambda
@@ -94,6 +95,8 @@
        ,@(if namespace
              `("REDIS_NAMESPACE" . ,namespace)
              '())))
+    (($ <elasticsearch-connection-config> host port)
+     `(("ELASTICSEARCH_URI" . ,(simple-format #f "http://~A:~A" host port))))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
@@ -130,6 +133,10 @@
     (redis-connection-config
      (inherit config)
      (port (port-for 'redis))))
+   ((elasticsearch-connection-config? config)
+    (elasticsearch-connection-config
+     (inherit config)
+     (port (port-for 'elasticsearch))))
    (else (error "unknown database connection config " config))))
 
 (define (setup-blank-databases-on-service-startup s)
@@ -165,6 +172,8 @@
                          '()) ;; TODO
                         ((redis-connection-config? config)
                          '()) ;; redis does not require any setup
+                        ((elasticsearch-connection-config? config)
+                         '()) ;; TODO
                         (else
                          (error "Unrecognised database config"))))
                      database-connection-configs))
