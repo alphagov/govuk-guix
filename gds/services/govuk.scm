@@ -309,11 +309,9 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(collections))
-           (requirement '(publishing-api signon)))
+           (requirement '(content-store static rummager)))
          (plek-config) (rails-app-config) collections
-         (service-startup-config)
-         (mongodb-connection-config
-          (database "authenticating_proxy")))))
+         (service-startup-config))))
 
 (define-public draft-collections-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
@@ -324,7 +322,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(draft-collections))
-           (requirement '(publishing-api signon)))
+           (requirement '(draft-content-store draft-static rummager)))
           (plek-config) (rails-app-config) collections
           (service-startup-config))))
 
