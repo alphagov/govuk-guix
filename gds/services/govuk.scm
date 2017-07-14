@@ -21,6 +21,7 @@
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases mongodb)
+  #:use-module (gds services utils databases elasticsearch)
   #:use-module (gds services govuk plek)
   #:use-module (gds services sidekiq)
   #:use-module (gds services delayed-job)
@@ -1615,6 +1616,7 @@
 ;;;
 
 (define-public rummager-service-type
+  ;; TODO: Rummager doesn't use Rails
   (make-rails-app-using-plek-service-type 'rummager))
 
 (define-public rummager-service
@@ -1623,10 +1625,17 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(rummager))
-          (requirement '(content-store publishing-api static)))
-         (service-startup-config)
+          (requirement '(publishing-api elasticsearch)))
+         (service-startup-config-add-pre-startup-scripts
+          (service-startup-config)
+          `((migrate-index
+             . ,#~(lambda ()
+                    (setenv "RUMMAGER_INDEX" "all")
+                    (run-command "bundle" "exec" "rake" "rummager:migrate_index")))))
          (redis-connection-config)
-         (plek-config) (rails-app-config)
+         (plek-config)
+         (rails-app-config) ;; TODO: Rummager doesn't use Rails
+         (elasticsearch-connection-config)
          rummager)))
 
 ;;;
