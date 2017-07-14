@@ -116,9 +116,12 @@ proxy_set_header Host $host:$server_port;")))
                          "proxy_pass http://~A-proxy;
 proxy_set_header Host $host:$server_port;"
                          (symbol->string service)))))))
-         (server-name (cons (simple-format #f "~A.~A" service domain)
-                            (or (assq-ref server-aliases service)
-                                '())))
+         (server-name (map
+                       (lambda (name)
+                         (simple-format #f "~A.~A" name domain))
+                       (cons service
+                             (or (assq-ref server-aliases service)
+                                 '()))))
          (root (string-append "/var/apps/" (symbol->string service) "/public")))))
       service-and-ports))))
 
