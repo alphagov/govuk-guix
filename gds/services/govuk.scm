@@ -1434,7 +1434,7 @@
           (inherit default-shepherd-service)
           (provision '(publisher))
           (requirement '(publishing-api frontend draft-frontend
-                         rummager signon)))
+                         rummager asset-manager calendars signon)))
          (service-startup-config)
          (plek-config) (rails-app-config) publisher
          (redis-connection-config)
@@ -1449,6 +1449,11 @@
             (cons
              (signon-authorisation
               (application-name "Publishing API"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Asset Manager")
+              (environment-variable "PUBLISHER_ASSET_MANAGER_CLIENT_BEARER_TOKEN"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
