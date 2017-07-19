@@ -444,7 +444,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(design-principles))
-           (requirement '()))
+           (requirement '(publishing-api)))
           (plek-config) (rails-app-config) design-principles
           (service-startup-config))))
 
