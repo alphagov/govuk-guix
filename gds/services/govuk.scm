@@ -1545,7 +1545,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(content-tagger))
-          (requirement '(publishing-api signon)))
+          (requirement '(publishing-api signon rummager)))
          (service-startup-config)
          (signon-application
           (name "Content Tagger")
