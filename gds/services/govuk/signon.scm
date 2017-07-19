@@ -39,6 +39,7 @@
             signon-authorisation?
             signon-authorisation-application-name
             signon-authorisation-token
+            signon-authorisation-environment-variable
 
             use-gds-sso-strategy
             update-signon-application-with-random-oauth
@@ -94,7 +95,10 @@
   signon-authorisation?
   (application-name signon-authorisation-application-name)
   (token signon-authorisation-token
-         (default #f)))
+         (default #f))
+  (environment-variable signon-authorisation-environment-variable
+                        (default #f))) ;; If #f, the default pattern
+                                       ;; will be used
 
 (define (update-signon-application-with-random-oauth app)
   (signon-application

@@ -67,14 +67,16 @@
               parameter
               (map
                (match-lambda
-                 (($ <signon-authorisation> application-name token)
+                 (($ <signon-authorisation> application-name token
+                                            environment-variable)
                   (let ((name
-                         (string-append
-                          (string-map
-                           (lambda (c)
-                             (if (eq? c #\space) #\_ c))
-                           (string-upcase application-name))
-                          "_BEARER_TOKEN")))
+                         (or environment-variable
+                             (string-append
+                              (string-map
+                               (lambda (c)
+                                 (if (eq? c #\space) #\_ c))
+                               (string-upcase application-name))
+                              "_BEARER_TOKEN"))))
                     (cons name token))))
                (concatenate
                 (map
