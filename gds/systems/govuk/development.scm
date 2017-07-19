@@ -7,10 +7,12 @@
   #:use-module (gnu)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
   #:use-module (gnu services web)
+  #:use-module (gnu packages wget)
   #:use-module (gnu services memcached)
   #:use-module (gnu services admin)
   #:use-module (gnu packages web)
@@ -463,6 +465,8 @@ the Signon Dev user passphrase in\n")
       the-silver-searcher
       tree
       jq
+      wget
+      curl
       %base-packages))
     (file-systems
      (cons (file-system
