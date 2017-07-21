@@ -54,9 +54,17 @@
 
 (define (service-port-from-plek-config plek-config service)
   (or
-   (assq-ref
-    (plek-config-service-ports plek-config)
-    service)
+   (or (assq-ref (plek-config-service-ports plek-config)
+                 service)
+       (and=> (find (match-lambda
+                      ((service-with-aliases . aliases)
+                       (if (memq service aliases)
+                           service-with-aliases
+                           #f)))
+                    (plek-config-service-port-aliases plek-config))
+              (lambda (service-with-aliases)
+                (assq-ref (plek-config-service-ports plek-config)
+                          (first service-with-aliases)))))
    (begin
      (display "plek-config-service-ports: ")
      (display (plek-config-service-ports plek-config))
