@@ -64,20 +64,10 @@ END
 $body$;
 " #$user #$user)))
 
-(define (postgresql-ensure-database-exists-gexp database owner)
+(define (postgresql-create-database-gexp database owner)
   #~(lambda (port)
       (simple-format port "
-DO
-$do$
-BEGIN
-   IF EXISTS (SELECT 1 FROM pg_database WHERE datname = '~A') THEN
-      RAISE NOTICE 'postgresql-ensure-database-exists: ~A already exists';
-   ELSE
-      PERFORM dblink_exec('dbname=' || current_database(), 'CREATE DATABASE ~A OWNER ~A');
-   END IF;
-END
-$do$;
-" #$database #$database #$database #$owner)))
+CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 
 (define (postgresql-import-gexp database-connection file)
   (match database-connection
@@ -113,4 +103,4 @@ $do$;
      (($ <postgresql-connection-config> host user port database)
       (list
        (postgresql-ensure-user-exists-gexp user)
-       (postgresql-ensure-database-exists-gexp database user))))))
+       (postgresql-create-database-gexp database user))))))
