@@ -147,7 +147,9 @@
               (service-and-ports govuk-ports)
               (router-config live-router-config)
               (draft-router-config draft-router-config)
-              (server-aliases '((rummager . ("search"))))
+              (server-aliases '((rummager . ("search"))
+                                (whitehall . ("whitehall-admin"
+                                              "whitehall-frontend"))))
               (domain "dev.gov.uk")))
     (service
      redis-service-type
@@ -241,7 +243,8 @@
    #:govuk-app-domain "dev.gov.uk"
    #:use-https? #f
    #:port 50080
-   #:aliases '((rummager . (search)))))
+   #:aliases '((rummager . (search))
+               (whitehall . (whitehall-admin whitehall-frontend)))))
 
 (define (set-services-plek-config services)
   (map
