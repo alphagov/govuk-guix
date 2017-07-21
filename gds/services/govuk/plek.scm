@@ -76,12 +76,11 @@
    service
    (service-port-from-plek-config plek-config service)))
 
-(define (service-symbol->environment-variable-string service)
+(define (service-name->environment-variable-string service)
   (string-map
    (lambda (c)
      (if (eq? c #\-) #\_ c))
-   (string-upcase
-    (symbol->string service))))
+   (string-upcase service)))
 
 (define* (make-custom-plek-config
           service-ports
@@ -153,53 +152,61 @@
 (define* (plek-config->environment-variables
           plek-config
           #:optional #:key
-          replace-services-with-draft-services-where-available
+          remove-draft-prefix?
           service-name-whitelist)
-  (let*
-      ((draft-service-names
-        (filter
-         (lambda (name)
-           (string-prefix?
-            "draft-"
-            (symbol->string name)))
-         (map first (plek-config-service-ports plek-config))))
-       (service-names-for-available-draft-services
-        (map
-         (lambda (name)
-           (string->symbol
-            (substring (symbol->string name) (string-length "draft-"))))
-         draft-service-names)))
     (cons*
      (cons "GOVUK_APP_DOMAIN" (plek-config-govuk-app-domain plek-config))
      (cons "GOVUK_ASSET_ROOT" (plek-config-govuk-asset-root plek-config))
      (cons "GOVUK_WEBSITE_ROOT" (plek-config-govuk-website-root plek-config))
      (cons "GOVUK_ASSET_HOST" (plek-config-govuk-asset-host plek-config))
      (cons "PLEK_SERVICE_DRAFT_ORIGIN_URI" (plek-config-draft-origin plek-config))
-     (map
-      (match-lambda
-        ((service . port)
-         (cons
-          (string-append
-           "PLEK_SERVICE_"
-           (service-symbol->environment-variable-string
-            (if (and replace-services-with-draft-services-where-available
-                     (memq service draft-service-names))
-                (string->symbol
-                 (substring (symbol->string service) (string-length "draft-")))
-                service))
-           "_URI")
-          ((plek-config-service-uri-function plek-config) service port))))
-      (filter
-       (match-lambda
+     (service-port-pairs->environment-variable-port-pairs
+      plek-config
+      (service-port-pairs plek-config service-name-whitelist)
+      remove-draft-prefix?)))
+
+(define (service-port-pairs->environment-variable-port-pairs
+         plek-config
+         service-port-pairs
+         remove-draft-prefix?)
+  (define (strip-draft-prefix-if-present s)
+    (if (string-prefix? "draft-" s)
+        (substring s (string-length "draft-"))
+        s))
+
+  (define name-and-port->service-uri
+    (plek-config-service-uri-function plek-config))
+
+  (map (match-lambda
          ((service . port)
-          (and
-           (if replace-services-with-draft-services-where-available
-               (not (memq service service-names-for-available-draft-services))
-               #t)
-           (if (list? service-name-whitelist)
-               (memq service service-name-whitelist)
-               #t))))
-       (plek-config-service-ports plek-config))))))
+          (cons
+           (string-append
+            "PLEK_SERVICE_"
+            (service-name->environment-variable-string
+             (let ((service-string (symbol->string service)))
+               (if remove-draft-prefix?
+                   (strip-draft-prefix-if-present service-string)
+                   service-string)))
+            "_URI")
+           (name-and-port->service-uri service port))))
+       service-port-pairs))
+
+(define (service-port-pairs plek-config
+                            service-name-whitelist)
+  (concatenate
+   (filter-map
+    (match-lambda
+      ((service . port)
+       (and (if (list? service-name-whitelist)
+                (memq service service-name-whitelist)
+                #t)
+            (map (lambda (name) (cons name port))
+                 (cons
+                  service
+                  (or (assq-ref (plek-config-service-port-aliases plek-config)
+                                service)
+                      '()))))))
+    (plek-config-service-ports plek-config))))
 
 (define (update-service-extension-parameters-for-plek-config
          service-name
@@ -217,29 +224,57 @@
           parameter
           (plek-config->environment-variables
            plek-config
-           #:replace-services-with-draft-services-where-available
+           #:remove-draft-prefix?
            (string-prefix? "draft-" (symbol->string service-name))
            #:service-name-whitelist
-           (if (memq service-name '(content-store draft-content-store))
-               #f ;; The content stores are special, as while they
-                  ;; don't require the frontend services in the sense
-                  ;; that they must be running before the
-                  ;; content-stores are started, the information given
-                  ;; to Plek is used when configuring backends in the
-                  ;; routers, and therefore needs to be available.
-               (append
-                (list service-name) ;; Some services (e.g. Whitehall) use
-                                    ;; Plek to find there own host, so
-                                    ;; include it by default
-                (shepherd-service-requirement shepherd-service)
-                (concatenate
-                 (map
-                  (lambda (requirement)
-                    (or (assq-ref
-                         (plek-config-service-port-aliases plek-config)
-                         requirement)
-                        '()))
-                  (shepherd-service-requirement shepherd-service))))))))
+           ;; The content stores are special, as while they don't
+           ;; require the frontend services in the sense that they
+           ;; must be running before the content-stores are started,
+           ;; the information given to Plek is used when configuring
+           ;; backends in the routers, and therefore needs to be
+           ;; available.
+           (cond
+            ((eq? service-name 'content-store)
+             ;; The live content store does not need to know about
+             ;; draft services, so don't include them in the whitelist
+             (remove (lambda (service)
+                       (string-prefix? "draft-" (symbol->string service)))
+                     (append
+                      (map first (plek-config-service-ports plek-config))
+                      (concatenate
+                       (map cdr (plek-config-service-port-aliases plek-config))))))
+
+            ((eq? service-name 'draft-content-store)
+             ;; The draft content store shouldn't use the non-draft
+             ;; versions of services
+             (let ((service-names
+                    (append
+                     (map first (plek-config-service-ports plek-config))
+                     (concatenate
+                      (map cdr (plek-config-service-port-aliases plek-config))))))
+               (filter (lambda (service)
+                         (or
+                          ;; Must be a draft service
+                          (string-prefix? "draft-" (symbol->string service))
+                          ;; or, no draft service exists
+                          (not (memq (symbol-append 'draft- service)
+                                     service-names))))
+                       service-names)))
+
+            (else
+             (append
+              (list service-name) ;; Some services (e.g. Whitehall) use
+              ;; Plek to find there own host, so
+              ;; include it by default
+              (concatenate
+               (map
+                (lambda (requirement)
+                  (cons requirement
+                        (or (assq-ref
+                             (plek-config-service-port-aliases plek-config)
+                             requirement)
+                            '())))
+                (shepherd-service-requirement shepherd-service)))))))))
         ((rails-app-config? parameter)
          (rails-app-config
           (inherit parameter)
