@@ -39,7 +39,9 @@
 ;;;
 
 
-(define (make-rails-app-using-plek-and-signon-service-type name)
+(define* (make-rails-app-using-plek-and-signon-service-type name
+                                                            #:key
+                                                            signon-plek-name)
   (let ((base-service-type
          (make-rails-app-using-plek-service-type name)))
 
@@ -96,7 +98,9 @@
                    (let ((service-uri
                           (if (eq? name 'authenticating-proxy)
                               (plek-config-draft-origin plek-config)
-                              (service-uri-from-plek-config plek-config name))))
+                              (service-uri-from-plek-config plek-config
+                                                            (or signon-plek-name
+                                                                name)))))
                      (signon-application
                       (inherit parameter)
                       (home-uri service-uri)
