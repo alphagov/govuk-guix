@@ -120,7 +120,8 @@
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml)))))
+            ,(replace-mongoid.yml)))
+        #:ruby ,ruby-2.3))
      (synopsis "Proxy to add authentication via Signon")
      (description "The Authenticating Proxy is a Rack based proxy,
 written in Ruby that performs authentication using gds-sso, and then
