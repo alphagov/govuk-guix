@@ -1732,7 +1732,8 @@
          (signon-application
           (name "Whitehall")
           (supported-permissions '("signin" "Editor" "GDS Editor" "GDS Admin"
-                                   "Import CSVs" "Managing Editor" "Upload Executable File Attachments"
+                                   "Import CSVs" "Managing Editor"
+                                   "Upload Executable File Attachments"
                                    "World Editor" "World Writer")))
          (signon-api-user
           (name "Whitehall")
