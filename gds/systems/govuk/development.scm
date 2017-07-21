@@ -337,7 +337,10 @@ the Signon Dev user passphrase in\n")
                  (lambda (app)
                    (cons
                     (signon-application-name app)
-                    (signon-application-supported-permissions app)))
+                    (or (assoc-ref '(("Whitehall" . ("signin" "GDS Admin"
+                                                     "Managing Editor")))
+                                   (signon-application-name app))
+                        (signon-application-supported-permissions app))))
                  (filter-map
                   (lambda (service)
                     (and (list? (service-parameters service))
