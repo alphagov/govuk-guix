@@ -379,7 +379,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(contacts-admin))
-           (requirement '(publishing-api whitehall-admin signon)))
+           (requirement '(publishing-api whitehall signon)))
           (plek-config) (rails-app-config) contacts-admin
           (signon-application
            (name "Contacts Admin")
@@ -413,7 +413,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-performance-manager))
-           (requirement '(publishing-api whitehall-admin signon)))
+           (requirement '(publishing-api whitehall signon)))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (plek-config) (rails-app-config) content-performance-manager
@@ -723,7 +723,7 @@
            (provision '(manuals-publisher))
            (requirement '(publishing-api
                           signon
-                          whitehall-admin))) ;; Whitehall required for the Organisation API
+                          whitehall))) ;; Whitehall required for the Organisation API
           (plek-config) (rails-app-config) manuals-publisher
           (signon-application
            (name "Manuals Publisher")
@@ -936,7 +936,7 @@
                           content-store
                           imminence
                           static
-                          whitehall-admin)))
+                          whitehall)))
           (plek-config) (rails-app-config) smart-answers
           (service-startup-config))))
 
@@ -1717,14 +1717,15 @@
 ;;;
 
 (define-public whitehall-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'whitehall-admin))
+  (make-rails-app-using-plek-and-signon-service-type 'whitehall
+                                                     #:signon-plek-name 'whitehall-admin))
 
 (define-public whitehall-service
   (service
    whitehall-service-type
    (list (shepherd-service
           (inherit default-shepherd-service)
-          (provision '(whitehall-admin))
+          (provision '(whitehall))
           (requirement '(publishing-api signon static need-api)))
          (service-startup-config)
          (plek-config) (rails-app-config) whitehall
