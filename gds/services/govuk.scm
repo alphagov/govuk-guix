@@ -1274,7 +1274,8 @@
            (inherit default-shepherd-service)
            (provision '(publishing-api))
            (requirement '(content-store draft-content-store signon
-                          govuk-content-schemas redis loopback postgres)))
+                          govuk-content-schemas redis loopback postgres
+                          memcached)))
           (service-startup-config
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
