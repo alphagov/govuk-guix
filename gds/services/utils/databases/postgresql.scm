@@ -40,6 +40,7 @@
                        OPEN_WRITE psql
                        (string-append "--user=" #$user)
                        "-a"
+                       "--no-psqlrc"
                        "-p" (number->string #$port))))
                (for-each
                 (lambda (o) (o p))
@@ -87,6 +88,7 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   "|"
                   ,psql
                   ,(simple-format #f "postgres://~A@~A:~A/~A" #$user #$host #$port #$database)
+                  "--no-psqlrc"
                   "--quiet")
                 " ")))
            (simple-format #t "Running command: ~A\n" command)
