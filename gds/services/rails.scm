@@ -123,7 +123,10 @@
                         #t
                         #$script
                         (lambda (key . args) (cons key args)))))
-                  (or (eq? result #t)
+                  (if (eq? result #t)
+                      (begin
+                        (simple-format #t "pre-startup-script ~A succeeded\n" '#$key)
+                        #t)
                       (begin
                         (simple-format #t "pre-startup-script ~A failed\n" '#$key)
                         (simple-format #t "result: ~A\n" result)
