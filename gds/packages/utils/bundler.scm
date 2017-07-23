@@ -9,6 +9,7 @@
   #:use-module (guix packages)
   #:use-module (guix profiles)
   #:use-module (guix store)
+  #:use-module (guix ui)
   #:use-module (guix utils)
   #:use-module (guix base32)
   #:use-module (guix download)
