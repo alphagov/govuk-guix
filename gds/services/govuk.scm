@@ -1728,7 +1728,30 @@
           (inherit default-shepherd-service)
           (provision '(whitehall))
           (requirement '(publishing-api signon static need-api)))
-         (service-startup-config)
+         (service-startup-config-add-pre-startup-scripts
+          (service-startup-config)
+          `((create-directories
+             . ,(with-imported-modules '((guix build utils))
+                  #~(lambda ()
+                      (let ((user (getpwnam "whitehall")))
+                        (for-each
+                         (lambda (suffix)
+                           (let ((directory
+                                  (string-append
+                                   "/data/uploads/whitehall/"
+                                   suffix)))
+                             (mkdir-p directory)
+                             (chown directory
+                                    (passwd:uid user)
+                                    (passwd:gid user))))
+                         '("attachment-cache"
+                           "bulk-upload-zip-file-tmp"
+                           "carrierwave-tmp"
+                           "clean"
+                           "incoming"
+                           "infected"))
+                        #t)))))
+          #:run-as-root #t)
          (plek-config) (rails-app-config) whitehall
          (signon-application
           (name "Whitehall")
