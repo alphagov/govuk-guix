@@ -1,0 +1,12 @@
+export SHELL
+export HOME="/root"
+
+source /root/.environment
+source /root/.bash_aliases
+
+green="\[\\e[0;32m\\]"
+yellow="\[\\e[0;33m\\]"
+blue="\[\\e[0;34m\\]"
+reset_color="\\[\\e[39m\\]"
+
+PS1="\\n${blue}\\h: ${reset_color} ${yellow}\\w ${green}\\n${reset_color}→ "

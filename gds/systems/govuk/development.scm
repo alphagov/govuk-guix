@@ -475,6 +475,40 @@ the Signon Dev user passphrase in\n")
       wget
       curl
       %base-packages))
+    (skeletons
+     `((".psqlrc" ,(local-file "skeletons/psqlrc"))
+       (".bashrc" ,(local-file "skeletons/bashrc"))
+       (".bash_aliases"
+        ,(plain-file
+          "aliases"
+          (apply
+           string-append
+           (map (match-lambda
+                 ((name . value)
+                  (simple-format #f "alias ~A=\"~A\"\n" name value)))
+                `(("redis" .
+                   ,(simple-format #f "redis-cli -p ~A"
+                                   (assoc-ref system-ports 'redis)))
+                  ("memcached-telnet" .
+                   ,(simple-format #f "telnet ~A"
+                                   (assoc-ref system-ports 'memcached))))))))
+       (".environment"
+        ,(plain-file
+          "environment"
+          (apply
+           string-append
+           (map (match-lambda
+                 ((name . value)
+                  (simple-format #f "export ~A=~A\n" name value)))
+                `(("PGPORT" . ,(assoc-ref system-ports 'postgresql))
+                  ("PGUSER" . "postgres"))))))
+       ,@(remove
+          (match-lambda
+           ((name rest ...)
+            (member name '(".bashrc"
+                           ".Xdefaults"
+                           ".guile-wm"))))
+          (default-skeletons))))
     (file-systems
      (cons (file-system
              (device "my-root")
