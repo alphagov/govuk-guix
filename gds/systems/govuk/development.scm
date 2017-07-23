@@ -442,7 +442,7 @@ the Signon Dev user passphrase in\n")
 
 (define-public development-os
   (operating-system
-    (host-name "govuk-test")
+    (host-name "govuk-dev")
     (timezone "Europe/London")
     (locale "en_GB.UTF-8")
     (bootloader (grub-configuration (device "/dev/sdX")))
