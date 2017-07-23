@@ -14,7 +14,10 @@ if [ $? -eq 0 ]; then
 fi
 
 echo
-echo "Test results saved to $RESULTS_DIRECTORY"
+echo "Test results saved to $RESULTS_DIRECTORY:"
+echo
+echo "  file://$(readlink -f "$RESULTS_DIRECTORY")/test-results.html"
+echo
 
 if [ -a "$RESULTS_DIRECTORY/all-tests-succeeded" ]; then
     exit 0
