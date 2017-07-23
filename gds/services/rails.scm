@@ -176,14 +176,10 @@
             #f
             (program-file
              (string-append "start-" string-name "-pre-startup-scripts")
-             (let
-                 ((foo
-                   (run-pre-startup-scripts-gexp
-                    name
-                    (service-startup-config-pre-startup-scripts
-                     service-startup-config))))
-               #~(begin
-                   (exit #$foo))))))
+             #~(exit #$(run-pre-startup-scripts-gexp
+                        name
+                        (service-startup-config-pre-startup-scripts
+                         service-startup-config))))))
        (run-root-pre-startup-scripts
         (run-pre-startup-scripts-gexp
          name
