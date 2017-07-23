@@ -100,7 +100,8 @@
     (mongodb . 57017)
     (redis . 56379)
     (elasticsearch . 59200)
-    (mysql . 53306)))
+    (mysql . 53306)
+    (memcached . 51211)))
 
 (define (port-for service)
   (or (assq-ref govuk-ports service)
