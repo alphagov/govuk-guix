@@ -18,6 +18,7 @@
             postgresql-create-database-gexp
             postgresql-list-databases-gexp
             postgresql-import-gexp
+            postgresql-create-user-for-database-connection
             postgresql-create-user-and-database-for-database-connection))
 
 (define-record-type* <postgresql-connection-config>
@@ -136,6 +137,21 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                 " ")))
            (simple-format #t "Running command: ~A\n" command)
            (zero? (system command)))))))
+
+(define (postgresql-create-user-for-database-connection
+         database-connection)
+  (let ((database-connection-with-postgres-user
+         (postgresql-connection-config
+          (inherit database-connection)
+          (user "postgres")))) ;; The user in the database connection
+                               ;; might not exist, so use postgres
+                               ;; instead
+    (run-with-psql-port
+     database-connection-with-postgres-user
+     (match database-connection
+       (($ <postgresql-connection-config> host user port database)
+        (list
+         (postgresql-ensure-user-exists-gexp user)))))))
 
 (define (postgresql-create-user-and-database-for-database-connection
          database-connection)
