@@ -16,6 +16,7 @@
             run-with-psql-port
             postgresql-ensure-user-exists-gexp
             postgresql-create-database-gexp
+            postgresql-list-databases-gexp
             postgresql-import-gexp
             postgresql-create-user-and-database-for-database-connection))
 
@@ -48,6 +49,47 @@
                 (list #$@operations))
                (close-pipe p)
                #t)))))))
+
+(define (postgresql-list-databases-gexp database-connection)
+  (match database-connection
+    (($ <postgresql-connection-config> host user port database)
+     (with-imported-modules '((ice-9 popen)
+                              (ice-9 rdelim)
+                              (srfi srfi-1))
+       #~(lambda ()
+           (use-modules (ice-9 popen)
+                        (ice-9 rdelim)
+                        (srfi srfi-1))
+           (let* ((command `(,(string-append #$postgresql "/bin/psql")
+                             ,(string-append "--user=" #$user)
+                             "-p" ,(number->string #$port)
+                             "--no-psqlrc"
+                             "-lqt"))
+                  (p (apply open-pipe* OPEN_READ command))
+                  (lines (let loop ((lines '())
+                                    (line (read-line p)))
+                           (if (eof-object? line)
+                               (reverse lines)
+                               (loop (cons line lines)
+                                     (read-line p))))))
+             (and (let ((status (close-pipe p)))
+                    (if (zero? status)
+                        #t
+                        (begin
+                          (simple-format #t
+                                         "command: ~A\n"
+                                         (string-join command))
+                          (error "listing databases failed, status ~A\n"
+                                 status))))
+                  (filter-map
+                   (lambda (line)
+                     (let ((name
+                            (string-trim-both
+                             (first (string-split line #\|)))))
+                       (if (eq? (string-length name) 0)
+                           #f
+                           name)))
+                   lines))))))))
 
 (define (postgresql-ensure-user-exists-gexp user)
   #~(lambda (port)
