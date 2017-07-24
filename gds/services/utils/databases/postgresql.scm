@@ -155,13 +155,22 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 
 (define (postgresql-create-user-and-database-for-database-connection
          database-connection)
-  (run-with-psql-port
-   (postgresql-connection-config
-    (inherit database-connection)
-    (user "postgres")) ;; The user in the database connection might
-                       ;; not exist, so use postgres instead
-   (match database-connection
-     (($ <postgresql-connection-config> host user port database)
-      (list
-       (postgresql-ensure-user-exists-gexp user)
-       (postgresql-create-database-gexp database user))))))
+  (let ((database-connection-with-postgres-user
+         (postgresql-connection-config
+          (inherit database-connection)
+          (user "postgres")))) ;; The user in the database connection
+                               ;; might not exist, so use postgres
+                               ;; instead
+    (run-with-psql-port
+     database-connection-with-postgres-user
+     (match database-connection
+       (($ <postgresql-connection-config> host user port database)
+        (list
+         (postgresql-ensure-user-exists-gexp user)
+         #~(lambda (port)
+             (if (member
+                  #$database
+                  (map car (#$(list-databases-gexp
+                               database-connection-with-postgres-user))))
+                 #t
+                 (#$(postgresql-create-database-gexp database user) port)))))))))
