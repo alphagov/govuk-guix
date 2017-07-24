@@ -15,6 +15,8 @@
   #:use-module (gds services delayed-job)
   #:use-module (gds services utils)
   #:use-module (gds services utils databases)
+  #:use-module (gds services utils databases postgresql)
+  #:use-module (gds services utils databases mysql)
   #:export (<rails-app-config>
             rails-app-config
             rails-app-config?
@@ -429,6 +431,54 @@
                           (symbol->string name))))))))
 
 (define (rails-run-db:setup s)
+  (define (rails-setup-or-migrate parameters)
+    (let* ((postgresql-or-mysql-connection-config
+            (find (lambda (parameter)
+                    (or (postgresql-connection-config? parameter)
+                        (mysql-connection-config? parameter)))
+                  parameters))
+           (database-already-exists?
+            (match postgresql-or-mysql-connection-config
+                   (#f
+                    #~#f)
+                   (($ <postgresql-connection-config> host user port database)
+                    #~(member
+                       #$database
+                       (#$(postgresql-list-databases-gexp
+                           postgresql-or-mysql-connection-config))))
+                   (($ <mysql-connection-config> host user port database)
+                    #~(member
+                       #$database
+                       (#$(mysql-list-databases-gexp
+                           (mysql-connection-config
+                            (inherit postgresql-or-mysql-connection-config)
+                             (user "root"))))))
+                   (_ #~#f))))
+      (with-imported-modules '((gds build utils))
+        #~(lambda ()
+            (use-modules (gds build utils))
+            (let ((run-rake-task
+                   (lambda args
+                     (if (and (file-exists? "bin/rake")
+                              ;; When spring is used, rake seems
+                              ;; to need to be run with bundle
+                              ;; exec
+                              (not (file-exists? "bin/spring")))
+                         (apply run-command "rake" args)
+                         (apply run-command "bundle" "exec" "rake" args)))))
+              (if #$database-already-exists?
+                  (let ((schema-value (getenv "SCHEMA"))
+                        (result
+                         (begin
+                           ;; Trick rails in to writing to
+                           ;; /dev/null, rather than the
+                           ;; schema that could be readonly
+                           (setenv "SCHEMA" "/dev/null")
+                           (run-rake-task "db:migrate"))))
+                    (setenv "SCHEMA" schema-value)
+                    result)
+                  (run-rake-task "db:setup")))))))
+
   (let
       ((parameters (service-parameters s)))
     (if (not (list? parameters))
@@ -439,18 +489,9 @@
           (lambda (parameter)
             (if (service-startup-config? parameter)
                 (service-startup-config-add-pre-startup-scripts
-                 (find service-startup-config? parameters)
+                 parameter
                  `((rails-db:setup
                     .
-                    ,(with-imported-modules '((gds build utils))
-                      #~(lambda ()
-                          (use-modules (gds build utils))
-                          (if (and (file-exists? "bin/rake")
-                                   ;; When spring is used, rake seems
-                                   ;; to need to be run with bundle
-                                   ;; exec
-                                   (not (file-exists? "bin/spring")))
-                              (run-command "rake" "db:setup")
-                              (run-command "bundle" "exec" "rake" "db:setup")))))))
+                    ,(rails-setup-or-migrate parameters))))
                 parameter))
           parameters)))))
