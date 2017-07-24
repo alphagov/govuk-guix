@@ -397,7 +397,7 @@ the Signon Dev user passphrase in\n")
    services))
 
 (define (setup-blank-databases-where-necessary services)
-  (map setup-blank-databases-on-service-startup services))
+  (map ensure-database-user-exists-on-service-startup services))
 
 (define (set-authenticating-proxy-upstream-url services)
   (update-services-parameters

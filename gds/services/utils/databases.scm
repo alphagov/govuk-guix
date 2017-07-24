@@ -31,7 +31,7 @@
             database-connection-config?
             database-connection-config->environment-variables
             update-database-connection-config-port
-            setup-blank-databases-on-service-startup
+            ensure-database-user-exists-on-service-startup
             database-connection-config->database-name))
 
 (define-record-type* <redis-connection-config>
@@ -139,7 +139,7 @@
      (port (port-for 'elasticsearch))))
    (else (error "unknown database connection config " config))))
 
-(define (setup-blank-databases-on-service-startup s)
+(define (ensure-database-user-exists-on-service-startup s)
   (let
       ((parameters (service-parameters s)))
     (if (not (list? parameters))
@@ -161,12 +161,12 @@
                         ((postgresql-connection-config? config)
                          `((postgresql
                             .
-                            ,(postgresql-create-user-and-database-for-database-connection
+                            ,(postgresql-create-user-for-database-connection
                               config))))
                         ((mysql-connection-config? config)
                          `((mysql
                             .
-                            ,(mysql-create-user-and-database-for-database-connection
+                            ,(mysql-create-user-for-database-connection
                               config))))
                         ((mongodb-connection-config? config)
                          '()) ;; TODO
