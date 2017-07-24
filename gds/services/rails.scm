@@ -189,8 +189,6 @@
              '())))
        (database-connection-configs
         (filter database-connection-config? rest))
-       (run-rake-db-setup?
-        (not (null? database-connection-configs)))
        (environment-variables
         (map
          (match-lambda
