@@ -18,6 +18,7 @@
             mysql-list-databases-gexp
             mysql-ensure-user-exists-gexp
             mysql-create-database-gexp
+            mysql-create-user-for-database-connection
             mysql-create-user-and-database-for-database-connection
             mysql-run-file-gexp))
 
@@ -133,6 +134,15 @@ CREATE DATABASE IF NOT EXISTS ~A;\n" #$database)
       (log-and-write port "
 GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
       (log-and-write port "EXIT\n")))
+
+(define (mysql-create-user-for-database-connection
+         database-connection)
+  (run-with-mysql-port
+   database-connection
+   (match database-connection
+     (($ <mysql-connection-config> host user port database password)
+      (list
+       (mysql-ensure-user-exists-gexp user password))))))
 
 (define (mysql-create-user-and-database-for-database-connection
          database-connection)
