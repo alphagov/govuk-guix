@@ -15,6 +15,7 @@
             mysql-connection-config-password
 
             run-with-mysql-port
+            mysql-list-databases-gexp
             mysql-ensure-user-exists-gexp
             mysql-create-database-gexp
             mysql-create-user-and-database-for-database-connection
@@ -72,6 +73,44 @@
              (simple-format #t "Running command: ~A\n\n" (string-join command))
              (zero?
               (system (string-join command)))))))))
+
+(define (mysql-list-databases-gexp database-connection)
+  (match database-connection
+    (($ <mysql-connection-config> host user port database password)
+     (with-imported-modules '((ice-9 popen)
+                              (ice-9 rdelim))
+       #~(lambda ()
+           (use-modules (ice-9 popen)
+                        (ice-9 rdelim))
+           (let* ((command `(,(string-append #$mariadb "/bin/mysql")
+                             "-h" #$host
+                             "-u" #$user
+                             "--protocol=tcp"
+                             ,(string-append "--password=" #$password "")
+                             "-P" ,(number->string #$port)
+                             "--batch"  ;; tab seperated output
+                             "--skip-column-names"
+                             "--execute=SHOW DATABASES;"))
+                  (p (apply open-pipe* OPEN_READ command))
+                  (lines (let loop ((lines '())
+                                    (line (read-line p)))
+                           (if (eof-object? line)
+                               (reverse lines)
+                               (loop (cons line lines)
+                                     (read-line p))))))
+             (and (let ((status (close-pipe p)))
+                    (if (zero? status)
+                        #t
+                        (begin
+                          (simple-format #t
+                                         "command: ~A\n"
+                                         (string-join command))
+                          (error "listing databases failed, status ~A\n"
+                                 status))))
+                  (map (lambda (line)
+                         (string-trim-both
+                          (car (string-split line #\tab))))
+                       lines))))))))
 
 (define (mysql-ensure-user-exists-gexp user password)
   #~(lambda (port)
