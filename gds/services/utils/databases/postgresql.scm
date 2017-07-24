@@ -34,6 +34,7 @@
     (($ <postgresql-connection-config> host user port database)
      (with-imported-modules '((ice-9 popen))
        #~(lambda ()
+           (use-modules (ice-9 popen))
            (let
                ((psql (string-append #$postgresql "/bin/psql")))
              (let ((p (open-pipe*
