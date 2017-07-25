@@ -170,7 +170,7 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
          #~(lambda (port)
              (if (member
                   #$database
-                  (map car (#$(list-databases-gexp
+                  (map car (#$(postgresql-list-databases-gexp
                                database-connection-with-postgres-user))))
                  #t
                  (#$(postgresql-create-database-gexp database user) port)))))))))
