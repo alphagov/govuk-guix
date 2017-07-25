@@ -4,7 +4,6 @@
   #:use-module (guix records)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
-  #:use-module (gds services govuk)
   #:use-module (gds services govuk router)
   #:export (<govuk-nginx-configuration>
             govuk-nginx-configuration
