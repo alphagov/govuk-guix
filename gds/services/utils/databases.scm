@@ -106,7 +106,7 @@
     (($ <postgresql-connection-config> host user port database) database)
     (($ <mysql-connection-config> host user port database) database)
     (($ <mongodb-connection-config> user password host port database) database)
-    (($ <redis-connection-config> host port db-number namespace) database)
+    (($ <redis-connection-config> host port db-number namespace) namespace)
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
