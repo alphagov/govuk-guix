@@ -176,7 +176,8 @@
               (config-file
                (tailon-configuration-file
                 (bind "localhost:54001")
-                (paths '("/var/log/shepherd.log")))))))
+                (paths '("/var/log/shepherd.log"
+                         ("NGinx Logs" "/var/log/nginx/*.access.log"))))))))
    base-services))
 
 (define (update-routing-services-configuration
