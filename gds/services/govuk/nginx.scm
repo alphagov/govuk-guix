@@ -112,9 +112,11 @@ proxy_set_header Host $host:$server_port;")))
             (name "app")
             (body (list (simple-format
                          #f
-                         "proxy_pass http://~A-proxy;
+                         "access_log /var/log/nginx/~A.access.log;
+proxy_pass http://~A-proxy;
 proxy_set_header Host $host:$server_port;"
-                         (symbol->string service)))))))
+                         service
+                         service))))))
          (server-name (map
                        (lambda (name)
                          (simple-format #f "~A.~A" name domain))
