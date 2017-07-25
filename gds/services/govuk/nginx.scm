@@ -104,19 +104,28 @@ proxy_set_header Host $host:$server_port;")))
         (nginx-server-configuration
          (inherit base)
          (locations
-          (list
-           (nginx-location-configuration
-            (uri "/")
-            (body '("try_files $uri/index.html $uri.html $uri @app;")))
-           (nginx-named-location-configuration
-            (name "app")
-            (body (list (simple-format
-                         #f
-                         "access_log /var/log/nginx/~A.access.log;
+          `(,(nginx-location-configuration
+              (uri "/")
+              (body (list "try_files $uri/index.html $uri.html $uri @app;")))
+            ,(nginx-named-location-configuration
+              (name "app")
+              (body (list (simple-format
+                           #f
+                           "access_log /var/log/nginx/~A.access.log;
 proxy_pass http://~A-proxy;
 proxy_set_header Host $host:$server_port;"
-                         service
-                         service))))))
+                           service
+                           service))))
+            ,@(if (eq? service 'whitehall)
+                  (list
+                   (nginx-location-configuration
+                    (uri "/government/uploads")
+                    (body (list (simple-format
+                                 #f
+                                 "proxy_pass http://whitehall-proxy;
+proxy_set_header Host whitehall-admin.~A:$server_port;"
+                                 domain)))))
+                  '())))
          (server-name (map
                        (lambda (name)
                          (simple-format #f "~A.~A" name domain))
