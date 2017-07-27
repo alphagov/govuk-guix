@@ -1093,12 +1093,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "00hf1b8v1hvjzhamfjpgh2zxp98jnp7vhrr0rb8001izk7gzbqq8")))
    (package
      (name "service-manual-publisher")
-     (version "release_300")
+     (version "release_301")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0d3v1a77g0ph2gvbca33i8973jhkg9h203sna7v8gfqj5dq6bvki")))
+       #:hash (base32 "0bl0ck63bk2wvk9zpbjshyci4zx81d7c4m5mna88s8l4j455scwj")))
      (build-system rails-build-system)
      (inputs
       `(;; Loading the database structure uses psql
