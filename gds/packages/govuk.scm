@@ -280,12 +280,12 @@ proxies requests to some upstream")
     (hash (base32 "0ygmb79rb1cb8gampgyy51jda7s6hfmr7nga937zr92nvfpmldwy")))
    (package
      (name "content-store")
-     (version "release_648")
+     (version "release_649")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0sav72jn6n9500xnp1g7p5pw4jhycd6b7758ps0ylvh8zwazipfw")))
+       #:hash (base32 "091c4cvb8h4wl6x5njbvmdsqf0mxd76k6l5cqasgp2fw19lf66wd")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
