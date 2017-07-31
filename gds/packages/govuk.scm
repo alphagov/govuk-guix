@@ -870,12 +870,12 @@ service setup.")
     (hash (base32 "19hh5488y1fsn1ckdr2cvg3cn997lf8swv84jjshv2bw6jg5q8l1")))
    (package
      (name "publishing-api")
-     (version "release_953")
+     (version "release_954")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "1adc30vfj4hwxhr1wlb9vf6m23pgbb8nrmb8h4vzb090bbhhf669")))
+       #:hash (base32 "1fvr7fhm4hxljwkmzb5ajs7il34vnlclr80vanwh312mncgzc3b4")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f
                   #:ruby ,ruby-2.3))
