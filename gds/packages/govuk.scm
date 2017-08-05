@@ -612,12 +612,12 @@ service setup.")
     (hash (base32 "1a22s5q11gqw9l79p89dln5pz72rl8kypa98lrh8941b37gq3gni")))
    (package
      (name "info-frontend")
-     (version "release_80")
+     (version "release_81")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "00ys0iwax26anjf3d53ifwyaapsr9b3b6bmc9vfj0qyvgwc2rs4m")))
+       #:hash (base32 "08796lv1ncm2vfzsjkwwi7mp7h81v55y8qgaz5kr01bjczcy8jah")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
