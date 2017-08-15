@@ -959,12 +959,12 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router
   (package
     (name "router")
-    (version "release_153")
+    (version "release_157")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "1sw3g0r2kk78c8l369zmkfjn9d4p5nh2nlfc2s2g233s1bnyg5ga")))
+      #:hash (base32 "0bcgw1irlw9nqy77799ks7amjiv1kmiw8yvdp4m2qb9dwkcq55qx")))
     (build-system gnu-build-system)
     (native-inputs
      `(("go" ,go)))
