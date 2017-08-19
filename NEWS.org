@@ -2,7 +2,15 @@
 #+STARTUP: content hidestars
 
 * 2017
+** August
+*** Update Guix release_8 -> release_9
+*** Improve support for Whitehall attachments
 ** July
+*** Display NGinx logs through Tailon in the development system
+*** Create per-service NGinx acccess.log files
+*** Improve Rails app database support
+*** Plek support improvements
+*** Elasticsearch connection support
 ** June
 *** Update Guix release_7 -> release_8
 *** Add support for using Tailon in the development system
