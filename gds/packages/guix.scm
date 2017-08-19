@@ -11,48 +11,6 @@
   #:use-module (guix git-download)
   #:use-module ((gnu packages package-management) #:prefix gnu:))
 
-(define (git-predicate directory)
-  "Return a predicate that returns true if a file is part of the Git checkout
-living at DIRECTORY.  Upon Git failure, return #f instead of a predicate.
-
-The returned predicate takes two arguments FILE and STAT where FILE is an
-absolute file name and STAT is the result of 'lstat'."
-  (define (parent-directory? thing directory)
-    ;; Return #t if DIRECTORY is the parent of THING.
-    (or (string-suffix? thing directory)
-        (and (string-index thing #\/)
-             (parent-directory? (dirname thing) directory))))
-
-  (let* ((pipe        (with-directory-excursion directory
-                        (open-pipe* OPEN_READ "git" "ls-files")))
-         (files       (let loop ((lines '()))
-                        (match (read-line pipe)
-                          ((? eof-object?)
-                           (reverse lines))
-                          (line
-                           (loop (cons line lines))))))
-         (inodes      (map (lambda (file)
-                             (let ((stat
-                                    (lstat (string-append directory "/" file))))
-                               (cons (stat:dev stat) (stat:ino stat))))
-                           files))
-         (status      (close-pipe pipe)))
-    (and (zero? status)
-         (lambda (file stat)
-           (match (stat:type stat)
-             ('directory
-              ;; 'git ls-files' does not list directories, only regular files,
-              ;; so we need this special trick.
-              (any (lambda (f) (parent-directory? f file))
-                   files))
-             ((or 'regular 'symlink)
-              ;; Comparing file names is always tricky business so we rely on
-              ;; inode numbers instead
-              (member (cons (stat:dev stat) (stat:ino stat))
-                      inodes))
-             (_
-              #f))))))
-
 (define-public guix
   (let ((select? (delay (git-predicate
                          (getenv "GDS_GNU_GUIX_PATH"))))
