@@ -11,6 +11,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
+  #:use-module (gnu packages screen)
   #:use-module (gnu services web)
   #:use-module (gnu packages wget)
   #:use-module (gnu services memcached)
@@ -471,6 +472,8 @@ the Signon Dev user passphrase in\n")
       redis
       mongo-tools
       htop
+      iotop
+      screen
       vim
       ncdu
       the-silver-searcher
