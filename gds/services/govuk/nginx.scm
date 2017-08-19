@@ -89,13 +89,20 @@ proxy_set_header Host $host:$server_port;")))
        (cons*
         (nginx-location-configuration
          (uri "/media")
-         (body '("proxy_pass http://asset-manager-proxy;")))
+         (body '("add_header \"Access-Control-Allow-Origin\" \"*\";"
+                 "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
+                 "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
+                 "proxy_pass http://asset-manager-proxy;")))
         (map
          (match-lambda
           ((service . port)
            (nginx-location-configuration
             (uri (simple-format #f "/~A" service))
-            (body (list (simple-format #f "proxy_pass http://~A-proxy;" service))))))
+            (body (list
+                   "add_header \"Access-Control-Allow-Origin\" \"*\";"
+                   "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
+                   "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
+                   (simple-format #f "proxy_pass http://~A-proxy;" service))))))
          service-and-ports)))
       (server-name (list (string-append "assets." domain))))
      (map
