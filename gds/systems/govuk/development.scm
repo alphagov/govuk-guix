@@ -14,7 +14,6 @@
   #:use-module (gnu packages screen)
   #:use-module (gnu services web)
   #:use-module (gnu packages wget)
-  #:use-module (gnu services memcached)
   #:use-module (gnu services admin)
   #:use-module (gnu packages web)
   #:use-module (gnu packages vim)
@@ -162,7 +161,9 @@
       (port (assq-ref system-ports 'redis))))
     (service
      memcached-service-type
-     (memcached-configuration))
+     (memcached-configuration
+      (tcp-port (assq-ref system-ports 'memcached))
+      (udp-port (assq-ref system-ports 'memcached))))
     (postgresql-service #:port (assq-ref system-ports 'postgresql))
     (mongodb-service #:port (assq-ref system-ports 'mongodb))
     (service
@@ -177,7 +178,7 @@
               (config-file
                (tailon-configuration-file
                 (bind "localhost:54001")
-                (paths '("/var/log/shepherd.log"
+                (files '("/var/log/shepherd.log"
                          ("NGinx Logs" "/var/log/nginx/*.access.log"))))))))
    base-services))
 
