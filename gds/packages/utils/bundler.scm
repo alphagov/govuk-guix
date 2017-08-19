@@ -371,7 +371,7 @@
                   `((,gnu-build-system . ,%gnu-build-system-modules)
                     (,rails-build-system . ,%rails-build-system-modules))
                   (package-build-system pkg))
-                 (error "package-with-bundler, unsupported build system ~A"
+                 (error "package-with-bundler, unsupported build system:"
                         (package-build-system pkg)))
                #:phases %standard-phases))
          ((#:modules modules)
