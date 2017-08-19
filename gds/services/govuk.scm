@@ -1727,7 +1727,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(whitehall))
-          (requirement '(publishing-api signon static need-api)))
+          (requirement '(publishing-api signon static)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((create-directories
