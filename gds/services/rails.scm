@@ -302,6 +302,7 @@
                   (string-append #$root-directory "/" dir))
                 '("log" "public"))))
             (begin
+              (mkdir-p (string-append #$root-directory "/bin"))
               (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")
               (copy-recursively
                (string-append #$package "/bin")
