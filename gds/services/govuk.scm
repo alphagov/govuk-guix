@@ -1780,7 +1780,7 @@
           (user "whitehall")
           (port "-")
           (database "whitehall_production")
-          (password "")))))
+          (password "whitehall")))))
 
 ;;;
 ;;; Service Lists
