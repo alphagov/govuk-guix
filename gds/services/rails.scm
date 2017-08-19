@@ -453,7 +453,8 @@
                        (#$(mysql-list-databases-gexp
                            (mysql-connection-config
                             (inherit postgresql-or-mysql-connection-config)
-                             (user "root"))))))
+                            (user "root")
+                            (password ""))))))
                    (_ #~#f))))
       (with-imported-modules '((gds build utils))
         #~(lambda ()
