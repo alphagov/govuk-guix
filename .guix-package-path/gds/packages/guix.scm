@@ -1,1 +1,0 @@
-../../../gds/packages/guix.scm
