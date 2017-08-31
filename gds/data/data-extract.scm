@@ -7,6 +7,7 @@
   #:use-module (guix records)
   #:use-module (guix derivations)
   #:use-module (guix store)
+  #:use-module (gds utils)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services utils databases mysql)
@@ -59,17 +60,6 @@
    extracts))
 
 (define (group-extracts field extracts)
-  (define (alist-add key value alist)
-    (if (null? alist)
-        (list (cons key (list value)))
-        (if (equal? (caar alist) key)
-            (cons (cons key
-                        (cons value
-                              (cdr (first alist))))
-                  (cdr alist))
-            (cons (car alist)
-                  (alist-add key value (cdr alist))))))
-
   (fold (lambda (extract result)
           (let ((key (field extract)))
             (fold (lambda (key result)
