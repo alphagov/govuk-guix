@@ -1554,7 +1554,7 @@
          (service-startup-config)
          (signon-application
           (name "Content Tagger")
-          (supported-permissions '("signin")))
+          (supported-permissions '("signin" "GDS Editor" "Tagathon participant")))
          (signon-api-user
           (name "Content Tagger")
           (email "content-tagger@guix-dev.gov.uk")
