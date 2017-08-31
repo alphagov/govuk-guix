@@ -87,7 +87,7 @@
   (map
    (lambda (service-name)
      (or (find (lambda (service-type)
-                 (equal?
+                 (string=?
                   (string->symbol service-name)
                   (service-type-name service-type)))
                (map service-kind govuk-services))
@@ -142,7 +142,7 @@
                  (lambda (opt name arg result)
                    (remove (match-lambda
                              (('file-system-mapping . value)
-                              (equal? (file-system-mapping-target value)
+                              (string=? (file-system-mapping-target value)
                                       "/var/lib"))
                              ((key . value) #f))
                            result)))

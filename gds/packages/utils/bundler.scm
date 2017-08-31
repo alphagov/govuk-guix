@@ -589,7 +589,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
 
 (define (extract-bundle-package-from-package pkg)
   (and=> (find (match-lambda ((name value rest ...)
-                              (equal? name "bundle-install")))
+                              (string=? name "bundle-install")))
                (package-inputs pkg))
          (match-lambda
            (("bundle-install" value rest ...)

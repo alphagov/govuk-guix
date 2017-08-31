@@ -49,9 +49,9 @@
               (match-lambda
                ((name . value)
                 (cond
-                 ((equal? name "MONGO_DB")
+                 ((string=? name "MONGO_DB")
                   (cons "ROUTER_MONGO_DB" value))
-                 ((equal? name "MONGODB_URI")
+                 ((string=? name "MONGODB_URI")
                   (cons "ROUTER_MONGO_URL" value))
                  (else
                   (cons name value)))))

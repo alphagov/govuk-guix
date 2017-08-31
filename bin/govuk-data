@@ -151,7 +151,7 @@
          (lambda (service-name)
            (or
             (find (lambda (service)
-                    (equal?
+                    (string=?
                      (string->symbol service-name)
                      (service-type-name (service-kind service))))
                   all-services)

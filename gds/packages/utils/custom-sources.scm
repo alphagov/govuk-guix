@@ -152,7 +152,7 @@
     (map
      (match-lambda
        ((name value rest ...)
-        (if (equal? name "bundle-install")
+        (if (string=? name "bundle-install")
             (cons*
              name
              (let ((bundle-pkg

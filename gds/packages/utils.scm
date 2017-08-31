@@ -62,7 +62,7 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby-path gemfile))
               (string-append
                (assoc-ref outputs "out") ,path))
              (clients-or-sessions
-              (if (equal? ,mongoid-version "3")
+              (if (string=? ,mongoid-version "3")
                   "sessions"
                   "clients")))
          (delete-file location)
@@ -190,7 +190,7 @@ end
     (map
      (match-lambda
        ((name pkg rest ...)
-        (if (equal? name "ruby")
+        (if (string=? name "ruby")
             `("ruby" ,ruby)
             (cons* name pkg rest))))
      (package-inputs pkg)))))

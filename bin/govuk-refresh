@@ -58,7 +58,7 @@
 (define (get-matching-packages args)
   (map (lambda (name)
          (or (find (lambda (pkg)
-                     (equal? name
+                     (string=? name
                              (package-name pkg)))
                    (all-packages))
              (leave (G_ "Could not find a package matching ~A")
