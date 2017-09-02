@@ -87,7 +87,7 @@
   (map
    (lambda (service-name)
      (or (find (lambda (service-type)
-                 (string=?
+                 (eq?
                   (string->symbol service-name)
                   (service-type-name service-type)))
                (map service-kind govuk-services))
