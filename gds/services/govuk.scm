@@ -1565,6 +1565,8 @@
               (application-name "Publishing API"))
              '("signin")))))
          (plek-config) (rails-app-config) content-tagger
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
          (postgresql-connection-config
           (user "content-tagger")
           (port "5432")
