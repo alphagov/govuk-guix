@@ -169,7 +169,8 @@
     (service
      elasticsearch-service-type
      (elasticsearch-configuration
-      (http-port (assq-ref system-ports 'elasticsearch))))
+      (http-port (assq-ref system-ports 'elasticsearch))
+      (transport-port 59300)))
     (mysql-service #:config (mysql-configuration
                              (port (assq-ref system-ports 'mysql))))
     govuk-content-schemas-service
