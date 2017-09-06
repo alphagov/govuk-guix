@@ -18,7 +18,7 @@
   (elasticsearch     elasticsearch-configuration-elasticsearch
                      (default elasticsearch))
   (data-path         elasticsearch-configuration-data-path
-                     (default "/var/elasticsearch"))
+                     (default "/var/lib/"))
   (logs-path         elasticsearch-configuration-logs-path
                      (default "/var/log/elasticsearch"))
   (http-port         elasticsearch-congiguration-port
