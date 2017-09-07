@@ -741,55 +741,6 @@ service setup.")
      (home-page "https://github.com/alphagov/maslow"))
    #:extra-inputs (list libffi)))
 
-(define-public metadata-api
-  (package
-    (name "metadata-api")
-    (version "release_78")
-    (source
-     (github-archive
-      #:repository name
-      #:commit-ish version
-      #:hash (base32 "1vh4xdydvk8mc3cmdpkhmcdhlaigxmn91fp1np6sh9alzgc2i3cr")))
-    (build-system gnu-build-system)
-    (native-inputs
-     `(("go" ,go)))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (delete 'configure)
-         (delete 'install)
-         (delete 'check)
-         (replace 'build
-                  (lambda* (#:key inputs outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (cwd (getcwd))
-                           (gopath (string-append cwd "/__build/"))
-                           (repo "alphagov/metadata-api")
-                           (build-path (string-append
-                                        gopath
-                                        "src/github.com/"
-                                        repo)))
-                      (copy-recursively cwd "../metadata-api-copy"
-                                        #:log (%make-void-port "w"))
-                      (mkdir-p "__build/src/github.com/alphagov")
-                      (mkdir-p "__build/bin")
-                      (setenv "GOPATH" gopath)
-                      (rename-file "../metadata-api-copy"
-                                   "__build/src/github.com/alphagov/metadata-api")
-                      (and
-                       (with-directory-excursion
-                           "__build/src/github.com/alphagov/metadata-api"
-                         (zero? (system* "make" "build")))
-                       (begin
-                         (mkdir-p (string-append out "/bin"))
-                         (copy-file (string-append build-path "/metadata-api")
-                                    (string-append out "/bin/metadata-api"))
-                         #t))))))))
-    (synopsis "")
-    (description "")
-    (license "")
-    (home-page "https://github.com/alphagov/metadata-api")))
-
 (define-public need-api
   (package-with-bundler
    (bundle-package
