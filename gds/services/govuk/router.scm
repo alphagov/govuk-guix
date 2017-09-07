@@ -24,7 +24,11 @@
   (api-port router-config-api-port
             (default 8081))
   (debug? router-config-debug
-          (default #f)))
+          (default #f))
+  (backend-connect-timeout router-config-backend-connect-timeout
+                           (default "1s"))
+  (backend-header-timeout router-config-backend-header-timeout
+                          (default "15s")))
 
 (define router-config->environment-variables
   (match-lambda
