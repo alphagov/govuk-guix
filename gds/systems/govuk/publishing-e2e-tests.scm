@@ -15,6 +15,7 @@
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk nginx)
+  #:use-module (gds services govuk router)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
@@ -50,6 +51,19 @@
                (publish-finders
                 . ,#~(lambda ()
                        (run-command "rake" "publishing_api:publish_finders")))))
+            parameter))
+      parameters))
+    (router-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (router-config? parameter)
+            (router-config
+             (inherit parameter)
+             ;; Performance for the initial requests to frontend apps seems
+             ;; to be poor, so until this is improved, extend the timeout for
+             ;; the router
+             (backend-header-timeout "60s"))
             parameter))
       parameters))
     (govuk-nginx-service-type
