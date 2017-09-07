@@ -32,11 +32,14 @@
 
 (define router-config->environment-variables
   (match-lambda
-    (($ <router-config> public-port api-port debug?)
+    (($ <router-config> public-port api-port debug?
+                        backend-connect-timeout backend-header-timeout)
      (append
       (list
        (cons "ROUTER_PUBADDR" (simple-format #f ":~A" public-port))
-       (cons "ROUTER_APIADDR" (simple-format #f ":~A" api-port)))
+       (cons "ROUTER_APIADDR" (simple-format #f ":~A" api-port))
+       (cons "ROUTER_BACKEND_CONNECT_TIMEOUT" backend-connect-timeout)
+       (cons "ROUTER_BACKEND_HEADER_TIMEOUT" backend-header-timeout))
       (if debug?
           (list (cons "DEBUG" "true"))
           '())))))
