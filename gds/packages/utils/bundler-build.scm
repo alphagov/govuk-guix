@@ -106,5 +106,7 @@
                            (string-join files ", "))
             (substitute* files
               ((".*s\\.date = \".*\"")
-               "  # date removed by govuk-guix")))))
+               "  # date removed by govuk-guix")
+              ((".*s\\.rubygems\\_version = .*$")
+               "  # rubygems_version removed by govuk-guix\n")))))
     (reset-timestamps output-path)))
