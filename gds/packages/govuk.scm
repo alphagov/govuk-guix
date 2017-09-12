@@ -741,31 +741,6 @@ service setup.")
      (home-page "https://github.com/alphagov/maslow"))
    #:extra-inputs (list libffi)))
 
-(define-public need-api
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0bvwysm8q8kbc70ajdhnicyssxm6qbjz4zl1mhnbir9z6dwzd2vg")))
-   (package
-     (name "need-api")
-     (version "release_146")
-     (source
-      (github-archive
-       #:repository "govuk_need_api"
-       #:commit-ish version
-       #:hash (base32 "1mgz29xmi4sgbbwal9z9rbb5f5drjgq5hj6kalbhvn8pin0glzqr")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:mongoid-version "3")))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/need-api"))
-   #:extra-inputs (list libffi)))
-
 (define-public policy-publisher
   (package-with-bundler
    (bundle-package

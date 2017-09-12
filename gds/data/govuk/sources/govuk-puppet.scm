@@ -41,7 +41,6 @@
       (,publisher-service-type
        ,specialist-publisher-service-type
        ,manuals-publisher-service-type))
-     ("govuk_needs_production" . (,need-api-service-type))
      ("imminence_production" . (,imminence-service-type))
      ("licence_finder_production" . (,licence-finder-service-type))
      ;;("manuals_publisher_production" . (,manuals-publisher-service-type))
