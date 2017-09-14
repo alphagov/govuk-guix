@@ -1604,28 +1604,6 @@
           (database "maslow")))))
 
 ;;;
-;;; Need API
-;;;
-
-(define-public need-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'need-api))
-
-(define-public need-api-service
-  (service
-   need-api-service-type
-   (list (shepherd-service
-          (inherit default-shepherd-service)
-          (provision '(need-api))
-          (requirement '(publishing-api signon)))
-         (service-startup-config)
-         (signon-application
-          (name "Need API")
-          (supported-permissions '("signin" "write")))
-         (plek-config) (rails-app-config) need-api
-         (mongodb-connection-config
-          (database "govuk_needs_development")))))
-
-;;;
 ;;; Rummager
 ;;;
 
@@ -1810,7 +1788,6 @@
    draft-content-store-service
    ;; email-alert-api-service Can't connect to Redis for some reason
    ;; email-alert-service-service Missing dependency on RabbitMQ
-   need-api-service
    imminence-service
    publishing-api-service
    rummager-service
