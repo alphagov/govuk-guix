@@ -955,12 +955,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "19m24df091j3ivxzb6sdbiz36c065r5fd5mfccv4sjssnaqr8pb6")))
    (package
      (name "rummager")
-     (version "release_1469")
+     (version "release_1470")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0laqigfsbfnydk4aiqrh0nwnf1p67rv4ibanzr0hf0f0728fch87")))
+       #:hash (base32 "19kfwrd126rl91n5j1bwg7d90gaf6skzc64xgggq37cdj04q5bds")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
