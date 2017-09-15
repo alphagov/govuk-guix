@@ -1289,7 +1289,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/travel-advice-publisher"))))
+     (home-page "https://github.com/alphagov/travel-advice-publisher"))
+   #:extra-inputs (list libffi)))
 
 (define-public whitehall
   (package-with-bundler
