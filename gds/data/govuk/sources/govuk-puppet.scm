@@ -65,6 +65,31 @@
       (,draft-router-service-type ,draft-router-api-service-type))
      ("router" . (,router-service-type ,router-api-service-type)))))
 
+(define (backups-directory)
+  (or (and=> (getenv "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY")
+             (lambda (directory)
+               (if (file-exists? directory)
+                   directory
+                   (error "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY does not exist"
+                          directory))))
+      (let* ((govuk-guix-root
+              (or (and=>
+                   (current-filename)
+                   (lambda (x)
+                     (string-drop-right
+                      x
+                      (string-length "gds/data/govuk/sources/govuk-puppet.scm"))))
+                  (getenv "GOVUK_GUIX_ROOT")
+                  (error "Unable to locate the govuk-guix root")))
+             (directory
+              (string-append
+               (dirname govuk-guix-root)
+               "/govuk-puppet/development-vm/replication/backups")))
+
+        (if (file-exists? directory)
+            directory
+            (error "The backups directory does not exist" directory)))))
+
 (define-record-type <govuk-puppet-source-file>
   (govuk-puppet-source-file date database hostname file)
   govuk-puppet-source-file?
@@ -274,26 +299,9 @@
 
 (define list-extracts
   (lambda ()
-    (let* ((govuk-puppet-directory
-            (or (getenv "GDS_GUIX_GOVUK_PUPPET_REPOSITORY")
-                (let ((govuk-guix-root
-                       (or (and=>
-                            (current-filename)
-                            (lambda (x)
-                              (string-drop-right
-                               x
-                               (string-length "gds/data/govuk/sources/govuk-puppet.scm"))))
-                           (getenv "GOVUK_GUIX_ROOT")
-                           (error "Unable to locate the govuk-guix root"))))
-                  (string-append
-                   (dirname govuk-guix-root)
-                   "/govuk-puppet"))))
-           (backup-directory
-            (string-append govuk-puppet-directory
-                           "/development-vm/replication/backups")))
-      (if (file-exists? backup-directory)
-          (find-extracts backup-directory)
-          (error "Directory does not exist ~A\n" backup-directory)))))
+    (append-map
+     source-file->extracts
+     (find-source-files (backups-directory)))))
 
 (define-public govuk-puppet-data-source
   (data-source
