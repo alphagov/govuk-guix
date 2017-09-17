@@ -6,6 +6,9 @@
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
   #:use-module (guix gexp)
+  #:use-module (guix hash)
+  #:use-module (guix base32)
+  #:use-module (gnu packages guile)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
   #:use-module (gds data data-source)
@@ -193,6 +196,81 @@
              (database database)
              (services (assoc-ref extract-name->services extract-name)))))
         (map car extract-name->services))))))
+
+;;;
+;;; govuk-puppet source data directory with index
+;;;
+
+(define (source-files->data-directory-with-index source-files)
+  (define source-file->details-list
+    (match-lambda
+     (($ <govuk-puppet-source-file> date database hostname file)
+      ;; G-expressions handle lists, so construct a list from the record
+      ;; fields
+      (let ((sha256-hash
+             (bytevector->nix-base32-string
+              (call-with-input-file (local-file-file file) port-sha256))))
+        (list (date->string "~Y-~m-~d" date)
+              database
+              hostname
+              file
+              sha256-hash)))))
+
+  (computed-file
+   "govuk-puppet-source-data"
+   (with-imported-modules '((guix build utils))
+     #~(begin
+         (add-to-load-path #$(file-append guile-json
+                                          "/share/guile/site/"
+                                          (effective-version)))
+         (use-modules (json)
+                      (ice-9 match)
+                      (srfi srfi-1)
+                      (guix build utils))
+
+         (let* ((source-file-details-lists
+                 '#$(map source-file->details-list
+                         source-files))
+                (source-file-destinations
+                 (map (match-lambda
+                       ((date database hostname file hash)
+                        (string-join
+                         (list date
+                               database
+                               hostname
+                               ;; Drop the hash and dash prefix
+                               (string-drop (basename file)
+                                            33))
+                         "/")))
+                      source-file-details-lists)))
+
+           (for-each (lambda (destination file)
+                       (let ((full-destination
+                              (string-append #$output "/" destination)))
+                         (mkdir-p (dirname full-destination))
+                         (symlink file full-destination)))
+                     source-file-destinations
+                     (map fourth source-file-details-lists))
+
+           (mkdir-p #$output)
+           (call-with-output-file (string-append #$output
+                                                 "/index.json")
+             (lambda (port)
+               (display
+                (scm->json-string
+                 `((source-files
+                    . ,(map (match-lambda*
+                             (((date database hostname file hash)
+                               destination)
+                              `(((date . ,date)
+                                 (database . ,database)
+                                 (hostname . ,hostname)
+                                 (url . ,destination)
+                                 (hash . ,hash)))))
+                            source-file-details-lists
+                            source-file-destinations)))
+                 #:pretty #t)
+                port))))))))
 
 (define list-extracts
   (lambda ()
