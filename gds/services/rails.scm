@@ -3,6 +3,7 @@
   #:use-module (ice-9 match)
   #:use-module (guix gexp)
   #:use-module (guix records)
+  #:use-module (guix modules)
   #:use-module (guix packages)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
@@ -273,9 +274,9 @@
          root-directory
          rails-app-config
          rest)))
-    (with-imported-modules `((guix build syscalls)
-                             (guix build bournish)
-                             (gnu build file-systems))
+    (with-imported-modules (source-module-closure
+                            '((guix build syscalls)
+                              (gnu build file-systems)))
      #~(begin
          (use-modules (guix build utils)
                       (gnu build file-systems)

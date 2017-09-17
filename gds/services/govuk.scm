@@ -7,6 +7,7 @@
   #:use-module ((gnu packages admin)
                 #:select (shadow))
   #:use-module (guix records)
+  #:use-module (guix modules)
   #:use-module (guix gexp)
   #:use-module (guix utils)
   #:use-module (ice-9 match)
@@ -232,9 +233,9 @@
            (root-pre-startup-scripts
             `((mount-uploads
                .
-               ,(with-imported-modules '((guix build utils)
-                                         (guix build bournish)
-                                         (gnu build file-systems))
+               ,(with-imported-modules (source-module-closure
+                                        '((guix build utils)
+                                          (gnu build file-systems)))
                   #~(lambda ()
                       (use-modules (gds build utils)
                                    (gnu build file-systems))
@@ -979,9 +980,9 @@
           result)))))
 
 (define (smokey-activation environment-variables package)
-  (with-imported-modules `((guix build syscalls)
-                           (guix build bournish)
-                           (gnu build file-systems))
+  (with-imported-modules (source-module-closure
+                          '((guix build syscalls)
+                            (gnu build file-systems)))
     #~(begin
         (use-modules (guix build utils)
                      (gnu build file-systems)
