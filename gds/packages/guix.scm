@@ -24,11 +24,10 @@
       (version "release_11")
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
-         ((#:tests? tests)
-          #f)
-         ((#:phases phases)
-          `(modify-phases ,phases
-             (delete 'check)))))
+         ;; Run the tests if using a tagged release, but not when
+         ;; using Guix through GDS_GNU_GUIX_PATH, as this slows down
+         ;; development.
+         ((#:tests? tests) (not local-source))))
       (source
        (if local-source
            (local-file (getenv "GDS_GNU_GUIX_PATH") "guix-gds"
