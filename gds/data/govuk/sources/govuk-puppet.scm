@@ -313,4 +313,6 @@
 
 (define-public govuk-puppet-data-source
   (data-source
-   (list-extracts list-extracts)))
+   (name "govuk-puppet")
+   (list-extracts list-extracts)
+   (data-directory-with-index data-directory-with-index)))
