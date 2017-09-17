@@ -829,8 +829,8 @@ content, as well as broadcasting changes to a message queue.")
      (source
       (github-archive
        #:repository "publishing-e2e-tests"
-       #:commit-ish "d21b889b9e9af2f8dd19d944dc12dd25f4159c15"
-       #:hash (base32 "1jk26a7c5d760rgrbb22xrkxy2sqsvlan2wcgvw9slff69v95w10")))
+       #:commit-ish "97d9bb58332a32b42053f054c45fd0c3b94b0fb5"
+       #:hash (base32 "1chsq8almh1qm4026z2hcz3mk2hqrrbd6qlkvzbjnwa6j4ijqsj4")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
