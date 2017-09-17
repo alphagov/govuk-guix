@@ -297,6 +297,10 @@
                  #:pretty #t)
                 port))))))))
 
+;;;
+;;; govuk-puppet-data-source
+;;;
+
 (define list-extracts
   (lambda ()
     (append-map
