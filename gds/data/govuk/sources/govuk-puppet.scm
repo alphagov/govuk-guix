@@ -1,5 +1,6 @@
 (define-module (gds data govuk sources govuk-puppet)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
@@ -11,6 +12,10 @@
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)
   #:export (govuk-puppet-data-source))
+
+;;;
+;;; Source file handling
+;;;
 
 (define postgresql-extracts
   `(("postgresql-primary-1.backend.integration"
@@ -57,7 +62,15 @@
       (,draft-router-service-type ,draft-router-api-service-type))
      ("router" . (,router-service-type ,router-api-service-type)))))
 
-(define (find-extracts backup-directory)
+(define-record-type <govuk-puppet-source-file>
+  (govuk-puppet-source-file date database hostname file)
+  govuk-puppet-source-file?
+  (date     govuk-puppet-source-file-date)
+  (database govuk-puppet-source-file-database)
+  (hostname govuk-puppet-source-file-hostname)
+  (file     govuk-puppet-source-file-file))
+
+(define (find-source-files backup-directory)
   (define (process-date-dir date stat . children)
     (concatenate
      (map (cut apply process-database-dir date <>) children)))
@@ -79,7 +92,8 @@
                 (get-extract-local-file date database hostname)
                 #f)))
       (if local-file
-          (process-local-file date database hostname local-file)
+          (list
+           (govuk-puppet-source-file date database hostname local-file))
           '())))
 
   (define (generic-latest.tbz2-local-file date database hostname)
@@ -110,43 +124,15 @@
             (list backup-directory date database hostname (first files))
             "/")))))
 
-  (define (process-local-file date database hostname local-file)
-    (let*
-        ((extracts-by-hostname
-          (or
-           (assoc-ref `(("postgresql" . ,postgresql-extracts)
-                        ("mysql" . ,mysql-extracts)
-                        ("mongo" . ,mongodb-extracts)
-                        ("elasticsearch" #f))
-                      database)
-           (begin
-             (simple-format #t "Warning, unknown database ~A\n" database)
-             #f)))
-         (extract-name->services
-          (if extracts-by-hostname
-              (or (assoc-ref extracts-by-hostname hostname)
-                  (begin
-                    (simple-format #t "Warning, unknown hostname ~A (~A)\n"
-                                   hostname
-                                   (string-join
-                                    (list date database hostname)
-                                    "/"))
-                    '()))
-              '())))
-      (filter-map
-       (lambda (extract-name)
-         (let ((get-extract-file
-                (assoc-ref `(("postgresql" . ,postgresql-extract-file)
-                             ("mysql" . ,mysql-extract-file)
-                             ("mongo" . ,mongo-extract-file))
-                           database)))
-           (data-extract
-            (file (get-extract-file local-file extract-name))
-            (datetime (string->date date "~Y-~m-~d"))
-            (database database)
-            (services (assoc-ref extract-name->services extract-name)))))
-       (map car extract-name->services))))
+  (let ((tree (file-system-tree backup-directory)))
+    (concatenate
+     (map (cut apply process-date-dir <>) (cddr tree)))))
 
+;;;
+;;; Extract handling
+;;;
+
+(define (source-file->extracts source-file)
   (define (postgresql-extract-file local-file extract-name)
     (tar-extract
      (name (string-append extract-name ".sql.gz"))
@@ -170,9 +156,43 @@
      (member (string-append "*/" extract-name))
      (strip-components 1)))
 
-  (let ((tree (file-system-tree backup-directory)))
-    (concatenate
-     (map (cut apply process-date-dir <>) (cddr tree)))))
+  (match source-file
+    (($ <govuk-puppet-source-file> date database hostname local-file)
+     (let*
+         ((extracts-by-hostname
+           (or
+            (assoc-ref `(("postgresql" . ,postgresql-extracts)
+                         ("mysql" . ,mysql-extracts)
+                         ("mongo" . ,mongodb-extracts)
+                         ("elasticsearch" #f))
+                       database)
+            (begin
+              (simple-format #t "Warning, unknown database ~A\n" database)
+              #f)))
+          (extract-name->services
+           (if extracts-by-hostname
+               (or (assoc-ref extracts-by-hostname hostname)
+                   (begin
+                     (simple-format #t "Warning, unknown hostname ~A (~A)\n"
+                                    hostname
+                                    (string-join
+                                     (list date database hostname)
+                                     "/"))
+                     '()))
+               '())))
+       (filter-map
+        (lambda (extract-name)
+          (let ((get-extract-file
+                 (assoc-ref `(("postgresql" . ,postgresql-extract-file)
+                              ("mysql" . ,mysql-extract-file)
+                              ("mongo" . ,mongo-extract-file))
+                            database)))
+            (data-extract
+             (file (get-extract-file local-file extract-name))
+             (datetime (string->date date "~Y-~m-~d"))
+             (database database)
+             (services (assoc-ref extract-name->services extract-name)))))
+        (map car extract-name->services))))))
 
 (define list-extracts
   (lambda ()
