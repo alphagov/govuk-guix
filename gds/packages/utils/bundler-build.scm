@@ -98,6 +98,8 @@
               (exit 1)
               (loop (+ retry 1))))))
 
+    (simple-format #t "Deleting .ruby-version\n")
+    (delete-file (string-append output-path "/.ruby-version"))
     (let ((files (find-files output-path".*\\.gemspec")))
       (if (null? files)
           (simple-format #t "No gemspecs to substitute dates for\n")
