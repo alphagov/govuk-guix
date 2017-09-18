@@ -50,7 +50,7 @@
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1m55k0fyr9rklay2ixa4jnp2xwdg3rw4d2i0h857pwf17idscknx")))
+    (hash (base32 "16klyaf7kq36mmrjy0lz66yckcsw28iymmjynvjcr32nykwfll1b")))
    (package
      (name "asset-manager")
      (version "release_136")
@@ -106,7 +106,7 @@
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1javq4cbfc5974ncqk2r9zf4p48xsbzxrbymmfrgfjyh5vqzd0gc")))
+    (hash (base32 "00qm6xwq7qsmivy7p79wcgz5lb6ndfzfb75lcf9zn5rd888wi6x2")))
    (package
      (name "authenticating-proxy")
      (version "release_38")
@@ -132,7 +132,7 @@ proxies requests to some upstream")
 (define-public bouncer
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0zffwip1x8fr5r9zmp7272d1frhl417vnpyqz2bj1wgd0xg071n3")))
+    (hash (base32 "1zc783hlnlzh8l9798h0bmii94kwdhmf0j9n9my24rw8lz5kdia2")))
    (package
      (name "bouncer")
      (version "release_207")
@@ -150,7 +150,7 @@ proxies requests to some upstream")
 (define-public calculators
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0hlpl55lvcghy0h13ad38z6kgm0bxw5cnwkbvshdc0wnmc3bv5xl")))
+    (hash (base32 "01cp0rf1gk4m07il841kxs2jrl8lypnyi4fdg1pk2gsbw2wip776")))
    (package
      (name "calculators")
      (version "release_198")
@@ -170,7 +170,7 @@ proxies requests to some upstream")
 (define-public calendars
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0h7k8iyy6sg37rg7364dwzpljwmx9m98rvs762kf0641n89k3qwh")))
+    (hash (base32 "0w193ghnk3fggkz8aw7fmm7m90nx2vsrgmgz7ngawhilxwk42kcj")))
    (package
      (name "calendars")
      (version "release_425")
@@ -188,7 +188,7 @@ proxies requests to some upstream")
 (define-public collections
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1nvaz45kmsmrc0q8kd1kvdvcw3jims81wqwmanb0d5bjkwzhr5r9")))
+    (hash (base32 "10z0fmghica0cg0hx2kffsk6y33h02fqfa8kvcrg7dm36m56kmws")))
    (package
      (name "collections")
      (version "release_363")
@@ -206,7 +206,7 @@ proxies requests to some upstream")
 (define-public collections-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "179li5vy9ykwlib3a23n87yij1yzyba3wsv6pgkqygjvw5pqb6hg")))
+    (hash (base32 "1fhbawz9jn2qhvwv2ximnplzf7dbrspk8bfk8zq4ldyzlm5dk2qr")))
    (package
      (name "collections-publisher")
      (version "release_264")
@@ -230,7 +230,7 @@ proxies requests to some upstream")
 (define-public contacts-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0gqyp0cckmz2wczzi0nxsj1dzvm793j0b4m04p82mx98ymixzhzj")))
+    (hash (base32 "1xdccghf5v6v6wr9a69b7v8bg7jn6xnijbcan234rzqr34gvwdzl")))
    (package
      (name "contacts-admin")
      (version "release_354")
@@ -253,7 +253,7 @@ proxies requests to some upstream")
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "06f26j2wym71lm55h6xr1plsgjxmfcbq6qjfrx6j8jsrr8l5x261")))
+    (hash (base32 "15bdi9ximq1xkag2bdbdd50bhrhmq9g63s2kp2j6xcamg0bmh0qz")))
    (package
      (name "content-performance-manager")
      (version "release_256")
@@ -277,7 +277,7 @@ proxies requests to some upstream")
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0kf1x5zjkfpyxcd5asqg3n65yixfx3jyq05g39d83nsnp2y08r8a")))
+    (hash (base32 "18bfmqrx4b5lv68ql8bxi8z735mffqsqz9lahwh3lk8jdgraxmj1")))
    (package
      (name "content-store")
      (version "release_664")
@@ -296,7 +296,7 @@ proxies requests to some upstream")
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "00fdbnwh2zlqg2pjlbs6vrxqjrmn8ggx8qmpp3ar2ivdyygikg1p")))
+    (hash (base32 "1mqzjkkd3fnvcy13krwfhqdn7vwb52jwfpkrkvf9y722l245pkl0")))
    (package
      (name "content-tagger")
      (version "release_509")
@@ -315,7 +315,7 @@ proxies requests to some upstream")
 (define-public design-principles
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1zd74v5dvywahq83ih2jkcsbxmcksn9ql3vcs3w3qvpbbscnpxsq")))
+    (hash (base32 "18mrx0jfyns3yv1z9bg3xi5xka4p5gxvr5xjbhz4ixhkd9vd2wnd")))
    (package
      (name "design-principles")
      (version "release_872")
@@ -336,7 +336,7 @@ proxies requests to some upstream")
 (define-public email-alert-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0vm3bpbv936c45m707ay9fcywygbhlkpi2r3hz3shb2ah4aw2ddi")))
+    (hash (base32 "129wa8n9inz5a81bl5cpmrcaa2k8ywhd894fsxi67f4q42wrdf5d")))
    (package
      (name "email-alert-api")
      (version "release_194")
@@ -362,7 +362,7 @@ proxies requests to some upstream")
 (define-public email-alert-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qzr2rb5kg5009mjkny2w7191q5k0358vmzrb60sliirj8g3b9pq")))
+    (hash (base32 "1wcvkwjbrwyk1533i6mfjpafl149n1k10dbp7lxfghmrn0scfhfv")))
    (package
      (name "email-alert-frontend")
      (version "release_47")
@@ -380,7 +380,7 @@ proxies requests to some upstream")
 (define-public email-alert-service
   (package-with-bundler
    (bundle-package
-    (hash (base32 "04v3rwmp54zl796rcpkgjzfhr7jrxg2chsmmf69nbbmjkd7r4hpl")))
+    (hash (base32 "14223q51y30rsrnind8z62f3mvr7grxwk5ijf84b9fzcxidsjnxh")))
    (package
      (name "email-alert-service")
      (version "release_82")
@@ -420,7 +420,7 @@ proxies requests to some upstream")
 (define-public feedback
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0zbfm5nq3bwygkjv3mhagrc7j8qzyf5x06c3n6das8qyxakishr8")))
+    (hash (base32 "0ia52y8wm8yi7fmllqr4gwwzmqs91ib7fzdn5qs06mzlraf87wwv")))
    (package
      (name "feedback")
      (version "release_307")
@@ -439,7 +439,7 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0z2n1daikwnyvar3fk2zck6jm209ybyjs67brlrn8wjq2vjg92ii")))
+    (hash (base32 "0zpqgv26lgyflmg2alw4y7r0nwh8rmcbbskgzqf6d1kzc1sicy9b")))
    (package
      (name "finder-frontend")
      (version "release_313")
@@ -457,7 +457,7 @@ proxies requests to some upstream")
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "11352844s8bmrafci47w6wmgljfsa7c5m738xck1bgr0yq98zibf")))
+    (hash (base32 "0cr42dli7b9mb7xmaphqfwwx3hsdfjznxp0mdp6wjlzy0ph5shah")))
    (package
      (name "frontend")
      (version "release_2727")
@@ -476,7 +476,7 @@ proxies requests to some upstream")
 (define-public government-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01zks4nk6p0h2vp3m0qzmhw6ygnvn8yi06kx06mhlxq5anksr5n1")))
+    (hash (base32 "099mnf522mdhgqq0rxzkqg51axny1jnrn1j0kh80qmh2zqd8sjrm")))
    (package
      (name "government-frontend")
      (version "release_448")
@@ -570,7 +570,7 @@ service setup.")
 (define-public hmrc-manuals-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qw49qvcfxcp07v9vsyqz1im2p9wvbmx488jjbfchrj0lz67phiy")))
+    (hash (base32 "0clc4hys4dnsk17d3762g418ryiyzn7ym42vcm7cq2dcz7g53q2k")))
    (package
      (name "hmrc-manuals-api")
      (version "release_191")
@@ -591,7 +591,7 @@ service setup.")
 (define-public imminence
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1sbyq6gnkrpmqym0c1a70xirga855a7rpszc6pdgjj7dgr2ww22c")))
+    (hash (base32 "0lg1p2ll1lys6pnlbk90k6835113y07wg84d6w2xnym9z7nqk23w")))
    (package
      (name "imminence")
      (version "release_320")
@@ -609,7 +609,7 @@ service setup.")
 (define-public info-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0lb5m39glx4gg9dql0lqwjrrcmdpw53j01i5whijf7vmsxh17z8c")))
+    (hash (base32 "1f406vh24gnzc0qxwqgnl5jn0zy9qdf9s03q2sms0gsl5rm6gcaa")))
    (package
      (name "info-frontend")
      (version "release_84")
@@ -628,7 +628,7 @@ service setup.")
 (define-public licence-finder
   (package-with-bundler
    (bundle-package
-    (hash (base32 "080z3hpfjgl6hpi710g54jwk06rr9npljfz38j1aj24xzv9x0mi4")))
+    (hash (base32 "0mps287rrpmwrxhgppb8qshh6p24j5kyxljnj9b8fw7vck9iphhq")))
    (package
      (name "licence-finder")
      (version "release_291")
@@ -647,7 +647,7 @@ service setup.")
 (define-public local-links-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "05m6364iq9qiqkaq4305dp434z3lh8jz2gvbahjsg6692bvglzhg")))
+    (hash (base32 "0jdgb4jw5pjxx932lgssa6jjyv85vj31jd4fslc0fwvdcdnl113z")))
    (package
      (name "local-links-manager")
      (version "release_127")
@@ -676,7 +676,7 @@ service setup.")
 (define-public manuals-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0fkx7gslmjwrhb6p1sagp8v8x9m10j9mjpdfvrri91imhgs43s8r")))
+    (hash (base32 "1h8fc5wz0i8yzbqhdr5f043sghhdr6ki5mjhrfnak1yfwvz4j2q5")))
    (package
      (name "manuals-frontend")
      (version "release_209")
@@ -694,7 +694,7 @@ service setup.")
 (define-public manuals-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "030kxzwp6z9lr5h9bw9nx82d2g7rrcxpnnbmcg1ahcsbdrk71n2g")))
+    (hash (base32 "0aj4cp5zbhjb9x3x6c8gcpccyhxbffmkdw7rjmsdrj8a4v4xnc27")))
    (package
      (name "manuals-publisher")
      (version "release_977")
@@ -718,7 +718,7 @@ service setup.")
 (define-public maslow
   (package-with-bundler
    (bundle-package
-    (hash (base32 "166yrwppydmr1m58n6p217d1lyk3wj4firpr0gzhrwc4y5bqrbq0")))
+    (hash (base32 "0sgwm594fd6k0l0cvmr417fwn3mjd78b1c7iil13iyfy0f1vz1ix")))
    (package
      (name "maslow")
      (version "release_202")
@@ -744,7 +744,7 @@ service setup.")
 (define-public policy-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0rmljc8xz11j9f13v450rifshklwjxxv9in8zgmzgnhv6pa8k4jb")))
+    (hash (base32 "0yg4ffs433hrw7csa51m93hi04fc2gjrl1xkj2bzhhgrc5lvsv5q")))
    (package
      (name "policy-publisher")
      (version "release_179")
@@ -768,7 +768,7 @@ service setup.")
 (define-public publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0grmmfmgh1gss46ssx8gzkbm9c58r8r0sggcp50vs3ziyl15n5mi")))
+    (hash (base32 "1dhqm67a4y4i55wkdixabgcwbngivqk1hhpg4mgainwwpjrw2ki7")))
    (package
      (name "publisher")
      (version "release_1810")
@@ -793,7 +793,7 @@ service setup.")
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0gqnp5kwdh14zybxx15qzp7q4lqfdzmb24d63k8pbcqb4z03y398")))
+    (hash (base32 "11gvn0szfspsx4h08hv48lzn8n53v1fzm79iznz5kwwi41qbplmj")))
    (package
      (name "publishing-api")
      (version "release_1002")
@@ -822,7 +822,7 @@ content, as well as broadcasting changes to a message queue.")
   (package-with-bundler
    (bundle-package
     (hash
-     (base32 "1lngabhlnymaxilc6ixdy8pxp6w669dg1n75v8agxlkgsqrkcvrz")))
+     (base32 "079kqv4kya282hnh1dr4mn8ksn7zc0mgmk0wjbsl9g41cvg5dqxy")))
    (package
      (name "publishing-e2e-tests")
      (version "0")
@@ -861,7 +861,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public release
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1zfb8b1slp4kg4vz5c98p9zr239mzh76mxyr81qyc2g6m1awk9s1")))
+    (hash (base32 "0yzkv98df4ywpnimc02fd54qf4gsn7rhhwzvhysf5kll3pzfsyqy")))
    (package
      (name "release")
      (version "release_259")
@@ -932,7 +932,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1fp6kp01wf6gv1qzlvr17x134pw8yymvgyyys45nz25chjwk8c08")))
+    (hash (base32 "08ix77pc459l08gw956dwc4n6fmxq1n5nz2g631jv7r8kx5v8fpl")))
    (package
      (name "router-api")
      (version "release_125")
@@ -952,7 +952,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public rummager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "19m24df091j3ivxzb6sdbiz36c065r5fd5mfccv4sjssnaqr8pb6")))
+    (hash (base32 "0bj7zlxh43i1zh3cb4baxpmfcfkkv3vi0zh4vxhnnsc0q70rdpwz")))
    (package
      (name "rummager")
      (version "release_1470")
@@ -979,7 +979,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "149nnadd5484kl941jhl1wwsn2yahkr8jzkx2bhd3522hngdnp8q")))
+    (hash (base32 "1jgjnhcgax0jfzwrkzyil9598krw3q2hxh9qwbv4vlzl3xr87ax5")))
    (package
      (name "search-admin")
      (version "release_97")
@@ -998,7 +998,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "13fpbgqnbr4i8qz71ws846n146ffsvvdy6d5ai39n4imxph49kg5")))
+    (hash (base32 "0xq28d5mscrvgpidjpn75pxzps3iaxqdhbhz9yq47a9wyzh3l8mn")))
    (package
      (name "service-manual-frontend")
      (version "release_103")
@@ -1016,7 +1016,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "00hf1b8v1hvjzhamfjpgh2zxp98jnp7vhrr0rb8001izk7gzbqq8")))
+    (hash (base32 "0jyyzipmvkya6gn0xmix8186di4jl1a68mr2244slz3ap7z2847x")))
    (package
      (name "service-manual-publisher")
      (version "release_305")
@@ -1038,7 +1038,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public short-url-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0rbs194crac31b1hw4drpyl69ha1h4d4knmhalw46clrma1hq2vz")))
+    (hash (base32 "08pfpvyrz2x933mxgp78nhmyf8rl6hplmfviwdgw8sdpy5pq1wsm")))
    (package
      (name "short-url-manager")
      (version "release_122")
@@ -1058,7 +1058,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public signon
   (package-with-bundler
    (bundle-package
-    (hash (base32 "08w5cpxnb4s439ssrpplkwr2jqlvlg6xrsyrfgam14q1j656j7hs"))
+    (hash (base32 "1vknxc4wzrnlck722x9fqlm6iq9hx2bs06wrj6cns6miy9pwsfay"))
     (without '("development" "test")))
    (package
      (name "signon")
@@ -1086,7 +1086,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public smart-answers
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mbn0inavgni1wzng3hc5hcvs4wjrclpbmca5w4bcbl85isdbfsr")))
+    (hash (base32 "125l31j6zn1dkag075kixqg6w0fg26m3kkaw8caqmcipzy3m27zz")))
    (package
      (name "smart-answers")
      (version "release_3742")
@@ -1105,7 +1105,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1q96hs0vckbsq0fnfyhkdwfhd1q28y28dfcw9kmlvm4w65qy2wn3"))
+    (hash (base32 "1xa7v9zh5d6v0f3km0i1vqzgl4qpmy7wa03adp16xry5ggcdmsfi"))
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
@@ -1135,7 +1135,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public smokey
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0dlvrdbd1ywmyygpfp7bcn1vnyawih513faaxvzgm4v2yxcya1bn")))
+    (hash (base32 "1yv32mx794cygskvb5qg9d3xg7zr4lmmirhal0nwmpg4c5qnxyqh")))
    (package
      (name "smokey")
      (version "0")
@@ -1181,7 +1181,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1c9wjfbzzpnr6fwz0y33zzc2nx2zhhicr8bniv3nfm4mq50b9hcz")))
+    (hash (base32 "0z1vzkvqaidm6fjmccpycymnl4z15sghri0kj6kpgvd17xipgjvg")))
    (package
      (name "static")
      (version "release_2675")
@@ -1201,7 +1201,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "177dd003by0xq6h9xb2g4difqgfwk29a4b6da9bsjcajapk65hbi")))
+    (hash (base32 "02j2sgk31kh1i07jaj6yzw391k2hg1p810qxpxcy6v55cd63hvq0")))
    (package
      (name "support")
      (version "release_595")
@@ -1227,7 +1227,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qjj6b1yn594khcchmwlsvfcvvbi1hmkjb2nkfy6sgkggzg8dx84")))
+    (hash (base32 "1knjpc53wzsqwh2qzcasi8rvf9vq2q1d4sbkcknm37ffwpzxb3wl")))
    (package
      (name "support-api")
      (version "release_130")
@@ -1252,7 +1252,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "19nnmvxs3m2zf01hv408lb3ijhzpwjd2c7fyq518s2q5h1h96q97")))
+    (hash (base32 "1hmdjmnfy99y2rwdbsb1fn9jb52h4wks9ylc3dyvq5l95q3qrbsk")))
    (package
      (name "transition")
      (version "release_791")
@@ -1270,7 +1270,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public travel-advice-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1swibmc3fmz98fghk7y5bnw64b0k0bzbmf796aw5mqbvxlvq5mbi")))
+    (hash (base32 "0r4kz45bqybnik191xakmzq5w11gxx65i4cda9nyijr74720ay4p")))
    (package
      (name "travel-advice-publisher")
      (version "release_270")
@@ -1295,7 +1295,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public whitehall
   (package-with-bundler
    (bundle-package
-    (hash (base32 "04y1w0vc8hynk7hqn6vaz0g6fsiisbf86w0w9l65v18zcnc172gs")))
+    (hash (base32 "1xlxpl3m4x9h24bli5cf9f7kjwag6awlafxqjns4pg42iy4w5svq")))
    (package
      (name "whitehall")
      (version "release_12987")
