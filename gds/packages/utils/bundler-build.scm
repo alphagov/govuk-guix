@@ -77,7 +77,7 @@
                                                  output-path
                                                  "/Gemfile.lock\n"))
 
-    (simple-format #f "Setting .ruby-version to ~A\n" ruby-version)
+    (simple-format #t "Setting .ruby-version to ~A\n" ruby-version)
     (call-with-output-file (string-append output-path "/.ruby-version")
       (lambda (port)
         (simple-format port "~A\n" ruby-version)))
