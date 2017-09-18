@@ -442,12 +442,12 @@ proxies requests to some upstream")
     (hash (base32 "0zpqgv26lgyflmg2alw4y7r0nwh8rmcbbskgzqf6d1kzc1sicy9b")))
    (package
      (name "finder-frontend")
-     (version "release_313")
+     (version "release_314")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02rf7jwnaaicqfnc8dcpms47nvkn8lsv30nqq6jywdahz1ikyyw6")))
+       #:hash (base32 "0nxgszv0h0fghs792dd0dpi3sk3li74mv7n081l20r9bjp884k9g")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
