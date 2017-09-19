@@ -1255,12 +1255,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0bfx5kyjykzr6yh90ansm0k7i97g0whng2dlfq1rqhpy4c9m0qhz")))
    (package
      (name "transition")
-     (version "release_794")
+     (version "release_795")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1yimjspyb3zcpjp2p3c1ipx6nhb22bfl7qqbpbay6ad1x9nsjqlp")))
+       #:hash (base32 "08hfi4cdcaxbv7hrvnw635g3vrxkciy0x6bjfdflszslwln16c8z")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
