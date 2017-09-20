@@ -1016,15 +1016,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0jyyzipmvkya6gn0xmix8186di4jl1a68mr2244slz3ap7z2847x")))
+    (hash (base32 "1jw8f05z8v2v0h1gxrkarw8v2hs57bsb66x5pxd31603l493fjci")))
    (package
      (name "service-manual-publisher")
-     (version "release_305")
+     (version "release_306")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0dda2jsrbzm9asg9vwjjxwnzw101jlaq6xgw29ffp7a8lksp9rid")))
+       #:hash (base32 "0r4q4779mlbhx12k599jxg0cjib5n3hkpm13kkbm9a3s91q7sfwx")))
      (build-system rails-build-system)
      (inputs
       `(;; Loading the database structure uses psql
