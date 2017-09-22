@@ -7,10 +7,10 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages linux))
 
-(define-public elasticsearch-1.7.2
+(define-public elasticsearch-2.4.6
   (package
    (name "elasticsearch")
-   (version "1.7.2")
+   (version "2.4.6")
    (source
     (origin
      (method url-fetch)
@@ -18,13 +18,14 @@
            "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-"
            version ".tar.gz"))
      (sha256
-      (base32 "1lix4asvx1lbc227gzsrws3xqbcbqaal7v10w60kch0c4xg970bg"))))
+      (base32 "0vzw9kpyyyv3f1m5sy9zara6shc7xkgi5xm5qbzvfywijavlnzjz"))))
    (build-system gnu-build-system)
    (inputs
     `(("jre" ,icedtea)
       ("coreutils" ,coreutils)
       ("inetutils" ,inetutils)
-      ("util-linux" ,util-linux)))
+      ("util-linux" ,util-linux)
+      ("grep" ,grep)))
    (arguments
     `(#:phases
       (modify-phases %standard-phases
@@ -38,7 +39,11 @@
                (lambda (dir)
                  (copy-recursively dir (string-append out "/" dir)
                                    #:log (%make-void-port "w")))
-               '("bin" "config" "lib"))
+               '("bin" "config" "lib" "modules"))
+              (for-each
+               (lambda (dir)
+                 (mkdir (string-append out "/" dir)))
+               '("plugins"))
               (for-each
                delete-file
                (find-files
@@ -48,15 +53,13 @@
                       (string-contains name "solaris")))))
               (wrap-program
                   (string-append out "/bin/elasticsearch")
-                `("ES_CLASSPATH" = (,(string-append
-                                      out "/lib/elasticsearch-1.7.2.jar")
-                                    ,(string-append out "/lib/*")
-                                    ,(string-append out "/lib/sigar/*")))
                 `("PATH" = (,(string-append (assoc-ref inputs "util-linux")
                                             "/bin")
                             ,(string-append (assoc-ref inputs "coreutils")
                                             "/bin")
                             ,(string-append (assoc-ref inputs "inetutils")
+                                            "/bin")
+                            ,(string-append (assoc-ref inputs "grep")
                                             "/bin")))
                 `("JAVA_HOME" = (,(assoc-ref inputs "jre"))))
               #t))))))
@@ -65,4 +68,4 @@
    (description "")
    (license "")))
 
-(define-public elasticsearch elasticsearch-1.7.2)
+(define-public elasticsearch elasticsearch-2.4.6)

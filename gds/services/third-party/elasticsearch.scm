@@ -24,16 +24,24 @@
   (http-port         elasticsearch-congiguration-port
                      (default 9200))
   (transport-port    elasticsearch-configuration-transport-port
-                     (default 9300))
-  (elasticsearch.yml elasticsearch-configuration-elasticsearch.yml
-                     (default #f)))
+                     (default 9300)))
 
-(define (elasticsearch.yml data-path logs-path http-port transport-port)
-  (mixed-text-file "elasticsearch.yml"
-                   "path.data: " data-path "\n"
-                   "path.logs: " logs-path "\n"
-                   "http.port: " (number->string http-port) "\n"
-                   "transport.tcp.port: " (number->string transport-port) "\n"))
+(define (elasticsearch-configuration-directory
+         data-path logs-path http-port transport-port)
+  (computed-file
+   "elasticsearch-config"
+   #~(begin
+       (mkdir #$output)
+       (mkdir (string-append #$output "/scripts"))
+       (call-with-output-file (string-append #$output "/elasticsearch.yml")
+         (lambda (port)
+           (display
+            (string-append
+             "path.data: " #$data-path "\n"
+             "path.logs: " #$logs-path "\n"
+             "http.port: " #$(number->string http-port) "\n"
+             "transport.tcp.port: " #$(number->string transport-port) "\n")
+            port))))))
 
 (define %elasticsearch-accounts
   (list (user-group (name "elasticsearch") (system? #t))
@@ -48,7 +56,7 @@
 (define elasticsearch-activation
   (match-lambda
     (($ <elasticsearch-configuration> elasticsearch data-path logs-path
-                                      http-port transport-port file)
+                                      http-port transport-port)
      #~(begin
          (use-modules (guix build utils)
                       (ice-9 match))
@@ -64,24 +72,23 @@
 (define elasticsearch-shepherd-service
   (match-lambda
     (($ <elasticsearch-configuration> elasticsearch data-path logs-path
-                                      http-port transport-port file)
-     (let ((elasticsearch.yml
-            (or file
-                (elasticsearch.yml
-                 data-path logs-path http-port transport-port))))
-       (list (shepherd-service
-              (provision '(elasticsearch))
-              (documentation "Run the Elasticsearch daemon.")
-              (requirement '(user-processes syslogd))
-              (start #~(make-forkexec-constructor
-                        (list
-                         (string-append #$elasticsearch "/bin/elasticsearch")
-                         "-d"
-                         "-p" "/var/run/elasticsearch/pid"
-                         (string-append "-Des.config=" #$elasticsearch.yml))
-                        #:user "elasticsearch"
-                        #:pid-file "/var/run/elasticsearch/pid"))
-              (stop #~(make-kill-destructor))))))))
+                                      http-port transport-port)
+     (list (shepherd-service
+            (provision '(elasticsearch))
+            (documentation "Run the Elasticsearch daemon.")
+            (requirement '(user-processes syslogd))
+            (start #~(make-forkexec-constructor
+                      (list
+                       (string-append #$elasticsearch "/bin/elasticsearch")
+                       "-d"
+                       "-p" "/var/run/elasticsearch/pid"
+                       (string-append
+                        "-Dpath.conf="
+                        #$(elasticsearch-configuration-directory
+                           data-path logs-path http-port transport-port)))
+                      #:user "elasticsearch"
+                      #:pid-file "/var/run/elasticsearch/pid"))
+            (stop #~(make-kill-destructor)))))))
 
 (define elasticsearch-service-type
   (service-type (name 'elasticsearch)
