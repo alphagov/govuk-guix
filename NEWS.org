@@ -2,6 +2,18 @@
 #+STARTUP: content hidestars
 
 * 2017
+** September
+*** Update Guix release_9 -> release_10 -> release_11
+*** Content Tagger improvements
+**** Add "GDS Editor" and "Tagathon Participant" permissions
+**** Run Sidekiq with Content Tagger
+*** Router improvements
+**** Enable specifying the header timeout for the router
+*** Bundler/Gem package improvements
+**** Remove the .ruby-version files, as this causes reproducibility issues
+*** Data management improvements
+**** Refactor the govuk-puppet data source
+**** Add functionality to generate data directories with indexes
 ** August
 *** Update Guix release_8 -> release_9
 *** Improve support for Whitehall attachments
