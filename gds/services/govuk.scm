@@ -1610,7 +1610,7 @@
 
 (define-public rummager-service-type
   ;; TODO: Rummager doesn't use Rails
-  (make-rails-app-using-plek-service-type 'rummager))
+  (make-rails-app-using-plek-and-signon-service-type 'rummager))
 
 (define-public rummager-service
   (service
@@ -1625,6 +1625,14 @@
              . ,#~(lambda ()
                     (setenv "RUMMAGER_INDEX" "all")
                     (run-command "bundle" "exec" "rake" "rummager:migrate_index")))))
+         (signon-api-user
+          (name "Rummager")
+          (email "rummager@dev.gov.uk")
+          (authorisation-permissions
+           (list (cons
+                  (signon-authorisation
+                   (application-name "Publishing API"))
+                  '("signin")))))
          (redis-connection-config)
          (plek-config)
          (rails-app-config) ;; TODO: Rummager doesn't use Rails
