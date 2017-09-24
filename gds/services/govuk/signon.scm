@@ -53,7 +53,11 @@
             signon-config
             signon-config?
             signon-config-applications
-            signon-config-users))
+            signon-config-users
+            signon-config-devise-pepper
+            signon-config-devise-secret-key
+
+            signon-config-with-random-secrets))
 
 (define-record-type* <signon-application>
   signon-application make-signon-application
@@ -347,12 +351,22 @@ end")
 (define-record-type* <signon-config>
   signon-config make-signon-config
   signon-config?
-  (applications signon-config-applications
-                (default '()))
-  (users        signon-config-users
-                (default '()))
-  (api-users    signon-config-api-users
-                (default '())))
+  (applications      signon-config-applications
+                     (default '()))
+  (users             signon-config-users
+                     (default '()))
+  (api-users         signon-config-api-users
+                     (default '()))
+  (devise-pepper     signon-config-devise-pepper
+                     (default #f))
+  (devise-secret-key signon-config-devise-secret-key
+                     (default #f)))
+
+(define (signon-config-with-random-secrets config)
+  (signon-config
+   (inherit config)
+   (devise-pepper     (random-base16-string 30))
+   (devise-secret-key (random-base16-string 30))))
 
 (define-public signon-service-type
   (service-type
@@ -365,7 +379,16 @@ end")
           (lambda (parameter)
             (if (service-startup-config? parameter)
                 (service-startup-config-add-pre-startup-scripts
-                 parameter
+                 (service-startup-config-with-additional-environment-variables
+                  parameter
+                  (let ((pepper (signon-config-devise-pepper config))
+                        (secret-key (signon-config-devise-secret-key config)))
+                    `(,@(if pepper
+                            `(("DEVISE_PEPPER" . ,pepper))
+                            '())
+                      ,@(if secret-key
+                            `(("DEVISE_SECRET_KEY" . ,secret-key))
+                            '()))))
                  `((signon-setup-applications
                     .
                     ,#~(lambda ()
