@@ -84,7 +84,8 @@
 (define (list-available-extracts . args)
   (let-values
       (((services data-extracts)
-        (arguments->services-and-data-extracts args)))
+        (options->services-and-data-extracts
+         (parse-command-line args options '(())))))
     (for-each
      (match-lambda
       ((service-type . data-extracts)
@@ -114,9 +115,8 @@
                                 (symbol->string
                                  (service-type-name service-type2)))))))))
 
-(define (arguments->services-and-data-extracts args)
-  (let* ((opts (parse-command-line args options '(())))
-         (service-names
+(define (options->services-and-data-extracts opts)
+  (let* ((service-names
           (filter-map (match-lambda
                        (('argument . a) a)
                        (_ #f))
@@ -255,14 +255,15 @@
    extracts-and-database-connection-configs))
 
 (define (load . args)
-  (let-values
-      (((services data-extracts)
-        (arguments->services-and-data-extracts args)))
-    (let ((extracts-and-database-connection-configs
-           (get-extracts-and-database-connection-configs services
-                                                         data-extracts)))
-      (show-selected-extracts extracts-and-database-connection-configs)
-      (load-selected-extracts))))
+  (let ((options (parse-command-line args options '(()))))
+    (let-values
+        (((services data-extracts)
+          (options->services-and-data-extracts options)))
+      (let ((extracts-and-database-connection-configs
+             (get-extracts-and-database-connection-configs services
+                                                           data-extracts)))
+        (show-selected-extracts extracts-and-database-connection-configs)
+        (load-selected-extracts)))))
 
 (define (govuk-data . args)
   (define commands
