@@ -21,7 +21,9 @@
     (package
       (inherit gnu:guix)
       (name "guix-gds")
-      (version "release_12")
+      (version (if local-source
+                   "local"
+                   "release_12"))
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ;; Run the tests if using a tagged release, but not when
