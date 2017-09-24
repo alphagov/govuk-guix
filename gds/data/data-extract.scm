@@ -11,6 +11,7 @@
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services utils databases mysql)
+  #:use-module (gds services utils databases elasticsearch)
   #:export (<data-extract>
             data-extract
             data-extract?
@@ -95,7 +96,17 @@
             ("mysql"
              (mysql-run-file-gexp
               database-connection-config
-              (data-extract-file extract)))))
+              (data-extract-file extract)))
+            ("elasticsearch"
+             (elasticsearch-restore-gexp
+              database-connection-config
+              (simple-format
+               #f "govuk-~A"
+               (date->string (data-extract-date extract) "~d/~m/~Y"))
+              (data-extract-file extract)
+              #:alias "govuk"
+              #:overrides "{\"settings\":{\"index\":{\"number_of_replicas\":\"0\",\"number_of_shards\":\"1\"}}}"
+              #:batch-size 250))))
          (script
           (with-store store
             (run-with-store store

@@ -65,6 +65,12 @@
       (,draft-router-service-type ,draft-router-api-service-type))
      ("router" . (,router-service-type ,router-api-service-type)))))
 
+(define elasticsearch-indexes
+  `(("api-elasticsearch-1.api.integration"
+     ("govuk" . (,rummager-service-type)))
+    ("rummager-elasticsearch-1.api.integration"
+     ("govuk" . (,rummager-service-type)))))
+
 (define (backups-directory)
   (or (and=> (getenv "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY")
              (lambda (directory)
@@ -104,16 +110,18 @@
      (map (cut apply process-database-dir date <>) children)))
 
   (define (process-database-dir date database stat . children)
-    (concatenate
-     (map (cut apply process-hostname-dir date database <>) children)))
+    (append-map
+     (if (equal? database "elasticsearch")
+         (cut apply process-elasticsearch-hostname-dir date <>)
+         (cut apply process-single-file-hostname-dir date database <>))
+     children))
 
-  (define (process-hostname-dir date database hostname stat . children)
+  (define (process-single-file-hostname-dir date database hostname stat . children)
     (let* ((get-extract-local-file
             (assoc-ref
              `(("postgresql" . ,postgresql-extract-local-file)
                ("mysql" . ,mysql-extract-local-file)
-               ("mongo" . ,mongo-extract-local-file)
-               ("elasticsearch" . #f))
+               ("mongo" . ,mongo-extract-local-file))
              database))
            (local-file
             (if get-extract-local-file
@@ -123,6 +131,20 @@
           (list
            (govuk-puppet-source-file date database hostname local-file))
           '())))
+
+  (define (process-elasticsearch-hostname-dir date hostname stat . children)
+    (filter-map
+     (match-lambda
+       ((name stat . children)
+        (if (string-suffix? ".zip" name)
+            (govuk-puppet-source-file
+             date "elasticsearch" hostname
+             (local-file
+              (string-join
+               (list backup-directory date "elasticsearch" hostname name)
+               "/")))
+            #f)))
+     children))
 
   (define (generic-latest.tbz2-local-file date database hostname)
     (let ((path
@@ -192,7 +214,7 @@
             (assoc-ref `(("postgresql" . ,postgresql-extracts)
                          ("mysql" . ,mysql-extracts)
                          ("mongo" . ,mongodb-extracts)
-                         ("elasticsearch" #f))
+                         ("elasticsearch" . ,elasticsearch-indexes))
                        database)
             (begin
               (simple-format #t "Warning, unknown database ~A\n" database)
@@ -208,19 +230,34 @@
                                      "/"))
                      '()))
                '())))
-       (filter-map
-        (lambda (extract-name)
-          (let ((get-extract-file
-                 (assoc-ref `(("postgresql" . ,postgresql-extract-file)
-                              ("mysql" . ,mysql-extract-file)
-                              ("mongo" . ,mongo-extract-file))
-                            database)))
-            (data-extract
-             (file (get-extract-file local-file extract-name))
-             (datetime (string->date date "~Y-~m-~d"))
-             (database database)
-             (services (assoc-ref extract-name->services extract-name)))))
-        (map car extract-name->services))))))
+       (if (equal? database "elasticsearch")
+           (let* ((file
+                   (govuk-puppet-source-file-file source-file))
+                  (index-name
+                   (basename (local-file-name file) ".zip"))
+                  (services
+                   (assoc-ref extract-name->services index-name)))
+             (if services
+                 (list
+                  (data-extract
+                   (file file)
+                   (datetime (string->date date "~Y-~m-~d"))
+                   (database database)
+                   (services services)))
+                 '()))
+           (filter-map
+            (lambda (extract-name)
+              (let ((get-extract-file
+                     (assoc-ref `(("postgresql" . ,postgresql-extract-file)
+                                  ("mysql" . ,mysql-extract-file)
+                                  ("mongo" . ,mongo-extract-file))
+                                database)))
+                (data-extract
+                 (file (get-extract-file local-file extract-name))
+                 (datetime (string->date date "~Y-~m-~d"))
+                 (database database)
+                 (services (assoc-ref extract-name->services extract-name)))))
+            (map car extract-name->services)))))))
 
 ;;;
 ;;; govuk-puppet source data directory with index
