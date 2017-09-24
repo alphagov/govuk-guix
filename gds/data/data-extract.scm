@@ -79,7 +79,8 @@
                  (time<? (date->time-utc (data-extract-datetime a))
                          (date->time-utc (data-extract-datetime b))))))
 
-(define (load-extract extract database-connection-config)
+(define* (load-extract extract database-connection-config
+                       #:key dry-run?)
   (let* ((load-gexp
           (match extract
             (($ <data-extract> file datetime "postgresql" services)
@@ -88,15 +89,18 @@
                (inherit database-connection-config)
                (user "postgres")
                (database "postgres"))
-              file))
+              file
+              #:dry-run? dry-run?))
             (($ <data-extract> file datetime "mongodb" services)
              (mongodb-restore-gexp
               database-connection-config
-              file))
+              file
+              #:dry-run? dry-run?))
             (($ <data-extract> file datetime "mysql" services)
              (mysql-run-file-gexp
               database-connection-config
-              file))
+              file
+              #:dry-run? dry-run?))
             (($ <data-extract> file datetime "elasticsearch" services)
              (elasticsearch-restore-gexp
               database-connection-config
@@ -106,7 +110,8 @@
               file
               #:alias "govuk"
               #:overrides "{\"settings\":{\"index\":{\"number_of_replicas\":\"0\",\"number_of_shards\":\"1\"}}}"
-              #:batch-size 250))))
+              #:batch-size 250
+              #:dry-run? dry-run?))))
          (script
           (with-store store
             (run-with-store store

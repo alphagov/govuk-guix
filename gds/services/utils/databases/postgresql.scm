@@ -114,7 +114,8 @@ $body$;
       (simple-format port "
 CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
 
-(define (postgresql-import-gexp database-connection file)
+(define* (postgresql-import-gexp database-connection file
+                                 #:key dry-run?)
   (match database-connection
     (($ <postgresql-connection-config> host user port database)
      #~(lambda _
@@ -135,8 +136,11 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   "--no-psqlrc"
                   "--quiet")
                 " ")))
-           (simple-format #t "Running command: ~A\n" command)
-           (zero? (system command)))))))
+           #$@(if dry-run?
+                  '((simple-format #t "Would run command: ~A\n"
+                                   command))
+                  '((simple-format #t "Running command: ~A\n" command)
+                    (zero? (system command)))))))))
 
 (define (postgresql-create-user-for-database-connection
          database-connection)

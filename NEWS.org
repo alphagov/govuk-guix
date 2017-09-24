@@ -15,6 +15,7 @@
 **** Refactor the govuk-puppet data source
 **** Add functionality to generate data directories with indexes
 **** Add initial support for Elasticsearch
+**** Add a --dry-run option to govuk-data
 ** August
 *** Update Guix release_8 -> release_9
 *** Improve support for Whitehall attachments

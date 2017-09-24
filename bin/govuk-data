@@ -79,7 +79,10 @@
                 (lambda (opt name arg result)
                   (alist-cons 'after
                               (parse-date arg)
-                              result)))))
+                              result)))
+        (option '("dry-run") #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'dry-run? #t result)))))
 
 (define (list-available-extracts . args)
   (let-values
@@ -233,8 +236,9 @@
    extracts-and-database-connection-configs)
   (display "\n"))
 
-(define (load-selected-extracts
-         extracts-and-database-connection-configs)
+(define* (load-selected-extracts
+          extracts-and-database-connection-configs
+          #:key dry-run?)
   (map
    (match-lambda
      ((data-extract . database-connection-configs)
@@ -250,7 +254,8 @@
                (else (database-connection-config->database-name
                       database-connection-config))))))
          (display "\n")
-         (load-extract data-extract database-connection-config))
+         (load-extract data-extract database-connection-config
+                       #:dry-run? dry-run?))
        database-connection-configs)))
    extracts-and-database-connection-configs))
 
@@ -263,7 +268,8 @@
              (get-extracts-and-database-connection-configs services
                                                            data-extracts)))
         (show-selected-extracts extracts-and-database-connection-configs)
-        (load-selected-extracts)))))
+        (load-selected-extracts extracts-and-database-connection-configs
+                                #:dry-run? (assq-ref options 'dry-run?))))))
 
 (define (govuk-data . args)
   (define commands

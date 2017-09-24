@@ -53,7 +53,8 @@
                 (status:exit-val
                  (close-pipe p))))))))))
 
-(define (mysql-run-file-gexp database-connection file)
+(define* (mysql-run-file-gexp database-connection file
+                              #:key dry-run?)
   (match database-connection
     (($ <mysql-connection-config> host user port database)
      (with-imported-modules '((ice-9 popen))
@@ -71,9 +72,13 @@
                            "--protocol=tcp"
                            "--password=''"
                            "-P" ,(number->string #$port))))
-             (simple-format #t "Running command: ~A\n\n" (string-join command))
-             (zero?
-              (system (string-join command)))))))))
+             #$@(if dry-run?
+                    '((simple-format #t "Would run command: ~A\n\n"
+                                     (string-join command)))
+                    '((simple-format #t "Running command: ~A\n\n"
+                                     (string-join command))
+                      (zero?
+                       (system (string-join command)))))))))))
 
 (define (mysql-list-databases-gexp database-connection)
   (match database-connection

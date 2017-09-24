@@ -113,7 +113,8 @@ if (db.getUser(username) === null) {
                 (status:exit-val
                  (close-pipe p))))))))))
 
-(define (mongodb-restore-gexp database-connection file)
+(define* (mongodb-restore-gexp database-connection file
+                               #:key dry-run?)
   (match database-connection
     (($ <mongodb-connection-config> user password host port database)
      #~(lambda ()
@@ -125,6 +126,10 @@ if (db.getUser(username) === null) {
                   "-d" #$database
                   "--drop" ;; TODO: Make this optional
                   #$file)))
-           (simple-format #t "Running command: ~A\n" (string-join command " "))
-           (zero?
-            (apply system* command)))))))
+           #$@(if dry-run?
+                  '((simple-format
+                     #t "Would run command: ~A\n"
+                     (string-join command " ")))
+                  '((simple-format #t "Running command: ~A\n" (string-join command " "))
+                    (zero?
+                     (apply system* command)))))))))

@@ -21,7 +21,8 @@
         (default 5432)))
 
 (define* (elasticsearch-restore-gexp database-connection index-name file
-                                     #:key alias overrides batch-size)
+                                     #:key alias overrides batch-size
+                                     dry-run?)
   (match database-connection
     (($ <elasticsearch-connection-config> host port)
      #~(lambda ()
@@ -35,6 +36,9 @@
                  #$file
                  #$@(if overrides (list overrides) '())
                  #$@(if batch-size (list (number->string batch-size)) '()))))
-           (simple-format #t "Running command: ~A\n" (string-join command " "))
-           (zero?
-            (apply system* command)))))))
+           #$@(if dry-run?
+                  '((simple-format #t "Would run command: ~A\n"
+                                   (string-join command " ")))
+                  '((simple-format #t "Running command: ~A\n" (string-join command " "))
+                    (zero?
+                     (apply system* command)))))))))
