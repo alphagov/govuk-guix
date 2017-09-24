@@ -950,11 +950,7 @@
   (program-file
    (string-append "start-publishing-e2e-tests")
    (with-imported-modules '((guix build utils)
-                            (gnu services herd)
-                            (srfi srfi-26)
-                            (ice-9 popen)
-                            (ice-9 rw)
-                            (ice-9 rdelim))
+                            (gnu services herd))
     #~(let ((bundle (string-append #$package "/bin/bundle")))
         (use-modules (guix build utils)
                      (gnu services herd)

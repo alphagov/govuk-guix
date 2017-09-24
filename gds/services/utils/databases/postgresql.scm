@@ -34,63 +34,59 @@
 (define (run-with-psql-port database-connection operations)
   (match database-connection
     (($ <postgresql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (use-modules (ice-9 popen))
-           (let
-               ((psql (string-append #$postgresql "/bin/psql")))
-             (let ((p (open-pipe*
-                       OPEN_WRITE psql
-                       (string-append "--user=" #$user)
-                       "-a"
-                       "--no-psqlrc"
-                       "-p" (number->string #$port))))
-               (for-each
-                (lambda (o) (o p))
-                (list #$@operations))
-               (close-pipe p)
-               #t)))))))
+     #~(lambda ()
+         (use-modules (ice-9 popen))
+         (let
+             ((psql (string-append #$postgresql "/bin/psql")))
+           (let ((p (open-pipe*
+                     OPEN_WRITE psql
+                     (string-append "--user=" #$user)
+                     "-a"
+                     "--no-psqlrc"
+                     "-p" (number->string #$port))))
+             (for-each
+              (lambda (o) (o p))
+              (list #$@operations))
+             (close-pipe p)
+             #t))))))
 
 (define (postgresql-list-databases-gexp database-connection)
   (match database-connection
     (($ <postgresql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen)
-                              (ice-9 rdelim)
-                              (srfi srfi-1))
-       #~(lambda ()
-           (use-modules (ice-9 popen)
-                        (ice-9 rdelim)
-                        (srfi srfi-1))
-           (let* ((command `(,(string-append #$postgresql "/bin/psql")
-                             ,(string-append "--user=" #$user)
-                             "-p" ,(number->string #$port)
-                             "--no-psqlrc"
-                             "-lqt"))
-                  (p (apply open-pipe* OPEN_READ command))
-                  (lines (let loop ((lines '())
-                                    (line (read-line p)))
-                           (if (eof-object? line)
-                               (reverse lines)
-                               (loop (cons line lines)
-                                     (read-line p))))))
-             (and (let ((status (close-pipe p)))
-                    (if (zero? status)
-                        #t
-                        (begin
-                          (simple-format #t
-                                         "command: ~A\n"
-                                         (string-join command))
-                          (error "listing databases failed, status ~A\n"
-                                 status))))
-                  (filter-map
-                   (lambda (line)
-                     (let ((name
-                            (string-trim-both
-                             (first (string-split line #\|)))))
-                       (if (eq? (string-length name) 0)
-                           #f
-                           name)))
-                   lines))))))))
+     #~(lambda ()
+         (use-modules (ice-9 popen)
+                      (ice-9 rdelim)
+                      (srfi srfi-1))
+         (let* ((command `(,(string-append #$postgresql "/bin/psql")
+                           ,(string-append "--user=" #$user)
+                           "-p" ,(number->string #$port)
+                           "--no-psqlrc"
+                           "-lqt"))
+                (p (apply open-pipe* OPEN_READ command))
+                (lines (let loop ((lines '())
+                                  (line (read-line p)))
+                         (if (eof-object? line)
+                             (reverse lines)
+                             (loop (cons line lines)
+                                   (read-line p))))))
+           (and (let ((status (close-pipe p)))
+                  (if (zero? status)
+                      #t
+                      (begin
+                        (simple-format #t
+                                       "command: ~A\n"
+                                       (string-join command))
+                        (error "listing databases failed, status ~A\n"
+                               status))))
+                (filter-map
+                 (lambda (line)
+                   (let ((name
+                          (string-trim-both
+                           (first (string-split line #\|)))))
+                     (if (eq? (string-length name) 0)
+                         #f
+                         name)))
+                 lines)))))))
 
 (define (postgresql-ensure-user-exists-gexp user)
   #~(lambda (port)

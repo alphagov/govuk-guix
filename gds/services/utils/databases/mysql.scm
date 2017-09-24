@@ -36,87 +36,83 @@
 (define (run-with-mysql-port database-connection operations)
   (match database-connection
     (($ <mysql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (let
-               ((command `(,(string-append #$mariadb "/bin/mysql")
-                           "-h" #$host
-                           "-u" "root"
-                           "--password="
-                           "-P" ,(number->string #$port))))
-             (simple-format #t "Connecting to mysql... (~A)\n" (string-join command))
-             (let ((p (apply open-pipe* OPEN_WRITE command)))
-               (for-each
-                (lambda (o) (o p))
-                (list #$@operations))
-               (zero?
-                (status:exit-val
-                 (close-pipe p))))))))))
+     #~(lambda ()
+         (let
+             ((command `(,(string-append #$mariadb "/bin/mysql")
+                         "-h" #$host
+                         "-u" "root"
+                         "--password="
+                         "-P" ,(number->string #$port))))
+           (simple-format #t "Connecting to mysql... (~A)\n" (string-join command))
+           (let ((p (apply open-pipe* OPEN_WRITE command)))
+             (for-each
+              (lambda (o) (o p))
+              (list #$@operations))
+             (zero?
+              (status:exit-val
+               (close-pipe p)))))))))
 
 (define* (mysql-run-file-gexp database-connection file
                               #:key dry-run?)
   (match database-connection
     (($ <mysql-connection-config> host user port database)
-     (with-imported-modules '((ice-9 popen))
-       #~(lambda ()
-           (let
-               ((command `(,(string-append #$pv "/bin/pv")
-                           ,#$file
-                           "|"
-                           ,(string-append #$pbzip2 "/bin/pbzip2")
-                           "-d"
-                           "|"
-                           ,(string-append #$mariadb "/bin/mysql")
-                           "-h" #$host
-                           "-u" "root"
-                           "--protocol=tcp"
-                           "--password=''"
-                           "-P" ,(number->string #$port))))
-             #$@(if dry-run?
-                    '((simple-format #t "Would run command: ~A\n\n"
-                                     (string-join command)))
-                    '((simple-format #t "Running command: ~A\n\n"
-                                     (string-join command))
-                      (zero?
-                       (system (string-join command)))))))))))
+     #~(lambda ()
+         (let
+             ((command `(,(string-append #$pv "/bin/pv")
+                         ,#$file
+                         "|"
+                         ,(string-append #$pbzip2 "/bin/pbzip2")
+                         "-d"
+                         "|"
+                         ,(string-append #$mariadb "/bin/mysql")
+                         "-h" #$host
+                         "-u" "root"
+                         "--protocol=tcp"
+                         "--password=''"
+                         "-P" ,(number->string #$port))))
+           #$@(if dry-run?
+                  '((simple-format #t "Would run command: ~A\n\n"
+                                   (string-join command)))
+                  '((simple-format #t "Running command: ~A\n\n"
+                                   (string-join command))
+                    (zero?
+                     (system (string-join command))))))))))
 
 (define (mysql-list-databases-gexp database-connection)
   (match database-connection
     (($ <mysql-connection-config> host user port database password)
-     (with-imported-modules '((ice-9 popen)
-                              (ice-9 rdelim))
-       #~(lambda ()
-           (use-modules (ice-9 popen)
-                        (ice-9 rdelim))
-           (let* ((command `(,(string-append #$mariadb "/bin/mysql")
-                             "-h" #$host
-                             "-u" #$user
-                             "--protocol=tcp"
-                             ,(string-append "--password=" #$password "")
-                             "-P" ,(number->string #$port)
-                             "--batch"  ;; tab seperated output
-                             "--skip-column-names"
-                             "--execute=SHOW DATABASES;"))
-                  (p (apply open-pipe* OPEN_READ command))
-                  (lines (let loop ((lines '())
-                                    (line (read-line p)))
-                           (if (eof-object? line)
-                               (reverse lines)
-                               (loop (cons line lines)
-                                     (read-line p))))))
-             (and (let ((status (close-pipe p)))
-                    (if (zero? status)
-                        #t
-                        (begin
-                          (simple-format #t
-                                         "command: ~A\n"
-                                         (string-join command))
-                          (error "listing databases failed, status ~A\n"
-                                 status))))
-                  (map (lambda (line)
-                         (string-trim-both
-                          (car (string-split line #\tab))))
-                       lines))))))))
+     #~(lambda ()
+         (use-modules (ice-9 popen)
+                      (ice-9 rdelim))
+         (let* ((command `(,(string-append #$mariadb "/bin/mysql")
+                           "-h" #$host
+                           "-u" #$user
+                           "--protocol=tcp"
+                           ,(string-append "--password=" #$password "")
+                           "-P" ,(number->string #$port)
+                           "--batch"  ;; tab seperated output
+                           "--skip-column-names"
+                           "--execute=SHOW DATABASES;"))
+                (p (apply open-pipe* OPEN_READ command))
+                (lines (let loop ((lines '())
+                                  (line (read-line p)))
+                         (if (eof-object? line)
+                             (reverse lines)
+                             (loop (cons line lines)
+                                   (read-line p))))))
+           (and (let ((status (close-pipe p)))
+                  (if (zero? status)
+                      #t
+                      (begin
+                        (simple-format #t
+                                       "command: ~A\n"
+                                       (string-join command))
+                        (error "listing databases failed, status ~A\n"
+                               status))))
+                (map (lambda (line)
+                       (string-trim-both
+                        (car (string-split line #\tab))))
+                     lines)))))))
 
 (define (mysql-ensure-user-exists-gexp user password)
   #~(lambda (port)
