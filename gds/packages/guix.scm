@@ -21,7 +21,7 @@
     (package
       (inherit gnu:guix)
       (name "guix-gds")
-      (version "release_11")
+      (version "release_12")
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ;; Run the tests if using a tagged release, but not when
@@ -42,5 +42,5 @@
                    ;; thinks that it has not built this
                    (commit version)))
              (sha256
-              (base32 "1n1ry42zdbwinlk3109zjkbv3cin0wa1banbzhn0ajq13di07spm"))
+              (base32 "02cnm92npgm7fqa0bc37my6c19hkgk0qj1hmbpn9rjbfvr2l1gvc"))
              (file-name (string-append "guix-" version "-checkout"))))))))
