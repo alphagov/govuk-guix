@@ -81,29 +81,29 @@
 
 (define (load-extract extract database-connection-config)
   (let* ((load-gexp
-          (match (data-extract-database extract)
-            ("postgresql"
+          (match extract
+            (($ <data-extract> file datetime "postgresql" services)
              (postgresql-import-gexp
               (postgresql-connection-config
                (inherit database-connection-config)
                (user "postgres")
                (database "postgres"))
-              (data-extract-file extract)))
-            ("mongo"
+              file))
+            (($ <data-extract> file datetime "mongodb" services)
              (mongodb-restore-gexp
               database-connection-config
-              (data-extract-file extract)))
-            ("mysql"
+              file))
+            (($ <data-extract> file datetime "mysql" services)
              (mysql-run-file-gexp
               database-connection-config
-              (data-extract-file extract)))
-            ("elasticsearch"
+              file))
+            (($ <data-extract> file datetime "elasticsearch" services)
              (elasticsearch-restore-gexp
               database-connection-config
               (simple-format
                #f "govuk-~A"
-               (date->string (data-extract-date extract) "~d/~m/~Y"))
-              (data-extract-file extract)
+               (date->string datetime "~d/~m/~Y"))
+              file
               #:alias "govuk"
               #:overrides "{\"settings\":{\"index\":{\"number_of_replicas\":\"0\",\"number_of_shards\":\"1\"}}}"
               #:batch-size 250))))
