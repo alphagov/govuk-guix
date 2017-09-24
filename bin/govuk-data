@@ -201,6 +201,59 @@
    '()
    services))
 
+(define (show-selected-extracts extracts-and-database-connection-configs)
+  (display "Extracts selected:\n")
+  (map
+   (match-lambda
+     ((data-extract . database-connection-configs)
+      (for-each
+       (lambda (database-connection-config)
+         (match data-extract
+           (($ <data-extract> file datetime database services)
+            (simple-format
+             #t " - ~A extract from ~A into the ~A database for"
+             database
+             (date->string datetime "~d/~m/~Y")
+             (match database
+               ("elasticsearch" "elasticsearch")
+               (else
+                (database-connection-config->database-name
+                 database-connection-config))))
+            (if (eq? 1 (length services))
+                (simple-format #t " the ~A service\n"
+                               (service-type-name (first services)))
+                (begin
+                  (display ":\n")
+                  (for-each
+                   (lambda (service)
+                     (simple-format #t "   - ~A\n"
+                                    (service-type-name service)))
+                   services))))))
+       database-connection-configs)))
+   extracts-and-database-connection-configs)
+  (display "\n"))
+
+(define (load-selected-extracts
+         extracts-and-database-connection-configs)
+  (map
+   (match-lambda
+     ((data-extract . database-connection-configs)
+      (for-each
+       (lambda (database-connection-config)
+         (match data-extract
+           (($ <data-extract> file datetime database services)
+            (simple-format
+             #t "Importing extract from ~A in to ~A\n"
+             (date->string datetime "~d/~m/~Y")
+             (match database
+               ("elasticsearch" "elasticsearch")
+               (else (database-connection-config->database-name
+                      database-connection-config))))))
+         (display "\n")
+         (load-extract data-extract database-connection-config))
+       database-connection-configs)))
+   extracts-and-database-connection-configs))
+
 (define (load . args)
   (let-values
       (((services data-extracts)
@@ -208,56 +261,8 @@
     (let ((extracts-and-database-connection-configs
            (get-extracts-and-database-connection-configs services
                                                          data-extracts)))
-
-      (display "Extracts selected:\n")
-      (map
-       (match-lambda
-         ((data-extract . database-connection-configs)
-          (for-each
-           (lambda (database-connection-config)
-             (match data-extract
-               (($ <data-extract> file datetime database services)
-                (simple-format
-                 #t " - ~A extract from ~A into the ~A database for"
-                 database
-                 (date->string datetime "~d/~m/~Y")
-                 (match database
-                   ("elasticsearch" "elasticsearch")
-                   (else
-                    (database-connection-config->database-name
-                     database-connection-config))))
-                (if (eq? 1 (length services))
-                    (simple-format #t " the ~A service\n"
-                                   (service-type-name (first services)))
-                    (begin
-                      (display ":\n")
-                      (for-each
-                       (lambda (service)
-                         (simple-format #t "   - ~A\n"
-                                        (service-type-name service)))
-                       services))))))
-           database-connection-configs)))
-       extracts-and-database-connection-configs)
-      (display "\n")
-
-      (map
-       (match-lambda
-         ((data-extract . database-connection-configs)
-          (for-each
-           (lambda (database-connection-config)
-             (match data-extract
-               (($ <data-extract> file datetime database services)
-                (simple-format
-                 #t "Importing extract from ~A in to ~A\n"
-                 (date->string datetime "~d/~m/~Y")
-                 (match database
-                   ("elasticsearch" "elasticsearch")
-                   (else (database-connection-config->database-name
-                          database-connection-config))))))
-             (display "\n")
-             (load-extract data-extract database-connection-config))
-           database-connection-configs)))
-       extracts-and-database-connection-configs))))
+      (show-selected-extracts extracts-and-database-connection-configs)
+      (load-selected-extracts))))
 
 (define (govuk-data . args)
   (define commands
