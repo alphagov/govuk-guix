@@ -87,7 +87,8 @@
                         #$(elasticsearch-configuration-directory
                            data-path logs-path http-port transport-port)))
                       #:user "elasticsearch"
-                      #:pid-file "/var/run/elasticsearch/pid"))
+                      #:pid-file "/var/run/elasticsearch/pid"
+                      #:log-file "/var/log/elasticsearch.log"))
             (stop #~(make-kill-destructor)))))))
 
 (define elasticsearch-service-type
