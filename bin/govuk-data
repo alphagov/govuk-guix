@@ -55,11 +55,9 @@
   (list govuk-puppet-data-source))
 
 (define (all-extracts)
-  (concatenate
-   (filter-map
-    (match-lambda (($ <data-source> list-extracts)
-                   (list-extracts)))
-    data-sources)))
+  (append-map
+   (lambda (list-extracts-thunk) (list-extracts-thunk))
+   (map data-source-list-extracts data-sources)))
 
 (define (parse-date str)
   (string->date str "~d/~m/~Y"))
