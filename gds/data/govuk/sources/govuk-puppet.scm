@@ -5,9 +5,13 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
+  #:use-module (web uri)
+  #:use-module (json)
   #:use-module (guix gexp)
   #:use-module (guix hash)
   #:use-module (guix base32)
+  #:use-module (guix download)
+  #:use-module (guix packages)
   #:use-module (gnu packages guile)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
@@ -360,6 +364,31 @@
                  #:pretty #t)
                 port))))))))
 
+(define (data-directory-index->source-files index-file base-url)
+  (let* ((index-data (json->scm index-file))
+         (source-files-data
+          (hash-ref index-data "source-files")))
+    (map (lambda (source-file-data)
+           (govuk-puppet-source-file
+            (string->date (hash-ref source-file-data "date") "~Y-~m-~d")
+            (hash-ref source-file-data "database")
+            (hash-ref source-file-data "hostname")
+            (let* ((uri (string->uri
+                         (string-append
+                          base-url (hash-ref source-file-data "url"))))
+                   (raw-path
+                    (readlink (uri-path uri))))
+              ;; If the uri is using the file scheme, check if the
+              ;; referenced file is actually in the store.
+              (if (string-prefix? "/gnu/store" raw-path)
+                  raw-path
+                  (origin
+                    (method url-fetch)
+                    (uri (uri->string uri))
+                    (sha256 (nix-base32-string->bytevector
+                             (hash-ref source-file-data "hash"))))))))
+         source-files-data)))
+
 ;;;
 ;;; govuk-puppet-data-source
 ;;;
@@ -376,8 +405,14 @@
           (find-source-files (backups-directory))
           filters)))
 
+(define (list-extracts-from-data-directory-index index-file base-url)
+  (append-map
+   source-file->extracts
+   (data-directory-index->source-files index-file base-url)))
+
 (define-public govuk-puppet-data-source
   (data-source
    (name "govuk-puppet")
    (list-extracts list-extracts)
+   (list-extracts-from-data-directory-index list-extracts-from-data-directory-index)
    (data-directory-with-index data-directory-with-index)))
