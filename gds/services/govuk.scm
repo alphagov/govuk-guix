@@ -1615,12 +1615,7 @@
           (inherit default-shepherd-service)
           (provision '(rummager))
           (requirement '(publishing-api elasticsearch)))
-         (service-startup-config-add-pre-startup-scripts
-          (service-startup-config)
-          `((migrate-index
-             . ,#~(lambda ()
-                    (setenv "RUMMAGER_INDEX" "all")
-                    (run-command "bundle" "exec" "rake" "rummager:migrate_index")))))
+         (service-startup-config)
          (signon-api-user
           (name "Rummager")
           (email "rummager@dev.gov.uk")
