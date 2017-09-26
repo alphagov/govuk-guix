@@ -161,8 +161,7 @@
      (else (error "Unrecognised scheme" (uri-scheme uri))))))
 
 (define (list-extracts)
-  (let ((base-url (or (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")
-                      (error "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL must be set to list extracts for a indexed data directory"))))
+  (let ((base-url (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")))
     (define (override-data-source extracts)
       (map (lambda (extract)
              (data-extract
@@ -170,23 +169,28 @@
               (data-source data-directory-with-index-data-source)))
            extracts))
 
-    (append-map
-     (match-lambda
-       (($ <data-source> name list-extracts
-                         list-extracts-from-data-directory-index
-                         data-directory-with-index)
-        (if list-extracts-from-data-directory-index
-            (override-data-source
-             (or (let ((data-source-base-url
-                        (string-append base-url "data-sources/" name "/")))
-                   (with-index-file
-                    (string-append data-source-base-url "index.json")
-                    (cut list-extracts-from-data-directory-index
-                         <>
-                         data-source-base-url)))
-                 '()))
-            '())))
-     (list govuk-puppet-data-source))))
+    (if base-url
+        (append-map
+         (match-lambda
+          (($ <data-source> name list-extracts
+                            list-extracts-from-data-directory-index
+                            data-directory-with-index)
+           (if list-extracts-from-data-directory-index
+               (override-data-source
+                (or (let ((data-source-base-url
+                           (string-append base-url "data-sources/" name "/")))
+                      (with-index-file
+                       (string-append data-source-base-url "index.json")
+                       (cut list-extracts-from-data-directory-index
+                            <>
+                            data-source-base-url)))
+                    '()))
+               '())))
+         (list govuk-puppet-data-source))
+        (begin
+          (simple-format
+           #t "info: not using the data-directory-with-index-data source, as GOVUK_GUIX_DATA_DIRECTORY_BASE_URL is unset\n")
+          '()))))
 
 (define data-directory-with-index-data-source
   (data-source
