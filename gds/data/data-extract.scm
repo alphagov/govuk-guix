@@ -43,7 +43,7 @@
    (lambda (extract)
      (and
       (let ((services (data-extract-services extract)))
-        (if services
+        (if (and services service-types)
             (any (lambda (service-type)
                    (member service-type (data-extract-services extract)))
                  service-types)
@@ -57,7 +57,8 @@
           #t)
       (if after-date
           (time>? (date->time-utc (data-extract-datetime extract))
-                   (date->time-utc after-date)))))
+                  (date->time-utc after-date))
+          #t)))
    extracts))
 
 (define (group-extracts field extracts)
