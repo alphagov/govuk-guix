@@ -370,9 +370,11 @@
      source-file->extracts
      (find-source-files (backups-directory)))))
 
-(define (data-directory-with-index)
+(define* (data-directory-with-index . filters)
   (source-files->data-directory-with-index
-   (find-source-files (backups-directory))))
+   (apply filter-source-files
+          (find-source-files (backups-directory))
+          filters)))
 
 (define-public govuk-puppet-data-source
   (data-source

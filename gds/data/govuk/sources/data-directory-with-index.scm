@@ -134,11 +134,13 @@
                              filters)))
                   data-sources))))))
 
-(define (build-data-directory-with-index)
+(define-public (build-data-directory-with-index . args)
   (with-store store
     (let ((derivation
-           ((lower-object (data-directory-with-index
-                           (list govuk-puppet-data-source)))
+           ((lower-object (apply
+                           data-directory-with-index
+                           (list govuk-puppet-data-source)
+                           args))
             store)))
       (build-derivations store (list derivation))
       (derivation->output-path derivation))))
