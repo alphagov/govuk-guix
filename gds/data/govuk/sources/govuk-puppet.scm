@@ -180,6 +180,28 @@
     (concatenate
      (map (cut apply process-date-dir <>) (cddr tree)))))
 
+(define* (filter-source-files source-files
+                              #:key
+                              databases
+                              hostnames
+                              before-date
+                              after-date)
+  (filter
+   (match-lambda
+     (($ <govuk-puppet-source-file> date database hostname file)
+      (and
+       (or (not databases)
+           (member database databases))
+       (or (not hostnames)
+           (member hostname hostnames))
+       (or (not before-date)
+           (time<? (date->time-utc date)
+                   (date->time-utc before-date)))
+       (or (not after-date)
+           (time>? (date->time-utc date)
+                   (date->time-utc after-date))))))
+   source-files))
+
 ;;;
 ;;; Extract handling
 ;;;
