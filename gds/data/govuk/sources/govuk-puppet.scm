@@ -350,11 +350,11 @@
                     . ,(map (match-lambda*
                              (((date database hostname file hash)
                                destination)
-                              `(((date . ,date)
-                                 (database . ,database)
-                                 (hostname . ,hostname)
-                                 (url . ,destination)
-                                 (hash . ,hash)))))
+                              `((date . ,date)
+                                (database . ,database)
+                                (hostname . ,hostname)
+                                (url . ,destination)
+                                (hash . ,hash))))
                             source-file-details-lists
                             source-file-destinations)))
                  #:pretty #t)
