@@ -105,26 +105,34 @@
 
   (computed-file name build))
 
-(define (data-directory-with-index data-sources)
-  (computed-file
-   "data-directory-with-index"
-   #~(begin
-       (mkdir #$output)
-       (symlink #$(data-extracts->data-directory-with-index
-                   (all-extracts data-sources))
-                (string-append #$output
-                               "/data-extracts"))
+(define* (data-directory-with-index
+          data-sources
+          #:key extract-filters data-source-specific-filters)
+  (let ((data-extracts
+         (apply filter-extracts (all-extracts data-sources) extract-filters)))
 
-       (mkdir (string-append #$output "/data-sources"))
-       (for-each
-        (lambda (source-name directory)
-          (symlink directory
-                   (string-append #$output
-                                  "/data-sources/"
-                                  source-name)))
-        '#$(map data-source-name data-sources)
-        '#$(map (cut apply <> '())
-                (map data-source-data-directory-with-index data-sources))))))
+    (computed-file
+     "data-directory-with-index"
+     #~(begin
+         (mkdir #$output)
+         (symlink #$(data-extracts->data-directory-with-index data-extracts)
+                  (string-append #$output
+                                 "/data-extracts"))
+
+         (mkdir (string-append #$output "/data-sources"))
+         (for-each
+          (lambda (source-name directory)
+            (symlink directory
+                     (string-append #$output
+                                    "/data-sources/"
+                                    source-name)))
+          '#$(map data-source-name data-sources)
+          '#$(map (lambda (data-source)
+                    (let ((filters (assq-ref data-source-specific-filters
+                                             data-source)))
+                      (apply (data-source-data-directory-with-index data-source)
+                             filters)))
+                  data-sources))))))
 
 (define (build-data-directory-with-index)
   (with-store store
