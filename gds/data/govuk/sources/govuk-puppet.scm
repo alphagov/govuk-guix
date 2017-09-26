@@ -129,7 +129,8 @@
                 #f)))
       (if local-file
           (list
-           (govuk-puppet-source-file date database hostname local-file))
+           (govuk-puppet-source-file (string->date date "~Y-~m-~d")
+                                     database hostname local-file))
           '())))
 
   (define (process-elasticsearch-hostname-dir date hostname stat . children)
@@ -138,7 +139,8 @@
        ((name stat . children)
         (if (string-suffix? ".zip" name)
             (govuk-puppet-source-file
-             date "elasticsearch" hostname
+             (string->date date "~Y-~m-~d")
+             "elasticsearch" hostname
              (local-file
               (string-join
                (list backup-directory date "elasticsearch" hostname name)
@@ -226,7 +228,9 @@
                      (simple-format #t "Warning, unknown hostname ~A (~A)\n"
                                     hostname
                                     (string-join
-                                     (list date database hostname)
+                                     (list (date->string date "~Y-~m-~d")
+                                           database
+                                           hostname)
                                      "/"))
                      '()))
                '())))
@@ -241,7 +245,7 @@
                  (list
                   (data-extract
                    (file file)
-                   (datetime (string->date date "~Y-~m-~d"))
+                   (datetime date)
                    (database database)
                    (services services)))
                  '()))
@@ -254,7 +258,7 @@
                                 database)))
                 (data-extract
                  (file (get-extract-file local-file extract-name))
-                 (datetime (string->date date "~Y-~m-~d"))
+                 (datetime date)
                  (database database)
                  (services (assoc-ref extract-name->services extract-name)))))
             (map car extract-name->services)))))))
@@ -272,7 +276,7 @@
       (let ((sha256-hash
              (bytevector->nix-base32-string
               (call-with-input-file (local-file-file file) port-sha256))))
-        (list (date->string "~Y-~m-~d" date)
+        (list (date->string date "~Y-~m-~d")
               database
               hostname
               file
