@@ -145,5 +145,3 @@
       (build-derivations store (list derivation))
       (derivation->output-path derivation))))
 
-;; Useful snippit for testing the above function
-;; (simple-format #t "\n\n~A\n" (build-data-directory-with-index))
