@@ -12,6 +12,7 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases elasticsearch)
+  #:use-module (gds data data-source)
   #:export (<data-extract>
             data-extract
             data-extract?
@@ -79,8 +80,13 @@
 (define (sort-extracts extracts)
   (stable-sort extracts
                (lambda (a b)
-                 (time<? (date->time-utc (data-extract-datetime a))
-                         (date->time-utc (data-extract-datetime b))))))
+                 (let ((utc-time-a (date->time-utc (data-extract-datetime a)))
+                       (utc-time-b (date->time-utc (data-extract-datetime b))))
+                   (if (time=? utc-time-a utc-time-b)
+                       (let ((data-source-a (data-extract-data-source a))
+                             (data-source-b (data-extract-data-source b)))
+                         (> (or (data-source-priority data-source-a) -1)
+                            (or (data-source-priority data-source-b) -1))))))))
 
 (define* (load-extract extract database-connection-config
                        #:key dry-run?)
