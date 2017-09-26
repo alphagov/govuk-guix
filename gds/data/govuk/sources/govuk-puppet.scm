@@ -273,7 +273,8 @@
                    (file file)
                    (datetime date)
                    (database database)
-                   (services services)))
+                   (services services)
+                   (data-source govuk-puppet-data-source)))
                  '()))
            (filter-map
             (lambda (extract-name)
@@ -286,7 +287,8 @@
                  (file (get-extract-file local-file extract-name))
                  (datetime date)
                  (database database)
-                 (services (assoc-ref extract-name->services extract-name)))))
+                 (services (assoc-ref extract-name->services extract-name))
+                 (data-source govuk-puppet-data-source))))
             (map car extract-name->services)))))))
 
 ;;;

@@ -19,6 +19,7 @@
             data-extract-datetime
             data-extract-database
             data-extract-services
+            data-extract-data-source
 
             filter-extracts
             group-extracts
@@ -31,7 +32,8 @@
   (file       data-extract-file)
   (datetime   data-extract-datetime)
   (database   data-extract-database)
-  (services   data-extract-services))
+  (services   data-extract-services)
+  (data-source data-extract-data-source))
 
 (define* (filter-extracts extracts
                           #:optional #:key

@@ -163,20 +163,28 @@
 (define (list-extracts)
   (let ((base-url (or (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")
                       (error "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL must be set to list extracts for a indexed data directory"))))
+    (define (override-data-source extracts)
+      (map (lambda (extract)
+             (data-extract
+              (inherit extract)
+              (data-source data-directory-with-index-data-source)))
+           extracts))
+
     (append-map
      (match-lambda
        (($ <data-source> name list-extracts
                          list-extracts-from-data-directory-index
                          data-directory-with-index)
         (if list-extracts-from-data-directory-index
-            (or (let ((data-source-base-url
-                       (string-append base-url "data-sources/" name "/")))
-                  (with-index-file
-                   (string-append data-source-base-url "index.json")
-                   (cut list-extracts-from-data-directory-index
-                     <>
-                     data-source-base-url)))
-                '())
+            (override-data-source
+             (or (let ((data-source-base-url
+                        (string-append base-url "data-sources/" name "/")))
+                   (with-index-file
+                    (string-append data-source-base-url "index.json")
+                    (cut list-extracts-from-data-directory-index
+                         <>
+                         data-source-base-url)))
+                 '()))
             '())))
      (list govuk-puppet-data-source))))
 
