@@ -2,7 +2,9 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
+  #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
+  #:use-module (web uri)
   #:use-module (guix gexp)
   #:use-module (guix modules)
   #:use-module (guix store)
@@ -12,7 +14,9 @@
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data govuk sources govuk-puppet)
-  #:export (data-directory-with-index))
+  #:export (data-directory-with-index
+
+            data-directory-with-index-data-source))
 
 (define (all-extracts data-sources)
   (concatenate
@@ -145,3 +149,38 @@
       (build-derivations store (list derivation))
       (derivation->output-path derivation))))
 
+;;;
+;;; data-directory-with-index-data-source
+;;;
+
+(define (with-index-file url function)
+  (let ((uri (string->uri url)))
+    (cond
+     ((eq? 'file (uri-scheme uri))
+      (call-with-input-file (uri-path uri) function))
+     (else (error "Unrecognised scheme" (uri-scheme uri))))))
+
+(define (list-extracts)
+  (let ((base-url (or (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")
+                      (error "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL must be set to list extracts for a indexed data directory"))))
+    (append-map
+     (match-lambda
+       (($ <data-source> name list-extracts
+                         list-extracts-from-data-directory-index
+                         data-directory-with-index)
+        (if list-extracts-from-data-directory-index
+            (or (let ((data-source-base-url
+                       (string-append base-url "data-sources/" name "/")))
+                  (with-index-file
+                   (string-append data-source-base-url "index.json")
+                   (cut list-extracts-from-data-directory-index
+                     <>
+                     data-source-base-url)))
+                '())
+            '())))
+     (list govuk-puppet-data-source))))
+
+(define data-directory-with-index-data-source
+  (data-source
+   (name "data-directory-with-index")
+   (list-extracts list-extracts)))
