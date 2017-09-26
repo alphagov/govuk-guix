@@ -183,4 +183,5 @@
 (define data-directory-with-index-data-source
   (data-source
    (name "data-directory-with-index")
-   (list-extracts list-extracts)))
+   (list-extracts list-extracts)
+   (priority 1)))

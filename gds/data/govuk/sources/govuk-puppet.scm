@@ -415,4 +415,5 @@
    (name "govuk-puppet")
    (list-extracts list-extracts)
    (list-extracts-from-data-directory-index list-extracts-from-data-directory-index)
-   (data-directory-with-index data-directory-with-index)))
+   (data-directory-with-index data-directory-with-index)
+   (priority 2)))
