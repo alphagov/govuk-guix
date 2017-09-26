@@ -106,7 +106,7 @@
               database-connection-config
               (simple-format
                #f "govuk-~A"
-               (date->string datetime "~d/~m/~Y"))
+               (date->string datetime "~d-~m-~Y"))
               file
               #:alias "govuk"
               #:overrides "{\"settings\":{\"index\":{\"number_of_replicas\":\"0\",\"number_of_shards\":\"1\"}}}"
