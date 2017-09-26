@@ -36,6 +36,7 @@
  (srfi srfi-19)
  (srfi srfi-37)
  (ice-9 match)
+ (ice-9 format)
  (guix ui)
  (guix scripts)
  (gnu services)
@@ -101,12 +102,24 @@
                ((database . data-extracts)
                 (simple-format #t "  database: ~A\n" database)
                 (for-each
-                 (lambda (data-extract)
+                 (match-lambda
+                  ((date . data-extracts)
                    (simple-format
                     #t "    - ~A\n"
-                    (date->string (data-extract-datetime data-extract)
-                                  "~d/~m/~Y")))
-                 data-extracts)))
+                    (date->string date "~d/~m/~Y"))
+                   (if (> (length data-extracts) 1)
+                       (for-each
+                        (lambda (data-extract)
+                          (let ((data-source
+                                 (data-extract-data-source
+                                  data-extract)))
+                            (format
+                             #t
+                             "      - ~A (~:r priority)\n"
+                             (data-source-name data-source)
+                             (data-source-priority data-source))))
+                        data-extracts))))
+                 (group-extracts data-extract-datetime data-extracts))))
               (group-extracts data-extract-database data-extracts))))))
      (stable-sort
       (group-extracts data-extract-services
@@ -212,11 +225,12 @@
       (for-each
        (lambda (database-connection-config)
          (match data-extract
-           (($ <data-extract> file datetime database services)
+           (($ <data-extract> file datetime database services data-source)
             (simple-format
-             #t " - ~A extract from ~A into the ~A database for"
+             #t " - ~A extract from ~A (~A) into the ~A database for"
              database
              (date->string datetime "~d/~m/~Y")
+             (data-source-name data-source)
              (match database
                ("elasticsearch" "elasticsearch")
                (else
