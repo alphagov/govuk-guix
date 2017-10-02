@@ -223,9 +223,10 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(asset-manager))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api signon redis)))
           (plek-config) (rails-app-config) asset-manager
-          (delayed-job-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           (signon-application
            (name "Asset Manager")
            (supported-permissions '("signin")))
