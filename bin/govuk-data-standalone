@@ -1,0 +1,207 @@
+#!/usr/bin/env ruby
+
+require 'uri'
+require 'json'
+require 'optparse'
+
+def data_directory_base_url
+  ENV['GOVUK_GUIX_DATA_DIRECTORY_BASE_URL']
+end
+
+def retrieve_index
+  base_uri = URI(data_directory_base_url)
+
+  data_extracts_index = "#{base_uri.path}data-extracts/index.json"
+
+  case base_uri.scheme
+  when "file"
+    JSON.parse(File.read(data_extracts_index))
+  when "http"
+  when "https"
+  when "ssh"
+    raise "#{base_uri.scheme} not yet supported"
+  else
+    puts "error: unrecognised URI scheme #{base_uri.scheme}"
+  end
+end
+
+def get_local_path_to_extract_data(extract, dry_run)
+  extract_data_uri = URI(
+    "#{data_directory_base_url}data-extracts/#{extract[:url]}"
+  )
+
+  case extract_data_uri.scheme
+  when "file"
+    extract_data_uri.path
+  when "http"
+  when "https"
+  when "ssh"
+    raise "#{base_uri.scheme} not yet supported"
+  else
+    puts "error: unrecognised URI scheme #{base_uri.scheme}"
+  end
+end
+
+def retrieve_extracts
+  index_data = retrieve_index
+
+  index_data['extracts'].map do |extract_hash|
+    extract_hash.each_with_object({}) do |(key, value), result|
+      result[key.to_sym] = value
+    end
+  end
+end
+
+def group_extracts(field, extracts)
+  extracts.each_with_object(Hash.new { |h,k| h[k] = [] }) do |extract, result|
+    key = extract[field]
+    key = [key] unless key.kind_of?(Array)
+
+    key.each do |key_value|
+      result[key_value].push(extract)
+    end
+  end
+end
+
+def sort_extracts(extracts)
+  extracts.sort_by { |extract| extract[:date] }
+end
+
+FILTER_OPTIONS = %i(services database before_date after_date).freeze
+
+def filter_extracts(extracts,
+                    services: false,
+                    database: false,
+                    before_date: false,
+                    after_date: false)
+  extracts.select do |extract|
+    next if services and
+      services.all? { |service| !extract[:services].include? service }
+
+    next if database and !database.include? extract[:database]
+    next if before_date and extract[:before_date] > before_date
+    next if after_date and extract[:after_date] < after_date
+
+    true
+  end
+end
+
+def all_services(extracts)
+  extracts.map(&:services).flatten.unique
+end
+
+def list(options)
+  extracts = filter_extracts(
+    retrieve_extracts,
+    **options.keep_if { |k| FILTER_OPTIONS.include? k }
+  )
+
+  group_extracts(:services, extracts).each do |service, extracts|
+    puts "service: #{service}"
+    group_extracts(:database, extracts).each do |database, extracts|
+      puts "  database: #{database}"
+      extracts.each do |extract|
+        puts "    - #{extract[:date]}"
+      end
+    end
+  end
+end
+
+def extracts_to_load_by_service_and_database(extracts)
+  group_extracts(
+    :services, extracts
+  ).each_with_object({}) do |(service, extracts), result|
+    result[service] = begin
+      group_extracts(
+        :database, extracts
+      ).each_with_object({}) do |(database, extracts), result|
+        # The last extract is the desired one, due to the sorting
+        result[database] = sort_extracts(extracts).last
+      end
+    end
+  end
+end
+
+def show_extracts_to_load(extracts_by_service_and_database)
+  puts "Extracts selected:"
+  extracts_by_service_and_database.each do |service, extracts_by_database|
+    extracts_by_database.each do |database, extract|
+      puts " - #{database} extract from #{extract[:date]} into the #{service} database"
+    end
+  end
+end
+
+def load_postgresql_extract(extract, dry_run)
+  local_file = get_local_path_to_extract_data(extract, dry_run)
+  command = "pv #{local_file} | gzip -d | psql --no-psqlrc --quiet"
+
+  if dry_run
+    puts "Would run command: #{command}"
+  else
+    puts "Running command: #{command}"
+    system(command)
+  end
+end
+
+def load_extracts(extracts_by_service_and_database, dry_run)
+  extracts_by_service_and_database.each do |service, extracts_by_database|
+    extracts_by_database.each do |database, extract|
+      puts "#{dry_run ? 'Would import' : 'Importing'} extract from #{extract[:date]} into the #{service} database"
+      puts
+
+      load_postgresql_extract(extract, dry_run)
+    end
+  end
+end
+
+def load(options)
+  all_extracts = filter_extracts(
+    retrieve_extracts,
+    **options.keep_if { |k| FILTER_OPTIONS.include? k }
+  )
+
+  services = options[:services] or all_services(all_extracts)
+
+  extracts = extracts_to_load_by_service_and_database(all_extracts)
+
+  show_extracts_to_load(extracts)
+  puts
+
+  load_extracts(extracts, options[:dry_run])
+end
+
+def parse_options
+  options = {}
+
+  OptionParser.new do |opt|
+    opt.on('--database DATABASE') { |o| options[:database] = o }
+    opt.on('--before BEFORE') { |o| options[:before_date] = o }
+    opt.on('--after AFTER') { |o| options[:after_date] = o }
+    opt.on('--dry-run') { |o| options[:dry_run] = true }
+  end.parse!
+
+  options
+end
+
+def main
+  options = parse_options
+
+  command = ARGV.shift
+  options[:services] = ARGV if !ARGV.empty?
+  unless command
+    puts "error: no command specified"
+    exit 1
+  end
+
+  case command
+  when "list"
+    list(options)
+  when "load"
+    load(options)
+  else
+    puts "error: command #{command} is not recognised"
+    exit 1
+  end
+end
+
+main
