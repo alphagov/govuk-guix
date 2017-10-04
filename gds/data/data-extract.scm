@@ -78,15 +78,16 @@
         extracts))
 
 (define (sort-extracts extracts)
-  (stable-sort extracts
-               (lambda (a b)
-                 (let ((utc-time-a (date->time-utc (data-extract-datetime a)))
-                       (utc-time-b (date->time-utc (data-extract-datetime b))))
-                   (if (time=? utc-time-a utc-time-b)
-                       (let ((data-source-a (data-extract-data-source a))
-                             (data-source-b (data-extract-data-source b)))
-                         (> (or (data-source-priority data-source-a) -1)
-                            (or (data-source-priority data-source-b) -1))))))))
+  (stable-sort
+   extracts
+   (lambda (a b)
+     (let ((utc-time-a (date->time-utc (data-extract-datetime a)))
+           (utc-time-b (date->time-utc (data-extract-datetime b))))
+       (if (time=? utc-time-a utc-time-b)
+           (let ((data-source-a (data-extract-data-source a))
+                 (data-source-b (data-extract-data-source b)))
+             (> (or (data-source-priority data-source-a) -1)
+                (or (data-source-priority data-source-b) -1))))))))
 
 (define* (load-extract extract database-connection-config
                        #:key dry-run?)
