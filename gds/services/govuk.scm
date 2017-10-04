@@ -1566,9 +1566,9 @@
          (sidekiq-config
           (file "config/sidekiq.yml"))
          (postgresql-connection-config
-          (user "content-tagger")
+          (user "content_tagger")
           (port "5432")
-          (database "content_tagger")))))
+          (database "content_tagger_production")))))
 
 ;;;
 ;;; Maslow
