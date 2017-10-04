@@ -111,7 +111,7 @@
                     (date->string date "~d/~m/~Y"))
                    (if (> (length data-extracts) 1)
                        (for-each
-                        (lambda (data-extract)
+                        (lambda (data-extract priority-ordering)
                           (let ((data-source
                                  (data-extract-data-source
                                   data-extract)))
@@ -119,8 +119,10 @@
                              #t
                              "      - ~A (~:r priority)\n"
                              (data-source-name data-source)
-                             (data-source-priority data-source))))
-                        data-extracts))))
+                             priority-ordering)))
+                        ;; Highest priority first, so reverse the sort order
+                        (reverse (sort-extracts data-extracts))
+                        (iota (length data-extracts) 1)))))
                  (group-extracts data-extract-datetime data-extracts))))
               (group-extracts data-extract-database data-extracts))))))
      (stable-sort
