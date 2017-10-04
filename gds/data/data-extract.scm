@@ -78,16 +78,22 @@
         extracts))
 
 (define (sort-extracts extracts)
+  "Sort EXTRACTS by time and priority so that the more recent and
+higher priority extracts appear later in the list"
   (stable-sort
    extracts
+   ;; Returns #t if b should rank higher than a, #f otherwise
    (lambda (a b)
      (let ((utc-time-a (date->time-utc (data-extract-datetime a)))
            (utc-time-b (date->time-utc (data-extract-datetime b))))
        (if (time=? utc-time-a utc-time-b)
            (let ((data-source-a (data-extract-data-source a))
                  (data-source-b (data-extract-data-source b)))
-             (> (or (data-source-priority data-source-a) -1)
-                (or (data-source-priority data-source-b) -1))))))))
+             ;; Does b have a higher priority than a?
+             (> (or (data-source-priority data-source-b) -1)
+                (or (data-source-priority data-source-a) -1)))
+           ;; Is b more recent than a?
+           (time>? utc-time-b utc-time-a))))))
 
 (define* (load-extract extract database-connection-config
                        #:key dry-run?)
