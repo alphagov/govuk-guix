@@ -196,4 +196,4 @@
   (data-source
    (name "data-directory-with-index")
    (list-extracts list-extracts)
-   (priority 1)))
+   (priority 2)))
