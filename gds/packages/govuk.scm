@@ -53,12 +53,12 @@
     (hash (base32 "0sz9931gd2w3b9wbh3zdc85zcbbxlngakl1w2d59l109fwjwbglr")))
    (package
      (name "asset-manager")
-     (version "release_161")
+     (version "release_162")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0bsy0cv08fbmsqkwa49h9zdgwb1whb3dbsnff3hbddvphfg2kb9m")))
+       #:hash (base32 "1in81cms4xnj2g2fr8pg5d16hik2lakm2qnd6x6g39czcwdpiz0h")))
      (build-system rails-build-system)
      (inputs
       `(("govuk_clamscan"
