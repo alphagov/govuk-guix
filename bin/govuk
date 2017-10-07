@@ -82,6 +82,8 @@ elif [ "$COMMAND" = "system" ]; then
     $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "refresh" ]; then
     $GUILE "$COMMAND_FULL_PATH" "${@:2}"
+elif [ "$COMMAND" = "cuirass-jobs" ]; then
+    $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 else
     "$COMMAND_FULL_PATH" "${@:2}"
 fi

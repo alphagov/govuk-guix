@@ -1,0 +1,44 @@
+#!/usr/bin/guile --no-auto-compile
+-*- scheme -*-
+!#
+
+;; To allow this script to be run directly, even from the Git
+;; repository, check if the environment is setup by checking if the
+;; (gds services) module is loadable. If it's not loadable, start this
+;; script again, but use the guix-pre-inst-env helper to setup the
+;; environment.
+(catch
+  #t
+  (lambda ()
+    (resolve-interface '(gds services)))
+  (lambda args
+    (let* ((govuk-guix-root
+            (or (and=> (current-filename)
+                       (lambda (x)
+                         (dirname (dirname x))))
+                (getenv "GOVUK_GUIX_ROOT")
+                (error "Unable to locate the govuk-guix root")))
+           (command-full-path
+            (string-append govuk-guix-root "/bin/govuk-cuirass-jobs")))
+      (exit
+       (status:exit-val
+        (apply
+         system*
+         "bash"
+         (string-append govuk-guix-root "/guix-pre-inst-env")
+         "guile"
+         command-full-path
+         (cdr (command-line))))))))
+
+(use-modules (ice-9 pretty-print)
+             (guix store)
+             (gds build-jobs govuk))
+
+(define (output-jobs jobs)
+  (pretty-print
+   jobs
+   (current-output-port)))
+
+(with-store store
+  (output-jobs
+   (govuk-packages-jobs store)))
