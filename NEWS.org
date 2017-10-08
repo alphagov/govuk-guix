@@ -9,6 +9,7 @@ A new command which prvides a similar interface and function to the
 govuk-data command, but without requiring a local Guix build daemon.
 *** Switch to fetching GNU Guix snapshots from http://git.cbaines.net:gds/gnu-guix
 As new releases cannot be pushed to the previous repository.
+*** Add new module for ruby gems related to GOV.UK
 ** September
 *** Update Guix release_9 -> release_10 -> release_11 -> release_12
 *** Content Tagger improvements
