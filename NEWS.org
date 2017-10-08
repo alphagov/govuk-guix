@@ -2,8 +2,12 @@
 #+STARTUP: content hidestars
 
 * 2017
+** October
+*** Add govuk-data-standalone
+A new command which prvides a similar interface and function to the
+govuk-data command, but without requiring a local Guix build daemon.
 ** September
-*** Update Guix release_9 -> release_10 -> release_11
+*** Update Guix release_9 -> release_10 -> release_11 -> release_12
 *** Content Tagger improvements
 **** Add "GDS Editor" and "Tagathon Participant" permissions
 **** Run Sidekiq with Content Tagger
@@ -16,6 +20,11 @@
 **** Add functionality to generate data directories with indexes
 **** Add initial support for Elasticsearch
 **** Add a --dry-run option to govuk-data
+*** Repository hosting issues
+The govuk-guix Git repository, along with the gnu-guix repository are
+no longer available on https://github.com/alphagov/. There are
+read-only copies on https://github.com/gds-attic/, but these are now
+out of date.
 ** August
 *** Update Guix release_8 -> release_9
 *** Improve support for Whitehall attachments
