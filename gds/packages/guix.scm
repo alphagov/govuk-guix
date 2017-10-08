@@ -23,7 +23,7 @@
       (name "guix-gds")
       (version (if local-source
                    "local"
-                   "release_12"))
+                   "release_13"))
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ;; Run the tests if using a tagged release, but not when
@@ -44,5 +44,5 @@
                    ;; thinks that it has not built this
                    (commit version)))
              (sha256
-              (base32 "02cnm92npgm7fqa0bc37my6c19hkgk0qj1hmbpn9rjbfvr2l1gvc"))
+              (base32 "09ydh5r26p5ifk8rj8pj10nw354f7gchxqz8gb8lhx6k1bx7wram"))
              (file-name (string-append "guix-" version "-checkout"))))))))

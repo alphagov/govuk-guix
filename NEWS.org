@@ -3,6 +3,7 @@
 
 * 2017
 ** October
+*** Update Guix release_12 -> release_13
 *** Add govuk-data-standalone
 A new command which prvides a similar interface and function to the
 govuk-data command, but without requiring a local Guix build daemon.
