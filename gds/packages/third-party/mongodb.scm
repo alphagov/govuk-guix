@@ -33,14 +33,14 @@
 (define-public mongodb
   (package
     (name "mongodb")
-    (version "3.4.4")
+    (version "3.4.9")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://github.com/mongodb/mongo/archive/r"
                                   version ".tar.gz"))
               (file-name (string-append name "-" version ".tar.gz"))
               (sha256
-               (base32 "1ccd6azplqpi9pp3l6fsi8240kkgagq5j6c2dksppjn7slk1kdy8"))))
+               (base32 "0gidwyvh3bdwmk2pccgkqkaln4ysgn8iwa7ihjzllsq0rdg95045"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("scons" ,scons)
@@ -88,7 +88,7 @@ traditional RDBMS systems (which are deep in functionality).")
 (define-public mongo-tools
   (package
     (name "mongo-tools")
-    (version "3.4.0")
+    (version "3.4.9")
     (source
      (origin (method url-fetch)
              (uri (string-append "https://github.com/mongodb/mongo-tools"
@@ -96,7 +96,7 @@ traditional RDBMS systems (which are deep in functionality).")
              (file-name (string-append name "-" version ".tar.gz"))
              (sha256
               (base32
-               "1xbcpnz2hz1wj5q5i3yqpcqh3g8ychyr2896m9z2v4l5sz5xcd23"))))
+               "1ap0p2051az00zp64j2v2a2yilc0nwajga37fl82qj18lspifvsb"))))
     (build-system gnu-build-system)
     (arguments
      '(#:phases
