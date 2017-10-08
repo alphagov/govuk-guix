@@ -145,7 +145,8 @@ proxies requests to some upstream")
      (synopsis "Rack based redirector backed by the Transition service")
      (description "")
      (license license:expat)
-     (home-page "https://github.com/alphagov/bouncer"))))
+     (home-page "https://github.com/alphagov/bouncer"))
+   #:extra-inputs (list libffi postgresql)))
 
 (define-public calculators
   (package-with-bundler
