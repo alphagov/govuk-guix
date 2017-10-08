@@ -357,7 +357,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/email-alert-api"))))
+     (home-page "https://github.com/alphagov/email-alert-api"))
+   #:extra-inputs (list libffi postgresql)))
 
 (define-public email-alert-frontend
   (package-with-bundler
