@@ -38,7 +38,7 @@
            (origin
              (method git-fetch)
              (uri (git-reference
-                   (url "https://github.com/alphagov/gnu-guix.git")
+                   (url "http://git.cbaines.net/gds/gnu-guix")
                    ;; Note that when changing the treeish, you will
                    ;; need to change the sha256 hash such that Guix
                    ;; thinks that it has not built this
