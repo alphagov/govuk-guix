@@ -22,6 +22,7 @@
   #:use-module (gnu services databases)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages version-control)
+  #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix build utils)
@@ -30,7 +31,6 @@
   #:use-module (gds packages third-party mongodb)
   #:use-module (guix store)
   #:use-module (gds services base)
-  #:use-module (gds services third-party mongodb)
   #:use-module (gds packages govuk)
   #:use-module (gds services)
   #:use-module (gds services rails)
@@ -137,6 +137,18 @@
                  (api-port 51004)
                  (debug? #t)))
 
+(define (mongodb-configuration-file port)
+  (mixed-text-file
+   "mongodb.yaml"
+   "
+processManagement:
+  pidFilePath: /var/run/mongodb/pid
+storage:
+  dbPath: /var/lib/mongodb
+net:
+  port: " (number->string port) "
+"))
+
 (define services
   (append
    api-services
@@ -164,7 +176,11 @@
       (tcp-port (assq-ref system-ports 'memcached))
       (udp-port (assq-ref system-ports 'memcached))))
     (postgresql-service #:port (assq-ref system-ports 'postgresql))
-    (mongodb-service #:port (assq-ref system-ports 'mongodb))
+    (service mongodb-service-type
+             (mongodb-configuration
+              (config-file
+               (mongodb-configuration-file
+                (assq-ref system-ports 'mongodb)))))
     (service
      elasticsearch-service-type
      (elasticsearch-configuration

@@ -30,61 +30,6 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python))
 
-(define-public mongodb
-  (package
-    (name "mongodb")
-    (version "3.4.9")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://github.com/mongodb/mongo/archive/r"
-                                  version ".tar.gz"))
-              (file-name (string-append name "-" version ".tar.gz"))
-              (sha256
-               (base32 "0gidwyvh3bdwmk2pccgkqkaln4ysgn8iwa7ihjzllsq0rdg95045"))))
-    (build-system gnu-build-system)
-    (native-inputs
-     `(("scons" ,scons)
-       ("python" ,python-2)
-       ("perl" ,perl)))
-    (arguments
-     `(#:tests? #f ; There is no 'check' target.
-       #:phases
-       (modify-phases %standard-phases
-         (delete 'configure) ; There is no configure phase
-         (add-after 'unpack 'scons-propagate-environment
-           (lambda _
-             ;; Modify the SConstruct file to arrange for
-             ;; environment variables to be propagated.
-             (substitute* "SConstruct"
-               (("^env = Environment\\(")
-                "env = Environment(ENV=os.environ, "))))
-         (add-after 'unpack 'create-version-file
-           (lambda _
-             (call-with-output-file "version.json"
-               (lambda (port)
-                 (display ,(simple-format #f "{
-    \"version\": \"~A\"
-}" version) port)))))
-         (replace 'build
-           (lambda _
-             (zero? (system* "scons"
-                             (format #f "--jobs=~a" (parallel-job-count))
-                             "--disable-warnings-as-errors"
-                             "mongod" "mongo" "mongos"))))
-         (replace 'install
-           (lambda _
-             (let ((bin  (string-append (assoc-ref %outputs "out") "/bin")))
-               (install-file "mongod" bin)
-               (install-file "mongos" bin)
-               (install-file "mongo" bin)))))))
-    (home-page "https://www.mongodb.org/")
-    (synopsis "High performance and high availability document database")
-    (description "Mongo is a high-performance, high availability,
-schema-free document-oriented database.  A key goal of MongoDB is to bridge
-the gap between key/value stores (which are fast and highly scalable) and
-traditional RDBMS systems (which are deep in functionality).")
-    (license (list license:agpl3 license:asl2.0))))
-
 (define-public mongo-tools
   (package
     (name "mongo-tools")
