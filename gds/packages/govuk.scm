@@ -1265,7 +1265,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/transition"))))
+     (home-page "https://github.com/alphagov/transition"))
+   #:extra-inputs (list postgresql)))
 
 (define-public travel-advice-publisher
   (package-with-bundler
