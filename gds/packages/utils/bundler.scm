@@ -28,9 +28,7 @@
   #:use-module (gds build-system rails)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler-build)
-  #:export (bundler
-
-            <bundle-package>
+  #:export (<bundle-package>
             bundle-package
             bundle-package?
             bundle-package-source
