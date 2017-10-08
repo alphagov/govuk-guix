@@ -375,7 +375,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/email-alert-frontend"))))
+     (home-page "https://github.com/alphagov/email-alert-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public email-alert-service
   (package-with-bundler
