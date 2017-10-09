@@ -319,12 +319,12 @@ proxies requests to some upstream")
     (hash (base32 "07vbzwzxmvj3c4rwx7w6d3py3r16f5ljx1yjxpjm8qm2hi6flrsg")))
    (package
      (name "design-principles")
-     (version "release_875")
+     (version "release_876")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1gxv51c3kc6qvy3vh16la3cp4i9jf7mgyl149rzmmidvw9vniw2h")))
+       #:hash (base32 "1brak8fq2406i666iqq1drm1lamcvfdjrw8lh25gp6y60d96nnif")))
      (build-system rails-build-system)
      (arguments `(;; Asset precompilation fails
                   #:precompile-rails-assets? #f
