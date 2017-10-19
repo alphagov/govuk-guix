@@ -1,5 +1,6 @@
 (define-module (gds systems govuk publishing-e2e-tests)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (guix gexp)
   #:use-module (gnu system)
   #:use-module (gnu services)
@@ -19,14 +20,18 @@
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
+(define setup-functions
+  (list
+   ;; This is not a real value that the gds-sso gem uses, as it
+   ;; just checks if the value is "real" or not.
+   (cut use-gds-sso-strategy <> "mock")))
+
 (define services
   (modify-services
-      (use-gds-sso-strategy
+      ((apply compose (reverse setup-functions))
        (append
         (setup-services (list publishing-e2e-tests-service))
-        (operating-system-user-services development-os))
-       "mock") ;; This is not a real value that the gds-sso gem uses,
-               ;; as it just checks if the value is "real" or not.
+        (operating-system-user-services development-os)))
     (travel-advice-publisher-service-type
      parameters =>
      (map
