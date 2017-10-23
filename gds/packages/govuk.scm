@@ -1092,12 +1092,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "16razi14b3jlq4pyhdgylvq8fsyajk0k5xnyw8rrf0my0rycd67y")))
    (package
      (name "smart-answers")
-     (version "release_3759")
+     (version "release_3761")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0h8wg3ck381fa56k9wkpkdlwak7g4ic7nwdygl45g2hm3qsi4pzp")))
+       #:hash (base32 "1lzwslff3gy1v6ignsnpdxfg4v5qs0f3nyf0hib7a7czwm44hgir")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
      (synopsis "")
