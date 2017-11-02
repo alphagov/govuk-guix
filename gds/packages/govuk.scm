@@ -1277,12 +1277,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "138dhgf4iph9xyv50398rq6gy8s2shpkz1s5b1fp6kxibnryx4vr")))
    (package
      (name "travel-advice-publisher")
-     (version "release_275")
+     (version "release_277")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1xxxc4igp3z3wm6ykw7lrg2xg858gb2ssqfimj3j76n8qkn2k11z")))
+       #:hash (base32 "06gcxay977jd7jkc7srwyzidwbzm1zc5an823jqac9hsv45fjysg")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
