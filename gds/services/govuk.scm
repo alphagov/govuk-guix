@@ -955,7 +955,7 @@
 
 (define (smokey-start-script environment-variables package)
   (program-file
-   (string-append "start-publishing-e2e-tests")
+   (string-append "start-smokey")
    (with-imported-modules '((guix build utils)
                             (gnu services herd))
     #~(let ((bundle (string-append #$package "/bin/bundle")))
