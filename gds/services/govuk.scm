@@ -1158,6 +1158,33 @@
 ;; Publishing E2E Tests
 ;;
 
+(define publishing-e2e-tests-signon-user-count 5)
+
+(define publishing-e2e-tests-signon-users
+  (map (lambda (number)
+         (signon-user
+          (name (simple-format #f "User ~s" number))
+          (email (simple-format #f "user-~s@dev.gov.uk" number))
+          (passphrase (random-base16-string 16))
+          (role (if (eq? number 0)
+                    "superadmin"
+                    "normal"))))
+       (iota publishing-e2e-tests-signon-user-count)))
+
+(define (signon-users->publishing-e2e-tests-environment-variables signon-users)
+  (cons*
+   `("SIGNON_USER_COUNT" . ,(number->string (length signon-users)))
+   (append-map (lambda (user number)
+                 `((,(simple-format #f "SIGNON_USER_~s_EMAIL" number)
+                    .
+                    ,(signon-user-email user))
+                   (,(simple-format #f "SIGNON_USER_~s_PASSPHRASE" number)
+                    .
+                    ,(signon-user-passphrase user))))
+               publishing-e2e-tests-signon-users
+               (iota (length signon-users)))))
+
+
 (define (make-publishing-e2e-tests-start-script environment-variables package)
   (let*
       ((environment-variables
@@ -1264,7 +1291,9 @@
   (service-type
    (name 'publishing-e2e-tests-service)
    (extensions
-    (list (service-extension
+    (list (service-extension signon-service-type
+                             (const publishing-e2e-tests-signon-users))
+          (service-extension
            shepherd-root-service-type
            (match-lambda
             ((plek-config package)
