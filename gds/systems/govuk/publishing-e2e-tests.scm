@@ -20,8 +20,23 @@
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
+(define (services-in-rails-production-environment services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        rails-app-config?
+        (lambda (config)
+          (update-rails-app-config-environment
+           "production"
+           config))))))
+   services))
+
 (define setup-functions
   (list
+   services-in-rails-production-environment
    ;; This is not a real value that the gds-sso gem uses, as it
    ;; just checks if the value is "real" or not.
    (cut use-gds-sso-strategy <> "mock")))
