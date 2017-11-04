@@ -78,6 +78,7 @@
   (filter
    (lambda (pair) (cdr pair))
    (list
+    (cons "SSL_CERT_FILE" "/run/current-system/profile/etc/ssl/certs/ca-certificates.crt")
     (cons "RAILS_ENV" (rails-app-config-environment config))
     (cons "SECRET_KEY_BASE" (rails-app-config-secret-key-base config))
     (cons "SECRET_TOKEN" (rails-app-config-secret-token config)))))
