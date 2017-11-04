@@ -57,10 +57,7 @@
 (define setup-functions
   (list
    modify-plek-config
-   services-in-rails-production-environment
-   ;; This is not a real value that the gds-sso gem uses, as it
-   ;; just checks if the value is "real" or not.
-   (cut use-gds-sso-strategy <> "mock")))
+   services-in-rails-production-environment))
 
 (define services
   (modify-services
