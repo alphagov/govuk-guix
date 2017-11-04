@@ -120,6 +120,8 @@ proxy_set_header Host $host:$server_port;")))
                            #f
                            "access_log /var/log/nginx/~A.access.log;
 proxy_pass http://~A-proxy;
+# Set X-Forwarded-SSL for OmniAuth
+proxy_set_header X-Forwarded-SSL 'on';
 proxy_set_header Host $host:$server_port;"
                            service
                            service))))
