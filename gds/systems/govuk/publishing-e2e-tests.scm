@@ -116,6 +116,14 @@
              (backend-header-timeout "60s"))
             parameter))
       parameters))
+    (signon-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (signon-config? parameter)
+            (signon-config-with-random-secrets parameter)
+            parameter))
+      parameters))
     (govuk-nginx-service-type
      parameter =>
      (govuk-nginx-configuration
