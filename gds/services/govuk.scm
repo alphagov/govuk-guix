@@ -224,7 +224,12 @@
            (inherit default-shepherd-service)
            (provision '(asset-manager))
            (requirement '(publishing-api signon redis)))
-          (plek-config) (rails-app-config) asset-manager
+         (plek-config)
+         (rails-app-config
+          ;; TODO: Probably shouldn't be #f, but not doing so means
+          ;; that it fails to start as AWS_S3_BUCKET_NAME is not set.
+          (assets? #f))
+         asset-manager
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (signon-application
@@ -1277,7 +1282,10 @@
           (service-startup-config
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
-          (plek-config) (rails-app-config) publishing-api
+          (plek-config)
+          (rails-app-config
+           (assets? #f))
+          publishing-api
           (signon-application
            (name "Publishing API")
            (supported-permissions '("signon" "view_all")))
@@ -1304,7 +1312,10 @@
            (provision '(content-store))
            (requirement '(router-api mongodb)))
           (service-startup-config)
-          (plek-config) (rails-app-config) content-store
+          (plek-config)
+          (rails-app-config
+           (assets? #f))
+          content-store
           (mongodb-connection-config
            (database "content-store")))))
 
@@ -1319,7 +1330,10 @@
           (provision '(draft-content-store))
           (requirement '(draft-router-api mongodb)))
          (service-startup-config)
-         (plek-config) (rails-app-config) content-store
+         (plek-config)
+         (rails-app-config
+          (assets? #f))
+         content-store
          (mongodb-connection-config
           (database "draft-content-store")))))
 
@@ -1516,7 +1530,10 @@
            (provision '(router-api))
            (requirement '(router)))
           (service-startup-config)
-          (plek-config) (rails-app-config) router-api
+          (plek-config)
+          (rails-app-config
+           (assets? #f))
+          router-api
           (router-api-config)
           default-router-database-connection-configs)))
 
@@ -1531,7 +1548,10 @@
            (provision '(draft-router-api))
            (requirement '(draft-router)))
           (service-startup-config)
-          (plek-config) (rails-app-config) router-api
+          (plek-config)
+          (rails-app-config
+           (assets? #f))
+          router-api
           (router-api-config)
           default-draft-router-database-connection-configs)))
 
@@ -1627,7 +1647,9 @@
                   '("signin")))))
          (redis-connection-config)
          (plek-config)
-         (rails-app-config) ;; TODO: Rummager doesn't use Rails
+         ;; TODO: Rummager doesn't use Rails
+         (rails-app-config
+          (assets? #f))
          (elasticsearch-connection-config)
          rummager)))
 
