@@ -1162,38 +1162,64 @@
       ((environment-variables
         (append
          environment-variables
-         `(("SECRET_KEY_BASE" . "t0a")
-           ("CAPYBARA_SAVE_PATH" . "/var/apps/publishing-e2e-tests/")
-           ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas")))))
+         `(("CAPYBARA_SAVE_PATH" . "/tmp/publishing-e2e-test-results")
+           ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas")
+           ("SSL_CERT_FILE" .
+            "/run/current-system/profile/etc/ssl/certs/ca-certificates.crt"))
+         (signon-users->publishing-e2e-tests-environment-variables
+          publishing-e2e-tests-signon-users))))
     (program-file
      (string-append "start-publishing-e2e-tests")
-     (with-imported-modules '((guix build utils)
-                              (gnu services herd)
-                              (srfi srfi-26)
-                              (ice-9 popen)
-                              (ice-9 rw)
-                              (ice-9 rdelim))
-       #~(let ((bundle (string-append #$package "/bin/bundle"))
-               (test-results.html
-                "/var/apps/publishing-e2e-tests/test-results.html"))
+     (with-imported-modules (source-module-closure
+                             '((guix build syscalls)
+                               (gnu build file-systems)
+                               (guix build utils)
+                               (gnu services herd)))
+       #~(let* ((results-directory
+                 "/tmp/publishing-e2e-test-results")
+                (test-results.html
+                 (string-append results-directory "/test-results.html")))
            (use-modules (guix build utils)
                         (gnu services herd)
+                        (gnu build file-systems)
+                        (guix build syscalls)
                         (srfi srfi-26)
                         (ice-9 popen)
                         (ice-9 rw)
                         (ice-9 rdelim))
 
-           (mkdir-p "/var/apps/publishing-e2e-tests")
+           (if (file-exists? "/var/apps/publishing-e2e-tests/bin")
+               (begin
+                 (mount "tmpfs" "/var/apps/publishing-e2e-tests/bin" "tmpfs")
+                 (copy-recursively
+                  (string-append #$package "/bin")
+                  "/var/apps/publishing-e2e-tests/bin"
+                  #:log (%make-void-port "w")
+                  #:follow-symlinks? #f))
+               (begin
+                 (mkdir-p "/var/apps/publishing-e2e-tests")
+                 (bind-mount #$package "/var/apps/publishing-e2e-tests")
+                 (mount "tmpfs" "/var/apps/publishing-e2e-tests/tmp" "tmpfs")))
 
            (for-each
             (lambda (env-var)
               (setenv (car env-var) (cdr env-var)))
             '#$environment-variables)
-           (chdir #$package)
+           (let* ((dir (string-append "/tmp/env.d/"))
+                  (file (string-append dir "publishing-e2e-tests")))
+             (mkdir-p dir)
+             (call-with-output-file file
+               (lambda (port)
+                 (for-each
+                  (lambda (env-var)
+                    (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
+                  '#$environment-variables))))
+
+           (chdir "/var/apps/publishing-e2e-tests")
            (let
                ((result
                  (zero? (system*
-                         bundle
+                         "/var/apps/publishing-e2e-tests/bin/bundle"
                          "exec"
                          "rspec"
                          "--format" "documentation"
@@ -1203,7 +1229,8 @@
              ;; Links to pages and screenshots are absolute, so turn
              ;; them in to relative links so that they work outside of
              ;; the container
-             (let ((substring "file:///var/apps/publishing-e2e-tests/"))
+             (let ((substring
+                    (string-append "file://" results-directory)))
                (with-atomic-file-replacement test-results.html
                  (lambda (in out)
                    (write-string/partial
@@ -1221,11 +1248,11 @@
 
              ;; Change file permissions to be writable by all
              (for-each (lambda (f) (chmod f #o666))
-                       (find-files "/var/apps/publishing-e2e-tests"))
+                       (find-files "/tmp/publishing-e2e-test-results"))
 
              (if result
                  (call-with-output-file
-                     "/var/apps/publishing-e2e-tests/all-tests-succeeded"
+                     (string-append results-directory "/all-tests-succeeded")
                    (lambda (port)
                      (simple-format port ""))))
 

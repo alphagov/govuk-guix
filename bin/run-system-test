@@ -7,7 +7,7 @@ RESULTS_DIRECTORY="$(dirname $(dirname ${BASH_SOURCE[0]}))/test-results"
 mkdir -p "$RESULTS_DIRECTORY"
 rm -f "$RESULTS_DIRECTORY/all-tests-succeeded"
 
-START_SCRIPT="$(bash ./guix-pre-inst-env guix system container --no-grafts --fallback $@ --share=$RESULTS_DIRECTORY=/var/apps/publishing-e2e-tests | tee /dev/stderr | tail -n1)"
+START_SCRIPT="$(bash ./guix-pre-inst-env guix system container --no-grafts --fallback $@ --share=$RESULTS_DIRECTORY=/tmp/publishing-e2e-test-results | tee /dev/stderr | tail -n1)"
 
 if [ $? -eq 0 ]; then
     sudo "$START_SCRIPT"
