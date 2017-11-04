@@ -25,6 +25,7 @@
             rails-app-config-secret-key-base
             rails-app-config-secret-token
             rails-app-config-run-with
+            rails-app-config-assets?
 
             update-rails-app-config-environment
             update-rails-app-config-with-random-secret-key-base
@@ -39,7 +40,8 @@
             generic-rails-app-service-account
             make-rails-app-service-type
 
-            rails-run-db:setup))
+            rails-run-db:setup
+            rails-run-assets:precompile))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -53,7 +55,9 @@
   (secret-token rails-app-config-secret-token
                 (default #f))
   (run-with     rails-app-config-run-with
-                (default 'unicorn)))
+                (default 'unicorn))
+  (assets?      rails-app-config-assets?
+                (default #t)))
 
 (define (update-rails-app-config-environment environment config)
   (rails-app-config
