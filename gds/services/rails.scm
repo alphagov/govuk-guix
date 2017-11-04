@@ -503,3 +503,33 @@
                     ,(rails-setup-or-migrate parameters))))
                 parameter))
           parameters)))))
+
+(define (rails-run-assets:precompile s)
+  (define rake-assets:precompile
+    (with-imported-modules '((gds build utils))
+      #~(lambda ()
+          (use-modules (gds build utils))
+          (let ((run-rake-task
+                 (lambda args
+                   (if (and (file-exists? "bin/rake")
+                            ;; When spring is used, rake seems
+                            ;; to need to be run with bundle
+                            ;; exec
+                            (not (file-exists? "bin/spring")))
+                       (apply run-command "rake" args)
+                       (apply run-command "bundle" "exec" "rake" args)))))
+            (run-rake-task "assets:precompile")))))
+
+  (let ((parameters (service-parameters s)))
+    (if (not (list? parameters))
+        s
+        (service
+         (service-kind s)
+         (map
+          (lambda (parameter)
+            (if (service-startup-config? parameter)
+                (service-startup-config-add-pre-startup-scripts
+                 parameter
+                 `((rails-assets:precompile . ,rake-assets:precompile)))
+                parameter))
+          parameters)))))
