@@ -138,7 +138,8 @@
                              (filter
                               (lambda (parameter)
                                 (or (signon-application? parameter)
-                                    (signon-api-user? parameter)))
+                                    (signon-api-user? parameter)
+                                    (signon-user? parameter)))
                               parameters)))
         (service-extension govuk-tailon-service-type
                            (lambda (parameters)

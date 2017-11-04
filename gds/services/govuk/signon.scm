@@ -426,6 +426,10 @@ end")
                                     (signon-config-applications parameter)
                                     (filter signon-application?
                                             extension-parameters)))
+                     (users (append
+                             (signon-config-api-users parameter)
+                             (filter signon-user?
+                                     extension-parameters)))
                      (api-users (append
                                  (signon-config-api-users parameter)
                                  (filter signon-api-user?
