@@ -153,6 +153,10 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                   (default #t))
   (domain                         govuk-nginx-configuration-domain
                                   (default "gov.uk"))
+  (tls-certificate                govuk-nginx-tls-certificate
+                                  (default #f))
+  (tls-private-key                govuk-nginx-tls-private-key
+                                  (default #f))
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
                                   (default '())))
 
@@ -164,12 +168,25 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                    draft-router-config
                                    server-aliases
                                    authenticated-draft-origin?
-                                   domain)
+                                   domain
+                                   tls-certificate
+                                   tls-private-key
+                                   additional-nginx-server-blocks)
     (nginx-configuration
      (server-blocks
-      (nginx-server-configurations service-and-ports
-                                   server-aliases
-                                   domain))
+      (let ((server-blocks
+             (nginx-server-configurations service-and-ports
+                                          server-aliases
+                                          domain)))
+        (if (and tls-certificate tls-private-key)
+            (map (lambda (config)
+                   (nginx-server-configuration
+                    (inherit config)
+                    (ssl-certificate tls-certificate)
+                    (ssl-certificate-key tls-private-key)))
+                 server-blocks)
+            server-blocks)))
+
      (upstream-blocks
       (nginx-upstream-configurations service-and-ports
                                      router-config
