@@ -121,9 +121,8 @@
       ("/var/lib/mongodb" "mongodb" "mongodb" #:recursive)))
    (service special-files-service-type
             `(("/bin/sh" ,(file-append (canonical-package bash)
-                                         "/bin/sh"))))
-   (service special-files-service-type
-            `(("/bin/bash" ,(file-append (canonical-package bash)
+                                       "/bin/sh"))
+              ("/bin/bash" ,(file-append (canonical-package bash)
                                          "/bin/bash"))))
    pretend-loopback-service))
 
