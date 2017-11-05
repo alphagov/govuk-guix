@@ -260,14 +260,17 @@ net:
            config))))))
    services))
 
+(define-public plek-aliases
+  '((rummager . (search))
+    (whitehall . (whitehall-admin whitehall-frontend))))
+
 (define plek-config
   (make-custom-plek-config
    govuk-ports
    #:govuk-app-domain "dev.gov.uk"
    #:use-https? #f
    #:port 50080
-   #:aliases '((rummager . (search))
-               (whitehall . (whitehall-admin whitehall-frontend)))))
+   #:aliases plek-aliases))
 
 (define (set-services-plek-config services)
   (map

@@ -1,10 +1,12 @@
 (define-module (gds services govuk nginx)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (gnu services web)
   #:use-module (guix records)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gds services govuk router)
+  #:use-module (gds services govuk tls)
   #:export (<govuk-nginx-configuration>
             govuk-nginx-configuration
             make-govuk-nginx-configuration
@@ -218,7 +220,23 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                      (compose (@@ (gnu services web) nginx-activation)
                               maybe-convert-to-nginx-configuration)))
                    (else (service-extension target compute)))))
-         (service-type-extensions nginx-service-type)))
+         (cons*
+          (service-extension
+           special-files-service-type
+           (lambda (nginx-config)
+             `(("/etc/nginx/dev.gov.uk.cert"
+                ,(development-os-tls-certificate
+                  (append-map nginx-server-configuration-server-name
+                              (nginx-configuration-server-blocks nginx-config))))
+               ("/etc/nginx/dev.gov.uk.key" ,development-os-tls-private-key))))
+          (service-extension
+           profile-service-type
+           (lambda (nginx-config)
+             (list
+              (development-os-certificates-package-for-domains
+               (append-map nginx-server-configuration-server-name
+                           (nginx-configuration-server-blocks nginx-config))))))
+          (service-type-extensions nginx-service-type))))
    (extend (lambda (config servers)
              ((service-type-extend nginx-service-type)
               (govuk-nginx-configuration->nginx-configuration config)

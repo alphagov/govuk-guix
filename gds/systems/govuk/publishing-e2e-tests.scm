@@ -3,6 +3,8 @@
   #:use-module (srfi srfi-26)
   #:use-module (guix gexp)
   #:use-module (gnu system)
+  #:use-module (gnu packages certs)
+  #:use-module (gnu packages tls)
   #:use-module (gnu services)
   #:use-module (gnu services web)
   #:use-module (gds packages govuk)
@@ -17,6 +19,7 @@
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk router)
+  #:use-module (gds services govuk plek)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
@@ -34,8 +37,26 @@
            config))))))
    services))
 
+(define (modify-plek-config services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        plek-config?
+        (const
+         (make-custom-plek-config
+          govuk-ports
+          #:govuk-app-domain "dev.gov.uk"
+          #:use-https? #t
+          #:port 50443
+          #:aliases plek-aliases))))))
+   services))
+
 (define setup-functions
   (list
+   modify-plek-config
    services-in-rails-production-environment
    ;; This is not a real value that the gds-sso gem uses, as it
    ;; just checks if the value is "real" or not.
@@ -90,7 +111,8 @@
      parameter =>
      (govuk-nginx-configuration
       (inherit parameter)
-      (authenticated-draft-origin? #f)
+      (tls-certificate "/etc/nginx/dev.gov.uk.cert")
+      (tls-private-key "/etc/nginx/dev.gov.uk.key")
       (additional-nginx-server-blocks
        (list
         (nginx-server-configuration
@@ -117,6 +139,10 @@
           base-services)
    (operating-system
     (inherit development-os)
+    (packages (cons*
+               openssl
+               nss-certs
+               (operating-system-packages development-os)))
     (services services))))
 
 publishing-e2e-tests-os
