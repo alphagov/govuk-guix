@@ -10,16 +10,6 @@
    (inherit tailon-service-type)
    (extensions
     (cons*
-     (service-extension signon-service-type
-                        (const
-                         (list
-                          (signon-application
-                           (name "Tailon")
-                           (description "View system and service logs")
-                           (home-uri "http://logs.dev.gov.uk:50080")
-                           (redirect-uri "http://logs.dev.gov.uk:50080")
-                           (oauth-id "none")
-                           (oauth-secret "none")))))
      (service-extension govuk-nginx-service-type
                         (const
                          (list
