@@ -1187,12 +1187,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0z8wx46rja9ckkq6bp88bs54wggq7src8rrs46502q8akhx4wrl2")))
    (package
      (name "static")
-     (version "release_2707")
+     (version "release_2708")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1rjqx587g9gsl38hp3577lcv9qdw0bz1kayblqkxcx1sfdh839sh")))
+       #:hash (base32 "0an7c2d9kn54qxwj7n6kk9hp6r6slicxjbd8w087dxd61lrjnhkr")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f
                   #:ruby ,ruby-2.3))
