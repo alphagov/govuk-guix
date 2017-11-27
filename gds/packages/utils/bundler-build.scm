@@ -82,9 +82,9 @@
       (lambda (port)
         (simple-format port "~A\n" ruby-version)))
 
-    (chmod (string-append output-path "/Gemfile.lock") #o644)
 
     (with-directory-excursion output-path
+      (chmod "Gemfile.lock" #o644)
       (run "bundle"
            "config"
            "build.nokogiri"
@@ -96,7 +96,12 @@
                      "--no-install")
           (if (> retry 3)
               (exit 1)
-              (loop (+ retry 1))))))
+              (loop (+ retry 1)))))
+      (substitute* "Gemfile.lock"
+        (("RUBY VERSION.*") "XXX")
+        (("BUNDLED WITH.*") "XXX"))
+      (substitute* "Gemfile.lock"
+        (("XXX.*") "")))
 
     (simple-format #t "Deleting .ruby-version\n")
     (delete-file (string-append output-path "/.ruby-version"))
