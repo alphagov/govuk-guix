@@ -147,12 +147,6 @@
    (cons* (find (lambda (s) (eq? (service-kind s)
                                  publishing-e2e-tests-service-type))
                 services)
-          (or (find (lambda (service)
-                      (eq? 'tailon
-                           (service-type-name
-                            (service-kind service))))
-                    services)
-              (error "Could not find tailon"))
           base-services)
    (operating-system
     (inherit development-os)

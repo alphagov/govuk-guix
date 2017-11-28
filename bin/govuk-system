@@ -116,13 +116,6 @@
                 (service-names->service-types service-names))
             (cons*
              govuk-nginx-service-type
-             (or (and=> (find (lambda (service)
-                                (eq? 'tailon
-                                     (service-type-name
-                                      (service-kind service))))
-                              (operating-system-user-services development-os))
-                        service-kind)
-                 (error "Could not find tailon"))
              authenticating-proxy-service-type
              (map service-kind base-services)))))
       (filter
