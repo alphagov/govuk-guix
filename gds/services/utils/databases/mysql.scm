@@ -37,6 +37,7 @@
   (match database-connection
     (($ <mysql-connection-config> host user port database)
      #~(lambda ()
+         (use-modules (ice-9 popen))
          (let
              ((command `(,(string-append #$mariadb "/bin/mysql")
                          "-h" #$host
