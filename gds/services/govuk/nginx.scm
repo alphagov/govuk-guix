@@ -10,15 +10,19 @@
   #:export (<govuk-nginx-configuration>
             govuk-nginx-configuration
             make-govuk-nginx-configuration
+            govuk-nginx-configuration-http-port
+            govuk-nginx-configuration-https-port
             govuk-nginx-configuration-service-and-ports
             govuk-nginx-configuration-router-config
             govuk-nginx-configuration-draft-router-config
             govuk-nginx-configuration-server-aliases
             govuk-nginx-configuration-authenticated-draft-origin?
             govuk-nginx-configuration-domain
+            govuk-nginx-configuration-tls-certificate
+            govuk-nginx-configuration-tls-private-key
+            govuk-nginx-configuration-additional-server-blocks
 
-            govuk-nginx-service-type
-            govuk-nginx-server-configuration-base))
+            govuk-nginx-service-type))
 
 (define (nginx-upstream-configurations service-and-ports
                                        router-config
@@ -50,20 +54,13 @@
                  (string-append "localhost:" (number->string port)))))))
     service-and-ports)))
 
-(define (govuk-nginx-server-configuration-base)
-  (nginx-server-configuration
-   (http-port 50080)
-   (https-port 50443)
-   (ssl-certificate #f)
-   (ssl-certificate-key #f)))
-
-(define (nginx-server-configurations service-and-ports
+(define (nginx-server-configurations base-nginx-server-configuration
+                                     service-and-ports
                                      server-aliases
                                      domain)
-  (let ((base (govuk-nginx-server-configuration-base)))
     (cons*
      (nginx-server-configuration
-      (inherit base)
+      (inherit base-nginx-server-configuration)
       (locations
        (list
         (nginx-location-configuration
@@ -74,7 +71,7 @@
          (body '("proxy_pass http://content-store-proxy;")))))
       (server-name (list (string-append "www." domain))))
      (nginx-server-configuration
-      (inherit base)
+      (inherit base-nginx-server-configuration)
       (locations
        (list
         (nginx-location-configuration
@@ -86,7 +83,7 @@ proxy_set_header Host $host:$server_port;")))
          (body '("proxy_pass http://draft-content-store-proxy;")))))
       (server-name (list (string-append "draft-origin." domain))))
      (nginx-server-configuration
-      (inherit base)
+      (inherit base-nginx-server-configuration)
       (locations
        (cons*
         (nginx-location-configuration
@@ -111,7 +108,7 @@ proxy_set_header Host $host:$server_port;")))
       (match-lambda
        ((service . port)
         (nginx-server-configuration
-         (inherit base)
+         (inherit base-nginx-server-configuration)
          (locations
           `(,(nginx-location-configuration
               (uri "/")
@@ -144,11 +141,15 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                              (or (assq-ref server-aliases service)
                                  '()))))
          (root (string-append "/var/apps/" (symbol->string service) "/public")))))
-      service-and-ports))))
+      service-and-ports)))
 
 (define-record-type* <govuk-nginx-configuration>
   govuk-nginx-configuration make-govuk-nginx-configuration
   govuk-nginx-configuration?
+  (http-port                      govuk-nginx-configuration-http-port
+                                  (default 80))
+  (https-port                     govuk-nginx-configuration-https-port
+                                  (default 443))
   (service-and-ports              govuk-nginx-configuration-service-and-ports)
   (router-config                  govuk-nginx-configuration-router-config)
   (draft-router-config            govuk-nginx-configuration-draft-router-config)
@@ -157,40 +158,45 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                   (default #t))
   (domain                         govuk-nginx-configuration-domain
                                   (default "gov.uk"))
-  (tls-certificate                govuk-nginx-tls-certificate
+  (tls-certificate                govuk-nginx-configuration-tls-certificate
                                   (default #f))
-  (tls-private-key                govuk-nginx-tls-private-key
+  (tls-private-key                govuk-nginx-configuration-tls-private-key
                                   (default #f))
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
                                   (default '())))
 
+(define (apply-base-nginx-server-configuration
+         govuk-nginx-config nginx-server-config)
+  (nginx-server-configuration
+   (inherit nginx-server-config)
+   (http-port (govuk-nginx-configuration-http-port govuk-nginx-config))
+   (https-port (govuk-nginx-configuration-https-port govuk-nginx-config))
+   (ssl-certificate (govuk-nginx-configuration-tls-certificate govuk-nginx-config))
+   (ssl-certificate-key (govuk-nginx-configuration-tls-private-key govuk-nginx-config))))
 
-(define govuk-nginx-configuration->nginx-configuration
-  (match-lambda
-   (($ <govuk-nginx-configuration> service-and-ports
-                                   router-config
-                                   draft-router-config
-                                   server-aliases
-                                   authenticated-draft-origin?
-                                   domain
-                                   tls-certificate
-                                   tls-private-key
-                                   additional-nginx-server-blocks)
+(define (base-nginx-server-configuration govuk-nginx-config)
+  (apply-base-nginx-server-configuration govuk-nginx-config
+                                         (nginx-server-configuration)))
+
+(define (govuk-nginx-configuration->nginx-configuration config)
+  (match config
+    (($ <govuk-nginx-configuration> http-port
+                                    https-port
+                                    service-and-ports
+                                    router-config
+                                    draft-router-config
+                                    server-aliases
+                                    authenticated-draft-origin?
+                                    domain
+                                    tls-certificate
+                                    tls-private-key
+                                    additional-nginx-server-blocks)
     (nginx-configuration
      (server-blocks
-      (let ((server-blocks
-             (nginx-server-configurations service-and-ports
-                                          server-aliases
-                                          domain)))
-        (if (and tls-certificate tls-private-key)
-            (map (lambda (config)
-                   (nginx-server-configuration
-                    (inherit config)
-                    (ssl-certificate tls-certificate)
-                    (ssl-certificate-key tls-private-key)))
-                 server-blocks)
-            server-blocks)))
-
+      (nginx-server-configurations (base-nginx-server-configuration config)
+                                   service-and-ports
+                                   server-aliases
+                                   domain))
      (upstream-blocks
       (nginx-upstream-configurations service-and-ports
                                      router-config
@@ -241,4 +247,6 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
    (extend (lambda (config servers)
              ((service-type-extend nginx-service-type)
               (govuk-nginx-configuration->nginx-configuration config)
-              servers)))))
+              (map (lambda (server)
+                     (apply-base-nginx-server-configuration config server))
+                   servers))))))
