@@ -1289,7 +1289,7 @@
 
 (define-public publishing-e2e-tests-service-type
   (service-type
-   (name 'publishing-e2e-tests-service)
+   (name 'publishing-e2e-tests)
    (extensions
     (list (service-extension signon-service-type
                              (const publishing-e2e-tests-signon-users))
