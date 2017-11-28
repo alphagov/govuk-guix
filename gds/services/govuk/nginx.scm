@@ -195,7 +195,8 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
       (nginx-upstream-configurations service-and-ports
                                      router-config
                                      draft-router-config
-                                     authenticated-draft-origin?))))))
+                                     authenticated-draft-origin?))
+     (server-names-hash-bucket-size 128)))))
 
 (define (maybe-convert-to-nginx-configuration config)
   (if (govuk-nginx-configuration? config)
