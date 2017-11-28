@@ -125,26 +125,35 @@
            ((key . script)
             #~(lambda ()
                 (simple-format #t "Running pre-startup-script ~A\n" '#$key)
-                (let
-                    ((result
-                      (catch
-                        #t
-                        #$script
-                        (lambda (key . args) (cons key args)))))
+
+                (let* ((start-time (get-internal-run-time))
+                       (result
+                        (catch
+                          #t
+                          #$script
+                          (lambda (key . args) (cons key args))))
+                       (seconds-taken
+                        (/ (- (get-internal-run-time) start-time)
+                           internal-time-units-per-second)))
                   (if (eq? result #t)
                       (begin
-                        (simple-format #t "pre-startup-script ~A succeeded\n" '#$key)
+                        (format
+                         #t "pre-startup-script ~a succeeded (~1,2f seconds)\n"
+                         '#$key seconds-taken)
                         #t)
                       (begin
-                        (simple-format #t "pre-startup-script ~A failed\n" '#$key)
-                        (simple-format #t "result: ~A\n" result)
+                        (format
+                         #t "pre-startup-script ~a failed (~1,2f seconds)\n"
+                         '#$key seconds-taken)
+                        (format #t "result: ~A\n" result)
                         #f))))))
          pre-startup-scripts)))
     (if (null? script-gexps)
         #~#t
         (with-imported-modules '((gds build utils))
         #~(begin
-            (use-modules (gds build utils))
+            (use-modules (gds build utils)
+                         (ice-9 format))
             (simple-format
              #t
              "Running ~A startup scripts for ~A\n"
