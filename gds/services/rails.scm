@@ -97,7 +97,7 @@
 (define (generic-rails-app-service-environment-variables
          root-directory . parameters)
   `(("PATH" . ,(simple-format #f "~A/bin" root-directory))
-    ("HOME" . "/nonexistent")
+    ("HOME" . ,root-directory)
     ,@(let ((rails-app-config
              (find rails-app-config? parameters)))
         (if rails-app-config
