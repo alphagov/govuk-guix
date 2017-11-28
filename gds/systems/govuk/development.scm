@@ -159,7 +159,7 @@ net:
     (service govuk-nginx-service-type
              (govuk-nginx-configuration
               (http-port 50080)
-              (https-port 50443)
+              (https-port #f)
               (service-and-ports govuk-ports)
               (router-config live-router-config)
               (draft-router-config draft-router-config)
