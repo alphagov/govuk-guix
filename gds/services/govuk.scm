@@ -1890,7 +1890,8 @@
    ;; transition-service
    release-service
    router-service
-   draft-router-service))
+   draft-router-service
+   publishing-e2e-tests-service))
 
 (define-public frontend-services
   (list
