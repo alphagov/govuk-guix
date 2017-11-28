@@ -14,7 +14,6 @@
                         (const
                          (list
                           (nginx-server-configuration
-                           (inherit (govuk-nginx-server-configuration-base))
                            (locations
                             (list
                              (nginx-location-configuration

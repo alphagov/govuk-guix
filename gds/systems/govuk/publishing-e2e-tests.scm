@@ -133,7 +133,6 @@
       (additional-nginx-server-blocks
        (list
         (nginx-server-configuration
-         (inherit (govuk-nginx-server-configuration-base))
          (server-name '("publishing-e2e-tests.dev.gov.uk"))
          (root "/var/apps/publishing-e2e-tests")
          (locations
