@@ -92,10 +92,11 @@
 (define (system-without-unnecessary-services
          services-to-keep
          system)
-  (for-each (lambda (service)
-              (unless (service? service)
-                (simple-format #t "error: system-without-unnecessary-services: not a service ~A\n" service)))
-            services-to-keep)
+  (for-each
+   (lambda (service)
+     (unless (service? service)
+       (simple-format #t "error: system-without-unnecessary-services: not a service ~A\n" service)))
+   services-to-keep)
   (for-each (lambda (service)
               (unless (member service
                               (operating-system-user-services system))
