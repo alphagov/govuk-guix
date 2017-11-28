@@ -228,8 +228,7 @@
         (let ((user (getpwnam #$string-name))
               (environment-variables '#$environment-variables))
 
-          (use-modules (guix build utils)
-                       (ice-9 popen))
+          (use-modules (guix build utils))
 
           (and
            #$run-root-pre-startup-scripts
