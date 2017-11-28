@@ -40,7 +40,15 @@
   (map service->name services))
 
 (define-public (find-missing-requirements
-                services all-services requirement->service)
+                services requirement->service-alist)
+  (define (services-for-requirements service)
+    (filter-map
+     (lambda (requirement)
+       (assq-ref requirement->service-alist requirement))
+     (append-map
+      shepherd-service-requirement
+      (shepherd-services-from-service service))))
+
   (fold
    (lambda (service missing-requirements)
      (append
@@ -50,25 +58,30 @@
                  (member service missing-requirements)
                  (member service new-services))
              new-services
-             (begin
-               ;; (simple-format #t "(memq service services): ~A ~A\n" (member service services) (service-names services))
-               ;; (simple-format #t "adding: ~A\n" (service->name service))
-               (cons
+             (cons
               service
-              new-services))))
+              new-services)))
        '()
-       (filter-map
-        (lambda (requirement)
-          (or (assq-ref requirement->service requirement)
-              #f ;; TODO(error "Could not find service ~A\n" requirement)
-              ))
-        (concatenate
-         (map
-          shepherd-service-requirement
-          (shepherd-services-from-service service)))))
+       (services-for-requirements service))
       missing-requirements))
    '()
    services))
+
+(define-public (find-missing-extension-targets services all-services)
+  (let* ((service-types (map service-kind services))
+         (extensions
+          (append-map service-type-extensions service-types))
+         (missing-service-types
+          (lset-difference
+           eq?
+           (delete-duplicates
+            (map service-extension-target extensions))
+           service-types)))
+    (filter
+     (lambda (service)
+       (member (service-kind service)
+               missing-service-types))
+     all-services)))
 
 (define-public (add-missing-requirements
                 services all-services requirement->service)
@@ -79,8 +92,10 @@
     (error "duplicates"))
   (let
       ((missing-requirements
-        (find-missing-requirements
-         services all-services requirement->service)))
+        (lset-union
+         equal?
+         (find-missing-requirements services requirement->service)
+         (find-missing-extension-targets services all-services))))
     (if (null? missing-requirements)
         services
         (add-missing-requirements
