@@ -54,10 +54,11 @@
                  (string-append "localhost:" (number->string port)))))))
     service-and-ports)))
 
-(define (nginx-server-configurations base-nginx-server-configuration
-                                     service-and-ports
-                                     server-aliases
-                                     domain)
+(define* (nginx-server-configurations base-nginx-server-configuration
+                                      service-and-ports
+                                      server-aliases
+                                      domain
+                                      #:key https?)
     (cons*
      (nginx-server-configuration
       (inherit base-nginx-server-configuration)
@@ -115,15 +116,14 @@ proxy_set_header Host $host:$server_port;")))
               (body (list "try_files $uri/index.html $uri.html $uri @app;")))
             ,(nginx-named-location-configuration
               (name "app")
-              (body (list (simple-format
-                           #f
-                           "access_log /var/log/nginx/~A.access.log;
-proxy_pass http://~A-proxy;
-# Set X-Forwarded-SSL for OmniAuth
-proxy_set_header X-Forwarded-SSL 'on';
-proxy_set_header Host $host:$server_port;"
-                           service
-                           service))))
+              (body
+               `(,(simple-format #f "access_log /var/log/nginx/~A.access.log;" service)
+                 ,(simple-format #f "proxy_pass http://~A-proxy;" service)
+                 ,@(if #f
+                       '("# Set X-Forwarded-SSL for OmniAuth"
+                         "proxy_set_header X-Forwarded-SSL 'on';")
+                       '())
+                 "proxy_set_header Host $host:$server_port;")))
             ,@(if (eq? service 'whitehall)
                   (list
                    (nginx-location-configuration
@@ -196,7 +196,8 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
       (nginx-server-configurations (base-nginx-server-configuration config)
                                    service-and-ports
                                    server-aliases
-                                   domain))
+                                   domain
+                                   #:https? (number? https-port)))
      (upstream-blocks
       (nginx-upstream-configurations service-and-ports
                                      router-config
