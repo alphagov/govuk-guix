@@ -101,7 +101,8 @@
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
-     (home-page "https://github.com/alphagov/asset-manager"))))
+     (home-page "https://github.com/alphagov/asset-manager"))
+   #:extra-inputs (list libffi)))
 
 (define-public authenticating-proxy
   (package-with-bundler
@@ -202,7 +203,8 @@ proxies requests to some upstream")
      (synopsis "Collections serves the new GOV.UK navigation and other pages")
      (description "")
      (license license:expat)
-     (home-page "https://github.com/alphagov/collections"))))
+     (home-page "https://github.com/alphagov/collections"))
+   #:extra-inputs (list libffi)))
 
 (define-public collections-publisher
   (package-with-bundler
@@ -249,7 +251,8 @@ proxies requests to some upstream")
      (description "")
      (license license:expat)
      (home-page "https://github.com/alphagov/contacts-admin"))
-   #:extra-inputs (list mariadb)))
+   #:extra-inputs (list libffi
+                        mariadb)))
 
 (define-public content-performance-manager
   (package-with-bundler
@@ -311,7 +314,8 @@ proxies requests to some upstream")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/content-tagger"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list postgresql
+                        libffi)))
 
 (define-public design-principles
   (package-with-bundler
@@ -418,7 +422,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/email-alert-service/"))))
+     (home-page "https://github.com/alphagov/email-alert-service/"))
+   #:extra-inputs (list libffi)))
 
 (define-public feedback
   (package-with-bundler
@@ -626,7 +631,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/info-frontend"))))
+     (home-page "https://github.com/alphagov/info-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public licence-finder
   (package-with-bundler
@@ -674,7 +680,8 @@ service setup.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/local-links-manager"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list postgresql
+                        libffi)))
 
 (define-public manuals-frontend
   (package-with-bundler
@@ -692,7 +699,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/manuals-frontend"))))
+     (home-page "https://github.com/alphagov/manuals-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public manuals-publisher
   (package-with-bundler
@@ -716,7 +724,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/manuals-publisher"))))
+     (home-page "https://github.com/alphagov/manuals-publisher"))
+   #:extra-inputs (list libffi)))
 
 (define-public maslow
   (package-with-bundler
@@ -766,7 +775,8 @@ service setup.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/policy-publisher"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list libffi
+                        postgresql)))
 
 (define-public publisher
   (package-with-bundler
@@ -818,6 +828,7 @@ content, as well as broadcasting changes to a message queue.")
      (license license:expat)
      (home-page "https://github.com/alphagov/publishing-api"))
    #:extra-inputs (list
+                   libffi
                    ;; Required by the pg gem
                    postgresql)))
 
@@ -996,7 +1007,8 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/search-admin"))
-   #:extra-inputs (list mariadb)))
+   #:extra-inputs (list libffi
+                        mariadb)))
 
 (define-public service-manual-frontend
   (package-with-bundler
@@ -1014,7 +1026,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/service-manual-frontend"))))
+     (home-page "https://github.com/alphagov/service-manual-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public service-manual-publisher
   (package-with-bundler
@@ -1036,7 +1049,8 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/service-manual-publisher"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list libffi
+                        postgresql)))
 
 (define-public short-url-manager
   (package-with-bundler
@@ -1199,7 +1213,9 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/static"))))
+     (home-page "https://github.com/alphagov/static"))
+   #:extra-inputs (list
+                   libffi)))
 
 (define-public support
   (package-with-bundler
