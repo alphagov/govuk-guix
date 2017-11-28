@@ -389,30 +389,25 @@ end")
                       ,@(if secret-key
                             `(("DEVISE_SECRET_KEY" . ,secret-key))
                             '()))))
-                 `((signon-setup-applications
+                 `((signon-setup
                     .
                     ,#~(lambda ()
                          (run-command
                           "rails" "runner"
-                          #$(signon-setup-applications-script
-                             (signon-config-applications config)))))
-                    (signon-setup-users
-                    .
-                    ,#~(lambda ()
-                         (run-command
-                          "rails" "runner"
-                          #$(signon-setup-users-script
-                             (map
-                              (cut filter-signon-user-application-permissions
-                                <> (signon-config-applications config))
-                              (signon-config-users config))))))
-                   (signon-setup-api-users
-                    .
-                    ,#~(lambda ()
-                         (run-command
-                          "rails" "runner"
-                          #$(signon-setup-api-users-script
-                             (signon-config-api-users config)))))))
+                          (string-join
+                           (map
+                            (lambda (script)
+                              (string-append "load '" script "';"))
+                            (list
+                             #$(signon-setup-applications-script
+                                (signon-config-applications config))
+                             #$(signon-setup-users-script
+                                (map
+                                 (cut filter-signon-user-application-permissions
+                                   <> (signon-config-applications config))
+                                 (signon-config-users config)))
+                             #$(signon-setup-api-users-script
+                                (signon-config-api-users config))))))))))
                 parameter))
           parameters)))))
    (compose concatenate)
