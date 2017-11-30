@@ -269,13 +269,16 @@
            (inherit default-shepherd-service)
            (provision '(authenticating-proxy))
            (requirement '(signon)))
-          (plek-config) (rails-app-config) authenticating-proxy
-          (service-startup-config)
-          (signon-application
-           (name "Content Preview")
-           (supported-permissions '("signin")))
-          (mongodb-connection-config
-           (database "authenticating_proxy")))))
+         (plek-config)
+         (rails-app-config
+          (assets? #f))
+         authenticating-proxy
+         (service-startup-config)
+         (signon-application
+          (name "Content Preview")
+          (supported-permissions '("signin")))
+         (mongodb-connection-config
+          (database "authenticating_proxy")))))
 
 ;;;
 ;;; Calculators
