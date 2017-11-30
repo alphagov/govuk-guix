@@ -119,7 +119,7 @@ proxy_set_header Host $host:$server_port;")))
               (body
                `(,(simple-format #f "access_log /var/log/nginx/~A.access.log;" service)
                  ,(simple-format #f "proxy_pass http://~A-proxy;" service)
-                 ,@(if #f
+                 ,@(if https?
                        '("# Set X-Forwarded-SSL for OmniAuth"
                          "proxy_set_header X-Forwarded-SSL 'on';")
                        '())
