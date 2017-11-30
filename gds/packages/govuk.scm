@@ -836,15 +836,15 @@ content, as well as broadcasting changes to a message queue.")
   (package-with-bundler
    (bundle-package
     (hash
-     (base32 "0nficwk1id99zlg57ahkbz5lrjalx45vf8ywqi54kazlfjp4x50b")))
+     (base32 "0638s65jrd0dqwdira5mppidn6ycpcrxhr1vzj185cp81c403zjn")))
    (package
      (name "publishing-e2e-tests")
      (version "0")
      (source
       (github-archive
        #:repository "publishing-e2e-tests"
-       #:commit-ish "5451c1f1b7baa0ac4849deed278c98739cdf0f01"
-       #:hash (base32 "116l3fhmr4jqpyf95gzpwmbqxcrhdj63f7npd1n8vfv521smig7r")))
+       #:commit-ish "e07cc17fa88ee958967e0219fd2c715ee47c277b"
+       #:hash (base32 "18mwrkwqpiwgga6kyyf2syp1bxjqkvlvpj5ddr3lnhnhq04i0w4c")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
@@ -867,6 +867,7 @@ content, as well as broadcasting changes to a message queue.")
      (license license:expat)
      (home-page "https://github.com/alphagov/publishing-e2e-tests"))
    #:extra-inputs (list
+                   libffi
                    ;; For nokogiri
                    pkg-config
                    libxml2

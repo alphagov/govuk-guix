@@ -1312,6 +1312,9 @@
                                 government-frontend
                                 draft-government-frontend
                                 travel-advice-publisher
+                                collections-publisher
+                                publisher
+                                frontend
                                 nginx
                                 asset-manager))
                  (respawn? #f)
