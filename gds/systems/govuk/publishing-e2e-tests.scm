@@ -128,6 +128,7 @@
      parameter =>
      (govuk-nginx-configuration
       (inherit parameter)
+      (https-port 50443)
       (tls-certificate "/etc/nginx/dev.gov.uk.cert")
       (tls-private-key "/etc/nginx/dev.gov.uk.key")
       (additional-nginx-server-blocks
