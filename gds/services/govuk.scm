@@ -1261,7 +1261,7 @@
              ;; them in to relative links so that they work outside of
              ;; the container
              (let ((substring
-                    (string-append "file://" results-directory)))
+                    (string-append "file://" results-directory "/")))
                (with-atomic-file-replacement test-results.html
                  (lambda (in out)
                    (write-string/partial
