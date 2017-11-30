@@ -147,6 +147,11 @@
    (cons* (find (lambda (s) (eq? (service-kind s)
                                  publishing-e2e-tests-service-type))
                 services)
+          ;; TODO: Currently nothing depends on authenticating-proxy,
+          ;; so its removed
+          (find (lambda (s) (eq? (service-type-name (service-kind s))
+                                 'authenticating-proxy))
+                services)
           base-services)
    (operating-system
     (inherit development-os)
