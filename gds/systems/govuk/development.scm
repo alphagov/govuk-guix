@@ -17,6 +17,7 @@
   #:use-module (gnu services admin)
   #:use-module (gnu packages web)
   #:use-module (gnu packages vim)
+  #:use-module (gnu packages lsof)
   #:use-module (gnu packages ncdu)
   #:use-module (gnu packages code)
   #:use-module (gnu services databases)
@@ -501,6 +502,7 @@ the Signon Dev user passphrase in\n")
       tree
       jq
       wget
+      lsof
       curl
       %base-packages))
     (skeletons
