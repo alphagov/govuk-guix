@@ -806,15 +806,15 @@ service setup.")
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "12hrqq0dwfj7dp1n96fsvb3r1wy9amphfqwidmdmh6ary1qsa9m0")))
+    (hash (base32 "15rp5biv96fs9gxxn0wspxbvvlg7jpna8lh70p1hylhm9gbsayja")))
    (package
      (name "publishing-api")
-     (version "release_1034")
+     (version "release_1036")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "1zr4nbby5991m6wsamb9wvy3pfz8qx92nzn5znyjkv2c3iqr66h6")))
+       #:hash (base32 "1v9vkq37j7kbdgvhpkcbavqm89a8wzpjlqj2w5csig7xdlj6b5nv")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f
                   #:ruby ,ruby-2.3))
