@@ -295,7 +295,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/content-store"))))
+     (home-page "https://github.com/alphagov/content-store"))
+   #:extra-inputs (list libffi)))
 
 (define-public content-tagger
   (package-with-bundler
