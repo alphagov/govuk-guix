@@ -802,7 +802,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/publisher"))))
+     (home-page "https://github.com/alphagov/publisher"))
+   #:extra-inputs (list libffi)))
 
 (define-public publishing-api
   (package-with-bundler
