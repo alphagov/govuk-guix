@@ -228,7 +228,8 @@ proxies requests to some upstream")
      (description "")
      (license license:expat)
      (home-page "https://github.com/alphagov/collections-publisher"))
-   #:extra-inputs (list mariadb)))
+   #:extra-inputs (list mariadb
+                        libffi)))
 
 (define-public contacts-admin
   (package-with-bundler
@@ -613,7 +614,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/imminence"))))
+     (home-page "https://github.com/alphagov/imminence"))
+   #:extra-inputs (list libffi)))
 
 (define-public info-frontend
   (package-with-bundler
@@ -897,7 +899,8 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/release"))
-   #:extra-inputs (list mariadb)))
+   #:extra-inputs (list mariadb
+                        libffi)))
 
 (define-public router
   (package
@@ -964,7 +967,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/router-api"))))
+     (home-page "https://github.com/alphagov/router-api"))
+   #:extra-inputs (list libffi)))
 
 (define-public rummager
   (package-with-bundler
@@ -1073,7 +1077,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/short-url-manager"))))
+     (home-page "https://github.com/alphagov/short-url-manager"))
+   #:extra-inputs (list libffi)))
 
 (define-public signon
   (package-with-bundler
@@ -1288,7 +1293,8 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/transition"))
-   #:extra-inputs (list postgresql)))
+   #:extra-inputs (list libffi
+                        postgresql)))
 
 (define-public travel-advice-publisher
   (package-with-bundler
