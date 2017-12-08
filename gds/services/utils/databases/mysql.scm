@@ -134,8 +134,7 @@ CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';\n
       (log-and-write port "
 CREATE DATABASE IF NOT EXISTS ~A;\n" #$database)
       (log-and-write port "
-GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)
-      (log-and-write port "EXIT\n")))
+GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)))
 
 (define (mysql-create-user-for-database-connection
          database-connection)
