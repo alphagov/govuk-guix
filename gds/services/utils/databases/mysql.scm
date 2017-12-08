@@ -125,6 +125,17 @@
 CREATE USER IF NOT EXISTS '~A'@'localhost' IDENTIFIED BY '~A';\n
 " #$user #$password)))
 
+(define (mysql-grant-all-privileges-for-database-gexp database user)
+  #~(lambda (port)
+      (define (log-and-write p str . args)
+        (display (apply simple-format #f str args))(display "\n")
+        (apply simple-format p str args))
+
+      (log-and-write port "
+GRANT ALL ON ~A.* TO '~A'@'localhost';\n
+FLUSH PRIVILEGES;
+" #$database #$user)))
+
 (define (mysql-create-database-gexp database user)
   #~(lambda (port)
       (define (log-and-write p str . args)
@@ -143,7 +154,8 @@ GRANT ALL ON ~A.* TO '~A'@'localhost';\n" #$database #$user)))
    (match database-connection
      (($ <mysql-connection-config> host user port database password)
       (list
-       (mysql-ensure-user-exists-gexp user password))))))
+       (mysql-ensure-user-exists-gexp user password)
+       (mysql-grant-all-privileges-for-database-gexp database user))))))
 
 (define (mysql-create-user-and-database-for-database-connection
          database-connection)
