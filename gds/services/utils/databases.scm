@@ -64,11 +64,16 @@
           host
           port
           database))))
-    (($ <mysql-connection-config> host user port database)
+    (($ <mysql-connection-config> host user port database password)
      `(("DATABASE_URL" .
         ,(simple-format
           #f
-          "mysql2://~A:~A/~A"
+          "mysql2://~A~A@~A:~A/~A"
+          user
+          (or (and=> password
+                     (lambda (password)
+                       (string-append ":" password)))
+              "")
           host
           port
           database))))
