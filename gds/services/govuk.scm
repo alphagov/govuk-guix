@@ -205,7 +205,7 @@
            (file "config/sidekiq.yml"))
           (mysql-connection-config
            (host "localhost")
-           (user "halberd")
+           (user "signon")
            (port "-")
            (database "signon_production")
            (password ""))
