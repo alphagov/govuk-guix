@@ -973,15 +973,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public rummager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1lw7m31vspariyjaj6dqrrfs9cac4ynnhv09qj7r6nq1qw6aylk0")))
+    (hash (base32 "1wsd0m6wmzqd65r99ngw9wm04nj8jrxvvdjcfqph03g1n98wl2fw")))
    (package
      (name "rummager")
-     (version "release_1615")
+     (version "release_1616")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0vbd621k986klvcxgwnp1j5psd8746rk9x0f25mlzllk3n6q215r")))
+       #:hash (base32 "1is8cw1bmyp0wbjmsxf29h7x5sqjq2c57s3pchnvzlj6an70bs3p")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
