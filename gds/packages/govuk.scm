@@ -133,15 +133,15 @@ proxies requests to some upstream")
 (define-public bouncer
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ifg3c5kmjsjayzpgbgri7b19gaj57hsd8ndpp9ngpl6vyd95x4b")))
+    (hash (base32 "18b0m0bhfvfnid92mr0hhk0w845585zgvfxxh65i7nybsd6igxg3")))
    (package
      (name "bouncer")
-     (version "release_210")
+     (version "release_214")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0bhlwnh3xwv3m3gfb7n2a96pln1ngxlfql9x6d64p73f08601s3b")))
+       #:hash (base32 "1vlc26lqz7k3cj5mxwhxcj3zr7sm7hj4z383lph9jck8b338ipcf")))
      (build-system rails-build-system)
      (synopsis "Rack based redirector backed by the Transition service")
      (description "")
