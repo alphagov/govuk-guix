@@ -504,7 +504,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/government-frontend"))))
+     (home-page "https://github.com/alphagov/government-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public govuk-content-schemas
   (package
