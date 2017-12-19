@@ -50,15 +50,15 @@
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1j3ihiwmlcs2z1cy09dls6mq5m524kxbm0qmmjsvpdfn68sgdwqr")))
+    (hash (base32 "1jk4qbyi27bdsbwk2ayq9hy63pb9q1k7cc4016vbhawf669v8x5m")))
    (package
      (name "asset-manager")
-     (version "release_201")
+     (version "release_202")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1n4dldsv4aiwis5bsibypbd1vxr67m376kfrid46r1518azicli9")))
+       #:hash (base32 "1w6sf1vwjga8hv492vpsflhmc0z077zjma9c4hfm92jz3wrlakd5")))
      (build-system rails-build-system)
      (inputs
       `(("govuk_clamscan"
