@@ -1207,15 +1207,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0nr5xzlcyvsivymlkd39il62j5hiiasc8vr4zmwabphilqjdl53g")))
+    (hash (base32 "1ab3cl2rsprcw1kmh14jkkg3c0nh076frnzzyaxzpv7797lb17ac")))
    (package
      (name "static")
-     (version "release_2745")
+     (version "release_2746")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "12a7q03fsj813s56ydacgr887xs6jlxsxz9ribnvamrw3ps49wdq")))
+       #:hash (base32 "1ld6gdsvrx854sg8wz1s5hlb1vldm8xwc4jyckyx7hsnncaxgwzq")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f
                   #:ruby ,ruby-2.3))
