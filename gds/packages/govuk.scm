@@ -621,15 +621,15 @@ service setup.")
 (define-public info-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "17yzyzddcqgz9z0vf3h7m97qivf2fsszz4xpziqi6j6wj8nz63yq")))
+    (hash (base32 "1xg3jh7k0nlxjqzhl5ip3ax6rqfcimrxbr8nh9ylj69cmg2farqj")))
    (package
      (name "info-frontend")
-     (version "release_85")
+     (version "release_86")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ix4ri739sigj7ycm8ylsdp320cnllr1qvawkdkb8bqc27azvyxk")))
+       #:hash (base32 "07d3cpp6r6w1klmba0mva8n9jqy2v5iqdqz0x3aqlqbsr6cmrflp")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
