@@ -107,15 +107,15 @@
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1c28nqb80mkdrlj2j45rl01fnp8awvqjzhsrmak2qj20xzgfd24d")))
+    (hash (base32 "1bs7s8b1i1vinhf4zp4k0rpk6v0bsyhlyv74kh8my8xwkycxkkyz")))
    (package
      (name "authenticating-proxy")
-     (version "release_43")
+     (version "release_44")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "17qrszw7jhd8w26hv2i6z18abf3yyhmxwip0rnn8q50mg649ssfp")))
+       #:hash (base32 "016bhs4cvki19065bg4w07ryi2442pcf91z0yfd9zlk80pxha6g5")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
