@@ -1255,15 +1255,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1whlhmrvnirpp81x0qd948a51hlk19p8hbivslsxkhr6k8ppqhpb")))
+    (hash (base32 "00571gjs3wv500y4b0xypcjyl7jgfrpcybmv89q6z4lizchjai83")))
    (package
      (name "support-api")
-     (version "release_138")
+     (version "release_140")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "00344x7cbmsgiqs4lyz8gwbnfjj33j4f6zj7syl4vd74037mjlp3")))
+       #:hash (base32 "1pb30m7fbhlqg28g2h05kalax90pb4sf16aiq69bjaby79n8h9dp")))
      (build-system rails-build-system)
      (arguments `(#:ruby ,ruby-2.3))
      (inputs
