@@ -185,7 +185,8 @@ proxies requests to some upstream")
      (synopsis "Serves calendars on GOV.UK")
      (description "")
      (license license:expat)
-     (home-page "https://github.com/alphagov/calendars"))))
+     (home-page "https://github.com/alphagov/calendars"))
+   #:extra-inputs (list libffi)))
 
 (define-public collections
   (package-with-bundler
