@@ -1156,7 +1156,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/specialist-publisher"))))
+     (home-page "https://github.com/alphagov/specialist-publisher"))
+   #:extra-inputs (list libffi)))
 
 (define-public smokey
   (package-with-bundler
