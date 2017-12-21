@@ -83,6 +83,7 @@
                     #:phases ,phases
                     #:system ,system
                     #:outputs %outputs
+                    #:precompile-rails-assets? ,precompile-rails-assets?
                     #:inputs %build-inputs)))
 
   (define guile-for-build

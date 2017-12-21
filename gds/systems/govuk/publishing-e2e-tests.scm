@@ -67,7 +67,6 @@
 
 (define setup-functions
   (list
-   precompile-rails-assets-on-startup
    modify-plek-config
    services-in-rails-production-environment))
 

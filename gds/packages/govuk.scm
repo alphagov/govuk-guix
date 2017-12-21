@@ -118,7 +118,8 @@
        #:hash (base32 "016bhs4cvki19065bg4w07ryi2442pcf91z0yfd9zlk80pxha6g5")))
      (build-system rails-build-system)
      (arguments
-      `(#:phases
+      `(#:precompile-rails-assets? #f
+        #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
             ,(replace-mongoid.yml)))
@@ -143,6 +144,8 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0lymfpwvv899p7pbi2ppd16wagws2x7bzangzhfaxm37khhdj4vr")))
      (build-system rails-build-system)
+     (arguments
+      '(#:precompile-rails-assets? #f))
      (synopsis "Rack based redirector backed by the Transition service")
      (description "")
      (license license:expat)
@@ -293,7 +296,7 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "1qn9wd5d0pxkqcgg401mqb1lwfcp3hlrnppwac8vaahd8i465a64")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)

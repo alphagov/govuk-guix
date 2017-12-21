@@ -314,7 +314,7 @@
                (map
                 (lambda (dir)
                   (string-append #$root-directory "/" dir))
-                '("log" "public"))))
+                '("log"))))
             (begin
               (mkdir-p (string-append #$root-directory "/bin"))
               (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")

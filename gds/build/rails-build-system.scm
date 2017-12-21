@@ -64,9 +64,18 @@
             (assoc-ref outputs "out")
             "/log")))
 
-(define* (precompile-rails-assets #:key inputs #:allow-other-keys)
-  (zero?
-   (system* "bundle" "exec" "rake" "assets:precompile")))
+(define* (precompile-rails-assets
+          #:key inputs precompile-rails-assets?
+          #:allow-other-keys)
+  (or (not precompile-rails-assets?)
+      (begin
+        (call-with-output-file "config/initializers/assets.govuk-guix.rb"
+          (lambda (port)
+            (display
+             "Rails.application.config.assets.initialize_on_precompile = false\n"
+             port)))
+        (zero?
+         (system* "bundle" "exec" "rake" "assets:precompile")))))
 
 (define* (install #:key inputs outputs #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out")))
@@ -113,6 +122,8 @@
     (replace 'build (lambda args #t))
     (replace 'check (lambda args #t))
     (replace 'install install)
+    (add-before 'install 'precompile-rails-assets
+                precompile-rails-assets)
     (add-after 'install 'wrap-bin-files-for-rails
                wrap-bin-files-for-rails)
     (add-after 'wrap-bin-files-for-rails 'replace-relative-spring-path
@@ -129,17 +140,7 @@
 (define* (rails-build #:key
                       inputs
                       (phases %standard-phases)
-                      (precompile-rails-assets? #t)
                       #:allow-other-keys
                       #:rest args)
   "Build the given Rails application, applying all of PHASES in order."
-  (apply gnu:gnu-build
-         #:inputs inputs
-         #:phases (filter
-                   (match-lambda
-                     ((key . value)
-                      (cond ((eq? key 'precompile-rails-assets)
-                             precompile-rails-assets?)
-                            (else #f))))
-                   phases)
-         args))
+  (apply gnu:gnu-build #:inputs inputs #:phases phases args))
