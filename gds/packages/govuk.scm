@@ -361,8 +361,6 @@ proxies requests to some upstream")
       `(#:precompile-rails-assets? #f
         #:phases
         (modify-phases %standard-phases
-          (add-after 'install 'replace-redis.yml
-                     ,(replace-redis.yml))
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
@@ -448,7 +446,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/feedback"))))
+     (home-page "https://github.com/alphagov/feedback"))
+   #:extra-inputs (list libffi)))
 
 (define-public finder-frontend
   (package-with-bundler
@@ -466,7 +465,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/finder-frontend"))))
+     (home-page "https://github.com/alphagov/finder-frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public frontend
   (package-with-bundler
@@ -806,6 +806,9 @@ service setup.")
                      ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
                      ,(replace-gds-sso-initializer)))))
+     (inputs
+      `(;; hostname is needed by the redis-lock gem
+        ("inetutils" ,inetutils)))
      (synopsis "")
      (description "")
      (license #f)
@@ -1130,7 +1133,8 @@ content, as well as broadcasting changes to a message queue.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/smart-answers"))))
+     (home-page "https://github.com/alphagov/smart-answers"))
+   #:extra-inputs (list libffi)))
 
 (define-public specialist-publisher
   (package-with-bundler
@@ -1295,6 +1299,9 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "08fbpn61c6pmyzq4njwkvcb0x0dclq0j701n11n774ziyf8d8wky")))
      (build-system rails-build-system)
+     (inputs
+      `(;; hostname is needed by the redis-lock gem
+        ("inetutils" ,inetutils)))
      (synopsis "")
      (description "")
      (license #f)
