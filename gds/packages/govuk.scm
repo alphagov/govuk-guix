@@ -843,7 +843,8 @@ content, as well as broadcasting changes to a message queue.")
                        (copy-recursively
                         "."
                         out
-                        #:log (%make-void-port "w"))))))))
+                        #:log (%make-void-port "w"))
+                       (mkdir-p (string-append out "/tmp/results"))))))))
      (synopsis "Suite of end-to-end tests for GOV.UK")
      (description "")
      (license license:expat)

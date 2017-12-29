@@ -20,6 +20,7 @@
   #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk plek)
+  #:use-module (gds services govuk publishing-e2e-tests)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
