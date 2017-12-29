@@ -37,16 +37,6 @@
   #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party phantomjs))
 
-;; TODO: The native search paths in the ruby-2.3 package from GNU Guix
-;; are wrong in the version currently in use, so fix this here.
-(define ruby-2.3
-  (package
-    (inherit (@ (gnu packages ruby) ruby-2.3))
-    (native-search-paths
-     (list (search-path-specification
-            (variable "GEM_PATH")
-            (files (list "lib/ruby/gems/2.3.0")))))))
-
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
@@ -96,8 +86,7 @@
           (add-after 'install 'create-uploads-directory
                      (lambda* (#:key outputs #:allow-other-keys)
                        (let ((out (assoc-ref outputs "out")))
-                         (mkdir-p (string-append out "/uploads"))))))
-        #:ruby ,ruby-2.3))
+                         (mkdir-p (string-append out "/uploads"))))))))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
@@ -122,8 +111,7 @@
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-            ,(replace-mongoid.yml)))
-        #:ruby ,ruby-2.3))
+            ,(replace-mongoid.yml)))))
      (synopsis "Proxy to add authentication via Signon")
      (description "The Authenticating Proxy is a Rack based proxy,
 written in Ruby that performs authentication using gds-sso, and then
@@ -421,7 +409,6 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0q2q6fxlsvwq79y2f6jh06v9n2w8ipdm0sw40mcmysjs9yfsdkxd")))
      (build-system rails-build-system)
-     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -460,7 +447,6 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "00r8mqr2djbxvgz57rak30zfwsf76h9h6d1hma81vvny1q4xsim2")))
      (build-system rails-build-system)
-     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -634,7 +620,6 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "0br95n6a186wiz9fkkwqj52mv4jk28hz3pcxnxqrpbn30x90zvpz")))
      (build-system rails-build-system)
-     (arguments `(#:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -661,8 +646,7 @@ service setup.")
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-            ,(use-blank-database.yml)))
-        #:ruby ,ruby-2.3))
+            ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -807,8 +791,7 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "1f7zyjv61zf7d7an6xgb8iq8dl39zrgbg3vrfh749hykhljfrf5m")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f
-                  #:ruby ,ruby-2.3))
+     (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
      (description
       "The Publishing API is a service that provides a HTTP API for
@@ -949,8 +932,7 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "01vsy1pdwyw8b875xd882n5k32gv4dfybvidybwh1d883flznbnm")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f
-                  #:ruby ,ruby-2.3))
+     (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
@@ -976,8 +958,7 @@ content, as well as broadcasting changes to a message queue.")
         (modify-phases %standard-phases
           (add-after
            'install 'replace-redis.yml
-           ,(replace-redis.yml)))
-        #:ruby ,ruby-2.3))
+           ,(replace-redis.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1059,8 +1040,7 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0bi1cl1cvzs17sag2a8yzdv1jr3398grc5cgf9033hpysi52q7an")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f ;; Asset precompilation fails
-                  #:ruby ,ruby-2.3))
+     (arguments '(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
      (synopsis "")
      (description "")
      (license #f)
@@ -1085,8 +1065,7 @@ content, as well as broadcasting changes to a message queue.")
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))
-        #:ruby ,ruby-2.3))
+                     ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1205,8 +1184,6 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1dgn6sxisc1rkidl5jn446z8lym3fdl63jr0jq2znr5qr0jp2v4c")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f
-                  #:ruby ,ruby-2.3))
      (synopsis "")
      (description "")
      (license #f)
@@ -1253,7 +1230,6 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "064im7gdm3x8qyvdv7mlzkwcnsbqv0q47h0x995hh8mr0crhnbav")))
      (build-system rails-build-system)
-     (arguments `(#:ruby ,ruby-2.3))
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)
@@ -1305,8 +1281,7 @@ content, as well as broadcasting changes to a message queue.")
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-            ,(replace-mongoid.yml)))
-        #:ruby ,ruby-2.3)) ;; There might be issues with Mongoid 2 and ruby 2.4
+            ,(replace-mongoid.yml)))))
      (synopsis "")
      (description "")
      (license #f)
