@@ -952,13 +952,7 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1vmx387ncccfpsvp0kzw1a6hsni1nkwbysach1gpsclhlrajlln8")))
      (build-system rails-build-system)
-     (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-after
-           'install 'replace-redis.yml
-           ,(replace-redis.yml)))))
+     (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
