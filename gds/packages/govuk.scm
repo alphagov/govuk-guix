@@ -1186,6 +1186,21 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1dgn6sxisc1rkidl5jn446z8lym3fdl63jr0jq2znr5qr0jp2v4c")))
      (build-system rails-build-system)
+     (arguments
+      '(#:phases
+        (modify-phases %standard-phases
+          (add-after 'install 'remove-redundant-page-caching
+            (lambda* (#:key outputs #:allow-other-keys)
+              ;; TODO: This caching causes problems, as the public
+              ;; directory is not writable, and it also looks
+              ;; redundant, as I can't see how the files are being
+              ;; served from this directory.
+              (substitute*
+                  (string-append
+                   (assoc-ref outputs "out")
+                   "/app/controllers/root_controller.rb")
+                (("  caches_page.*$")
+                 "")))))))
      (synopsis "")
      (description "")
      (license #f)
