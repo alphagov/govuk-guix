@@ -77,8 +77,12 @@
        (list
         (nginx-location-configuration
          (uri "/")
-         (body '("proxy_pass http://draft-origin-proxy;
-proxy_set_header Host $host:$server_port;")))
+         (body `("proxy_pass http://draft-origin-proxy;
+proxy_set_header Host $host:$server_port;"
+                 ,@(if https?
+                       '("# Set X-Forwarded-SSL for OmniAuth"
+                         "proxy_set_header X-Forwarded-SSL 'on';")
+                       '()))))
         (nginx-location-configuration
          (uri "/api/content")
          (body '("proxy_pass http://draft-content-store-proxy;")))))
@@ -98,11 +102,14 @@ proxy_set_header Host $host:$server_port;")))
           ((service . port)
            (nginx-location-configuration
             (uri (simple-format #f "/~A" service))
-            (body (list
-                   "add_header \"Access-Control-Allow-Origin\" \"*\";"
-                   "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
-                   "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
-                   (simple-format #f "proxy_pass http://~A-proxy;" service))))))
+            (body `("add_header \"Access-Control-Allow-Origin\" \"*\";"
+                    "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
+                    "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
+                    ,@(if https?
+                          '("# Set X-Forwarded-SSL for OmniAuth"
+                            "proxy_set_header X-Forwarded-SSL 'on';")
+                          '())
+                    ,(simple-format #f "proxy_pass http://~A-proxy;" service))))))
          service-and-ports)))
       (server-name (list (string-append "assets." domain))))
      (map
