@@ -363,7 +363,7 @@
           (plek-config) (rails-app-config) collections-publisher
           (signon-application
            (name "Collections Publisher")
-           (supported-permissions '("signin" "GDS Editor" "Edit Taxonomy" "Sidekiq Monitoring")))
+           (supported-permissions '("signin" "GDS Editor")))
           (signon-api-user
            (name "Collections Publisher")
            (email "collections-publisher@guix-dev.gov.uk")
