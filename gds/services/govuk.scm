@@ -447,23 +447,6 @@
            (database "content_performance_manager_production")))))
 
 ;;;
-;;; Design Principles
-;;;
-
-(define-public design-principles-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'design-principles))
-
-(define-public design-principles-service
-  (service
-   design-principles-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(design-principles))
-           (requirement '(publishing-api)))
-          (plek-config) (rails-app-config) design-principles
-          (service-startup-config))))
-
-;;;
 ;;; Email Alert API
 ;;;
 
@@ -1900,7 +1883,6 @@
    calculators-service
    calendars-service
    collections-service
-   design-principles-service
    email-alert-frontend-service
    feedback-service
    finder-frontend-service

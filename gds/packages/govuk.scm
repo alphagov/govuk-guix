@@ -323,27 +323,6 @@ proxies requests to some upstream")
    #:extra-inputs (list postgresql
                         libffi)))
 
-(define-public design-principles
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "01gg6yy8wa1g1zmf4072xa7v1lvyhdqhhpi8w29krl27anfag3qa")))
-   (package
-     (name "design-principles")
-     (version "release_876")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1brak8fq2406i666iqq1drm1lamcvfdjrw8lh25gp6y60d96nnif")))
-     (build-system rails-build-system)
-     (arguments `(;; Asset precompilation fails
-                  #:precompile-rails-assets? #f
-                  #:ruby ,ruby-2.3))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/design-principles"))))
-
 (define-public email-alert-api
   (package-with-bundler
    (bundle-package
