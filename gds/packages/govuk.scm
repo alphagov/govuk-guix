@@ -818,15 +818,15 @@ content, as well as broadcasting changes to a message queue.")
   (package-with-bundler
    (bundle-package
     (hash
-     (base32 "0w1air5z0dhdwbsm5mml1lnvx04k893rln4fypxj6xmvb28aw60i")))
+     (base32 "1ysv8781prbclmf6ralanba5bf0wbwyvv046r9fpacpy950k3yj4")))
    (package
      (name "publishing-e2e-tests")
      (version "0")
      (source
       (github-archive
        #:repository "publishing-e2e-tests"
-       #:commit-ish "16c03fb65aae5cb3df5523fe51abb125375bafb3"
-       #:hash (base32 "1pv6nqqc9c69nv3dnpdfjcwq9g9s9disz41sdjsrgzj38m0xclf8")))
+       #:commit-ish "a7c6e6b0af5eb048b1f0c6b0a43e20f823cca0d4"
+       #:hash (base32 "13nfk1w0nslgp5hrwfvzf4f26i1smympnx477l9a6cna40dasfac")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
