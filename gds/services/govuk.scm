@@ -253,6 +253,7 @@
                         (bind-mount storage-dir app-dir)
                         (chmod app-dir #o777)
                         #t)))))))
+          (redis-connection-config)
           (mongodb-connection-config
            (database "asset_manager")))))
 
