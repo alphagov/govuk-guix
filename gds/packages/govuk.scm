@@ -691,7 +691,15 @@ service setup.")
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml #:mongoid-version "3")))))
+            ,(replace-mongoid.yml #:mongoid-version "3"))
+          (add-after
+              'install 'alter-secrets.yml
+            (lambda* (#:key outputs #:allow-other-keys)
+              (substitute* (string-append
+                            (assoc-ref outputs "out")
+                            "/config/secrets.yml")
+                (("SECRET_TOKEN")
+                "SECRET_KEY_BASE")))))))
      (synopsis "")
      (description "")
      (license #f)
