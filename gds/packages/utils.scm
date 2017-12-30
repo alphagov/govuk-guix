@@ -134,18 +134,15 @@ production:
 ")))
          #t))))
 
-(define-public (replace-ruby-version version)
+(define-public (remove-ruby-version version)
   `(lambda* (#:key outputs #:allow-other-keys)
      (let ((location
-            (string-append
-             (getcwd)
-             "/.ruby-version")))
+            (string-append (getcwd)
+                           "/.ruby-version")))
        (if (file-exists? location)
            (delete-file location))
-       (call-with-output-file location
-         (lambda (port)
-           (simple-format port "~A" ,version)))
-       (simple-format #t "\"~A\" written to .ruby-version\n" ,version)
+       (substitute* "Gemfile"
+         (("^ruby .*") ""))
        #t)))
 
 (define-public replace-gds-sso-initializer

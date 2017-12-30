@@ -262,9 +262,9 @@
                        "LD_LIBRARY_PATH"
                        '("lib")
                        (map cdr inputs))))
-         (add-after 'set-ld-library-path 'replace-ruby-version
-                    ,(replace-ruby-version (package-version
-                                            (bundle-package-ruby bundle-pkg))))
+         (add-after 'set-ld-library-path 'remove-ruby-version
+                    ,(remove-ruby-version (package-version
+                                           (bundle-package-ruby bundle-pkg))))
          (replace 'build
                   (lambda* (#:key inputs outputs #:allow-other-keys)
                     (let* ((cwd (getcwd))
@@ -433,8 +433,8 @@ load Gem.bin_path(\"bundler\", \"bundler\")" ruby gemfile)))
                                   (cdr input)
                                   #f))
                             inputs))))
-             (add-after 'set-ld-library-path 'replace-ruby-version
-                        ,(replace-ruby-version (package-version ruby)))
+             (add-after 'set-ld-library-path 'remove-ruby-version
+                        ,(remove-ruby-version (package-version ruby)))
              (add-before 'configure 'add-bundle-install-bin-to-path
                          (lambda* (#:key inputs #:allow-other-keys)
                            (use-modules (srfi srfi-1)
