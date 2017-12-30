@@ -176,8 +176,10 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
          govuk-nginx-config nginx-server-config)
   (nginx-server-configuration
    (inherit nginx-server-config)
-   (http-port (govuk-nginx-configuration-http-port govuk-nginx-config))
-   (https-port (govuk-nginx-configuration-https-port govuk-nginx-config))
+   (listen (list
+            (number->string (govuk-nginx-configuration-http-port govuk-nginx-config))
+            (simple-format #f "~A ssl"
+                           (govuk-nginx-configuration-https-port govuk-nginx-config))))
    (ssl-certificate (govuk-nginx-configuration-tls-certificate govuk-nginx-config))
    (ssl-certificate-key (govuk-nginx-configuration-tls-private-key govuk-nginx-config))))
 

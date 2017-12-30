@@ -110,7 +110,6 @@
 (define-public base-services
   (list
    (syslog-service)
-   (urandom-seed-service)
    (nscd-service)
    (guix-service
     (guix-configuration
