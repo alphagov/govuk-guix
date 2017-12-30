@@ -36,11 +36,11 @@
   (govuk-app-domain plek-config-govuk-app-domain
                     (default "publishing.service.gov.uk"))
   (govuk-asset-root plek-config-govuk-asset-root
-                    (default "https://static.publishing.service.gov.uk"))
+                    (default "https://assets.publishing.service.gov.uk"))
   (govuk-website-root plek-config-govuk-website-root
                       (default "https://www.gov.uk"))
   (govuk-asset-host plek-config-govuk-asset-host
-                    (default "https://static.publishing.service.gov.uk"))
+                    (default "https://assets.publishing.service.gov.uk"))
   (draft-origin plek-config-draft-origin
                 (default "https://draft-origin.publishing.service.gov.uk"))
   (dev-domain plek-config-dev-domain
