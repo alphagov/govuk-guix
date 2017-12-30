@@ -55,17 +55,6 @@
           #:aliases plek-aliases))))))
    services))
 
-(define (precompile-rails-assets-on-startup services)
-  (map
-   (lambda (service)
-     (if (and
-          (list? (service-parameters service))
-          (and=> (find rails-app-config? (service-parameters service))
-                 rails-app-config-assets?))
-         (rails-run-assets:precompile service)
-         service))
-   services))
-
 (define setup-functions
   (list
    modify-plek-config
