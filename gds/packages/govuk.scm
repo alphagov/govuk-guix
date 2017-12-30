@@ -83,10 +83,12 @@
      (arguments
       `(#:phases
         (modify-phases %standard-phases
-          (add-after 'install 'create-uploads-directory
+          (add-after 'install 'create-uploads-and-fake-s3-directories
                      (lambda* (#:key outputs #:allow-other-keys)
                        (let ((out (assoc-ref outputs "out")))
-                         (mkdir-p (string-append out "/uploads"))))))))
+                         (mkdir-p (string-append out "/uploads"))
+                         (mkdir-p (string-append out "/fake-s3")))
+                       #t)))))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)

@@ -247,12 +247,17 @@
                   #~(lambda ()
                       (use-modules (gds build utils)
                                    (gnu build file-systems))
-                      (let ((app-dir "/var/apps/asset-manager/uploads")
-                            (storage-dir "/var/lib/asset-manager-uploads"))
-                        (mkdir-p storage-dir)
-                        (bind-mount storage-dir app-dir)
-                        (chmod app-dir #o777)
-                        #t)))))))
+                      (for-each
+                       (lambda (directory)
+                         (let ((app-dir
+                                (string-append "/var/apps/asset-manager/" directory))
+                               (storage-dir
+                                (string-append "/var/lib/asset-manager/" directory)))
+                           (mkdir-p storage-dir)
+                           (bind-mount storage-dir app-dir)
+                           (chmod app-dir #o777)))
+                       '("uploads" "fake-s3"))
+                      #t))))))
           (redis-connection-config)
           (mongodb-connection-config
            (database "asset_manager")))))

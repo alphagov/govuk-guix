@@ -97,6 +97,15 @@ proxy_set_header Host $host:$server_port;"
                  "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
                  "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
                  "proxy_pass http://asset-manager-proxy;")))
+        (nginx-location-configuration
+         (uri "~ /cloud-storage-proxy/(.*)")
+         (body '("internal;"
+                 "set $download_url $1$is_args$args;"
+                 "proxy_pass $download_url;")))
+        (nginx-location-configuration
+         (uri "~ /fake-s3/(.*)")
+         (body '("proxy_set_header Host $host:$server_port;"
+                 "proxy_pass http://asset-manager-proxy;")))
         (map
          (match-lambda
           ((service . port)
