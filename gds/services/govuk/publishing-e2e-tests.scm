@@ -140,6 +140,7 @@
                   #:follow-symlinks? #f)))
 
            (chmod results-directory #o777)
+           (chmod "/var/apps/publishing-e2e-tests/tmp" #o777)
 
            (let* ((dir (string-append "/tmp/env.d/"))
                   (file (string-append dir "publishing-e2e-tests")))
