@@ -465,11 +465,6 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0x006qa4bvl75v59d4s6y9mbkl4rd2rjr9nrv5klhmdh1ipkqdrl")))
      (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-before 'bundle-install 'replace-ruby-version
-                      ,(replace-ruby-version (package-version ruby))))))
      (synopsis "")
      (description "")
      (license #f)
