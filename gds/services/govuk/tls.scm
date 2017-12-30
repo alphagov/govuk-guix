@@ -46,8 +46,6 @@ tls_www_server
 # keys for encryption and signing.
 encryption_key
 
-serial 007
-
 ca
 
 cert_signing_key")))
