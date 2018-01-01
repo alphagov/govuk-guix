@@ -90,10 +90,6 @@
                        str)))
                out))))
 
-         ;; Change file permissions to be writable by all
-         (for-each (lambda (f) (chmod f #o666))
-                   (find-files results-directory))
-
          (if result
              (call-with-output-file
                  (string-append results-directory "/all-tests-succeeded")
@@ -187,6 +183,11 @@
                          (publishing-e2e-tests-environment-variables
                           plek-config
                           publishing-e2e-tests-signon-users)))))
+
+                  ;; Change file permissions to be writable by all
+                  (for-each
+                   (lambda (f) (chmod f #o666))
+                   (find-files #$publishing-e2e-tests-results-directory))
 
                   (fork+exec-command
                    '(#$(program-file
