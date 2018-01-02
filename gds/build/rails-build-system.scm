@@ -68,14 +68,7 @@
           #:key inputs precompile-rails-assets?
           #:allow-other-keys)
   (or (not precompile-rails-assets?)
-      (begin
-        (call-with-output-file "config/initializers/assets.govuk-guix.rb"
-          (lambda (port)
-            (display
-             "Rails.application.config.assets.initialize_on_precompile = false\n"
-             port)))
-        (zero?
-         (system* "bundle" "exec" "rake" "assets:precompile")))))
+      (invoke "bundle" "exec" "rake" "assets:precompile")))
 
 (define* (install #:key inputs outputs #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out")))
