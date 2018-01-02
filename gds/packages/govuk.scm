@@ -676,12 +676,12 @@ service setup.")
     (hash (base32 "15c53fxiz3gsasx42ad77277izywmd7i8q3q10fr8sn7kncda7vv")))
    (package
      (name "manuals-publisher")
-     (version "release_1008")
+     (version "release_1009")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0lxhyfy20sj31i1zqy0ajycnn8s6szhpmbh730l3bg6a2xhz274s")))
+       #:hash (base32 "08si0fm8hvim454marbxnqd9lbphjll6mypzb6cmq9knnpifag7z")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f ;; Asset precompilation fails
