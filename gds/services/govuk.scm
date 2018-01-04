@@ -383,6 +383,7 @@
                (application-name "Publishing API"))
               '("signin")))))
           (service-startup-config)
+          (redis-connection-config)
           (mysql-connection-config
            (user "collections-pub")
            (password (random-base16-string 30))
