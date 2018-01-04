@@ -1309,8 +1309,18 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(frontend))
-          (requirement '(static rummager content-store)))
-         (service-startup-config)
+          (requirement '(static
+                         rummager
+                         content-store
+                         ;; For publishing special routes
+                         publishing-api)))
+         (service-startup-config-add-pre-startup-scripts
+          (service-startup-config
+           (environment-variables
+            '(("GOVUK_APP_NAME" . "frontend"))))
+          `((publish-special-routes
+             . ,#~(lambda ()
+                    (run-command "rake" "publishing_api:publish_special_routes")))))
          (plek-config) (rails-app-config) frontend)))
 
 (define-public draft-frontend-service-type
@@ -1323,7 +1333,9 @@
           (inherit default-shepherd-service)
           (provision '(draft-frontend))
           (requirement '(draft-static rummager draft-content-store)))
-         (service-startup-config)
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "draft-frontend"))))
          (plek-config) (rails-app-config) frontend)))
 
 ;;;
