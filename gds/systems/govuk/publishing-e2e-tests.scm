@@ -115,6 +115,20 @@
                        (run-command "rake" "publishing_api:publish_finders")))))
             parameter))
       parameters))
+    (rummager-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-add-pre-startup-scripts
+             parameter
+             `((create-all-indices
+                . ,#~(lambda ()
+                       (setenv "RUMMAGER_INDEX" "all")
+                       (run-command "bundle" "exec" "rake"
+                                    "rummager:create_all_indices")))))
+            parameter))
+      parameters))
     (router-service-type
      parameters =>
      (map
