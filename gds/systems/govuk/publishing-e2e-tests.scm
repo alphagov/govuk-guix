@@ -90,6 +90,16 @@
                             (run-command "rake" "db:seed")))))
          parameter))
       parameters))
+    (publisher-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-with-additional-environment-variables
+             parameter
+             '(("DISABLE_EMAIL" . "true")))
+            parameter))
+      parameters))
     (specialist-publisher-service-type
      parameters =>
      (map
