@@ -336,7 +336,9 @@
            (provision '(collections))
            (requirement '(content-store static rummager)))
          (plek-config) (rails-app-config) collections
-         (service-startup-config))))
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "collections")))))))
 
 (define-public draft-collections-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
@@ -349,7 +351,9 @@
            (provision '(draft-collections))
            (requirement '(draft-content-store draft-static rummager)))
           (plek-config) (rails-app-config) collections
-          (service-startup-config))))
+          (service-startup-config
+           (environment-variables
+            '(("GOVUK_APP_NAME" . "draft-collections")))))))
 
 ;;;
 ;;; Collections Publisher
