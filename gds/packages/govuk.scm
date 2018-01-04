@@ -241,6 +241,7 @@ proxies requests to some upstream")
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
+     ;; Asset compilation fails as it tries to connect to Redis
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
@@ -1037,7 +1038,8 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0bi1cl1cvzs17sag2a8yzdv1jr3398grc5cgf9033hpysi52q7an")))
      (build-system rails-build-system)
-     (arguments '(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
+     ;; Asset precompilation fails due to trying to connect to MongoDB
+     (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
@@ -1084,7 +1086,9 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1n5hlvzpcc5fjwalzx59cmiqwrnhf3iaqns652y78w5zayb39ay9")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f)) ;; Asset precompilation fails
+     ;; Asset precompilation fails due to the preload_working_days
+     ;; initialiser
+     (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
@@ -1217,7 +1221,9 @@ content, as well as broadcasting changes to a message queue.")
        #:hash (base32 "1rj2snym7f2hsi4hnp78nr3szmv3hdxnhd65g4a16r20k0h57pv2")))
      (build-system rails-build-system)
      (arguments
-      `(#:precompile-rails-assets? #f ;; Asset precompilation fails
+      `(#:precompile-rails-assets? #f ;; Asset precompilation fails,
+                                      ;; as it tries to connect to
+                                      ;; redis
         #:phases
         (modify-phases %standard-phases
           (add-after
