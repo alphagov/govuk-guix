@@ -162,6 +162,7 @@
                       draft-government-frontend
                       travel-advice-publisher
                       collections-publisher
+                      collections
                       publisher
                       manuals-publisher
                       frontend
