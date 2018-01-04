@@ -597,7 +597,6 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "157qa96r6qgfm626xv1j3irrfn4ybyiz8c7fw28x4m0j6lfjdn7x")))
      (build-system rails-build-system)
-     (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
@@ -639,8 +638,7 @@ service setup.")
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
      (arguments
-      `(#:precompile-rails-assets? #f ;; Asset precompilation fails
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
             ,(use-blank-database.yml)))))
@@ -684,8 +682,7 @@ service setup.")
        #:hash (base32 "1mi5p257wp5akrmjvi6mszlpv5zpznhlffngjzg91v313j55w8fm")))
      (build-system rails-build-system)
      (arguments
-      `(#:precompile-rails-assets? #f ;; Asset precompilation fails
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-mongoid.yml
             ,(replace-mongoid.yml #:mongoid-version "3"))
