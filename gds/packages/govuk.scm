@@ -685,8 +685,6 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
-          (add-after 'install 'replace-mongoid.yml
-            ,(replace-mongoid.yml #:mongoid-version "3"))
           (add-after
               'install 'alter-secrets.yml
             (lambda* (#:key outputs #:allow-other-keys)
