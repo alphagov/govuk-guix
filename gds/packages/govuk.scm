@@ -756,12 +756,12 @@ service setup.")
     (hash (base32 "1y9xl3qv0rymfqc2242swkvdhvvqr54y12sgdjblj8fnm5giz5yi")))
    (package
      (name "publisher")
-     (version "release_1878")
+     (version "release_1879")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "13y8vjkx2q0dvrx3wznxdpvrhbzdrslgr4ch3k85iy8qj669s1av")))
+       #:hash (base32 "17iy3nflshlh8d94bviricri3ifm9p2qlmhv7fm6jd15cmpv5225")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
