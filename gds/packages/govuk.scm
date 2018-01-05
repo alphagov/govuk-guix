@@ -168,12 +168,12 @@ proxies requests to some upstream")
     (hash (base32 "1lh8v8z5ixg619hwzk5g6ix0bwpgg7mcdi32k6achfpa0n4pis11")))
    (package
      (name "calendars")
-     (version "release_447")
+     (version "release_448")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0x4pbvzrkm84ar2n4jhc0brpfl826xmk6jgvv9nij1qk6smq3pka")))
+       #:hash (base32 "0zkwx513ns5b3048cig4vlqnlvcqxvg86kvcnvwva0ak9r7fgr00")))
      (build-system rails-build-system)
      (synopsis "Serves calendars on GOV.UK")
      (description "")
