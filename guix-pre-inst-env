@@ -37,7 +37,7 @@ export GUIX_UNINSTALLED="true"
 
 SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile git --search-paths)"
 
-INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER GUIX_GITHUB_TOKEN)
+INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER GUIX_GITHUB_TOKEN GUIX_DAEMON_SOCKET)
 
 for var in $(env -0 | tr -d '\n' | tr '\0' '\n' | cut -d '=' -f 1); do
     if [[ $var == GDS_* ]]
