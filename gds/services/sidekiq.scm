@@ -50,7 +50,7 @@
                       '#$start-command
                       #:user #$user
                       #:pid-file #$pidfile
-                      #:pid-file-timeout 5
+                      #:pid-file-timeout 60
                       #:log-file #$(string-append "/var/log/" name".log")
                       #:directory #$directory
                       #:environment-variables

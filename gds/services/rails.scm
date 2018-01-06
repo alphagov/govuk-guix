@@ -263,7 +263,7 @@
              #:user (passwd:uid user)
              #:directory #$root-directory
              #:pid-file #$pid-file
-             #:pid-file-timeout 10
+             #:pid-file-timeout 60
              #:log-file #$(string-append "/var/log/" string-name ".log")
              #:environment-variables environment-variables))))))))
 
