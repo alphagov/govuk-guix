@@ -99,4 +99,5 @@
                        (service-extension activation-service-type
                                           elasticsearch-activation)
                        (service-extension account-service-type
-                                          (const %elasticsearch-accounts))))))
+                                          (const %elasticsearch-accounts))))
+                (default-value (elasticsearch-configuration))))

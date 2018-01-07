@@ -1,9 +1,11 @@
 (define-module (gds services govuk signon)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 rdelim)
   #:use-module (srfi srfi-26)
   #:use-module (guix records)
   #:use-module (guix gexp)
+  #:use-module (guix build utils)
   #:use-module (gnu services)
   #:use-module (gds services)
   #:use-module (gds services utils)
@@ -57,7 +59,10 @@
             signon-config-devise-pepper
             signon-config-devise-secret-key
 
-            signon-config-with-random-secrets))
+            signon-config-with-random-secrets
+            signon-dev-user-passphrase
+            add-signon-dev-user
+            update-services-with-random-signon-secrets))
 
 (define-record-type* <signon-application>
   signon-application make-signon-application
@@ -431,3 +436,85 @@ end")
                                          extension-parameters))))
                     parameter))
               parameters)))))
+
+(define (signon-dev-user-passphrase)
+  (define (new-passphrase)
+    (random-base16-string 16))
+
+  (or (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
+      (let ((data-dir (or (getenv "XDG_DATA_HOME")
+                            (and=> (getenv "HOME")
+                                   (cut string-append <> "/.local/share")))))
+        (if (file-exists? data-dir)
+            (let* ((govuk-guix-dir
+                    (string-append data-dir "/govuk-guix"))
+                   (system-dir
+                    (string-append govuk-guix-dir "/systems/development"))
+                   (passphrase-file
+                    (string-append system-dir "/passphrase")))
+              (if (file-exists? passphrase-file)
+                  (call-with-input-file passphrase-file read-line)
+                  (let ((passphrase (new-passphrase)))
+                    (mkdir-p system-dir)
+                    (call-with-output-file passphrase-file
+                      (cut display passphrase <>))
+                    passphrase)))
+            (let ((passphrase (new-passphrase)))
+              (simple-format #t "\nUnable to find directory to place
+the Signon Dev user passphrase in\n")
+              (simple-format #t "The following passphrase will be used, but this will not be persisted: ~A\n\n" passphrase)
+              passphrase)))))
+
+(define (add-signon-dev-user services)
+  (let
+      ((dev-email (or (getenv "GOVUK_GUIX_DEVELOPMENT_EMAIL")
+                      "dev@dev.gov.uk"))
+       (dev-passphrase (signon-dev-user-passphrase)))
+    (update-services-parameters
+     services
+     (list
+      (cons
+       signon-service-type
+       (list
+        (cons
+         signon-config?
+         (lambda (config)
+           (signon-config
+            (inherit config)
+            (users
+             (list
+              (signon-user
+               (name "Dev")
+               (email dev-email)
+               (passphrase dev-passphrase)
+               (role "superadmin")
+               (application-permissions
+                (map
+                 (lambda (app)
+                   (cons
+                    (signon-application-name app)
+                    (or (assoc-ref '(("Whitehall" . ("signin" "GDS Admin"
+                                                     "Managing Editor")))
+                                   (signon-application-name app))
+                        (signon-application-supported-permissions app))))
+                 (filter-map
+                  (lambda (service)
+                    (and (list? (service-parameters service))
+                         (find signon-application? (service-parameters service))))
+                  services)))))))))))))))
+
+(define (update-services-with-random-signon-secrets services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        signon-application?
+        (lambda (app)
+          (update-signon-application-with-random-oauth app)))
+       (cons
+        signon-api-user?
+        (lambda (api-user)
+          (update-signon-api-user-with-random-authorisation-tokens api-user))))))
+   services))

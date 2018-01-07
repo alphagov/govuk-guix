@@ -21,51 +21,29 @@
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk publishing-e2e-tests)
+  #:use-module (gds services govuk routing-configuration)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk development))
 
 (define (services-in-rails-production-environment services)
   (map
    (lambda (service)
-     (update-service-parameters
-      service
-      (list
-       (cons
-        rails-app-config?
-        (lambda (config)
-          (update-rails-app-config-environment
-           "production"
-           config))))))
+     (update-rails-app-config-environment-for-service
+      "production"
+      service))
    services))
-
-(define (modify-plek-config services)
-  (map
-   (lambda (service)
-     (update-service-parameters
-      service
-      (list
-       (cons
-        plek-config?
-        (const
-         (make-custom-plek-config
-          govuk-ports
-          #:govuk-app-domain "dev.gov.uk"
-          #:use-https? #t
-          #:port 50443
-          #:aliases plek-aliases))))))
-   services))
-
-(define setup-functions
-  (list
-   modify-plek-config
-   services-in-rails-production-environment))
 
 (define services
   (modify-services
-      ((apply compose (reverse setup-functions))
-       (append
-        (setup-services (list publishing-e2e-tests-service))
-        (operating-system-user-services development-os)))
+      (set-routing-configuration-for-services
+       (services-in-rails-production-environment
+        (append
+         (setup-services (list publishing-e2e-tests-service))
+         (operating-system-user-services development-os)))
+       #:use-high-ports? #t
+       #:use-https? #t
+       #:app-domain "dev.gov.uk"
+       #:web-domain "www.dev.gov.uk")
     (asset-manager-service-type
      parameters =>
      (map

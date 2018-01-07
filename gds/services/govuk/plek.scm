@@ -85,7 +85,8 @@
 (define* (make-custom-plek-config
           service-ports
           #:optional #:key
-          (govuk-app-domain (plek-config-govuk-app-domain (plek-config)))
+          (app-domain (plek-config-govuk-app-domain (plek-config)))
+          (web-domain "www.gov.uk")
           (use-https? #t)
           (port (if use-https? 443 80))
           (aliases '()))
@@ -99,20 +100,20 @@
          (else (string-append
                 ":" (number->string port))))))
     (plek-config
-     (govuk-app-domain govuk-app-domain)
+     (govuk-app-domain app-domain)
      (dev-domain
       (if use-https?
          ;; Plek uses DEV_DOMAIN to decide whether to use http or https
-         govuk-app-domain
+         app-domain
          #f))
      (govuk-asset-root
-      (string-append scheme "://assets." govuk-app-domain string-port))
+      (string-append scheme "://assets." app-domain string-port))
      (govuk-website-root
-      (string-append scheme "://www." govuk-app-domain string-port))
+      (string-append scheme "://" web-domain string-port))
      (govuk-asset-host
-      (string-append scheme "://assets." govuk-app-domain string-port))
+      (string-append scheme "://assets." app-domain string-port))
      (draft-origin
-      (string-append scheme "://draft-origin." govuk-app-domain string-port))
+      (string-append scheme "://draft-origin." app-domain string-port))
      (service-ports service-ports)
      (service-port-aliases aliases)
      (service-uri-function

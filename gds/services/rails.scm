@@ -40,7 +40,9 @@
             generic-rails-app-service-account
             make-rails-app-service-type
 
-            rails-run-db:setup))
+            rails-run-db:setup
+            update-rails-app-config-environment-for-service
+            run-db:setup-if-postgresql-or-mysql-is-used))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -510,3 +512,26 @@
                     ,(rails-setup-or-migrate parameters))))
                 parameter))
           parameters)))))
+
+(define (update-rails-app-config-environment-for-service environment service)
+  (update-service-parameters
+   service
+   (list
+    (cons
+     rails-app-config?
+     (lambda (config)
+       (update-rails-app-config-environment
+        environment
+        (update-rails-app-config-with-random-secret-key-base config)))))))
+
+(define (run-db:setup-if-postgresql-or-mysql-is-used service)
+  (if (and
+       (list? (service-parameters service))
+       (find rails-app-config? (service-parameters service))
+       (any
+        (lambda (parameter)
+          (or (postgresql-connection-config? parameter)
+              (mysql-connection-config? parameter)))
+        (service-parameters service)))
+      (rails-run-db:setup service)
+      service))

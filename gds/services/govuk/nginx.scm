@@ -9,15 +9,16 @@
   #:use-module (gds services govuk tls)
   #:export (<govuk-nginx-configuration>
             govuk-nginx-configuration
+            govuk-nginx-configuration?
             make-govuk-nginx-configuration
             govuk-nginx-configuration-http-port
             govuk-nginx-configuration-https-port
             govuk-nginx-configuration-service-and-ports
-            govuk-nginx-configuration-router-config
-            govuk-nginx-configuration-draft-router-config
+            govuk-nginx-configuration-origin-url
+            govuk-nginx-configuration-draft-origin-url
             govuk-nginx-configuration-server-aliases
-            govuk-nginx-configuration-authenticated-draft-origin?
-            govuk-nginx-configuration-domain
+            govuk-nginx-configuration-web-domain
+            govuk-nginx-configuration-app-domain
             govuk-nginx-configuration-tls-certificate
             govuk-nginx-configuration-tls-private-key
             govuk-nginx-configuration-additional-server-blocks
@@ -25,26 +26,15 @@
             govuk-nginx-service-type))
 
 (define (nginx-upstream-configurations service-and-ports
-                                       router-config
-                                       draft-router-config
-                                       authenticated-draft-origin)
+                                       origin-url
+                                       draft-origin-url)
   (cons*
    (nginx-upstream-configuration
     (name "origin-proxy")
-    (servers (list
-              (string-append
-               "localhost:"
-               (number->string
-                (router-config-public-port router-config))))))
+    (servers (list origin-url)))
    (nginx-upstream-configuration
     (name "draft-origin-proxy")
-    (servers (list
-              (string-append
-               "localhost:"
-               (number->string
-                (if authenticated-draft-origin
-                    (assq-ref service-and-ports 'authenticating-proxy)
-                    (router-config-public-port draft-router-config)))))))
+    (servers (list draft-origin-url)))
    (map
     (match-lambda
      ((service . port)
@@ -57,7 +47,8 @@
 (define* (nginx-server-configurations base-nginx-server-configuration
                                       service-and-ports
                                       server-aliases
-                                      domain
+                                      web-domain
+                                      app-domain
                                       #:key https?)
     (cons*
      (nginx-server-configuration
@@ -70,7 +61,7 @@
         (nginx-location-configuration
          (uri "/api/content")
          (body '("proxy_pass http://content-store-proxy;")))))
-      (server-name (list (string-append "www." domain))))
+      (server-name (list (string-append web-domain))))
      (nginx-server-configuration
       (inherit base-nginx-server-configuration)
       (locations
@@ -86,7 +77,7 @@ proxy_set_header Host $host:$server_port;"
         (nginx-location-configuration
          (uri "/api/content")
          (body '("proxy_pass http://draft-content-store-proxy;")))))
-      (server-name (list (string-append "draft-origin." domain))))
+      (server-name (list (string-append "draft-origin." app-domain))))
      (nginx-server-configuration
       (inherit base-nginx-server-configuration)
       (locations
@@ -120,7 +111,7 @@ proxy_set_header Host $host:$server_port;"
                           '())
                     ,(simple-format #f "proxy_pass http://~A-proxy;" service))))))
          service-and-ports)))
-      (server-name (list (string-append "assets." domain))))
+      (server-name (list (string-append "assets." app-domain))))
      (map
       (match-lambda
        ((service . port)
@@ -148,11 +139,11 @@ proxy_set_header Host $host:$server_port;"
                                  #f
                                  "proxy_pass http://whitehall-proxy;
 proxy_set_header Host whitehall-admin.~A:$server_port;"
-                                 domain)))))
+                                 app-domain)))))
                   '())))
          (server-name (map
                        (lambda (name)
-                         (simple-format #f "~A.~A" name domain))
+                         (simple-format #f "~A.~A" name app-domain))
                        (cons service
                              (or (assq-ref server-aliases service)
                                  '()))))
@@ -166,14 +157,18 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                   (default 80))
   (https-port                     govuk-nginx-configuration-https-port
                                   (default 443))
-  (service-and-ports              govuk-nginx-configuration-service-and-ports)
-  (router-config                  govuk-nginx-configuration-router-config)
-  (draft-router-config            govuk-nginx-configuration-draft-router-config)
-  (server-aliases                 govuk-nginx-configuration-server-aliases)
-  (authenticated-draft-origin?    govuk-nginx-configuration-authenticated-draft-origin?
-                                  (default #t))
-  (domain                         govuk-nginx-configuration-domain
-                                  (default "gov.uk"))
+  (service-and-ports              govuk-nginx-configuration-service-and-ports
+                                  (default '()))
+  (origin-url                     govuk-nginx-configuration-origin-url
+                                  (default "https://www.gov.uk/"))
+  (draft-origin-url               govuk-nginx-configuration-draft-origin-url
+                                  (default "https://draft-origin.publishing.service.gov.uk/"))
+  (server-aliases                 govuk-nginx-configuration-server-aliases
+                                  (default '()))
+  (web-domain                     govuk-nginx-configuration-web-domain
+                                  (default "www.gov.uk"))
+  (app-domain                     govuk-nginx-configuration-app-domain
+                                  (default "publishing.service.gov.uk"))
   (tls-certificate                govuk-nginx-configuration-tls-certificate
                                   (default #f))
   (tls-private-key                govuk-nginx-configuration-tls-private-key
@@ -203,27 +198,27 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
     (($ <govuk-nginx-configuration> http-port
                                     https-port
                                     service-and-ports
-                                    router-config
-                                    draft-router-config
+                                    origin-url
+                                    draft-origin-url
                                     server-aliases
-                                    authenticated-draft-origin?
-                                    domain
+                                    web-domain
+                                    app-domain
                                     tls-certificate
                                     tls-private-key
                                     additional-nginx-server-blocks)
-    (nginx-configuration
-     (server-blocks
-      (nginx-server-configurations (base-nginx-server-configuration config)
-                                   service-and-ports
-                                   server-aliases
-                                   domain
-                                   #:https? (number? https-port)))
-     (upstream-blocks
-      (nginx-upstream-configurations service-and-ports
-                                     router-config
-                                     draft-router-config
-                                     authenticated-draft-origin?))
-     (server-names-hash-bucket-size 128)))))
+     (nginx-configuration
+      (server-blocks
+       (nginx-server-configurations (base-nginx-server-configuration config)
+                                    service-and-ports
+                                    server-aliases
+                                    web-domain
+                                    app-domain
+                                    #:https? (number? https-port)))
+      (upstream-blocks
+       (nginx-upstream-configurations service-and-ports
+                                      origin-url
+                                      draft-origin-url))
+      (server-names-hash-bucket-size 128)))))
 
 (define (maybe-convert-to-nginx-configuration config)
   (if (govuk-nginx-configuration? config)
@@ -270,4 +265,5 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
               (govuk-nginx-configuration->nginx-configuration config)
               (map (lambda (server)
                      (apply-base-nginx-server-configuration config server))
-                   servers))))))
+                   servers))))
+   (default-value (govuk-nginx-configuration))))
