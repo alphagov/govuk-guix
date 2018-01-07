@@ -8,6 +8,7 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages curl)
+  #:use-module (gnu packages certs)
   #:use-module (gnu packages databases)
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
@@ -20,6 +21,7 @@
   #:use-module (gnu packages lsof)
   #:use-module (gnu packages ncdu)
   #:use-module (gnu packages code)
+  #:use-module (gnu packages tls)
   #:use-module (gnu services databases)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages version-control)
@@ -192,6 +194,8 @@
    wget
    lsof
    curl
+   openssl
+   nss-certs
    %base-packages))
 
 (define (hosts-file host-name plek-config)
