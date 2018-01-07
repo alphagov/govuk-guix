@@ -51,7 +51,6 @@
  (gnu system file-systems)
  (gds utils)
  (gds services govuk)
- (gds services govuk tailon)
  (gds services govuk nginx)
  (gds systems utils)
  (gds systems govuk development))
