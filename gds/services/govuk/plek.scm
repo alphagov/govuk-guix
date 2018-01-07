@@ -265,9 +265,9 @@
 
             (else
              (append
-              (list service-name) ;; Some services (e.g. Whitehall) use
-              ;; Plek to find there own host, so
-              ;; include it by default
+              ;; Some services (e.g. Whitehall) use Plek to find there
+              ;; own host, so include it by default
+              (list service-name)
               (concatenate
                (map
                 (lambda (requirement)
