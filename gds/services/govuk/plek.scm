@@ -69,6 +69,7 @@
      (display "plek-config-service-ports: ")
      (display (plek-config-service-ports plek-config))
      (display "\n")
+     (backtrace)
      (error "Port missing from plek-config for" service))))
 
 (define (service-uri-from-plek-config plek-config service)
