@@ -304,12 +304,12 @@ proxies requests to some upstream")
     (hash (base32 "0bgvi4g6h6nkhjq9a73ajfcl6w4s80acn8s7vwaidsd8kzrb8ky6")))
    (package
      (name "content-tagger")
-     (version "release_660")
+     (version "release_663")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0z4xcbv2r4cb0p9x9cxzan9ia76haq6gs68k70wahbppz9934nlk")))
+       #:hash (base32 "1p3x55d12p74np3wmgcmwiq54pv86aw586l4cfkc615963vqkn3l")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
