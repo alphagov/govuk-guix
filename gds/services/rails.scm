@@ -42,7 +42,8 @@
 
             rails-run-db:setup
             update-rails-app-config-environment-for-service
-            run-db:setup-if-postgresql-or-mysql-is-used))
+            run-db:setup-if-postgresql-or-mysql-is-used
+            update-rails-app-config-with-random-secret-key-base-for-services))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -512,6 +513,18 @@
                     ,(rails-setup-or-migrate parameters))))
                 parameter))
           parameters)))))
+
+(define (update-rails-app-config-with-random-secret-key-base-for-services
+         services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        rails-app-config?
+        update-rails-app-config-with-random-secret-key-base))))
+   services))
 
 (define (update-rails-app-config-environment-for-service environment service)
   (update-service-parameters
