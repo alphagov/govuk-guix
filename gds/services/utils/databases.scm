@@ -28,6 +28,12 @@
             redis-connection-config-port
             redis-connection-config-namespace
 
+            <memcached-connection-config>
+            memcached-connection-config
+            memcached-connection-config?
+            memcached-connection-config-servers
+            memcached-connection-config-port
+
             database-connection-config?
             database-connection-config->environment-variables
             update-database-connection-config-port
@@ -46,12 +52,22 @@
   (namespace redis-connection-config-namespace
              (default #f)))
 
+(define-record-type* <memcached-connection-config>
+  memcached-connection-config make-memcached-connection-config
+  memcached-connection-config?
+  (servers       memcached-connection-config-servers
+                 (default '("localhost" "11211"))))
+
+(define (memcached-connection-config-port config)
+  (second (first (memcached-connection-config-servers config))))
+
 (define (database-connection-config? config)
   (or (postgresql-connection-config? config)
       (mysql-connection-config? config)
       (mongodb-connection-config? config)
       (redis-connection-config? config)
-      (elasticsearch-connection-config? config)))
+      (elasticsearch-connection-config? config)
+      (memcached-connection-config? config)))
 
 (define database-connection-config->environment-variables
   (match-lambda
@@ -102,6 +118,14 @@
              '())))
     (($ <elasticsearch-connection-config> host port)
      `(("ELASTICSEARCH_URI" . ,(simple-format #f "http://~A:~A" host port))))
+    (($ <memcached-connection-config> servers)
+     `(("MEMCACHE_SERVERS" . ,(string-join
+                               (map
+                                (match-lambda
+                                  ((host) host)
+                                  ((host port) (string-append host ":" port))
+                                  ((host port weight) (string-append host ":" port ":" weight)))
+                                servers)))))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
@@ -142,7 +166,18 @@
     (elasticsearch-connection-config
      (inherit config)
      (port (port-for 'elasticsearch))))
-   (else (error "unknown database connection config " config))))
+   ((memcached-connection-config? config)
+    (memcached-connection-config
+     (servers (map (match-lambda*
+                     ((host)
+                      (list host (port-for 'memcached)))
+                     ((host old-port)
+                      (list host (port-for 'memcached)))
+                     ((host old-port weight)
+                      (list host (port-for 'memcached) weight)))
+                   (memcached-connection-config-servers config)))))
+   (else (backtrace)
+         (error "unknown database connection config " config))))
 
 (define (ensure-database-user-exists-on-service-startup s)
   (let
