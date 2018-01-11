@@ -105,12 +105,12 @@
     (hash (base32 "1iqwcpl0s0gqm5wn1q855wis0pa9rcbzqpk9ks9nkpfhd8cng5p4")))
    (package
      (name "authenticating-proxy")
-     (version "release_51")
+     (version "release_52")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0jnhnh60ndd3g9liqccpc5fixvw05allq1mn6r7ywa29mkqajgaa")))
+       #:hash (base32 "13a21v1brc8nzjvcjlj3n0p32qplpbmpkk1fl6qay85bkdf3rarx")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
