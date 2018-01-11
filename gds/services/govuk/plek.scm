@@ -4,6 +4,7 @@
   #:use-module (ice-9 match)
   #:use-module (web uri)
   #:use-module (guix records)
+  #:use-module (guix gexp)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gds services)
@@ -307,3 +308,12 @@
 (define (make-rails-app-using-plek-service-type name)
   (extend-service-type-with-plek
    (make-rails-app-service-type name)))
+
+(define-public (plek-config->hosts-file plek-config)
+  (plain-file "hosts"
+              (string-join
+               (list
+                "127.0.0.1 localhost"
+                "::1 localhost"
+                (plek-config->/etc/hosts-string plek-config))
+               "\n")))
