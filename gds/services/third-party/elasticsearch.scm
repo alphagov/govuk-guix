@@ -7,8 +7,15 @@
   #:use-module (guix gexp)
   #:use-module (ice-9 match)
   #:use-module (gds packages third-party elasticsearch)
-  #:export (elasticsearch-configuration
+  #:export (<elasticsearch-configuration>
+            elasticsearch-configuration
             elasticsearch-configuration?
+            elasticsearch-configuration-elasticsearch
+            elasticsearch-configuration-data-path
+            elasticsearch-configuration-logs-path
+            elasticsearch-configuration-port
+            elasticsearch-configuration-transport-port
+
             elasticsearch-service
             elasticsearch-service-type))
 
@@ -21,7 +28,7 @@
                      (default "/var/lib/"))
   (logs-path         elasticsearch-configuration-logs-path
                      (default "/var/log/elasticsearch"))
-  (http-port         elasticsearch-congiguration-port
+  (http-port         elasticsearch-configuration-port
                      (default 9200))
   (transport-port    elasticsearch-configuration-transport-port
                      (default 9300)))
