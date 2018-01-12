@@ -101,8 +101,8 @@
 (define* (set-routing-configuration-for-services
           services
           #:key
-          use-high-ports?
-          use-https?
+          (use-high-ports? #f)
+          (use-https? #t)
           (authenticated-draft-origin? #t)
           (app-domain "publishing.service.gov.uk")
           (web-domain "www.gov.uk")
