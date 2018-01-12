@@ -266,11 +266,11 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
           (service-extension
            special-files-service-type
            (lambda (nginx-config)
-             `(("/etc/nginx/dev.gov.uk.cert"
+             `(("/etc/nginx/cert"
                 ,(development-os-tls-certificate
                   (append-map nginx-server-configuration-server-name
                               (nginx-configuration-server-blocks nginx-config))))
-               ("/etc/nginx/dev.gov.uk.key" ,development-os-tls-private-key))))
+               ("/etc/nginx/key" ,development-os-tls-private-key))))
           (service-extension
            profile-service-type
            (lambda (nginx-config)
