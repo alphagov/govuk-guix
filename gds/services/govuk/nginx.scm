@@ -49,7 +49,13 @@
                                       server-aliases
                                       web-domain
                                       app-domain
-                                      #:key https?)
+                                      #:key https?
+                                      include-port-in-host-header?)
+  (define proxy_set_header
+    (if include-port-in-host-header?
+        "proxy_set_header Host $host:$server_port;"
+        "proxy_set_header Host $host;"))
+
     (cons*
      (nginx-server-configuration
       (inherit base-nginx-server-configuration)
@@ -69,7 +75,7 @@
         (nginx-location-configuration
          (uri "/")
          (body `("proxy_pass http://draft-origin-proxy;
-proxy_set_header Host $host:$server_port;"
+" ,proxy_set_header
                  ,@(if https?
                        '("# Set X-Forwarded-SSL for OmniAuth"
                          "proxy_set_header X-Forwarded-SSL 'on';")
@@ -95,7 +101,7 @@ proxy_set_header Host $host:$server_port;"
                  "proxy_pass $download_url;")))
         (nginx-location-configuration
          (uri "~ /fake-s3/(.*)")
-         (body '("proxy_set_header Host $host:$server_port;"
+         (body `(,proxy_set_header
                  "proxy_pass http://asset-manager-proxy;")))
         (map
          (match-lambda
@@ -130,7 +136,7 @@ proxy_set_header Host $host:$server_port;"
                        '("# Set X-Forwarded-SSL for OmniAuth"
                          "proxy_set_header X-Forwarded-SSL 'on';")
                        '())
-                 "proxy_set_header Host $host:$server_port;")))
+                 ,proxy_set_header)))
             ,@(if (eq? service 'whitehall)
                   (list
                    (nginx-location-configuration
@@ -138,8 +144,11 @@ proxy_set_header Host $host:$server_port;"
                     (body (list (simple-format
                                  #f
                                  "proxy_pass http://whitehall-proxy;
-proxy_set_header Host whitehall-admin.~A:$server_port;"
-                                 app-domain)))))
+proxy_set_header Host whitehall-admin.~A~A:$server_port;"
+                                 app-domain
+                                 (if include-port-in-host-header?
+                                     ":$server_port"
+                                     ""))))))
                   '())))
          (server-name (map
                        (lambda (name)
@@ -157,6 +166,13 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                   (default 80))
   (https-port                     govuk-nginx-configuration-https-port
                                   (default 443))
+  ;; This is useful when the intended port to connect to nginx on,
+  ;; isn't the port it's listening on, e.g. if it's running on 8080,
+  ;; but traffic comes in on port 80, and is redirected by iptables.
+  ;;
+  ;; This is a substitute for more complex network handling.
+  (include-port-in-host-header?   govuk-nginx-configuration-include-port-in-host-header?
+                                  (default #f))
   (service-and-ports              govuk-nginx-configuration-service-and-ports
                                   (default '()))
   (origin-url                     govuk-nginx-configuration-origin-url
@@ -197,6 +213,7 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
   (match config
     (($ <govuk-nginx-configuration> http-port
                                     https-port
+                                    include-port-in-host-header?
                                     service-and-ports
                                     origin-url
                                     draft-origin-url
@@ -213,7 +230,9 @@ proxy_set_header Host whitehall-admin.~A:$server_port;"
                                     server-aliases
                                     web-domain
                                     app-domain
-                                    #:https? (number? https-port)))
+                                    #:https? (number? https-port)
+                                    #:include-port-in-host-header?
+                                    include-port-in-host-header?))
       (upstream-blocks
        (nginx-upstream-configurations service-and-ports
                                       origin-url

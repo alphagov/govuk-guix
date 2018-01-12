@@ -138,6 +138,7 @@
                (http-port (if use-high-ports? 50080 80))
                (https-port (and use-https?
                                 (if use-high-ports? 50443 443)))
+               (include-port-in-host-header? use-high-ports?)
                (service-and-ports ports)
                (origin-url (string-append
                             "localhost:"
