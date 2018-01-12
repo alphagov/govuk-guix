@@ -19,6 +19,7 @@
             %default-aliases
             set-routing-configuration-for-services
             high-database-service-ports
+            default-database-service-ports
             update-database-service-ports-for-services))
 
 (define (generate-port-range start-port services)
@@ -126,8 +127,16 @@
           (const plek-config)))))
      services))
 
+  (define database-service-ports
+    (if use-high-ports?
+        high-database-service-ports
+        default-database-service-ports))
+
   (update-services-parameters
-   (update-services-plek-config services)
+   (update-services-plek-config
+    (update-database-service-ports-for-services
+     database-service-ports
+     services))
    (list
     (cons
      govuk-nginx-service-type
@@ -197,12 +206,27 @@
                   (port-for-service-name 'draft-router-api-port))))))))
 
 (define high-database-service-ports
-  `((postgresql . 55432)
+  '((postgresql . 55432)
     (mongodb . 57017)
     (redis . 56379)
     (elasticsearch . 59200)
     (mysql . 53306)
     (memcached . 51211)))
+
+(define default-database-service-ports
+  `((postgresql . ,((@@ (gnu services databases) postgresql-configuration-port)
+                    (postgresql-configuration
+                     (config-file #f)
+                     (data-directory #f))))
+    (mongodb . 27107)
+    (redis . ,((@@ (gnu services databases) redis-configuration-port)
+               (redis-configuration)))
+    (elasticsearch . ,(elasticsearch-configuration-port
+                       (elasticsearch-configuration)))
+    (mysql . ,((@@ (gnu services databases) mysql-configuration-port)
+               (mysql-configuration)))
+    (memcached . ,(memcached-configuration-tcp-port
+                   (memcached-configuration)))))
 
 (define (mongodb-configuration-file port)
   (mixed-text-file
