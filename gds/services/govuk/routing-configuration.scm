@@ -66,9 +66,20 @@
         ,(simple-format #f "localhost:~A" port))))))
 
 (define (service-to-port-mapping services use-high-ports?)
+  (define services-discoverable-through-plek
+    (filter (lambda (service)
+              (or
+               (and (list? (service-value service))
+                    (find plek-config?
+                          (service-value service)))
+               (memq (service-kind service)
+                     (list router-service-type
+                           draft-router-service-type))))
+            services))
+
   (if use-high-ports?
-      (high-ports-for-services services)
-      (standard-ports-for-services services)))
+      (high-ports-for-services services-discoverable-through-plek)
+      (standard-ports-for-services services-discoverable-through-plek)))
 
 (define* (plek-config-from-routing-configuration-arguments
           services
