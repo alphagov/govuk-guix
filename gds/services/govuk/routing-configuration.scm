@@ -155,9 +155,9 @@
       (cons govuk-nginx-configuration?
             (lambda (config)
               (govuk-nginx-configuration
-               (http-port (if use-high-ports? 50080 80))
+               (http-port (if use-high-ports? 50080 8080))
                (https-port (and use-https?
-                                (if use-high-ports? 50443 443)))
+                                (if use-high-ports? 50443 8443)))
                (include-port-in-host-header? use-high-ports?)
                (tls-certificate (if use-https? "/etc/nginx/cert" #f))
                (tls-private-key (if use-https? "/etc/nginx/key" #f))
