@@ -1731,7 +1731,7 @@
    release-service
    router-service
    draft-router-service
-   publishing-e2e-tests-service))
+   (service publishing-e2e-tests-service-type)))
 
 (define-public frontend-services
   (list

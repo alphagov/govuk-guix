@@ -11,7 +11,11 @@
   #:use-module (gds packages govuk)
   #:use-module (gds services utils)
   #:use-module (gds services govuk plek)
-  #:use-module (gds services govuk signon))
+  #:use-module (gds services govuk signon)
+  #:export (publishing-e2e-tests-signon-users
+            publishing-e2e-tests-environment-variables
+
+            publishing-e2e-tests-service-type))
 
 (define publishing-e2e-tests-signon-user-count 5)
 
@@ -203,7 +207,7 @@
                   #t))
        (stop #~(make-kill-destructor)))))))
 
-(define-public publishing-e2e-tests-service-type
+(define publishing-e2e-tests-service-type
   (service-type
    (name 'publishing-e2e-tests)
    (extensions
@@ -222,9 +226,6 @@
           (service-extension shepherd-root-service-type
                              publishing-e2e-tests-service-shepherd-services)
           (service-extension activation-service-type
-                             publishing-e2e-tests-activation-gexp)))))
-
-(define-public publishing-e2e-tests-service
-  (service
-   publishing-e2e-tests-service-type
-   (list (plek-config) publishing-e2e-tests)))
+                             publishing-e2e-tests-activation-gexp)))
+   (default-value
+     (list (plek-config) publishing-e2e-tests))))
