@@ -50,9 +50,14 @@
  (gnu system linux-container)
  (gnu system file-systems)
  (gds utils)
+ (gds services rails)
  (gds services govuk)
+ (gds services govuk plek)
  (gds services govuk nginx)
+ (gds services govuk routing-configuration)
+ (gds services utils databases)
  (gds systems utils)
+ (gds systems govuk base)
  (gds systems govuk development))
 
 (define %build-default-options
@@ -80,6 +85,11 @@
                                      (target "/var/lib")
                                      (writable? #t)))))
             '())
+      (rails-environment . "development")
+      (app-domain . "dev.gov.uk")
+      (web-domain . "dev.gov.uk")
+      (use-high-ports? . #t)
+      (use-https? . #f)
       ,@%build-default-options)))
 
 (define (service-names->service-types service-names)
@@ -105,23 +115,70 @@
                         service-name (first similarly-named-services)))))))
    service-names))
 
-(define (operating-system-for service-names)
-  (update-system-services-package-source-from-environment
-   (system-without-unnecessary-services
-    (let ((service-types-whitelist
-           (append
-            (if (null? service-names)
-                (map service-kind govuk-services)
-                (service-names->service-types service-names))
-            (cons*
-             govuk-nginx-service-type
-             authenticating-proxy-service-type
-             (map service-kind base-services)))))
+(define* (operating-system-for-services
+          service-names
+          rails-environment
+          app-domain
+          web-domain
+          use-high-ports
+          use-https)
+
+  (define service-types-whitelist
+    (append
+     (if (null? service-names)
+         (map service-kind govuk-services)
+         (service-names->service-types service-names))
+     (cons*
+      govuk-nginx-service-type
+      ;; TODO: The authenticating-proxy service isn't required by
+      ;; anything.
+      authenticating-proxy-service-type
+      asset-manager-service-type
+      (map service-kind base-services))))
+
+  (define base-system
+    (update-system-services-package-source-from-environment
+     (system-without-unnecessary-services
       (filter
        (lambda (service)
          (member (service-kind service) service-types-whitelist))
-       (operating-system-user-services development-os)))
-    development-os)))
+       (operating-system-user-services govuk-development-os))
+      govuk-development-os)))
+
+  (define routing-configuration-arguments
+    `(#:use-high-ports? ,use-high-ports
+      #:use-https? ,use-https
+      #:app-domain ,app-domain
+      #:web-domain ,web-domain))
+
+  (define plek-config
+    (apply plek-config-from-routing-configuration-arguments
+           (operating-system-user-services base-system)
+           routing-configuration-arguments))
+
+  (define database-service-ports
+    (if use-high-ports
+        high-database-service-ports
+        default-database-service-ports))
+
+  (define (add-database-startup-scripts services)
+    (map ensure-database-user-exists-on-service-startup
+         (map run-db:setup-if-postgresql-or-mysql-is-used services)))
+
+  (define (set-services-configuration services)
+    (add-database-startup-scripts
+     (apply
+      set-routing-configuration-for-services
+      (map
+       (cut update-rails-app-config-environment-for-service rails-environment <>)
+       services)
+      routing-configuration-arguments)))
+
+  (operating-system
+    (inherit base-system)
+    (hosts-file (plek-config->hosts-file plek-config))
+    (services (set-services-configuration
+               (operating-system-user-services base-system)))))
 
 (define options
   ;; Specifications of the command-line options.
@@ -138,6 +195,40 @@
                                       "/var/lib"))
                              ((key . value) #f))
                            result)))
+         (option '("rails-environment") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'rails-environment
+                                      arg
+                                      (alist-delete 'rails-environment result))
+                          rest)))
+         (option '("app-domain") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'app-domain
+                                      arg
+                                      (alist-delete 'app-domain result))
+                          rest)))
+         (option '("web-domain") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'web-domain
+                                      arg
+                                      (alist-delete 'web-domain result))
+                          rest)))
+         (option '("use-high-ports") #f #t
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'use-high-ports?
+                                      (string=? arg "true")
+                                      (alist-delete 'use-high-ports? result))
+                          rest)))
+         (option '("use-https") #f #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'use-https? #t
+                                      (alist-delete 'use-https? result))
+                          rest)))
          %standard-build-options))
 
 (define (start . args)
@@ -158,7 +249,13 @@
           (set-grafting #f)
           (mlet* %store-monad
               ((sys (container-script
-                     (operating-system-for (option-values opts 'argument))
+                     (operating-system-for-services
+                      (option-values opts 'argument)
+                      (assq-ref opts 'rails-environment)
+                      (assq-ref opts 'app-domain)
+                      (assq-ref opts 'web-domain)
+                      (assq-ref opts 'use-high-ports?)
+                      (assq-ref opts 'use-https?))
                      #:mappings (option-values opts 'file-system-mapping)
                      #:container-shared-network? #t)))
             (mbegin %store-monad
