@@ -23,118 +23,16 @@
   #:use-module (gds services govuk publishing-e2e-tests)
   #:use-module (gds services govuk routing-configuration)
   #:use-module (gds systems utils)
-  #:use-module (gds systems govuk development))
-
-(define (services-in-rails-production-environment services)
-  (map
-   (lambda (service)
-     (update-rails-app-config-environment-for-service
-      "production"
-      service))
-   services))
+  #:use-module (gds systems govuk base)
+  #:use-module (gds systems govuk test))
 
 (define services
   (modify-services
-      (set-routing-configuration-for-services
-       (services-in-rails-production-environment
-        (append
-         (setup-services (list publishing-e2e-tests-service))
-         (operating-system-user-services development-os)))
-       #:use-high-ports? #t
-       #:use-https? #t
-       #:app-domain "dev.gov.uk"
-       #:web-domain "www.dev.gov.uk")
-    (asset-manager-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-            (service-startup-config-with-additional-environment-variables
-             parameter
-             '(("PROXY_PERCENTAGE_OF_ASSET_REQUESTS_TO_S3_VIA_NGINX" . "100")
-               ("PROXY_PERCENTAGE_OF_WHITEHALL_ASSET_REQUESTS_TO_S3_VIA_NGINX" . "100")
-               ("FAKE_S3_HOST" . "http://asset-manager-proxy")
-               ("ALLOW_FAKE_S3_IN_PRODUCTION_FOR_PUBLISHING_E2E_TESTS" . "true")))
-            parameter))
-      parameters))
-    (travel-advice-publisher-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-         (service-startup-config-add-pre-startup-scripts
-          parameter
-          `((db-seed . ,#~(lambda ()
-                            (run-command "rake" "db:seed")))))
-         parameter))
-      parameters))
-    (publisher-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-            (service-startup-config-with-additional-environment-variables
-             parameter
-             '(("DISABLE_EMAIL" . "true")))
-            parameter))
-      parameters))
-    (specialist-publisher-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-            (service-startup-config-add-pre-startup-scripts
-             parameter
-             `((db-seed
-                . ,#~(lambda ()
-                       (run-command "rake" "db:seed")))
-               (publish-finders
-                . ,#~(lambda ()
-                       (run-command "rake" "publishing_api:publish_finders")))))
-            parameter))
-      parameters))
-    (rummager-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-            (service-startup-config-add-pre-startup-scripts
-             parameter
-             `((create-all-indices
-                . ,#~(lambda ()
-                       (setenv "RUMMAGER_INDEX" "all")
-                       (run-command "bundle" "exec" "rake"
-                                    "rummager:create_all_indices")))))
-            parameter))
-      parameters))
-    (router-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (router-config? parameter)
-            (router-config
-             (inherit parameter)
-             ;; Performance for the initial requests to frontend apps seems
-             ;; to be poor, so until this is improved, extend the timeout for
-             ;; the router
-             (backend-header-timeout "60s"))
-            parameter))
-      parameters))
-    (signon-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (signon-config? parameter)
-            (signon-config-with-random-secrets parameter)
-            parameter))
-      parameters))
+      (operating-system-user-services govuk-test-os)
     (govuk-nginx-service-type
      parameter =>
      (govuk-nginx-configuration
       (inherit parameter)
-      (https-port 50443)
-      (tls-certificate "/etc/nginx/dev.gov.uk.cert")
-      (tls-private-key "/etc/nginx/dev.gov.uk.key")
       (additional-nginx-server-blocks
        (list
         (nginx-server-configuration
@@ -146,6 +44,12 @@
             (uri "/")
             (body '("autoindex on;"))))))))))))
 
+(define plek-config
+  (any (lambda (service)
+         (and (list? (service-value service))
+              (find plek-config? (service-value service))))
+       (operating-system-user-services govuk-test-os)))
+
 (define-public publishing-e2e-tests-os
   (system-without-unnecessary-services
    (cons* (find (lambda (s) (eq? (service-kind s)
@@ -156,13 +60,14 @@
           (find (lambda (s) (eq? (service-type-name (service-kind s))
                                  'authenticating-proxy))
                 services)
-          base-services)
+          (filter (lambda (s)
+                    (memq (service-kind s)
+                          (map service-kind base-services)))
+                  services))
    (operating-system
-    (inherit development-os)
-    (packages (cons*
-               openssl
-               nss-certs
-               (operating-system-packages development-os)))
-    (services services))))
+     (inherit govuk-test-os)
+     (services services)
+     (hosts-file
+      (plek-config->hosts-file plek-config)))))
 
 publishing-e2e-tests-os
