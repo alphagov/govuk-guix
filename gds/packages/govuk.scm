@@ -1355,15 +1355,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qpbwaw146p9dv3y3zkd44l2n0ybam80kjj0kkdpvkrz1h94fdqv")))
+    (hash (base32 "0xdnhskhv080mmkl6y0z3b9wi0msrqnnw47hjdsqbrwcmrnyahp4")))
    (package
      (name "transition")
-     (version "release_824")
+     (version "release_826")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "17cjhc45niz69ddg4mfkcnm76p2r9xilsa61i8088l92fmsqz074")))
+       #:hash (base32 "08jkb026aisif0w7nd8kf998cb3vfjf2p36p60958gkvvz2ay37j")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
