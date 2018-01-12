@@ -62,7 +62,8 @@
             signon-config-with-random-secrets
             signon-dev-user-passphrase
             add-signon-dev-user
-            update-services-with-random-signon-secrets))
+            update-services-with-random-signon-secrets
+            set-random-devise-secrets-for-the-signon-service))
 
 (define-record-type* <signon-application>
   signon-application make-signon-application
@@ -518,3 +519,15 @@ the Signon Dev user passphrase in\n")
         (lambda (api-user)
           (update-signon-api-user-with-random-authorisation-tokens api-user))))))
    services))
+
+(define (set-random-devise-secrets-for-the-signon-service services)
+  (modify-services
+      services
+    (signon-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (signon-config? parameter)
+            (signon-config-with-random-secrets parameter)
+            parameter))
+      parameters))))
