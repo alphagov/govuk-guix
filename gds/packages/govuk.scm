@@ -174,7 +174,6 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/calculators"))
    #:extra-inputs (list libffi)))
 
-
 (define-public calendars
   (package-with-bundler
    (bundle-package
@@ -692,7 +691,6 @@ service setup.")
      (license #f)
      (home-page "https://github.com/alphagov/hmrc-manuals-api"))
    #:extra-inputs (list libffi)))
-
 
 (define-public imminence
   (package-with-bundler
