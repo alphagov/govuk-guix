@@ -41,6 +41,15 @@
   #:use-module (gds packages utils bundler)
   #:use-module (gds packages third-party phantomjs))
 
+(define govuk-admin-template-initialiser
+  '(lambda _
+     (with-output-to-file
+         "config/initializers/govuk_admin_template_environment_indicators.rb"
+       (lambda ()
+         (display "GovukAdminTemplate.environment_style = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONMENT_STYLE', 'development')
+GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONMENT_LABEL', 'Dvelopment')
+")))))
+
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
@@ -220,6 +229,8 @@ proxies requests to some upstream")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "Used to create browse and topic pages")
@@ -245,8 +256,13 @@ proxies requests to some upstream")
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
-     ;; Asset compilation fails as it tries to connect to Redis
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments
+      `(;; Asset compilation fails as it tries to connect to Redis
+        #:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+                      govuk-admin-template-initialiser))))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
      (license license:expat)
@@ -270,6 +286,8 @@ proxies requests to some upstream")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
@@ -311,6 +329,14 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "1pjnvvn9s5pnnzg31s8gg6zhnagz5xjpavg8y5f497ggfwxcqivf")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
+
      (synopsis "")
      (description "")
      (license #f)
@@ -335,6 +361,8 @@ proxies requests to some upstream")
       `(#:precompile-rails-assets? #f
         #:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
@@ -416,6 +444,11 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0q2q6fxlsvwq79y2f6jh06v9n2w8ipdm0sw40mcmysjs9yfsdkxd")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
      (synopsis "")
      (description "")
      (license #f)
@@ -736,6 +769,8 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
             ,(use-blank-database.yml)))))
      (synopsis "")
@@ -780,6 +815,8 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after
               'install 'alter-secrets.yml
             (lambda* (#:key outputs #:allow-other-keys)
@@ -810,6 +847,8 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
                      ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
@@ -861,6 +900,8 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
                      ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
@@ -960,6 +1001,8 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
@@ -1069,6 +1112,11 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0zw0n1hijnkla94pav53cz8xyzwz07izaah5m8jkcajjiy5yf34k")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1108,6 +1156,11 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "1z9k24s3gks2gnk071wi37lxjv83l0wnm96a2jfnzn10bglmycvf")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
      (inputs
       `(;; Loading the database structure uses psql
         ("postgresql" ,postgresql)))
@@ -1132,7 +1185,12 @@ content, as well as broadcasting changes to a message queue.")
        #:hash (base32 "0bi1cl1cvzs17sag2a8yzdv1jr3398grc5cgf9033hpysi52q7an")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to trying to connect to MongoDB
-     (arguments '(#:precompile-rails-assets? #f))
+     (arguments
+      `(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1156,6 +1214,8 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
@@ -1205,6 +1265,8 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after
            'install 'alter-secrets.yml
            (lambda* (#:key outputs #:allow-other-keys)
@@ -1319,6 +1381,8 @@ content, as well as broadcasting changes to a message queue.")
                                       ;; redis
         #:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after
            'install 'replace-redis.yml
            ,(replace-redis.yml)))))
@@ -1365,6 +1429,11 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "08jkb026aisif0w7nd8kf998cb3vfjf2p36p60958gkvvz2ay37j")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
@@ -1391,6 +1460,8 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
             ,(replace-mongoid.yml)))))
      (synopsis "")
@@ -1423,6 +1494,8 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml))
           (add-after 'install 'set-bulk-upload-zip-file-tmp
