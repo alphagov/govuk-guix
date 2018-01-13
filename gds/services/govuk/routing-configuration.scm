@@ -162,17 +162,10 @@
                (tls-certificate (if use-https? "/etc/nginx/cert" #f))
                (tls-private-key (if use-https? "/etc/nginx/key" #f))
                (service-and-ports ports)
-               (origin-url (string-append
-                            "localhost:"
-                            (number->string
-                             (port-for-service-name 'router))))
-               (draft-origin-url (string-append
-                                  "localhost:"
-                                  (number->string
-                                   (port-for-service-name
-                                    (if authenticated-draft-origin?
-                                        'authenticating-proxy
-                                        'draft-router)))))
+               (origin-service 'router)
+               (draft-origin-service (if authenticated-draft-origin?
+                                         'authenticating-proxy
+                                         'draft-router))
                (server-aliases (map (match-lambda
                                       ((name . aliases)
                                        (cons name
