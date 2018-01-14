@@ -95,7 +95,7 @@
     (service mysql-service-type (mysql-configuration))
     govuk-content-schemas-service)))
 
-(define-public setup-services
+(define setup-services
   (let
       ((service-setup-functions
         ;; Service setup functions, order alphabetically if possible,

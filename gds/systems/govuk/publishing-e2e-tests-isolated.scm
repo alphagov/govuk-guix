@@ -4,7 +4,7 @@
   #:use-module (gnu services networking)
   #:use-module (gds systems govuk publishing-e2e-tests))
 
-(define-public publishing-e2e-tests-isolated-os
+(define publishing-e2e-tests-isolated-os
   (operating-system
     (inherit publishing-e2e-tests-os)
     (services

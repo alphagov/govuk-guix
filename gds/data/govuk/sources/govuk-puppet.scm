@@ -412,7 +412,7 @@
    source-file->extracts
    (data-directory-index->source-files index-file base-url)))
 
-(define-public govuk-puppet-data-source
+(define govuk-puppet-data-source
   (data-source
    (name "govuk-puppet")
    (list-extracts list-extracts)

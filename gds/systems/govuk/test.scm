@@ -23,7 +23,8 @@
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk routing-configuration)
   #:use-module (gds systems utils)
-  #:use-module (gds systems govuk production))
+  #:use-module (gds systems govuk production)
+  #:export (govuk-test-os))
 
 (define (setup-services-for-test-os services)
   (define apply-general-configuration
@@ -124,7 +125,7 @@
             parameter))
       parameters))))
 
-(define-public govuk-test-os
+(define govuk-test-os
   (operating-system
     (inherit govuk-production-os)
     (host-name "govuk-test")

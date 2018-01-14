@@ -6,9 +6,14 @@
   #:use-module (gnu system)
   #:use-module (gds services utils)
   #:export (system-without-unnecessary-services
-            update-system-services-package-source-from-environment))
+            update-system-services-package-source-from-environment
 
-(define-public (shepherd-services-from-service service)
+            shepherd-services-from-service
+            find-missing-requirements
+            find-missing-extension-targets
+            add-missing-requirements))
+
+(define (shepherd-services-from-service service)
   (let ((shepherd-root-service-type-extension
          (find (lambda (service-extension)
                  (eq? (service-extension-target
@@ -39,8 +44,8 @@
 (define (service-names services)
   (map service->name services))
 
-(define-public (find-missing-requirements
-                services requirement->service-alist)
+(define (find-missing-requirements
+         services requirement->service-alist)
   (define (services-for-requirements service)
     (filter-map
      (lambda (requirement)
@@ -67,7 +72,7 @@
    '()
    services))
 
-(define-public (find-missing-extension-targets services all-services)
+(define (find-missing-extension-targets services all-services)
   (let* ((service-types (map service-kind services))
          (extensions
           (append-map service-type-extensions service-types))
@@ -83,8 +88,8 @@
                missing-service-types))
      all-services)))
 
-(define-public (add-missing-requirements
-                services all-services requirement->service)
+(define (add-missing-requirements
+         services all-services requirement->service)
   (unless (eq? (length services)
                (length (delete-duplicates services)))
     (simple-format #t "\n~A\n\n" (service-names services))

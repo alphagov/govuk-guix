@@ -24,7 +24,8 @@
   #:use-module (gds services govuk routing-configuration)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk base)
-  #:use-module (gds systems govuk test))
+  #:use-module (gds systems govuk test)
+  #:export (publishing-e2e-tests-os))
 
 (define services
   (modify-services
@@ -50,7 +51,7 @@
               (find plek-config? (service-value service))))
        (operating-system-user-services govuk-test-os)))
 
-(define-public publishing-e2e-tests-os
+(define publishing-e2e-tests-os
   (system-without-unnecessary-services
    (cons* (find (lambda (s) (eq? (service-kind s)
                                  publishing-e2e-tests-service-type))

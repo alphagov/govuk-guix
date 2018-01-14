@@ -40,7 +40,7 @@
   #:use-module (gds systems govuk base)
   #:export (govuk-production-os))
 
-(define-public govuk-production-os
+(define govuk-production-os
   (operating-system
     (host-name "govuk-production")
     (timezone "Europe/London")

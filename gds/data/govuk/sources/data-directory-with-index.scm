@@ -138,7 +138,7 @@
                              filters)))
                   data-sources))))))
 
-(define-public (build-data-directory-with-index . args)
+(define (build-data-directory-with-index . args)
   (with-store store
     (let ((derivation
            ((lower-object (apply

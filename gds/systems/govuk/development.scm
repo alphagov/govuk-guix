@@ -8,7 +8,7 @@
   #:use-module (gds systems govuk production)
   #:export (govuk-development-os))
 
-(define-public setup-services-for-development-os
+(define setup-services-for-development-os
   (let
       ((service-setup-functions
         ;; Service setup functions, order alphabetically if possible,
@@ -33,7 +33,7 @@
 
     (apply compose (reverse service-setup-functions))))
 
-(define-public govuk-development-os
+(define govuk-development-os
   (operating-system
     (inherit govuk-production-os)
     (host-name "govuk-development")
