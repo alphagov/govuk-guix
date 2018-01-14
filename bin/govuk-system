@@ -223,11 +223,16 @@
                                       (string=? arg "true")
                                       (alist-delete 'use-high-ports? result))
                           rest)))
-         (option '("use-https") #f #f
+         (option '("use-https") #f #t
                  (lambda (opt name arg result . rest)
                    (apply values
-                          (alist-cons 'use-https? #t
-                                      (alist-delete 'use-https? result))
+                          (alist-cons
+                           'use-https?
+                           (or (eq? arg #f)
+                               (if (member arg '("development" "certbot"))
+                                   (string->symbol arg)
+                                   (error "Unknown https argument" arg)))
+                           (alist-delete 'use-https? result))
                           rest)))
          %standard-build-options))
 

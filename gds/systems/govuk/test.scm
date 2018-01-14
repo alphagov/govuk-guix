@@ -35,7 +35,7 @@
           (list
            (cut set-routing-configuration-for-services <>
                 #:use-high-ports? #t
-                #:use-https? #t
+                #:use-https? 'development
                 #:app-domain "test.gov.uk"
                 #:web-domain "test.gov.uk")
            ;; TODO: ensure-database-user-exists-on-service-startup and

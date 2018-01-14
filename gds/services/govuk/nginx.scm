@@ -3,6 +3,8 @@
   #:use-module (ice-9 match)
   #:use-module (gnu services web)
   #:use-module (guix records)
+  #:use-module (guix gexp)
+  #:use-module (gnu packages tls)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gds services govuk router)
@@ -19,8 +21,7 @@
             govuk-nginx-configuration-server-aliases
             govuk-nginx-configuration-web-domain
             govuk-nginx-configuration-app-domain
-            govuk-nginx-configuration-tls-certificate
-            govuk-nginx-configuration-tls-private-key
+            govuk-nginx-configuration-tls
             govuk-nginx-configuration-additional-server-blocks
 
             govuk-nginx-service-type))
@@ -42,6 +43,7 @@
                                       draft-origin-service
                                       web-domain
                                       app-domain
+                                      tls
                                       #:key https?
                                       include-port-in-host-header?)
   (define proxy_set_header
@@ -180,15 +182,17 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
                                   (default "www.gov.uk"))
   (app-domain                     govuk-nginx-configuration-app-domain
                                   (default "publishing.service.gov.uk"))
-  (tls-certificate                govuk-nginx-configuration-tls-certificate
-                                  (default #f))
-  (tls-private-key                govuk-nginx-configuration-tls-private-key
+  (tls                            govuk-nginx-configuration-tls
                                   (default #f))
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
                                   (default '())))
 
 (define (apply-base-nginx-server-configuration
          govuk-nginx-config nginx-server-config)
+
+  (define tls-config
+    (govuk-nginx-configuration-tls govuk-nginx-config))
+
   (nginx-server-configuration
    (inherit nginx-server-config)
    (listen
@@ -197,8 +201,24 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
                    (lambda (https-port)
                      (list (string-append (number->string https-port) " ssl"))))
             '())))
-   (ssl-certificate (govuk-nginx-configuration-tls-certificate govuk-nginx-config))
-   (ssl-certificate-key (govuk-nginx-configuration-tls-private-key govuk-nginx-config))))
+   (ssl-certificate (cond
+                     ((eq? tls-config 'development)
+                      "/etc/nginx/cert")
+                     ((eq? tls-config 'certbot)
+                      (string-append "/etc/letsencrypt/live/"
+                                     (govuk-nginx-configuration-web-domain
+                                      govuk-nginx-config)
+                                     "/fullchain.pem"))
+                     (else #f)))
+   (ssl-certificate-key (cond
+                         ((eq? tls-config 'development)
+                          "/etc/nginx/key")
+                         ((eq? tls-config 'certbot)
+                          (string-append "/etc/letsencrypt/live/"
+                                         (govuk-nginx-configuration-web-domain
+                                          govuk-nginx-config)
+                                         "/privkey.pem"))
+                         (else #f)))))
 
 (define (base-nginx-server-configuration govuk-nginx-config)
   (apply-base-nginx-server-configuration govuk-nginx-config
@@ -215,8 +235,7 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
                                     server-aliases
                                     web-domain
                                     app-domain
-                                    tls-certificate
-                                    tls-private-key
+                                    tls
                                     additional-nginx-server-blocks)
      (nginx-configuration
       (server-blocks
@@ -227,6 +246,7 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
                                     draft-origin-service
                                     web-domain
                                     app-domain
+                                    tls
                                     #:https? (number? https-port)
                                     #:include-port-in-host-header?
                                     include-port-in-host-header?))
@@ -243,37 +263,38 @@ proxy_set_header Host whitehall-admin.~A~A:$server_port;"
   (service-type
    (inherit nginx-service-type)
    (extensions
-    (map (lambda (se)
-           (let ((target (service-extension-target se))
-                 (compute (service-extension-compute se)))
-             (cond ((eq? target shepherd-root-service-type)
-                    (service-extension
-                     target
-                     (compose (@@ (gnu services web) nginx-shepherd-service)
-                              maybe-convert-to-nginx-configuration)))
-                   ((eq? target activation-service-type)
-                    (service-extension
-                     target
-                     (compose (@@ (gnu services web) nginx-activation)
-                              maybe-convert-to-nginx-configuration)))
-                   (else (service-extension target compute)))))
-         (cons*
-          (service-extension
-           special-files-service-type
-           (lambda (nginx-config)
-             `(("/etc/nginx/cert"
-                ,(development-os-tls-certificate
-                  (append-map nginx-server-configuration-server-name
-                              (nginx-configuration-server-blocks nginx-config))))
-               ("/etc/nginx/key" ,development-os-tls-private-key))))
-          (service-extension
-           profile-service-type
-           (lambda (nginx-config)
-             (list
-              (development-os-certificates-package-for-domains
-               (append-map nginx-server-configuration-server-name
-                           (nginx-configuration-server-blocks nginx-config))))))
-          (service-type-extensions nginx-service-type))))
+    (append
+     (map (lambda (se)
+            (let ((target (service-extension-target se))
+                  (compute (service-extension-compute se)))
+              (cond ((eq? target shepherd-root-service-type)
+                     (service-extension
+                      target
+                      (compose (@@ (gnu services web) nginx-shepherd-service)
+                               maybe-convert-to-nginx-configuration)))
+                    ((eq? target activation-service-type)
+                     (service-extension
+                      target
+                      (compose (@@ (gnu services web) nginx-activation)
+                               maybe-convert-to-nginx-configuration)))
+                    (else (service-extension target compute)))))
+          (service-type-extensions nginx-service-type))
+     (list
+      (service-extension
+       special-files-service-type
+       (lambda (nginx-config)
+         `(("/etc/nginx/cert"
+            ,(development-os-tls-certificate
+              (append-map nginx-server-configuration-server-name
+                          (nginx-configuration-server-blocks nginx-config))))
+           ("/etc/nginx/key" ,development-os-tls-private-key))))
+      (service-extension
+       profile-service-type
+       (lambda (nginx-config)
+         (list
+          (development-os-certificates-package-for-domains
+           (append-map nginx-server-configuration-server-name
+                       (nginx-configuration-server-blocks nginx-config)))))))))
    (extend (lambda (config servers)
              ((service-type-extend nginx-service-type)
               (govuk-nginx-configuration->nginx-configuration config)

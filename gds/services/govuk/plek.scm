@@ -29,7 +29,8 @@
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
             extend-service-type-with-plek
-            make-rails-app-using-plek-service-type))
+            make-rails-app-using-plek-service-type
+            plek-config->domains))
 
 (define-record-type* <plek-config>
   plek-config make-plek-config
@@ -317,3 +318,34 @@
                 "::1 localhost"
                 (plek-config->/etc/hosts-string plek-config))
                "\n")))
+
+(define (plek-config->domains plek-config)
+  (match-record
+      plek-config
+      <plek-config>
+    (govuk-app-domain
+     govuk-asset-root
+     govuk-website-root
+     govuk-asset-host
+     draft-origin
+     service-ports
+     service-port-aliases)
+
+    (append
+     (list
+      (uri-host (string->uri govuk-website-root))
+      (uri-host (string->uri draft-origin)))
+     (delete-duplicates
+      (list
+       (uri-host (string->uri govuk-asset-root))
+       (uri-host (string->uri govuk-asset-host))))
+     (append-map
+      (match-lambda
+        ((service . port)
+         (map
+          (lambda (name)
+            (simple-format #f "~A.~A" name govuk-app-domain))
+          (cons service
+                (or (assq-ref service-port-aliases service)
+                    '())))))
+      service-ports))))

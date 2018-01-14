@@ -1,7 +1,9 @@
 (define-module (gds services govuk routing-configuration)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (guix gexp)
+  #:use-module (gnu packages tls)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
   #:use-module (gds services third-party elasticsearch)
@@ -102,7 +104,7 @@
           services
           #:key
           (use-high-ports? #f)
-          (use-https? #t)
+          (use-https? 'development)
           (authenticated-draft-origin? #t)
           (app-domain "publishing.service.gov.uk")
           (web-domain "www.gov.uk")
@@ -143,11 +145,25 @@
         high-database-service-ports
         default-database-service-ports))
 
+  (define (add-the-certbot-activation-service services)
+    (cons (simple-service 'govuk-certbot
+                          activation-service-type
+                          (certbot-activation
+                           8080
+                           web-domain
+                           (plek-config->domains plek-config)))
+          services))
+
+  (define service-setup-functions
+    `(,update-services-plek-config
+      ,(cut update-database-service-ports-for-services
+         database-service-ports <>)
+      ,@(if (eq? use-https? 'certbot)
+            (list add-the-certbot-activation-service)
+            '())))
+
   (update-services-parameters
-   (update-services-plek-config
-    (update-database-service-ports-for-services
-     database-service-ports
-     services))
+   ((apply compose (reverse service-setup-functions)) services)
    (list
     (cons
      govuk-nginx-service-type
@@ -159,8 +175,7 @@
                (https-port (and use-https?
                                 (if use-high-ports? 50443 8443)))
                (include-port-in-host-header? use-high-ports?)
-               (tls-certificate (if use-https? "/etc/nginx/cert" #f))
-               (tls-private-key (if use-https? "/etc/nginx/key" #f))
+               (tls use-https?)
                (service-and-ports ports)
                (origin-service 'router)
                (draft-origin-service (if authenticated-draft-origin?
@@ -295,3 +310,19 @@ net:
                         (mysql-configuration
                          (inherit parameter)
                          (port (assq-ref ports 'mysql))))))
+
+(define (certbot-activation http-port
+                            web-domain
+                            domains)
+  #~(begin
+      (system* #$(file-append certbot "/bin/certbot")
+               "certonly"
+               "--cert-name" #$web-domain
+               "-d" #$(string-join domains ",")
+               "-n" ;; Run non-interactively
+               ;; TODO: This is useful for ;; testing, but not
+               ;; sensible in the long run.
+               "--email" "mail@cbaines.net"
+               "--agree-tos"
+               "--standalone"
+               "--http-01-port" #$(number->string http-port))))
