@@ -634,8 +634,16 @@ service setup.")
                                (let* ((base (string-drop (string-drop-right file 4)
                                                          prefix))
                                       (go   (string-append object-dir base ".go")))
-                                 (invoke "guild" "compile" "-L" module-dir
-                                         file "-o" go)))
+                                 (invoke "guild" "compile"
+                                          "--warn=unused-variable"
+                                          "--warn=unused-toplevel"
+                                          "--warn=unbound-variable"
+                                          "--warn=arity-mismatch"
+                                          "--warn=duplicate-case-datum"
+                                          "--warn=bad-case-datum"
+                                          "--warn=format"
+                                          "-L" module-dir
+                                          file "-o" go)))
                              (find-files module-dir "\\.scm$"))
                    (setenv "GUIX_PACKAGE_PATH" module-dir)
                    (setenv "GUILE_LOAD_PATH" (string-append
