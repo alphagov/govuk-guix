@@ -261,7 +261,7 @@ proxies requests to some upstream")
         #:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
-                      govuk-admin-template-initialiser))))
+                      ,govuk-admin-template-initialiser))))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
      (license license:expat)
