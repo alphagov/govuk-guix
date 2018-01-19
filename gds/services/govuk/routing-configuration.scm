@@ -57,7 +57,7 @@
   (generate-port-range 3000 services))
 
 (define (high-ports-for-services services)
-  (generate-port-range 53000 services))
+  (generate-port-range 33000 services))
 
 (define (set-router-api-router-nodes port)
   (lambda (ssc)
@@ -92,7 +92,7 @@
    #:web-domain web-domain
    #:use-https? use-https?
    #:port (if use-high-ports?
-              (if use-https? 50443 50080)
+              (if use-https? 30443 30080)
               (if use-https? 443 80))
    #:aliases aliases))
 
@@ -171,9 +171,9 @@
       (cons govuk-nginx-configuration?
             (lambda (config)
               (govuk-nginx-configuration
-               (http-port (if use-high-ports? 50080 8080))
+               (http-port (if use-high-ports? 30080 8080))
                (https-port (and use-https?
-                                (if use-high-ports? 50443 8443)))
+                                (if use-high-ports? 30443 8443)))
                (include-port-in-host-header? use-high-ports?)
                (tls use-https?)
                (service-and-ports ports)
@@ -225,12 +225,12 @@
                   (port-for-service-name 'draft-router-api-port))))))))
 
 (define high-database-service-ports
-  '((postgresql . 55432)
-    (mongodb . 57017)
-    (redis . 56379)
-    (elasticsearch . 59200)
-    (mysql . 53306)
-    (memcached . 51211)))
+  '((postgresql . 35432)
+    (mongodb . 37017)
+    (redis . 36379)
+    (elasticsearch . 39200)
+    (mysql . 33306)
+    (memcached . 31211)))
 
 (define default-database-service-ports
   `((postgresql . ,((@@ (gnu services databases) postgresql-configuration-port)
@@ -305,7 +305,7 @@ net:
                                  (http-port (assq-ref ports 'elasticsearch))
                                  ;; TODO: The transport-port should
                                  ;; not be hardcoded.
-                                 (transport-port 59300)))
+                                 (transport-port 39300)))
     (mysql-service-type parameter =>
                         (mysql-configuration
                          (inherit parameter)
