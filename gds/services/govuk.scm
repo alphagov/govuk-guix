@@ -563,7 +563,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(finder-frontend))
-           (requirement '()))
+           (requirement '(content-store rummager static)))
           (plek-config) (rails-app-config) finder-frontend
           (service-startup-config))))
 
