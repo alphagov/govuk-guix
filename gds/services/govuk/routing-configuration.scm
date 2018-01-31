@@ -6,7 +6,6 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
-  #:use-module (gds services third-party elasticsearch)
   #:use-module (gds services)
   #:use-module (gds services utils)
   #:use-module (gds services utils databases)

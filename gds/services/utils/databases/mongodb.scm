@@ -2,7 +2,6 @@
   #:use-module (ice-9 match)
   #:use-module (guix gexp)
   #:use-module (guix records)
-  #:use-module (gds packages third-party mongodb)
   #:use-module (gnu packages databases)
   #:export (<mongodb-connection-config>
             mongodb-connection-config

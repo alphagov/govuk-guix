@@ -23,7 +23,7 @@
       (name "guix-gds")
       (version (if local-source
                    "local"
-                   "release_15"))
+                   "release_16"))
       (arguments
        (substitute-keyword-arguments (package-arguments gnu:guix)
          ;; Run the tests if using a tagged release, but not when
@@ -39,10 +39,7 @@
              (method git-fetch)
              (uri (git-reference
                    (url "http://git.cbaines.net/gds/gnu-guix")
-                   ;; Note that when changing the treeish, you will
-                   ;; need to change the sha256 hash such that Guix
-                   ;; thinks that it has not built this
                    (commit version)))
              (sha256
-              (base32 "1ykwda609jc5836cmy4jrwrarnj4pj6b99znbgq7adnvna31xcy2"))
+              (base32 "1fylaz5xr7c5kaxjv2id9yi5456i7fpcfsc2gg89nln2yc8668hd"))
              (file-name (string-append "guix-" version "-checkout"))))))))
