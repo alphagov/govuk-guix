@@ -567,6 +567,19 @@
           (plek-config) (rails-app-config) finder-frontend
           (service-startup-config))))
 
+(define-public draft-finder-frontend-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'draft-finder-frontend))
+
+(define-public draft-finder-frontend-service
+  (service
+   draft-finder-frontend-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(draft-finder-frontend))
+           (requirement '(draft-content-store rummager draft-static)))
+          (plek-config) (rails-app-config) finder-frontend
+          (service-startup-config))))
+
 ;;;
 ;;; HMRC Manuals API
 ;;;
@@ -1775,6 +1788,7 @@
    draft-email-alert-frontend-service
    draft-frontend-service
    draft-government-frontend-service
+   draft-finder-frontend-service
    draft-manuals-frontend-service
    draft-service-manual-frontend-service
    draft-static-service))
