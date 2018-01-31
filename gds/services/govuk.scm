@@ -1321,6 +1321,15 @@
           `((publish-special-routes
              . ,#~(lambda ()
                     (run-command "rake" "publishing_api:publish_special_routes")))))
+         (signon-api-user
+          (name "Frontend")
+          (email "frontend@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (plek-config) (rails-app-config) frontend)))
 
 (define-public draft-frontend-service-type
@@ -1336,6 +1345,15 @@
          (service-startup-config
           (environment-variables
            '(("GOVUK_APP_NAME" . "draft-frontend"))))
+         (signon-api-user
+          (name "Draft Frontend")
+          (email "draft-frontend@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (plek-config) (rails-app-config) frontend)))
 
 ;;;
