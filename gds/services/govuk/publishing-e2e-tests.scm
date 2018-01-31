@@ -164,6 +164,10 @@
        (requirement '(specialist-publisher
                       government-frontend
                       draft-government-frontend
+                      contacts-admin
+                      finder-frontend
+                      content-tagger
+                      whitehall
                       travel-advice-publisher
                       collections-publisher
                       collections
