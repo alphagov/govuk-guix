@@ -13,6 +13,7 @@
             plek-config
             plek-config?
             plek-config-govuk-app-domain
+            plek-config-govuk-app-domain-external
             plek-config-govuk-asset-root
             plek-config-govuk-website-root
             plek-config-govuk-asset-host
@@ -37,6 +38,8 @@
   plek-config?
   (govuk-app-domain plek-config-govuk-app-domain
                     (default "publishing.service.gov.uk"))
+  (govuk-app-domain-external plek-config-govuk-app-domain-external
+                             (default "publishing.service.gov.uk"))
   (govuk-asset-root plek-config-govuk-asset-root
                     (default "https://assets.publishing.service.gov.uk"))
   (govuk-website-root plek-config-govuk-website-root
@@ -89,6 +92,7 @@
           service-ports
           #:optional #:key
           (app-domain (plek-config-govuk-app-domain (plek-config)))
+          (app-domain-external (plek-config-govuk-app-domain-external (plek-config)))
           (web-domain "www.gov.uk")
           (use-https? #t)
           (port (if use-https? 443 80))
@@ -104,6 +108,7 @@
                 ":" (number->string port))))))
     (plek-config
      (govuk-app-domain app-domain)
+     (govuk-app-domain-external app-domain-external)
      (dev-domain
       (if use-https?
          ;; Plek uses DEV_DOMAIN to decide whether to use http or https
@@ -160,6 +165,8 @@
           service-name-whitelist)
     (cons*
      (cons "GOVUK_APP_DOMAIN" (plek-config-govuk-app-domain plek-config))
+     (cons "GOVUK_APP_DOMAIN_EXTERNAL" (plek-config-govuk-app-domain-external
+                                        plek-config))
      (cons "GOVUK_ASSET_ROOT" (plek-config-govuk-asset-root plek-config))
      (cons "GOVUK_WEBSITE_ROOT" (plek-config-govuk-website-root plek-config))
      (cons "GOVUK_ASSET_HOST" (plek-config-govuk-asset-host plek-config))
