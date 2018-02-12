@@ -497,12 +497,12 @@ proxies requests to some upstream")
     (hash (base32 "06wm97zyrj6bcizh6w0lf3kcl395wpl1ryzp2labw12g3mbmg74c")))
    (package
      (name "government-frontend")
-     (version "release_639")
+     (version "release_640")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "04f1hz4hjgiw4mmsxp76jm03i371ym6vfz3aa5c0f9vcvd5lv542")))
+       #:hash (base32 "0x8m9lvkv5134h7sb11465z78ld91vbwx2zh0si33crx6wl5is0f")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
