@@ -1371,15 +1371,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0fab7ccshbcl7mf4yq082q42azx4mlglqg1r2a6wiakc1g1d3yxy")))
+    (hash (base32 "136brhb5698mvdxsxd3r8k648mz8hcc9w9sr6p1hqqa6pd5bnfyv")))
    (package
      (name "support")
-     (version "release_640")
+     (version "release_641")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "09ksmaxxnmkr7zfyz62aw4zqx282k3zmsyy21r35aznfivzgp9hl")))
+       #:hash (base32 "13bjg037bby9j8r4ynrcd9pd4wj232cm3wixhhyn8i3kihlzwqf0")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f ;; Asset precompilation fails,
