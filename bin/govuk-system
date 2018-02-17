@@ -237,7 +237,7 @@
                           rest)))
          %standard-build-options))
 
-(define (start . args)
+(define (start-script opts)
   (define (option-values opts key)
     (reverse
      (filter-map (match-lambda
@@ -246,28 +246,34 @@
                    (_ #f))
                  opts)))
 
-  (define (start-script opts)
-    (with-store store
-      (set-build-options-from-command-line store opts)
+  (with-store store
+    (set-build-options-from-command-line store opts)
 
-      (run-with-store store
-        (mbegin %store-monad
-          (set-grafting #f)
-          (mlet* %store-monad
-              ((sys (container-script
-                     (operating-system-for-services
-                      (option-values opts 'argument)
-                      (assq-ref opts 'rails-environment)
-                      (assq-ref opts 'app-domain)
-                      (assq-ref opts 'web-domain)
-                      (assq-ref opts 'use-high-ports?)
-                      (assq-ref opts 'use-https?))
-                     #:mappings (option-values opts 'file-system-mapping)
-                     #:container-shared-network? #t)))
-            (mbegin %store-monad
-              (built-derivations (list sys))
-              (return (derivation->output-path sys))))))))
+    (run-with-store store
+      (mbegin %store-monad
+        (set-grafting #f)
+        (mlet* %store-monad
+            ((sys (container-script
+                   (operating-system-for-services
+                    (option-values opts 'argument)
+                    (assq-ref opts 'rails-environment)
+                    (assq-ref opts 'app-domain)
+                    (assq-ref opts 'web-domain)
+                    (assq-ref opts 'use-high-ports?)
+                    (assq-ref opts 'use-https?))
+                   #:mappings (option-values opts 'file-system-mapping)
+                   #:container-shared-network? #t)))
+          (mbegin %store-monad
+            (built-derivations (list sys))
+            (return (derivation->output-path sys))))))))
 
+(define (build . args)
+  (let* ((opts (parse-command-line args options (list %default-options))))
+    (display (start-script opts))
+    (newline)
+    (exit 0)))
+
+(define (start . args)
   (define (sudo-path)
     (find
      file-exists?
@@ -317,6 +323,7 @@
 (define (govuk-system . args)
   (define commands
     `(("start" . ,start)
+      ("build" . ,build)
       ("passphrase" . ,passphrase)))
 
   (display "\n")
