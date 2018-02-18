@@ -223,44 +223,44 @@
   (service
    asset-manager-service-type
    (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(asset-manager))
-           (requirement '(publishing-api signon redis)))
+          (inherit default-shepherd-service)
+          (provision '(asset-manager))
+          (requirement '(publishing-api signon redis)))
          (plek-config)
          (rails-app-config
           ;; TODO: Probably shouldn't be #f, but not doing so means
           ;; that it fails to start as AWS_S3_BUCKET_NAME is not set.
           (assets? #f))
          asset-manager
-          (sidekiq-config
-           (file "config/sidekiq.yml"))
-          (signon-application
-           (name "Asset Manager")
-           (supported-permissions '("signin")))
-          (service-startup-config
-           (root-pre-startup-scripts
-            `((mount-uploads
-               .
-               ,(with-imported-modules (source-module-closure
-                                        '((guix build utils)
-                                          (gnu build file-systems)))
-                  #~(lambda ()
-                      (use-modules (gds build utils)
-                                   (gnu build file-systems))
-                      (for-each
-                       (lambda (directory)
-                         (let ((app-dir
-                                (string-append "/var/apps/asset-manager/" directory))
-                               (storage-dir
-                                (string-append "/var/lib/asset-manager/" directory)))
-                           (mkdir-p storage-dir)
-                           (bind-mount storage-dir app-dir)
-                           (chmod app-dir #o777)))
-                       '("uploads" "fake-s3"))
-                      #t))))))
-          (redis-connection-config)
-          (mongodb-connection-config
-           (database "asset_manager")))))
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
+         (signon-application
+          (name "Asset Manager")
+          (supported-permissions '("signin")))
+         (service-startup-config
+          (root-pre-startup-scripts
+           `((mount-uploads
+              .
+              ,(with-imported-modules (source-module-closure
+                                       '((guix build utils)
+                                         (gnu build file-systems)))
+                 #~(lambda ()
+                     (use-modules (gds build utils)
+                                  (gnu build file-systems))
+                     (for-each
+                      (lambda (directory)
+                        (let ((app-dir
+                               (string-append "/var/apps/asset-manager/" directory))
+                              (storage-dir
+                               (string-append "/var/lib/asset-manager/" directory)))
+                          (mkdir-p storage-dir)
+                          (bind-mount storage-dir app-dir)
+                          (chmod app-dir #o777)))
+                      '("uploads" "fake-s3"))
+                     #t))))))
+         (redis-connection-config)
+         (mongodb-connection-config
+          (database "asset_manager")))))
 
 ;;;
 ;;; Authenticating Proxy
