@@ -596,10 +596,10 @@
            (requirement '(publishing-api signon)))
           (plek-config) (rails-app-config) hmrc-manuals-api
           (signon-application
-           (name "HMRC Manuals Api")
+           (name "HMRC Manuals API")
            (supported-permissions '("signin")))
           (signon-api-user
-           (name "HMRC Manuals Api")
+           (name "HMRC Manuals API")
            (email "hmrc-manuals-api@guix-dev.gov.uk")
            (authorisation-permissions
             (list
