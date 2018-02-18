@@ -495,7 +495,10 @@ the Signon Dev user passphrase in\n")
                    (cons
                     (signon-application-name app)
                     (or (assoc-ref '(("Whitehall" . ("signin" "GDS Admin"
-                                                     "Managing Editor")))
+                                                     "Managing Editor"))
+                                     ("Asset Manager" . ())
+                                     ("HMRC Manuals API" . ())
+                                     ("Publishing API" . ()))
                                    (signon-application-name app))
                         (signon-application-supported-permissions app))))
                  (filter-map
