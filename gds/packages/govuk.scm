@@ -1247,7 +1247,15 @@ content, as well as broadcasting changes to a message queue.")
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
-     (arguments `(#:precompile-rails-assets? #f))
+     (arguments
+      '(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'delete-test
+            (lambda _
+              ;; This directory is large, ~50,000 files, so remove it
+              ;; from the package to save space
+              (delete-file-recursively "test"))))))
      (synopsis "")
      (description "")
      (license #f)
