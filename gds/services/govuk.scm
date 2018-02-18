@@ -1190,7 +1190,7 @@
           publishing-api
           (signon-application
            (name "Publishing API")
-           (supported-permissions '("signon" "view_all")))
+           (supported-permissions '("signin" "view_all")))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (postgresql-connection-config
