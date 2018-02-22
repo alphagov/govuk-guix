@@ -77,6 +77,9 @@
                        '("# Set X-Forwarded-SSL for OmniAuth"
                          "proxy_set_header X-Forwarded-SSL 'on';")
                        '()))))
+        ;; TODO: This should be reworked somehow, to add
+        ;; authentication. Maybe a special route could route
+        ;; /api/content directly through to the Content Store?
         (nginx-location-configuration
          (uri "/api/content")
          (body '("proxy_pass http://draft-content-store-proxy;")))))
