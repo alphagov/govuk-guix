@@ -1222,6 +1222,12 @@ content, as well as broadcasting changes to a message queue.")
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
+          ;; Ideally this would be configurable, but as it's not, lets
+          ;; just disable it
+          (add-before 'install 'disable-google-analytics
+            (lambda _
+              (substitute* "config/initializers/govuk_admin_template.rb"
+                (("false") "true"))))
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
