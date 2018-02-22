@@ -99,6 +99,33 @@
              (backend-header-timeout "60s"))
             parameter))
       parameters))
+    (whitehall-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-add-pre-startup-scripts
+             parameter
+             `((publish-finders
+                . ,#~(lambda ()
+                       (run-command "rake" "db:seed")))))
+            parameter))
+      parameters))
+    (contacts-admin-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-add-pre-startup-scripts
+             parameter
+             `((publish-finders
+                . ,#~(lambda ()
+                       (run-command "rake" "db:seed")))
+               (publish-finders
+                . ,#~(lambda ()
+                       (run-command "rake" "finders:publish")))))
+            parameter))
+      parameters))
     (specialist-publisher-service-type
      parameters =>
      (map
