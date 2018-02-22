@@ -171,6 +171,7 @@
                       travel-advice-publisher
                       collections-publisher
                       collections
+                      draft-collections
                       publisher
                       manuals-publisher
                       frontend
