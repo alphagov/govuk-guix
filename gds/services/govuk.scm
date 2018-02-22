@@ -228,9 +228,7 @@
           (requirement '(publishing-api signon redis)))
          (plek-config)
          (rails-app-config
-          ;; TODO: Probably shouldn't be #f, but not doing so means
-          ;; that it fails to start as AWS_S3_BUCKET_NAME is not set.
-          (assets? #f))
+          (precompiled-assets-are-environment-specific? #f))
          asset-manager
          (sidekiq-config
           (file "config/sidekiq.yml"))
