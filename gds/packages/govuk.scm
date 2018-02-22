@@ -256,9 +256,7 @@ proxies requests to some upstream")
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
      (arguments
-      `(;; Asset compilation fails as it tries to connect to Redis
-        #:precompile-rails-assets? #f
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
                       ,govuk-admin-template-initialiser))))
