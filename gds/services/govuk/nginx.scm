@@ -144,7 +144,7 @@
                     (body (list (simple-format
                                  #f
                                  "proxy_pass http://whitehall-proxy;
-proxy_set_header Host whitehall-admin.~A~A:$server_port;"
+proxy_set_header Host whitehall-admin.~A~A;"
                                  app-domain
                                  (if include-port-in-host-header?
                                      ":$server_port"
