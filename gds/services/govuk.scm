@@ -565,7 +565,10 @@
            (provision '(finder-frontend))
            (requirement '(content-store rummager static)))
           (plek-config) (rails-app-config) finder-frontend
-          (service-startup-config))))
+          (service-startup-config
+           (environment-variables
+            '(("GOVUK_APP_NAME" . "finder-frontend"))))
+)))
 
 (define-public draft-finder-frontend-service-type
   (make-rails-app-using-plek-and-signon-service-type 'draft-finder-frontend))
@@ -578,7 +581,9 @@
            (provision '(draft-finder-frontend))
            (requirement '(draft-content-store rummager draft-static)))
           (plek-config) (rails-app-config) finder-frontend
-          (service-startup-config))))
+          (service-startup-config
+           (environment-variables
+            '(("GOVUK_APP_NAME" . "draft-finder-frontend")))))))
 
 ;;;
 ;;; HMRC Manuals API
