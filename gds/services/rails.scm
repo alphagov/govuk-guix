@@ -2,6 +2,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (guix gexp)
+  #:use-module (guix utils)
   #:use-module (guix records)
   #:use-module (guix modules)
   #:use-module (guix packages)
@@ -59,7 +60,11 @@
   (run-with     rails-app-config-run-with
                 (default 'unicorn))
   (assets?      rails-app-config-assets?
-                (default #t)))
+                (default #t))
+  (precompiled-assets-are-environment-specific?
+   rails-app-config-precompiled-assets-are-environment-specific?
+   (default #t)))
+
 
 (define (update-rails-app-config-environment environment config)
   (rails-app-config
@@ -91,6 +96,43 @@
 
 (define (app-name->root-directory name)
   (string-append "/var/apps/" name))
+
+(define (tweak-package-with-environment pkg parameters)
+  (let ((environment-variables
+         (cons
+          (cons "RAILS_ENV" (rails-app-config-environment
+                             (find rails-app-config? parameters)))
+          (service-startup-config-environment-variables
+           (find service-startup-config? parameters)))))
+    (package
+      (inherit pkg)
+      (arguments
+       (substitute-keyword-arguments (package-arguments pkg)
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-before 'precompile-rails-assets 'set-environment
+               (lambda _
+                 (simple-format
+                  #t "Setting environment variables in the ~A package from the service configuration, as the assets contained within this package are environment specific:\n" ,(package-name pkg))
+                 (for-each
+                  (lambda (var)
+                    (let ((key (car var))
+                          (value (cdr var)))
+                      (simple-format #t "  ~A=~A\n" key value)
+                      (setenv key value)))
+                  ',environment-variables))))))))))
+
+(define (package-from-parameters parameters)
+  (let ((rails-app-config (find rails-app-config?
+                                parameters))
+        (pkg (find package?
+                   parameters)))
+    (if (and rails-app-config
+             (rails-app-config-assets? rails-app-config)
+             (rails-app-config-precompiled-assets-are-environment-specific?
+              rails-app-config))
+        (tweak-package-with-environment pkg parameters)
+        pkg)))
 
 ;;;
 ;;; Generic Rails App Service
@@ -179,7 +221,7 @@
          rest)
   (let*
       ((rails-app-config (find rails-app-config? rest))
-       (package (find package? rest))
+       (package (package-from-parameters rest))
        (string-name (symbol->string name))
        (string-port
         (number->string (rails-app-config-port rails-app-config)))
@@ -280,7 +322,7 @@
          rest)
   (let*
       ((rails-app-config (find rails-app-config? rest))
-       (package (find package? rest))
+       (package (package-from-parameters rest))
        (string-name (symbol->string name))
        (root-directory (app-name->root-directory string-name))
        (environment-variables
@@ -364,7 +406,7 @@
          .
          rest)
   (let*
-      ((package (find package? rest))
+      ((package (package-from-parameters rest))
        (root-directory
         (app-name->root-directory (symbol->string name)))
        (ss (or (find shepherd-service? rest)
