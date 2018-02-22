@@ -43,7 +43,7 @@
                                       draft-origin-service
                                       web-domain
                                       app-domain
-                                      tls
+                                      nginx-port
                                       #:key https?
                                       include-port-in-host-header?)
   (define proxy_set_header
@@ -111,11 +111,11 @@
             (body `("add_header \"Access-Control-Allow-Origin\" \"*\";"
                     "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
                     "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
-                    ,@(if https?
-                          '("# Set X-Forwarded-SSL for OmniAuth"
-                            "proxy_set_header X-Forwarded-SSL 'on';")
-                          '())
-                    ,(simple-format #f "proxy_pass http://~A-proxy;" service))))))
+                    ,(simple-format #f "proxy_pass ~A://~A.~A:~A;"
+                                    (if https? "https" "http")
+                                    service
+                                    app-domain
+                                    nginx-port))))))
          service-and-ports)))
       (server-name (list (string-append "assets." app-domain))))
      (map
@@ -249,7 +249,7 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                     draft-origin-service
                                     web-domain
                                     app-domain
-                                    tls
+                                    (or https-port http-port)
                                     #:https? (number? https-port)
                                     #:include-port-in-host-header?
                                     include-port-in-host-header?))
