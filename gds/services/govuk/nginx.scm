@@ -36,6 +36,193 @@
                  (string-append "localhost:" (number->string port)))))))
    service-and-ports))
 
+(define (proxy-set-header-host include-port-in-host-header?)
+  (if include-port-in-host-header?
+      "proxy_set_header Host $host:$server_port;"
+      "proxy_set_header Host $host;"))
+
+(define (web-domain-server-configuration
+         base-nginx-server-configuration
+         origin-service
+         web-domain)
+  (nginx-server-configuration
+   (inherit base-nginx-server-configuration)
+   (locations
+    (list
+     (nginx-location-configuration
+      (uri "/")
+      (body (list (simple-format
+                   #f "proxy_pass http://~A-proxy;" origin-service))))
+     (nginx-location-configuration
+      (uri "/api/content")
+      (body '("proxy_pass http://content-store-proxy;")))))
+   (server-name (list (string-append web-domain)))))
+
+(define (draft-origin-server-configuration
+         base-nginx-server-configuration
+         draft-origin-service
+         app-domain
+         https?
+         include-port-in-host-header?)
+  (nginx-server-configuration
+   (inherit base-nginx-server-configuration)
+   (locations
+    (list
+     (nginx-location-configuration
+      (uri "/")
+      (body `(,(simple-format
+                #f "proxy_pass http://~A-proxy;\n" draft-origin-service)
+              ,(proxy-set-header-host include-port-in-host-header?)
+              ,@(if https?
+                    '("# Set X-Forwarded-SSL for OmniAuth"
+                      "proxy_set_header X-Forwarded-SSL 'on';")
+                    '()))))
+     ;; TODO: This should be reworked somehow, to add
+     ;; authentication. Maybe a special route could route
+     ;; /api/content directly through to the Content Store?
+     (nginx-location-configuration
+      (uri "/api/content")
+      (body '("proxy_pass http://draft-content-store-proxy;")))))
+   (server-name (list (string-append "draft-origin." app-domain)))))
+
+(define (assets-server-configuration
+         base-nginx-server-configuration
+         app-domain
+         nginx-port
+         https?
+         include-port-in-host-header?)
+
+  (define services-to-proxy-assets-for
+    '(asset-manager
+      calculators
+      calendars
+      collections
+      email-alert-frontend
+      feedback
+      finder-frontend
+      frontend
+      government-frontend
+      info-frontend
+      manuals-frontend
+      licencefinder
+      service-manual-frontend
+      smartanswers))
+
+  (define special-cases
+    '((whitehall-frontend
+       . ("/government/assets/"
+          "/government/placeholder"
+          "/government/uploads/"))
+      (static
+       . ("/government/uploads/system/uploads/organisation/logo/"
+          "/government/uploads/system/uploads/classification_featuring_image_data/file/"
+          "/government/uploads/system/uploads/consultation_response_form_data/file/"
+          "/government/uploads/system/uploads/default_news_organisation_image_data/file/"
+          "/government/uploads/system/uploads/person/image/"
+          "/government/uploads/system/uploads/promotional_feature_item/image/"
+          "/government/uploads/system/uploads/take_part_page/image/"
+          "/government/uploads/system/uploads/image_data/file/"))))
+
+  (define (proxy-pass-to-service service)
+    (simple-format #f "proxy_pass ~A://~A.~A:~A;"
+                   (if https? "https" "http")
+                   service
+                   app-domain
+                   nginx-port))
+
+  (define access-control-headers
+    '("add_header \"Access-Control-Allow-Origin\" \"*\";"
+      "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
+      "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"))
+
+  (nginx-server-configuration
+   (inherit base-nginx-server-configuration)
+   (locations
+    (append
+     (list
+      (nginx-location-configuration
+       (uri "/media")
+       (body `(,@access-control-headers
+               "proxy_pass http://asset-manager-proxy;")))
+      (nginx-location-configuration
+       (uri "~ /cloud-storage-proxy/(.*)")
+       (body '("internal;"
+               "set $download_url $1$is_args$args;"
+               "proxy_pass $download_url;")))
+      (nginx-location-configuration
+       (uri "~ /fake-s3/(.*)")
+       (body `(,(proxy-set-header-host include-port-in-host-header?)
+               "proxy_pass http://asset-manager-proxy;"))))
+     (append-map
+      (match-lambda
+        ((service . locations)
+         (map (lambda (location)
+                (nginx-location-configuration
+                 (uri location)
+                 (body
+                  `(,@access-control-headers
+                    ,(proxy-pass-to-service service)))))
+              locations)))
+      special-cases)
+     (map
+      (lambda (service)
+        (nginx-location-configuration
+         (uri (simple-format #f "/~A" service))
+         (body `(,@access-control-headers
+                 ,(proxy-pass-to-service service)))))
+      services-to-proxy-assets-for)
+     (list
+      (nginx-location-configuration
+       (uri "/")
+       (body `(,@access-control-headers
+               ,(proxy-pass-to-service "static")))))))
+    (server-name (list (string-append "assets." app-domain)))))
+
+(define (service-nginx-server-configuration
+         base-nginx-server-configuration
+         app-domain
+         server-aliases
+         service
+         port
+         https?
+         include-port-in-host-header?)
+  (nginx-server-configuration
+   (inherit base-nginx-server-configuration)
+   (locations
+    `(,(nginx-location-configuration
+        (uri "/")
+        (body (list "try_files $uri/index.html $uri.html $uri @app;")))
+      ,(nginx-named-location-configuration
+        (name "app")
+        (body
+         `(,(simple-format #f "access_log /var/log/nginx/~A.access.log;" service)
+           ,(simple-format #f "proxy_pass http://~A-proxy;" service)
+           ,@(if https?
+                 '("# Set X-Forwarded-SSL for OmniAuth"
+                   "proxy_set_header X-Forwarded-SSL 'on';")
+                 '())
+           ,(proxy-set-header-host include-port-in-host-header?))))
+      ,@(if (eq? service 'whitehall)
+            (list
+             (nginx-location-configuration
+              (uri "/government/uploads")
+              (body (list (simple-format
+                           #f
+                           "proxy_pass http://whitehall-proxy;
+proxy_set_header Host whitehall-admin.~A~A;"
+                           app-domain
+                           (if include-port-in-host-header?
+                               ":$server_port"
+                               ""))))))
+            '())))
+   (server-name (map
+                 (lambda (name)
+                   (simple-format #f "~A.~A" name app-domain))
+                 (cons service
+                       (or (assq-ref server-aliases service)
+                           '()))))
+   (root (string-append "/var/apps/" (symbol->string service) "/public"))))
+
 (define* (nginx-server-configurations base-nginx-server-configuration
                                       service-and-ports
                                       server-aliases
@@ -46,117 +233,31 @@
                                       nginx-port
                                       #:key https?
                                       include-port-in-host-header?)
-  (define proxy_set_header
-    (if include-port-in-host-header?
-        "proxy_set_header Host $host:$server_port;"
-        "proxy_set_header Host $host;"))
-
     (cons*
-     (nginx-server-configuration
-      (inherit base-nginx-server-configuration)
-      (locations
-       (list
-        (nginx-location-configuration
-         (uri "/")
-         (body (list (simple-format
-                      #f "proxy_pass http://~A-proxy;" origin-service))))
-        (nginx-location-configuration
-         (uri "/api/content")
-         (body '("proxy_pass http://content-store-proxy;")))))
-      (server-name (list (string-append web-domain))))
-     (nginx-server-configuration
-      (inherit base-nginx-server-configuration)
-      (locations
-       (list
-        (nginx-location-configuration
-         (uri "/")
-         (body `(,(simple-format
-                   #f "proxy_pass http://~A-proxy;\n" draft-origin-service)
-                 ,proxy_set_header
-                 ,@(if https?
-                       '("# Set X-Forwarded-SSL for OmniAuth"
-                         "proxy_set_header X-Forwarded-SSL 'on';")
-                       '()))))
-        ;; TODO: This should be reworked somehow, to add
-        ;; authentication. Maybe a special route could route
-        ;; /api/content directly through to the Content Store?
-        (nginx-location-configuration
-         (uri "/api/content")
-         (body '("proxy_pass http://draft-content-store-proxy;")))))
-      (server-name (list (string-append "draft-origin." app-domain))))
-     (nginx-server-configuration
-      (inherit base-nginx-server-configuration)
-      (locations
-       (cons*
-        (nginx-location-configuration
-         (uri "/media")
-         (body '("add_header \"Access-Control-Allow-Origin\" \"*\";"
-                 "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
-                 "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
-                 "proxy_pass http://asset-manager-proxy;")))
-        (nginx-location-configuration
-         (uri "~ /cloud-storage-proxy/(.*)")
-         (body '("internal;"
-                 "set $download_url $1$is_args$args;"
-                 "proxy_pass $download_url;")))
-        (nginx-location-configuration
-         (uri "~ /fake-s3/(.*)")
-         (body `(,proxy_set_header
-                 "proxy_pass http://asset-manager-proxy;")))
-        (map
-         (match-lambda
-          ((service . port)
-           (nginx-location-configuration
-            (uri (simple-format #f "/~A" service))
-            (body `("add_header \"Access-Control-Allow-Origin\" \"*\";"
-                    "add_header \"Access-Control-Allow-Methods\" \"GET, OPTIONS\";"
-                    "add_header \"Access-Control-Allow-Headers\" \"origin, authorization\";"
-                    ,(simple-format #f "proxy_pass ~A://~A.~A:~A;"
-                                    (if https? "https" "http")
-                                    service
-                                    app-domain
-                                    nginx-port))))))
-         service-and-ports)))
-      (server-name (list (string-append "assets." app-domain))))
+     (web-domain-server-configuration base-nginx-server-configuration
+                                      origin-service
+                                      web-domain)
+     (draft-origin-server-configuration base-nginx-server-configuration
+                                        draft-origin-service
+                                        app-domain
+                                        https?
+                                        include-port-in-host-header?)
+     (assets-server-configuration base-nginx-server-configuration
+                                  app-domain
+                                  nginx-port
+                                  https?
+                                  include-port-in-host-header?)
      (map
       (match-lambda
-       ((service . port)
-        (nginx-server-configuration
-         (inherit base-nginx-server-configuration)
-         (locations
-          `(,(nginx-location-configuration
-              (uri "/")
-              (body (list "try_files $uri/index.html $uri.html $uri @app;")))
-            ,(nginx-named-location-configuration
-              (name "app")
-              (body
-               `(,(simple-format #f "access_log /var/log/nginx/~A.access.log;" service)
-                 ,(simple-format #f "proxy_pass http://~A-proxy;" service)
-                 ,@(if https?
-                       '("# Set X-Forwarded-SSL for OmniAuth"
-                         "proxy_set_header X-Forwarded-SSL 'on';")
-                       '())
-                 ,proxy_set_header)))
-            ,@(if (eq? service 'whitehall)
-                  (list
-                   (nginx-location-configuration
-                    (uri "/government/uploads")
-                    (body (list (simple-format
-                                 #f
-                                 "proxy_pass http://whitehall-proxy;
-proxy_set_header Host whitehall-admin.~A~A;"
-                                 app-domain
-                                 (if include-port-in-host-header?
-                                     ":$server_port"
-                                     ""))))))
-                  '())))
-         (server-name (map
-                       (lambda (name)
-                         (simple-format #f "~A.~A" name app-domain))
-                       (cons service
-                             (or (assq-ref server-aliases service)
-                                 '()))))
-         (root (string-append "/var/apps/" (symbol->string service) "/public")))))
+        ((service . port)
+         (service-nginx-server-configuration
+          base-nginx-server-configuration
+          app-domain
+          server-aliases
+          service
+          port
+          https?
+          include-port-in-host-header?)))
       service-and-ports)))
 
 (define-record-type* <govuk-nginx-configuration>
