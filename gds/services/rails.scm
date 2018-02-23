@@ -102,8 +102,16 @@
          (cons
           (cons "RAILS_ENV" (rails-app-config-environment
                              (find rails-app-config? parameters)))
-          (service-startup-config-environment-variables
-           (find service-startup-config? parameters)))))
+          ;; TODO: This isn't great, as this module is mostly generic,
+          ;; and not GOV.UK specific, apart from this. Just using the
+          ;; service-startup-config means that the secrets get used as
+          ;; well, which is worse.
+          (filter (match-lambda
+                    ((name . value)
+                     (or (string-prefix? "PLEK_" name)
+                         (string-prefix? "GOVUK_" name))))
+                  (service-startup-config-environment-variables
+                   (find service-startup-config? parameters))))))
     (package
       (inherit pkg)
       (arguments
