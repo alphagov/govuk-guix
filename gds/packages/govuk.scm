@@ -1236,7 +1236,8 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/signon"))
-   #:extra-inputs (list mariadb
+   #:extra-inputs (list libffi
+                        mariadb
                         postgresql
                         openssl)))
 
