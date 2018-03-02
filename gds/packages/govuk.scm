@@ -869,12 +869,12 @@ service setup.")
     (hash (base32 "1makpvc8ha4n9hascx5c82m0rmaacxfakivzmjsxxnlzj4gl6h1i")))
    (package
      (name "policy-publisher")
-     (version "release_238")
+     (version "release_239")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "18fpvswan641cphns84l07dh2bm58px5ypx6ahbd875m5kdxk7wa")))
+       #:hash (base32 "0kbgx0i97x9gsz1dnh3gwb1g1qk4dkis1rdyl86jppq1a7wf47rb")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
