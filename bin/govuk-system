@@ -237,7 +237,7 @@
                           rest)))
          %standard-build-options))
 
-(define (start-script opts)
+(define (opts->operating-system opts)
   (define (option-values opts key)
     (reverse
      (filter-map (match-lambda
@@ -245,6 +245,18 @@
                     (and (eq? key head) tail))
                    (_ #f))
                  opts)))
+
+  (operating-system-for-services
+   (option-values opts 'argument)
+   (assq-ref opts 'rails-environment)
+   (assq-ref opts 'app-domain)
+   (assq-ref opts 'web-domain)
+   (assq-ref opts 'use-high-ports?)
+   (assq-ref opts 'use-https?)))
+
+(define (start-script opts)
+  (define os
+    (opts->operating-system opts))
 
   (with-store store
     (set-build-options-from-command-line store opts)
@@ -254,13 +266,7 @@
         (set-grafting #f)
         (mlet* %store-monad
             ((sys (container-script
-                   (operating-system-for-services
-                    (option-values opts 'argument)
-                    (assq-ref opts 'rails-environment)
-                    (assq-ref opts 'app-domain)
-                    (assq-ref opts 'web-domain)
-                    (assq-ref opts 'use-high-ports?)
-                    (assq-ref opts 'use-https?))
+                   os
                    #:mappings (option-values opts 'file-system-mapping)
                    #:container-shared-network? #t)))
           (mbegin %store-monad
