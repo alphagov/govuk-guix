@@ -284,7 +284,9 @@
 
 (define (vm-image-and-system opts)
   (define os
-    (opts->operating-system opts))
+    (virtualized-operating-system
+     (opts->operating-system opts)
+     '()))
 
   (with-store store
     (set-build-options-from-command-line store opts)
