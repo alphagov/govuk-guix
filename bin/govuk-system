@@ -284,9 +284,21 @@
 
 (define (vm-image-and-system opts)
   (define os
-    (virtualized-operating-system
-     (opts->operating-system opts)
-     '()))
+    (let ((base-os
+           (virtualized-operating-system
+            (opts->operating-system opts)
+            '())))
+      (operating-system
+        (inherit base-os)
+        (file-systems
+         (map (lambda (fs)
+                (if (string=? (file-system-mount-point fs)
+                              "/gnu/store")
+                    (peek "fs" (file-system
+                      (inherit fs)
+                      (device (peek "TAG" "TAG_gnu_store"))))
+                    fs))
+              (operating-system-file-systems base-os))))))
 
   (with-store store
     (set-build-options-from-command-line store opts)
