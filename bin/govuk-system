@@ -325,12 +325,34 @@
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
+(define (vm-start-script opts)
+  (define os
+    (opts->operating-system opts))
+
+  (with-store store
+    (set-build-options-from-command-line store opts)
+
+    (run-with-store store
+      (mbegin %store-monad
+        (set-grafting #f)
+        (mlet* %store-monad
+            ((item
+              (system-qemu-image/shared-store-script
+               os)))
+          (mbegin %store-monad
+            (built-derivations (list item))
+            (return (derivation->output-path item))))))))
+
 (define (build . args)
   (let* ((opts (parse-command-line args options (list %default-options)))
          (output (assq-ref opts 'output)))
-    (if (string=? output "vm-image-and-system")
-        (display (vm-image-and-system opts))
-        (display (start-script opts)))
+    (cond
+     ((string=? output "vm-image-and-system")
+      (display (vm-image-and-system opts)))
+     ((string=? output "vm-start-script")
+      (display (vm-start-script opts)))
+     (else
+      (display (start-script opts))))
     (newline)
     (exit 0)))
 
