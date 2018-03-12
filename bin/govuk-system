@@ -45,8 +45,11 @@
  (guix gexp)
  (guix store)
  (guix build utils)
+ (gnu packages linux)
  (gnu services)
+ (gnu services base)
  (gnu services web)
+ (gnu services networking)
  (gnu system)
  (gnu system vm)
  (gnu system linux-container)
@@ -282,11 +285,53 @@
             (built-derivations (list sys))
             (return (derivation->output-path sys))))))))
 
+(define (add-services-for-vm os)
+  (operating-system
+    (inherit os)
+    (services
+     (cons* (login-service)
+
+            (service console-font-service-type
+                     (map (lambda (tty)
+                            (cons tty %default-console-font))
+                          '("tty1" "tty2" "tty3")))
+
+            (agetty-service (agetty-configuration
+                             (extra-options '("-L")) ; no carrier detect
+                             (term "vt100")
+                             (tty #f))) ; automatic
+
+            (mingetty-service (mingetty-configuration
+                               (tty "tty1")))
+            (mingetty-service (mingetty-configuration
+                               (tty "tty2")))
+            (mingetty-service (mingetty-configuration
+                               (tty "tty3")))
+
+            (udev-service #:rules (list lvm2 fuse alsa-utils crda))
+
+            (service static-networking-service-type
+                     (list (static-networking (interface "lo")
+                                              (ip "127.0.0.1")
+                                              (requirement '())
+                                              (provision '(loopback)))))
+
+            (dhcp-client-service)
+
+            (filter
+             (lambda (s)
+               (not (eq?
+                     'dummy-loopback-service
+                     (service-type-name
+                      (service-kind s)))))
+             (operating-system-user-services os))))))
+
 (define (vm-image-and-system opts)
   (define os
     (let ((base-os
            (virtualized-operating-system
-            (opts->operating-system opts)
+            (add-services-for-vm
+             (opts->operating-system opts))
             '())))
       (operating-system
         (inherit base-os)
@@ -327,7 +372,8 @@
 
 (define (vm-start-script opts)
   (define os
-    (opts->operating-system opts))
+    (add-services-for-vm
+     (opts->operating-system opts)))
 
   (with-store store
     (set-build-options-from-command-line store opts)
