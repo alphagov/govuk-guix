@@ -246,15 +246,15 @@
                           rest)))
          %standard-build-options))
 
-(define (opts->operating-system opts)
-  (define (option-values opts key)
-    (reverse
-     (filter-map (match-lambda
-                   ((head . tail)
-                    (and (eq? key head) tail))
-                   (_ #f))
-                 opts)))
+(define (option-values opts key)
+  (reverse
+   (filter-map (match-lambda
+                 ((head . tail)
+                  (and (eq? key head) tail))
+                 (_ #f))
+               opts)))
 
+(define (opts->operating-system opts)
   (operating-system-for-services
    (option-values opts 'argument)
    (assq-ref opts 'rails-environment)
