@@ -5,6 +5,7 @@
   #:use-module (guix utils)
   #:use-module (guix records)
   #:use-module (guix modules)
+  #:use-module (guix store)
   #:use-module (guix packages)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
@@ -12,6 +13,7 @@
   #:use-module (gnu packages base)
   #:use-module ((gnu packages admin)
                 #:select (shadow))
+  #:use-module (gds data tar-archive)
   #:use-module (gds services)
   #:use-module (gds services sidekiq)
   #:use-module (gds services delayed-job)
@@ -27,6 +29,7 @@
             rails-app-config-secret-token
             rails-app-config-run-with
             rails-app-config-assets?
+            rails-app-config-read-bundle-install-input-as-tar-archive?
 
             update-rails-app-config-environment
             update-rails-app-config-with-random-secret-key-base
@@ -44,7 +47,8 @@
             rails-run-db:setup
             update-rails-app-config-environment-for-service
             run-db:setup-if-postgresql-or-mysql-is-used
-            update-rails-app-config-with-random-secret-key-base-for-services))
+            update-rails-app-config-with-random-secret-key-base-for-services
+            update-rails-app-set-read-bundle-install-input-as-tar-archive?))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -63,7 +67,10 @@
                 (default #t))
   (precompiled-assets-are-environment-specific?
    rails-app-config-precompiled-assets-are-environment-specific?
-   (default #t)))
+   (default #t))
+  (read-bundle-install-input-as-tar-archive?
+   rails-app-config-read-bundle-install-input-as-tar-archive?
+   (default #f)))
 
 
 (define (update-rails-app-config-environment environment config)
@@ -324,6 +331,37 @@
   (mixed-text-file "gemrc"
                    "custom_shebang: " ruby "/bin/ruby\n"))
 
+(define (read-bundle-install-input-as-tar-archive package)
+  (define bundle-install-input
+    (any (match-lambda
+           ((name package rest ...)
+            (if (string=? name "bundle-install")
+                package
+                #f)))
+         (package-inputs package)))
+
+  #~(let* ((cache-directory "/var/cache/gems")
+           (bundle-install #$bundle-install-input)
+           (bundle-install-cache-directory
+            (string-append cache-directory
+                           (string-drop bundle-install
+                                        #$(string-length (%store-prefix))))))
+
+      (mkdir-p cache-directory)
+      (unless (file-exists? bundle-install-cache-directory)
+        (simple-format #t "Caching ~A ..." bundle-install "\n"root)
+        (mkdir bundle-install-cache-directory)
+        (system* #$(file-append tar "/bin/tar")
+                 "--extract"
+                 "--strip-components=3"
+                 "--file" #$(tar-archive
+                             (name (string-append (package-name package)
+                                                  "-bundle-install.tar"))
+                             (contents bundle-install-input))
+                 (string-append "--directory=" bundle-install-cache-directory))
+        (bind-mount bundle-install-cache-directory bundle-install)
+        (simple-format #t "Finished caching ~A\n" bundle-install))))
+
 (define (generic-rails-app-activation
          name
          .
@@ -349,6 +387,12 @@
                       (ice-9 match)
                       (ice-9 ftw)
                       (srfi srfi-26))
+
+         #$@(if (rails-app-config-read-bundle-install-input-as-tar-archive?
+                 rails-app-config)
+                (list (read-bundle-install-input-as-tar-archive package))
+                '())
+
          (let* ((string-name (symbol->string '#$name))
                 (user (getpwnam string-name))
                 (bundle (string-append #$root-directory "/bin/bundle")))
