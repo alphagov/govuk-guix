@@ -285,7 +285,7 @@
             (built-derivations (list sys))
             (return (derivation->output-path sys))))))))
 
-(define (add-services-for-vm os)
+(define (alter-services-for-vm os)
   (operating-system
     (inherit os)
     (services
@@ -318,19 +318,21 @@
 
             (dhcp-client-service)
 
-            (filter
-             (lambda (s)
-               (not (eq?
-                     'dummy-loopback-service
-                     (service-type-name
-                      (service-kind s)))))
-             (operating-system-user-services os))))))
+            (update-rails-app-set-read-bundle-install-input-as-tar-archive?
+             #t
+             (filter
+              (lambda (s)
+                (not (eq?
+                      'dummy-loopback-service
+                      (service-type-name
+                       (service-kind s)))))
+              (operating-system-user-services os)))))))
 
 (define (vm-image-and-system opts)
   (define os
     (let ((base-os
            (virtualized-operating-system
-            (add-services-for-vm
+            (alter-services-for-vm
              (opts->operating-system opts))
             '())))
       (operating-system
@@ -372,7 +374,7 @@
 
 (define (vm-start-script opts)
   (define os
-    (add-services-for-vm
+    (alter-services-for-vm
      (opts->operating-system opts)))
 
   (with-store store
