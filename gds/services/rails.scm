@@ -631,6 +631,22 @@
         environment
         (update-rails-app-config-with-random-secret-key-base config)))))))
 
+(define (update-rails-app-set-read-bundle-install-input-as-tar-archive?
+         bundle-install-input-as-tar-archive? services)
+  (map
+   (lambda (service)
+     (update-service-parameters
+      service
+      (list
+       (cons
+        rails-app-config?
+        (lambda (config)
+          (rails-app-config
+           (inherit config)
+           (read-bundle-install-input-as-tar-archive?
+            bundle-install-input-as-tar-archive?)))))))
+   services))
+
 (define (run-db:setup-if-postgresql-or-mysql-is-used service)
   (if (and
        (list? (service-parameters service))
