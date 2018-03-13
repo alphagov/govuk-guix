@@ -347,12 +347,12 @@ proxies requests to some upstream")
     (hash (base32 "009ra0940mlgnbbqsnch43m357hkcsbz040nwjpa481d11c8aqwz")))
    (package
      (name "email-alert-api")
-     (version "release_509")
+     (version "release_510")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "191drhi8nv4xm5f61ggs0d3dk9zfs6yxyr4c31862kas8mdqz4nf")))
+       #:hash (base32 "0d11d1xwn3wf49rnb2zwlmaczk5xh3ys806aq62wb1rj8mss9ksv")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
