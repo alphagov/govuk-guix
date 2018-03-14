@@ -349,7 +349,7 @@
 
       (mkdir-p cache-directory)
       (unless (file-exists? bundle-install-cache-directory)
-        (simple-format #t "Caching ~A ..." bundle-install "\n")
+        (simple-format #t "Caching ~A ...\n" bundle-install)
         (mkdir bundle-install-cache-directory)
         (system* #$(file-append tar "/bin/tar")
                  "--extract"
