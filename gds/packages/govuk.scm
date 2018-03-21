@@ -374,12 +374,12 @@ proxies requests to some upstream")
     (hash (base32 "1zrmx24k52qnwkrf233m9pjjw1s7kfrqw2zpd15dgnw1bbdqzzli")))
    (package
      (name "email-alert-frontend")
-     (version "release_141")
+     (version "release_142")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dp9xbslry3r6z1hf5lgvr6ic9hnsccisnx5cfic0abhh7x293bm")))
+       #:hash (base32 "0hrdjan789dizqkz79qj9j3c7rcfxa85kzqx8ynd4p14gm1h0s00")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
