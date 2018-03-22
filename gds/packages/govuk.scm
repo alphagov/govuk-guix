@@ -866,15 +866,15 @@ service setup.")
 (define-public policy-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "136w7skrn97j59b9xmis4vdhq2a8n7r7qkmhp40pnwgi8yacjmip")))
+    (hash (base32 "15bb557an28z69x4xlyanb0vvji9hwvk05kzidsi0qmkfszkrqm8")))
    (package
      (name "policy-publisher")
-     (version "release_247")
+     (version "release_249")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0jpy3rmkf7pckdzfgfd8mpfafhcg0659jdqsxgkipmqrdaid1zf6")))
+       #:hash (base32 "0vbcp8hxl8yn0fcm2xl7772yybb8f9pgxhjwynhjq99yfap1lm03")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
