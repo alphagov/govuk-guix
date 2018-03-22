@@ -244,7 +244,13 @@
                  (lambda (opt name arg result . rest)
                    (apply values
                           (alist-cons 'output
-                                      arg
+                                      (if (member
+                                           arg
+                                           '("vm-image-and-system"
+                                             "vm-start-script"
+                                             "container-start-script"))
+                                          (string->symbol arg)
+                                          (error "Unknown output argument" arg))
                                       (alist-delete 'output result))
                           rest)))
          %standard-build-options))
@@ -393,13 +399,14 @@
 
 (define (build . args)
   (let* ((opts (parse-command-line args options (list %default-options)))
-         (output (assq-ref opts 'output)))
+         (output (or (assq-ref opts 'output)
+                     'container-start-script)))
     (cond
-     ((string=? output "vm-image-and-system")
+     ((eq? output 'vm-image-and-system)
       (display (vm-image-and-system opts)))
-     ((string=? output "vm-start-script")
+     ((eq? output 'vm-start-script)
       (display (vm-start-script opts)))
-     (else
+     ((eq? output 'container-start-script)
       (display (start-script opts))))
     (newline)
     (exit 0)))
