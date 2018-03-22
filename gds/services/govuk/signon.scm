@@ -58,6 +58,7 @@
             signon-config-users
             signon-config-devise-pepper
             signon-config-devise-secret-key
+            signon-config-instance-name
 
             signon-config-with-random-secrets
             signon-dev-user-passphrase
@@ -366,6 +367,8 @@ end")
   (devise-pepper     signon-config-devise-pepper
                      (default #f))
   (devise-secret-key signon-config-devise-secret-key
+                     (default #f))
+  (instance-name     signon-config-instance-name
                      (default #f)))
 
 (define (signon-config-with-random-secrets config)
@@ -388,12 +391,16 @@ end")
                  (service-startup-config-with-additional-environment-variables
                   parameter
                   (let ((pepper (signon-config-devise-pepper config))
-                        (secret-key (signon-config-devise-secret-key config)))
+                        (secret-key (signon-config-devise-secret-key config))
+                        (instance-name (signon-config-instance-name config)))
                     `(,@(if pepper
                             `(("DEVISE_PEPPER" . ,pepper))
                             '())
                       ,@(if secret-key
                             `(("DEVISE_SECRET_KEY" . ,secret-key))
+                            '())
+                      ,@(if instance-name
+                            `(("INSTANCE_NAME" . ,instance-name))
                             '()))))
                  `((signon-setup
                     .
