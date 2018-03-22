@@ -809,12 +809,12 @@ service setup.")
     (hash (base32 "1xfqhdrni1wnqqr4hvx3wny50pd9fksymnkw1r226wdk9f0a87x5")))
    (package
      (name "manuals-publisher")
-     (version "release_1073")
+     (version "release_1074")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1ddci4wn1q3cyvinm7rdkj0h63wnjz4vhgyijwbpcmvirr2qwlv0")))
+       #:hash (base32 "1bmcqv8l3ma3b2dks3f32iz2icpgjr0c3iar8ghsnp3733h9xyd2")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
