@@ -272,7 +272,7 @@
    (assq-ref opts 'use-high-ports?)
    (assq-ref opts 'use-https?)))
 
-(define (start-script opts)
+(define (container-start-script opts)
   (define os
     (opts->operating-system opts))
 
@@ -407,7 +407,7 @@
      ((eq? output 'vm-start-script)
       (display (vm-start-script opts)))
      ((eq? output 'container-start-script)
-      (display (start-script opts))))
+      (display (container-start-script opts))))
     (newline)
     (exit 0)))
 
@@ -418,16 +418,29 @@
      '("/run/setuid-programs/sudo"
        "/usr/bin/sudo")))
 
-  (let* ((opts (parse-command-line args options (list %default-options))))
+  (define (run-as-root . args)
+    (apply
+     system*
+     (if (eq? (getuid) 1)
+         args
+         (cons (sudo-path) args))))
+
+  (let* ((opts (parse-command-line args options (list %default-options)))
+         (output (or (assq-ref opts 'output)
+                     'container-start-script))
+         (start-script
+          (or (assq-ref `((vm-start-script . ,vm-start-script)
+                          (container-start-script . ,container-start-script))
+                        output)
+              (begin
+                (simple-format #t "start is not supported for output:~A\n"
+                             output)
+                (exit 1)))))
     (exit
      (status:exit-val
-      (apply
-       system*
-       (if (eq? (getuid) 1)
-           (list (start-script opts))
-           (list
-            (sudo-path)
-            (start-script opts))))))))
+      (if (eq? output 'container-start-script)
+          (run-as-root (start-script opts))
+          (system* (start-script opts)))))))
 
 (define (passphrase . args)
   (or (and=> (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
