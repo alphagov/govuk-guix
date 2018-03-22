@@ -240,18 +240,18 @@
                                    (error "Unknown https argument" arg)))
                            (alist-delete 'use-https? result))
                           rest)))
-         (option '("output") #t #f
+         (option '("type") #t #f
                  (lambda (opt name arg result . rest)
                    (apply values
-                          (alist-cons 'output
+                          (alist-cons 'type
                                       (if (member
                                            arg
                                            '("vm-image-and-system"
                                              "vm-start-script"
                                              "container-start-script"))
                                           (string->symbol arg)
-                                          (error "Unknown output argument" arg))
-                                      (alist-delete 'output result))
+                                          (error "Unknown type argument" arg))
+                                      (alist-delete 'type result))
                           rest)))
          %standard-build-options))
 
@@ -399,14 +399,14 @@
 
 (define (build . args)
   (let* ((opts (parse-command-line args options (list %default-options)))
-         (output (or (assq-ref opts 'output)
+         (type (or (assq-ref opts 'type)
                      'container-start-script)))
     (cond
-     ((eq? output 'vm-image-and-system)
+     ((eq? type 'vm-image-and-system)
       (display (vm-image-and-system opts)))
-     ((eq? output 'vm-start-script)
+     ((eq? type 'vm-start-script)
       (display (vm-start-script opts)))
-     ((eq? output 'container-start-script)
+     ((eq? type 'container-start-script)
       (display (container-start-script opts))))
     (newline)
     (exit 0)))
@@ -426,19 +426,19 @@
          (cons (sudo-path) args))))
 
   (let* ((opts (parse-command-line args options (list %default-options)))
-         (output (or (assq-ref opts 'output)
+         (type (or (assq-ref opts 'type)
                      'container-start-script))
          (start-script
           (or (assq-ref `((vm-start-script . ,vm-start-script)
                           (container-start-script . ,container-start-script))
-                        output)
+                        type)
               (begin
-                (simple-format #t "start is not supported for output:~A\n"
-                             output)
+                (simple-format #t "start is not supported for type:~A\n"
+                             type)
                 (exit 1)))))
     (exit
      (status:exit-val
-      (if (eq? output 'container-start-script)
+      (if (eq? type 'container-start-script)
           (run-as-root (start-script opts))
           (system* (start-script opts)))))))
 
