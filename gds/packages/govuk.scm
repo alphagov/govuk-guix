@@ -1066,15 +1066,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0v9cvw32jvw6lp7mvk5s5zj3sbf18c0vnd2dkgv2k8lwrvkcks0w")))
+    (hash (base32 "1bv44xkbhd808ymd2slzcv3hlwghdhyy1f55wzizaw6c22vmgizc")))
    (package
      (name "router-api")
-     (version "release_147")
+     (version "release_148")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0qwr1ynvhymb5ikb6mnd13pkwrngk29k7clc9sf2jrzmk2h8lpri")))
+       #:hash (base32 "074hc5fchg0n6dmd2pxgnpsmf0aqmjs73j30wb2vsdkg44xcpj9i")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
