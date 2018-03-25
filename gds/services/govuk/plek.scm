@@ -138,25 +138,10 @@
          string-port))))))
 
 (define (plek-config->/etc/hosts-string plek-config)
-  (define (string-uri->host s)
-    (uri-host
-     (string->uri s)))
-
   (string-concatenate
    (map
     (cut string-append "127.0.0.1  " <> "\n")
-    (map
-     string-uri->host
-     (cons*
-      (plek-config-govuk-asset-root plek-config)
-      (plek-config-govuk-website-root plek-config)
-      (plek-config-govuk-asset-host plek-config)
-      (plek-config-draft-origin plek-config)
-      (map
-       (match-lambda
-        ((service . port)
-         ((plek-config-service-uri-function plek-config) service port)))
-       (plek-config-service-ports plek-config)))))))
+    (plek-config->domains plek-config))))
 
 (define* (plek-config->environment-variables
           plek-config
