@@ -1,7 +1,41 @@
 #+TITLE: govuk-guix News
 #+STARTUP: content hidestars
 
+* 2018
+** March
+*** Support reading bundle install inputs as tar archives
+This massively improves startup time for Rails services.
+*** Support Virtual Machines through govuk-system
+*** Update Guix release_17 -> release_18 -> release_19
+** February
+*** Customise the Rails precompiled assets
+With the configuration for the respective services, as some of the
+configuration for the services leaks in to the static assets.
+*** Add a build command to govuk-system
+*** Update Guix release_16 -> release_17
+*** Add external domain support to Plek
+** January
+*** Add a package definition for govuk-guix itself
+*** Refactor the management of service routing
+Make it much more configurable.
+*** Refactor govuk-system
+*** Add more options to govuk-system
+Including the Rails environment, app and web domain, and routing
+configuration.
+*** Add LetsEncrypt Support
+*** Update Guix release_15 -> release_16
+This removes most of the third party packages and services from the
+repository, as they are no longer necessary.
 * 2017
+** December
+*** Update Guix release_14 -> release_15
+*** Improve the Asset Manager service
+** November
+*** Add TLS support to the govuk-nginx-service-type
+*** Use the Rails production environment when running the Publishing E2E Tests
+This provides a more rigorous test of the services.
+*** Precompile assets for Rails services
+*** Update Guix release_13 -> release_14
 ** October
 *** Update Guix release_12 -> release_13
 *** Add govuk-data-standalone
