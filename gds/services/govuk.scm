@@ -618,7 +618,7 @@
 ;;;
 
 (define-public licence-finder-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'licence-finder))
+  (make-rails-app-using-plek-and-signon-service-type 'licencefinder))
 
 (define-public licence-finder-service
   (service
