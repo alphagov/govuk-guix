@@ -347,9 +347,9 @@
          (map (lambda (fs)
                 (if (string=? (file-system-mount-point fs)
                               "/gnu/store")
-                    (peek "fs" (file-system
+                    (file-system
                       (inherit fs)
-                      (device (peek "TAG" "TAG_gnu_store"))))
+                      (device "TAG_gnu_store"))
                     fs))
               (operating-system-file-systems base-os))))))
 
