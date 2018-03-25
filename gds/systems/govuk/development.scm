@@ -15,7 +15,6 @@
         ;; and add comments to indicate any interdependencies in the
         ;; configuration
         (list
-         add-signon-dev-user
          (cut map
            (cut update-rails-app-config-environment-for-service "development" <>)
            <>)

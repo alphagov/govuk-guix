@@ -62,7 +62,7 @@
 
             signon-config-with-random-secrets
             signon-dev-user-passphrase
-            add-signon-dev-user
+            update-signon-service-add-users
             update-services-with-random-signon-secrets
             set-random-devise-secrets-for-the-signon-service))
 
@@ -473,46 +473,21 @@ the Signon Dev user passphrase in\n")
               (simple-format #t "The following passphrase will be used, but this will not be persisted: ~A\n\n" passphrase)
               passphrase)))))
 
-(define (add-signon-dev-user services)
-  (let
-      ((dev-email (or (getenv "GOVUK_GUIX_DEVELOPMENT_EMAIL")
-                      "dev@dev.gov.uk"))
-       (dev-passphrase (signon-dev-user-passphrase)))
-    (update-services-parameters
-     services
+(define (update-signon-service-add-users users services)
+  (update-services-parameters
+   services
+   (list
+    (cons
+     signon-service-type
      (list
       (cons
-       signon-service-type
-       (list
-        (cons
-         signon-config?
-         (lambda (config)
-           (signon-config
-            (inherit config)
-            (users
-             (list
-              (signon-user
-               (name "Dev")
-               (email dev-email)
-               (passphrase dev-passphrase)
-               (role "superadmin")
-               (application-permissions
-                (map
-                 (lambda (app)
-                   (cons
-                    (signon-application-name app)
-                    (or (assoc-ref '(("Whitehall" . ("signin" "GDS Admin"
-                                                     "Managing Editor"))
-                                     ("Asset Manager" . ())
-                                     ("HMRC Manuals API" . ())
-                                     ("Publishing API" . ()))
-                                   (signon-application-name app))
-                        (signon-application-supported-permissions app))))
-                 (filter-map
-                  (lambda (service)
-                    (and (list? (service-parameters service))
-                         (find signon-application? (service-parameters service))))
-                  services)))))))))))))))
+       signon-config?
+       (lambda (config)
+         (signon-config
+          (inherit config)
+          (users
+           (append (signon-config-users config)
+                   users))))))))))
 
 (define (update-services-with-random-signon-secrets services)
   (map

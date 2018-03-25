@@ -3,6 +3,7 @@
 
 * 2018
 ** March
+*** Improve the Signon users support in govuk-system
 *** Support reading bundle install inputs as tar archives
 This massively improves startup time for Rails services.
 *** Support Virtual Machines through govuk-system

@@ -56,9 +56,11 @@
  (gnu system file-systems)
  (gds utils)
  (gds services rails)
+ (gds services utils)
  (gds services govuk)
  (gds services govuk plek)
  (gds services govuk nginx)
+ (gds services govuk signon)
  (gds services govuk routing-configuration)
  (gds services utils databases)
  (gds systems utils)
@@ -126,7 +128,8 @@
           app-domain
           web-domain
           use-high-ports
-          use-https)
+          use-https
+          signon-users)
 
   (define service-types-whitelist
     (append
@@ -170,14 +173,60 @@
     (map ensure-database-user-exists-on-service-startup
          (map run-db:setup-if-postgresql-or-mysql-is-used services)))
 
-  (define (set-services-configuration services)
-    (add-database-startup-scripts
-     (apply
-      set-routing-configuration-for-services
-      (map
-       (cut update-rails-app-config-environment-for-service rails-environment <>)
-       services)
-      routing-configuration-arguments)))
+  (define (configure-signon-users services)
+    (cond
+     ((memq 'none signon-users)
+      (unless (eq? (length signon-users) 1)
+        (display "error: if --signon-users=none is specified, addition users cannot be\n")
+        (exit 1))
+      services)
+     ((null? signon-users)
+      (update-signon-service-add-users
+       (list
+        (signon-user
+         (name "Dev")
+         (email "dev@dev.gov.uk")
+         (passphrase (signon-dev-user-passphrase))
+         (role "superadmin")
+         (application-permissions
+          (default-signon-user-permissions services))))
+       services))
+     (else
+      (let ((users
+             (map (lambda (user)
+                    (if (eq? 'unset
+                             (signon-user-application-permissions user))
+                        (signon-user
+                         (inherit user)
+                         (application-permissions
+                          (default-signon-user-permissions services)))
+                        user))
+                  signon-users)))
+
+        (update-signon-service-add-users users services)))))
+
+  (define (set-routing-configuration services)
+    (apply
+     set-routing-configuration-for-services
+     services
+     routing-configuration-arguments))
+
+  (define (set-rails-environment services)
+    (map
+     (cut update-rails-app-config-environment-for-service
+       rails-environment <>)
+     services))
+
+  (define set-services-configuration
+    (let
+        ((service-setup-functions
+          (list
+           add-database-startup-scripts
+           set-rails-environment
+           set-routing-configuration
+           configure-signon-users)))
+
+      (apply compose (reverse service-setup-functions))))
 
   (operating-system
     (inherit base-system)
@@ -185,6 +234,50 @@
     (packages useful-packages)
     (services (set-services-configuration
                (operating-system-user-services base-system)))))
+
+(define (default-signon-user-permissions services)
+  (map
+   (lambda (app)
+     (cons
+      (signon-application-name app)
+      (or (assoc-ref '(("Whitehall" . ("signin" "GDS Admin"
+                                       "Managing Editor"))
+                       ("Asset Manager" . ())
+                       ("HMRC Manuals API" . ())
+                       ("Publishing API" . ()))
+                     (signon-application-name app))
+          (signon-application-supported-permissions app))))
+   (filter-map
+    (lambda (service)
+      (and (list? (service-parameters service))
+           (find signon-application? (service-parameters service))))
+    services)))
+
+(define (parse-signon-user-argument arg)
+  (define* (signon-user-record
+            #:key name email role
+            (passphrase (random-base16-string 16))
+            (application-permissions 'unset))
+    (signon-user
+     (name name)
+     (email email)
+     (role role)
+     (passphrase passphrase)
+     (application-permissions application-permissions)))
+
+  (let ((read-arg (call-with-input-string arg read)))
+    (cond
+     ((symbol? read-arg)
+      (cond
+       ((eq? read-arg 'none)
+        'none)
+       (else
+        (error "Unrecognised symbol " read-arg))))
+     ((list? read-arg)
+      (apply signon-user-record
+             (call-with-input-string arg read)))
+     (else
+      (error "Unrecognised signon user argument " arg)))))
 
 (define options
   ;; Specifications of the command-line options.
@@ -253,6 +346,11 @@
                                           (error "Unknown type argument" arg))
                                       (alist-delete 'type result))
                           rest)))
+         (option '("signon-user") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'signon-users
+                               (parse-signon-user-argument arg)
+                               result)))
          %standard-build-options))
 
 (define (option-values opts key)
@@ -270,12 +368,10 @@
    (assq-ref opts 'app-domain)
    (assq-ref opts 'web-domain)
    (assq-ref opts 'use-high-ports?)
-   (assq-ref opts 'use-https?)))
+   (assq-ref opts 'use-https?)
+   (option-values opts 'signon-users)))
 
-(define (container-start-script opts)
-  (define os
-    (opts->operating-system opts))
-
+(define (container-start-script os opts)
   (with-store store
     (set-build-options-from-command-line store opts)
 
@@ -334,12 +430,11 @@
                        (service-kind s)))))
               (operating-system-user-services os)))))))
 
-(define (vm-image-and-system opts)
-  (define os
+(define (vm-image-and-system os opts)
+  (define vm-os
     (let ((base-os
            (virtualized-operating-system
-            (alter-services-for-vm
-             (opts->operating-system opts))
+            (alter-services-for-vm os)
             '())))
       (operating-system
         (inherit base-os)
@@ -366,10 +461,10 @@
                #~(begin
                    (mkdir #$output)
                    (chdir #$output)
-                   (symlink #$((operating-system-derivation os) store)
+                   (symlink #$((operating-system-derivation vm-os) store)
                             "system")
                    (symlink #$((system-qemu-image/shared-store
-                                os
+                                vm-os
                                 ;; TODO: This shouldn't be necessary
                                 #:disk-image-size (* 80 (expt 2 20)))
                                store)
@@ -378,11 +473,7 @@
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
-(define (vm-start-script opts)
-  (define os
-    (alter-services-for-vm
-     (opts->operating-system opts)))
-
+(define (vm-start-script os opts)
   (with-store store
     (set-build-options-from-command-line store opts)
 
@@ -392,22 +483,87 @@
         (mlet* %store-monad
             ((item
               (system-qemu-image/shared-store-script
-               os)))
+               (alter-services-for-vm os))))
           (mbegin %store-monad
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
+(define (display-system-information os)
+
+  (define (display-signon-service value)
+    (display "Service: Signon\n")
+    (display "  Users:\n")
+    (match (find signon-config? value)
+      (($ <signon-config> applications users)
+       (for-each (match-lambda
+                   (($ <signon-user>
+                       name email passphrase role application-permissions)
+                    (format #t "   - Name: ~a~%" name)
+                    (format #t "     Email: ~a~%" email)
+                    (format #t "     Role: ~a~%" role)
+                    (format #t "     Passphrase: ~a~%"
+                            passphrase)
+                    (display "     Application permissions:\n")
+                    (for-each (match-lambda
+                                ((app . permissions)
+                                 (simple-format #t "      - ~A (~A)\n"
+                                                app (string-join
+                                                     permissions
+                                                     ", "))))
+                              application-permissions)
+                    (newline)))
+                 users))))
+
+  (define display-functions
+    (list
+     (cons signon-service-type display-signon-service)))
+
+  (define (display-services-and-gather-others services)
+    (fold
+     (lambda (service other-services)
+       (let ((type (service-kind service))
+             (value (service-value service)))
+
+         (let ((display-function
+                (assq-ref display-functions type)))
+           (if display-function
+               (begin
+                 (display-function value)
+                 other-services)
+               (cons service
+                     other-services)))))
+     '()
+     services))
+
+  (newline)
+  (let* ((rest (display-services-and-gather-others
+                (operating-system-user-services os))))
+    (display "Other services:\n")
+    (for-each (lambda (service)
+                (format #t " - ~a~%" service))
+              (stable-sort
+               (map (lambda (service)
+                      (symbol->string
+                       (service-type-name (service-kind service))))
+                    rest)
+                string<?))))
+
 (define (build . args)
   (let* ((opts (parse-command-line args options (list %default-options)))
          (type (or (assq-ref opts 'type)
-                     'container-start-script)))
-    (cond
-     ((eq? type 'vm-image-and-system)
-      (display (vm-image-and-system opts)))
-     ((eq? type 'vm-start-script)
-      (display (vm-start-script opts)))
-     ((eq? type 'container-start-script)
-      (display (container-start-script opts))))
+                   'container-start-script))
+         (os   (opts->operating-system opts))
+         (build-function
+          (assq-ref
+           `((vm-image-and-system . ,vm-image-and-system)
+             (vm-start-script . ,vm-start-script)
+             (container-start-script . ,container-start-script))
+           type))
+         (output (build-function os opts)))
+
+    (display-system-information os)
+    (newline)
+    (display output)
     (newline)
     (exit 0)))
 
@@ -419,28 +575,36 @@
        "/usr/bin/sudo")))
 
   (define (run-as-root . args)
-    (apply
-     system*
-     (if (eq? (getuid) 1)
-         args
-         (cons (sudo-path) args))))
+    (let ((command
+           (if (eq? (getuid) 1)
+               args
+               (cons (sudo-path) args))))
+      (format #t "Running command:~%  ~a~2%" (string-join command " "))
+      (apply system* command)))
 
   (let* ((opts (parse-command-line args options (list %default-options)))
          (type (or (assq-ref opts 'type)
                      'container-start-script))
-         (start-script
+         (start-script-builder
           (or (assq-ref `((vm-start-script . ,vm-start-script)
                           (container-start-script . ,container-start-script))
                         type)
               (begin
                 (simple-format #t "start is not supported for type:~A\n"
                              type)
-                (exit 1)))))
+                (exit 1))))
+         (os (opts->operating-system opts))
+         (start-script (start-script-builder os opts)))
+
+    (display-system-information os)
+    (newline)
     (exit
      (status:exit-val
       (if (eq? type 'container-start-script)
-          (run-as-root (start-script opts))
-          (system* (start-script opts)))))))
+          (run-as-root start-script)
+          (begin
+            (format #t "Running command:~%  ~a~2%" start-script)
+            (system* start-script)))))))
 
 (define (passphrase . args)
   (or (and=> (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
