@@ -221,7 +221,7 @@
           (extra-inputs '()))
   (package
     (name (string-append (package-name pkg) "-bundle-install"))
-    (version "0")
+    (version (package-version pkg))
     (source (bundle-package
              (inherit bundle-pkg)
              (location (bundle-package-location bundle-pkg))
