@@ -752,7 +752,8 @@ service setup.")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/licence-finder"))))
+     (home-page "https://github.com/alphagov/licence-finder"))
+   #:extra-inputs (list libffi)))
 
 (define-public local-links-manager
   (package-with-bundler
