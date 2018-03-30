@@ -487,7 +487,8 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/frontend"))))
+     (home-page "https://github.com/alphagov/frontend"))
+   #:extra-inputs (list libffi)))
 
 (define-public government-frontend
   (package-with-bundler
