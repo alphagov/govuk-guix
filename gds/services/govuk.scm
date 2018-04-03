@@ -1665,7 +1665,12 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(whitehall))
-          (requirement '(publishing-api signon static)))
+          (requirement '(publishing-api
+                         ;; The frontend component of Whitehall uses
+                         ;; the content store directly
+                         content-store
+                         signon
+                         static)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((create-directories
