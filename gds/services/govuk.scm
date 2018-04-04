@@ -417,7 +417,7 @@
           (service-startup-config)
           (redis-connection-config)
           (mysql-connection-config
-           (user "contacts-admin")
+           (user "contacts")
            (password (random-base16-string 30))
            (database "contacts_production")))))
 
