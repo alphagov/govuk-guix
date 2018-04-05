@@ -1169,6 +1169,9 @@
           (requirement '(publishing-api signon)))
          (plek-config) (rails-app-config) support-api
          (service-startup-config)
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
+         (redis-connection-config)
          (postgresql-connection-config
           (user "support-api")
           (database "support_api")))))
