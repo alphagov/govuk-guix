@@ -800,6 +800,9 @@
                (application-name "Publishing API"))
               '("signin")))))
           (service-startup-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (redis-connection-config)
           (mongodb-connection-config
            (database "manuals_publisher")))))
 
