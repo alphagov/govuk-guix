@@ -724,12 +724,15 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(imminence))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api signon redis)))
           (plek-config) (rails-app-config) imminence
           (signon-application
            (name "Imminence")
            (supported-permissions '("signin")))
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           (service-startup-config)
+          (redis-connection-config)
           (mongodb-connection-config
            (database "imminence")))))
 
