@@ -581,7 +581,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(feedback))
-           (requirement '(publishing-api signon)))
+           (requirement '(publishing-api support-api signon)))
           (plek-config) (rails-app-config) feedback
           (service-startup-config))))
 
@@ -1145,7 +1145,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(support))
-          (requirement '(publishing-api signon)))
+          (requirement '(support-api signon)))
          (signon-application
           (name "Support")
           (supported-permissions '("signin")))
