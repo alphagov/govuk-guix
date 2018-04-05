@@ -459,6 +459,41 @@
            (database "content_performance_manager_production")))))
 
 ;;;
+;;; Content Audit Tool
+;;;
+
+(define-public content-audit-tool-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'content-audit-tool))
+
+(define-public content-audit-tool-service
+  (service
+   content-audit-tool-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(content-audit-tool))
+           (requirement '(publishing-api whitehall signon)))
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
+          (plek-config) (rails-app-config) content-audit-tool
+          (signon-application
+           (name "Content Audit Tool")
+           (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Content Audit Tool")
+           (email "content-audit-tool@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Publishing API"))
+              '("signin")))))
+          (service-startup-config)
+          (redis-connection-config)
+          (postgresql-connection-config
+           (user "content_audit_tool")
+           (database "content_audit_tool_production")))))
+
+;;;
 ;;; Email Alert API
 ;;;
 
@@ -1764,6 +1799,7 @@
   (list
    ;; bouncer-service
    authenticating-proxy-service
+   content-audit-tool-service
    content-performance-manager-service
    search-admin-service
    signon-service
