@@ -679,6 +679,35 @@
            (database "licence_finder")))))
 
 ;;;
+;;; Link Checker API
+;;;
+
+(define-public link-checker-api-service-type
+  (make-rails-app-using-plek-and-signon-service-type 'link-checker-api))
+
+(define-public link-checker-api-service
+  (service
+   link-checker-api-service-type
+   (list (shepherd-service
+           (inherit default-shepherd-service)
+           (provision '(link-checker-api))
+           (requirement '(signon)))
+         (plek-config)
+         (rails-app-config
+          (assets? #f))
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
+         link-checker-api
+         (signon-api-user
+          (name "Link Checker API")
+          (email "link-checker-api@guix-dev.gov.uk")
+          (authorisation-permissions (list)))
+         (service-startup-config)
+         (redis-connection-config)
+         (mongodb-connection-config
+          (database "link_checker_api")))))
+
+;;;
 ;;; Local Links Manager
 ;;;
 
@@ -1810,6 +1839,7 @@
    authenticating-proxy-service
    content-audit-tool-service
    content-performance-manager-service
+   link-checker-api-service
    search-admin-service
    signon-service
    support-service

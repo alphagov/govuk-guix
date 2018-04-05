@@ -782,6 +782,34 @@ service setup.")
      (home-page "https://github.com/alphagov/licence-finder"))
    #:extra-inputs (list libffi)))
 
+(define-public link-checker-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0y2v1wsqzsbl566map484fygsw2jzpcw24lj36imb7p2pz6w76cj")))
+   (package
+     (name "link-checker-api")
+     (version "release_115")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "19rs2vkkyjq501fsqacrs2dq90gym6frzny6jnpx555dw5gndxx9")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/link-checker-api"))
+   #:extra-inputs (list postgresql libffi
+                        ;; TODO: Remove sqlite once it's been removed
+                        ;; from the package
+                        sqlite)))
+
 (define-public local-links-manager
   (package-with-bundler
    (bundle-package
