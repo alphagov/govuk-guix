@@ -267,6 +267,32 @@ proxies requests to some upstream")
    #:extra-inputs (list libffi
                         mariadb)))
 
+(define-public content-audit-tool
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1jqaywxc7mpyqiz454xc686af8r2skcsb0v8vbgv4p6sdpp11jj4")))
+   (package
+     (name "content-audit-tool")
+     (version "release_414")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "1v7svzymhvbls5fwdfvf1dcb7py3yw1g8cqg0sf381x7ylbhk58b")))
+     (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+          (add-before 'install 'add-govuk-admin-template-initialiser
+            ,govuk-admin-template-initialiser)
+          (add-after 'install 'replace-database.yml
+                     ,(use-blank-database.yml)))))
+     (synopsis "")
+     (description "")
+     (license #f)
+     (home-page "https://github.com/alphagov/content-audit-tool"))
+   #:extra-inputs (list postgresql libffi)))
+
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
