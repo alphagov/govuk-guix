@@ -381,6 +381,8 @@
                (application-name "Publishing API"))
               '("signin")))))
           (service-startup-config)
+          (sidekiq-config
+           (file "config/sidekiq.yml"))
           (redis-connection-config)
           (mysql-connection-config
            (user "collections-pub")
