@@ -284,6 +284,8 @@
 
 (define options
   ;; Specifications of the command-line options.
+  ;;
+  ;; Specified as: names required-arg? optional-arg? processor
   (cons* (option '("share") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'file-system-mapping
