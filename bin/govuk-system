@@ -221,9 +221,12 @@
     (let
         ((service-setup-functions
           (list
+           ;; TODO The ordering is important here, without this coming
+           ;; before add-database-startup-scripts, the wrong ports can
+           ;; be used
+           set-routing-configuration
            add-database-startup-scripts
            set-rails-environment
-           set-routing-configuration
            configure-signon-users)))
 
       (apply compose (reverse service-setup-functions))))
