@@ -894,15 +894,15 @@ service setup.")
 (define-public maslow
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1cacmvrrklacd1sr2br3dxn3w1vjza451f8m6ngwf1lzp52n407f")))
+    (hash (base32 "0d107flrajkgczw866fkbxlk37vni3nmhqhqhvswqy4cwq0cfqsv")))
    (package
      (name "maslow")
-     (version "release_270")
+     (version "release_272")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1x4q5jlhlxdh1ik9s9xymd6p34a0z9hd84iidpsgzxml5ma8l3zr")))
+       #:hash (base32 "0j5fzrjl0qalyfrij7z1fxnsr7xmm9hqy6mkfqnn9fdybvhbg501")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
