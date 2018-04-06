@@ -103,6 +103,7 @@
           services
           #:key
           (use-high-ports? #f)
+          (http-ports-mode #f)
           (use-https? 'development)
           (authenticated-draft-origin? #t)
           (app-domain "publishing.service.gov.uk")
@@ -120,7 +121,24 @@
 
   (define ports
     (service-to-port-mapping services use-high-ports?))
- 
+
+  (define http-ports
+    (let ((mode (or http-ports-mode
+                    (if use-high-ports?
+                        'high
+                        'standard))))
+      (assq-ref
+       '((standard
+          . ((http . 80)
+             (https . 443)))
+         (alternative
+          . ((http . 8080)
+             (https . 8443)))
+         (high
+          . ((http . 30080)
+             (https . 30443))))
+       mode)))
+
   (define (port-for-service-name name)
     (assq-ref ports name))
 
@@ -170,9 +188,9 @@
       (cons govuk-nginx-configuration?
             (lambda (config)
               (govuk-nginx-configuration
-               (http-port (if use-high-ports? 30080 8080))
+               (http-port (assq-ref http-ports 'http))
                (https-port (and use-https?
-                                (if use-high-ports? 30443 8443)))
+                                (assq-ref http-ports 'https)))
                (include-port-in-host-header? use-high-ports?)
                (tls use-https?)
                (service-and-ports ports)
