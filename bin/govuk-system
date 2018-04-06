@@ -579,13 +579,16 @@
      '("/run/setuid-programs/sudo"
        "/usr/bin/sudo")))
 
-  (define (run-as-root . args)
+  (define* (run args #:key as-root)
     (let ((command
-           (if (eq? (getuid) 1)
-               args
-               (cons (sudo-path) args))))
+           (if as-root
+               (if (eq? (getuid) 1)
+                   args
+                   (cons (sudo-path) args))
+               args)))
       (format #t "Running command:~%  ~a~2%" (string-join command " "))
-      (apply system* command)))
+      (status:exit-val
+       (apply system* command))))
 
   (let* ((opts (parse-command-line args options (list %default-options)))
          (type (or (assq-ref opts 'type)
@@ -604,12 +607,14 @@
     (display-system-information os)
     (newline)
     (exit
-     (status:exit-val
-      (if (eq? type 'container-start-script)
-          (run-as-root start-script)
-          (begin
-            (format #t "Running command:~%  ~a~2%" start-script)
-            (system* start-script)))))))
+     (run `(,start-script
+            ,@(if (eq? type 'vm-start-script)
+                  '("-m" "8G"
+                    "-net" "user"
+                    "-net" "nic,model=virtio"
+                    "-enable-kvm")
+                  '()))
+          #:as-root (eq? type 'container-start-script)))))
 
 (define (passphrase . args)
   (or (and=> (getenv "GOVUK_GUIX_DEVELOPMENT_PASSPHRASE")
