@@ -26,6 +26,22 @@
 
             govuk-nginx-service-type))
 
+(define %services-to-proxy-assets-for
+  '(asset-manager
+    calculators
+    calendars
+    collections
+    email-alert-frontend
+    feedback
+    finder-frontend
+    frontend
+    government-frontend
+    info-frontend
+    manuals-frontend
+    licencefinder
+    service-manual-frontend
+    smartanswers))
+
 (define (nginx-upstream-configurations service-and-ports)
   (map
    (match-lambda
@@ -86,27 +102,12 @@
    (server-name (list (string-append "draft-origin." app-domain)))))
 
 (define (assets-server-configuration
+         services
          base-nginx-server-configuration
          app-domain
          nginx-port
          https?
          include-port-in-host-header?)
-
-  (define services-to-proxy-assets-for
-    '(asset-manager
-      calculators
-      calendars
-      collections
-      email-alert-frontend
-      feedback
-      finder-frontend
-      frontend
-      government-frontend
-      info-frontend
-      manuals-frontend
-      licencefinder
-      service-manual-frontend
-      smartanswers))
 
   (define special-cases
     '((whitehall-frontend
@@ -170,7 +171,7 @@
          (uri (simple-format #f "/~A" service))
          (body `(,@access-control-headers
                  ,(proxy-pass-to-service service)))))
-      services-to-proxy-assets-for)
+      services)
      (list
       (nginx-location-configuration
        (uri "/")
@@ -242,7 +243,11 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                         app-domain
                                         https?
                                         include-port-in-host-header?)
-     (assets-server-configuration base-nginx-server-configuration
+     (assets-server-configuration (let ((services (map car service-and-ports)))
+                                    (filter (lambda (service)
+                                              (memq service services))
+                                            %services-to-proxy-assets-for))
+                                  base-nginx-server-configuration
                                   app-domain
                                   nginx-port
                                   https?
