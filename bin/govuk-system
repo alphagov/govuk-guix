@@ -129,6 +129,7 @@
           app-domain
           web-domain
           admin-environment-label
+          signon-instance-name
           use-high-ports
           use-https
           signon-users)
@@ -228,6 +229,24 @@
          admin-environment-label)
         services))
 
+  (define (set-signon-instance-name services)
+    (update-services-parameters
+     services
+     (list
+      (cons
+       signon-service-type
+       (list
+        (cons
+         signon-config?
+         (lambda (config)
+           (signon-config
+            (inherit config)
+            (instance-name
+             (if (and (string? signon-instance-name)
+                      (string=? signon-instance-name ""))
+                 #f
+                 signon-instance-name))))))))))
+
   (define set-services-configuration
     (let
         ((service-setup-functions
@@ -236,6 +255,7 @@
            ;; before add-database-startup-scripts, the wrong ports can
            ;; be used
            set-routing-configuration
+           set-signon-instance-name
            add-database-startup-scripts
            set-admin-environment-label
            set-rails-environment
@@ -347,6 +367,14 @@
                                       arg
                                       (alist-delete 'admin-environment-label result))
                           rest)))
+         (option '("signon-instance-name") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'signon-instance-name
+                                      arg
+                                      (alist-delete 'signon-instance-name
+                                                    result))
+                          rest)))
          (option '("use-high-ports") #f #t
                  (lambda (opt name arg result . rest)
                    (apply values
@@ -412,6 +440,7 @@
    (assq-ref opts 'app-domain)
    (assq-ref opts 'web-domain)
    (assq-ref opts 'admin-environment-label)
+   (assq-ref opts 'signon-instance-name)
    (assq-ref opts 'use-high-ports?)
    (assq-ref opts 'use-https?)
    (option-values opts 'signon-users)))
