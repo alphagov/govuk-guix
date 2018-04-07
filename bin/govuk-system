@@ -61,6 +61,7 @@
  (gds services govuk plek)
  (gds services govuk nginx)
  (gds services govuk signon)
+ (gds services govuk admin-environment-style)
  (gds services govuk routing-configuration)
  (gds services utils databases)
  (gds systems utils)
@@ -127,6 +128,7 @@
           rails-environment
           app-domain
           web-domain
+          admin-environment-label
           use-high-ports
           use-https
           signon-users)
@@ -219,6 +221,13 @@
        rails-environment <>)
      services))
 
+  (define (set-admin-environment-label services)
+    (if admin-environment-label
+        (use-govuk-admin-template-environment-label
+         services
+         admin-environment-label)
+        services))
+
   (define set-services-configuration
     (let
         ((service-setup-functions
@@ -228,6 +237,7 @@
            ;; be used
            set-routing-configuration
            add-database-startup-scripts
+           set-admin-environment-label
            set-rails-environment
            configure-signon-users)))
 
@@ -330,6 +340,13 @@
                                       arg
                                       (alist-delete 'web-domain result))
                           rest)))
+         (option '("admin-environment-label") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'admin-environment-label
+                                      arg
+                                      (alist-delete 'admin-environment-label result))
+                          rest)))
          (option '("use-high-ports") #f #t
                  (lambda (opt name arg result . rest)
                    (apply values
@@ -394,6 +411,7 @@
    (assq-ref opts 'rails-environment)
    (assq-ref opts 'app-domain)
    (assq-ref opts 'web-domain)
+   (assq-ref opts 'admin-environment-label)
    (assq-ref opts 'use-high-ports?)
    (assq-ref opts 'use-https?)
    (option-values opts 'signon-users)))
