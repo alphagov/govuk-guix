@@ -1190,12 +1190,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0pjvpcl0kf3i2l6vycz0ih387x7ljac5ivcd687sd172aws91b53")))
    (package
      (name "service-manual-frontend")
-     (version "release_138")
+     (version "release_139")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1h6p75sdajjvn2nyyww5pjnvjphpaw5x07fx98wmlax4pi06h784")))
+       #:hash (base32 "0lhzhszqg8si2cq6amk9586rggaj2k0ip6fgypgv5qqy2r05vwjh")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
