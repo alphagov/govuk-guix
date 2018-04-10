@@ -419,12 +419,12 @@ proxies requests to some upstream")
     (hash (base32 "1721l3fl4c04qmxch1d9v0b68x0f8bjard1kradmxmzxrmh9qvfv")))
    (package
      (name "email-alert-service")
-     (version "release_148")
+     (version "release_149")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1pdhr2d58jrkpxqzzvjrknv8s512z8wxhgg90f6v73pi9wlpcv0s")))
+       #:hash (base32 "07r6hmwj0b32xza1piydvfyqx9k22dhhbah509qjb6arsjvz0vi9")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)))
