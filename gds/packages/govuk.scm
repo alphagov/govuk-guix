@@ -1412,12 +1412,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "03778akaj2ffk2q851zgklb2cwbcsb9s4jd3c79wwsdwqrvqsg3h")))
    (package
      (name "static")
-     (version "release_2850")
+     (version "release_2851")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "04w4xhfzqycdwcmm029n3ab2hxkyjjkd4nqmjq3f2r1606kxqj62")))
+       #:hash (base32 "0r0y1a6f6pd5byz4c80m8nzc8z1wwfv5nsr1bv2f139wfs6nkv3g")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
