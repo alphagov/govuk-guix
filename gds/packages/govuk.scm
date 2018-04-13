@@ -177,15 +177,15 @@ proxies requests to some upstream")
 (define-public calendars
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1j5gddwxaqhpv3prpq7qq1dkaka5m2v7lb1ns6y5201dqgbp4kvi")))
+    (hash (base32 "1hrzfwjy0ws9n33cr78gs18rsnpkvbmmzfc6p520fvax2fk3dc57")))
    (package
      (name "calendars")
-     (version "release_506")
+     (version "release_507")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1ij13nfckh6psjsvbclkxcdvf0a4awgbx83bk275x4g9sabmnmlh")))
+       #:hash (base32 "1faqwns3y8b852yyy1nms8s7gvb49aqx1jji8rfran46yfhmnhgx")))
      (build-system rails-build-system)
      (synopsis "Serves calendars on GOV.UK")
      (description "")
