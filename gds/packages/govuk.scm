@@ -1206,15 +1206,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0zq79zd435rwf0hkqpchmanlqas8wfrgnck6qb1ipwcrxm8bllvs")))
+    (hash (base32 "1k5lz2dhqx53w3gk17qi9548vj7b9iykr7nlv13gsiadvb02500i")))
    (package
      (name "service-manual-publisher")
-     (version "release_353")
+     (version "release_354")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0j5l6j0q3jci6j5l80cjsdwhwsb3djbn1x015h6pah1yn5xj3d9k")))
+       #:hash (base32 "02jn0j9gvdj1z2wf948kafn5fm45qki1731b4sflc1zyp7ckicid")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
