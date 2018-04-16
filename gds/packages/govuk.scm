@@ -242,15 +242,15 @@ proxies requests to some upstream")
 (define-public contacts-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0pxlx66cqy3scq4rwlqxjawbph1m2pwyi9szilrchwql1r5smg4i")))
+    (hash (base32 "0fc78sgaa64sd79xh3rzq3j4fw9h2dbf514fs7s5bmmxgx4xxm6l")))
    (package
      (name "contacts-admin")
-     (version "release_440")
+     (version "release_442")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1kjf3gns9mqj986ajmkm9gava29xcdx2w76d90m0ysj68vsyvg5s")))
+       #:hash (base32 "0qm5pyqav8hzkqql2nb51ss52abj4q2kmmcv45zavqlbm4wg0x6b")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
