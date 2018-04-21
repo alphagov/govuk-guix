@@ -1,0 +1,5 @@
+#!/bin/sh
+
+GOVUKCLI="$(readlink -f $GOVUK_GUIX_ROOT/../govuk-aws/tools/govukcli)"
+
+$GOVUKCLI $@
