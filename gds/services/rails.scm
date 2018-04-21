@@ -276,8 +276,8 @@
           rails-app-config
           rest)))
        (pid-file
-        (if (eq? (rails-app-config-run-with rails-app-config)
-                 'unicorn)
+        (if (memq (rails-app-config-run-with rails-app-config)
+                  '(unicorn rails))
             (string-append "/tmp/" string-name ".pid")
             #f))
        (start-command
@@ -287,6 +287,12 @@
             (string-append root-directory "/bin/bundle")
             "exec"
             "unicorn"
+            "-p" string-port
+            "-P" pid-file))
+          ('rails
+           (list
+            "bin/rails"
+            "server"
             "-p" string-port
             "-P" pid-file))
           ((and command string)
