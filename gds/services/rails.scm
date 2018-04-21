@@ -569,15 +569,19 @@
       (with-imported-modules '((gds build utils))
         #~(lambda ()
             (use-modules (gds build utils))
-            (let ((run-rake-task
+            (let ((run-task
                    (lambda args
-                     (if (and (file-exists? "bin/rake")
-                              ;; When spring is used, rake seems
-                              ;; to need to be run with bundle
-                              ;; exec
-                              (not (file-exists? "bin/spring")))
-                         (apply run-command "rake" args)
-                         (apply run-command "bundle" "exec" "rake" args)))))
+                     (cond
+                      ((and (file-exists? "bin/rake")
+                            ;; When spring is used, rake seems
+                            ;; to need to be run with bundle
+                            ;; exec
+                            (not (file-exists? "bin/spring")))
+                       (apply run-command "rake" args))
+                      ((file-exists? "bin/bundle")
+                       (apply run-command "bundle" "exec" "rake" args))
+                      (else
+                       (apply run-command "bin/rails" args))))))
               (if #$database-already-exists?
                   (let ((schema-value (getenv "SCHEMA"))
                         (result
@@ -585,11 +589,11 @@
                            ;; Trick rails in to writing to
                            ;; /dev/null, rather than the
                            ;; schema that could be readonly
-                           (setenv "SCHEMA" "/dev/null")
-                           (run-rake-task "db:migrate"))))
+                           (setenv "SCHEMA" "tmp/schema")
+                           (run-task "db:migrate"))))
                     (setenv "SCHEMA" schema-value)
                     result)
-                  (run-rake-task "db:setup")))))))
+                  (run-task "db:setup")))))))
 
   (let
       ((parameters (service-parameters s)))
