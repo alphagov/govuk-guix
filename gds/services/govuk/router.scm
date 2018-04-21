@@ -67,7 +67,6 @@
                (concatenate
                 (map database-connection-config->environment-variables
                      (filter database-connection-config? rest)))))))
-           (user (getpwnam "nobody"))
            (string-service-name
             (symbol->string name)))
        (list
@@ -78,7 +77,7 @@
          (respawn? #f)
          (start #~(make-forkexec-constructor
                    (string-append #$package "/bin/router")
-                   #:user (passwd:uid #$user)
+                   #:user (passwd:uid (getpwnam "nobody"))
                    #:environment-variables '#$environment-variables
                    #:log-file (string-append "/var/log/" #$string-service-name)))
          (stop #~(make-kill-destructor))))))))
