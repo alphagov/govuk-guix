@@ -1048,15 +1048,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public release
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0ranv42gihj4c1xcxpmyx82c2i55nyczzgcrfs8bxj4g6zjcvmcj")))
+    (hash (base32 "1dq4i2h25dx5y2sa5jd242g5fg72y6kf7bkfv957clabrfhycjl3")))
    (package
      (name "release")
-     (version "release_292")
+     (version "release_293")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1ph6k8qzfag3vjjnhp2zv6m28c3fc5w6q3b2rlw3rcnrmzq4nk1c")))
+       #:hash (base32 "001c2ysgw55sj884gmwingardfphhi1cfsfrz6b3n6prjp7nxhcx")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
