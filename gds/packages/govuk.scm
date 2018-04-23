@@ -1234,15 +1234,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public short-url-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0391ppyfmlymalsl0c1mb7cjz5y5qpn67605krr2l50nzpsmxs1x")))
+    (hash (base32 "153vpkxm8gacv5l05iawv137khzjvpbq6dpjc77m65fbrrf6glkd")))
    (package
      (name "short-url-manager")
-     (version "release_197")
+     (version "release_198")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0mwzf8jc1ayv53zbfxg790l3zraqkvvr402kx3nv59fcs610bbqq")))
+       #:hash (base32 "1lqk1jx5c1zzz73wby55r75ivc9wfx300zgwsj65ypd90pvfxl06")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to trying to connect to MongoDB
      (arguments
