@@ -25,11 +25,14 @@
                    "local"
                    "release_20"))
       (arguments
-       (substitute-keyword-arguments (package-arguments gnu:guix)
-         ;; Run the tests if using a tagged release, but not when
-         ;; using Guix through GDS_GNU_GUIX_PATH, as this slows down
-         ;; development.
-         ((#:tests? tests) (not local-source))))
+       (if local-source
+           (ensure-keyword-arguments
+            (package-arguments gnu:guix)
+            ;; Run the tests if using a tagged release, but not when
+            ;; using Guix through GDS_GNU_GUIX_PATH, as this slows down
+            ;; development.
+            '(#:tests? #f))
+           (package-arguments gnu:guix)))
       (source
        (if local-source
            (local-file (getenv "GDS_GNU_GUIX_PATH") "guix-gds"
@@ -43,3 +46,12 @@
              (sha256
               (base32 "116fnz7j9k191a6cgk11bf4jv5vf2mrh6xg791cd54nfi1iszg3m"))
              (file-name (string-append "guix-" version "-checkout"))))))))
+
+(define-public guix-no-tests
+  (package
+    (inherit guix)
+    (name "guix-gds-no-tests")
+    (arguments
+     (ensure-keyword-arguments
+      (package-arguments guix)
+      '(#:tests? #f)))))
