@@ -133,7 +133,8 @@
           use-high-ports
           use-https
           signon-users
-          read-bundle-install-input-as-tar-archive)
+          read-bundle-install-input-as-tar-archive
+          http-ports-mode)
 
   (define service-types-whitelist
     (append
@@ -160,6 +161,7 @@
   (define routing-configuration-arguments
     `(#:use-high-ports? ,use-high-ports
       #:use-https? ,use-https
+      #:http-ports-mode ,http-ports-mode
       #:app-domain ,(or app-domain
                         host-name)
       #:web-domain ,(or web-domain
@@ -393,12 +395,12 @@
                  (lambda (opt name arg result . rest)
                    (apply values
                           (alist-cons
-                           'http-ports
+                           'http-ports-mode
                            (or (eq? arg #f)
                                (if (member arg '("high" "alternative" "standard"))
                                    (string->symbol arg)
                                    (error "Unknown http-ports argument" arg)))
-                           (alist-delete 'use-high-ports? result))
+                           (alist-delete 'http-ports-mode result))
                           rest)))
          (option '("use-https") #f #t
                  (lambda (opt name arg result . rest)
@@ -464,7 +466,8 @@
    (assq-ref opts 'use-https?)
    (option-values opts 'signon-users)
    (option-value opts 'read-bundle-install-input-as-tar-archive?
-                 #:default default-read-bundle-install-input-as-tar-archive?)))
+                 #:default default-read-bundle-install-input-as-tar-archive?)
+   (assq-ref opts 'http-ports-mode)))
 
 (define (container-start-script os opts)
   (with-store store

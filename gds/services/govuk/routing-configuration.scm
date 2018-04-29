@@ -85,7 +85,8 @@
 (define* (plek-config-from-routing-configuration-arguments
           services
           #:key use-high-ports? use-https? app-domain web-domain
-          (aliases %default-aliases))
+          (aliases %default-aliases)
+          #:allow-other-keys)
   (make-custom-plek-config
    (service-to-port-mapping services use-high-ports?)
    #:app-domain app-domain
