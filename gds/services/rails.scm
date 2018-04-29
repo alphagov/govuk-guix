@@ -48,7 +48,7 @@
             update-rails-app-config-environment-for-service
             run-db:setup-if-postgresql-or-mysql-is-used
             update-rails-app-config-with-random-secret-key-base-for-services
-            update-rails-app-set-read-bundle-install-input-as-tar-archive?))
+            update-rails-app-set-read-bundle-install-input-as-tar-archive))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -641,7 +641,7 @@
         environment
         (update-rails-app-config-with-random-secret-key-base config)))))))
 
-(define (update-rails-app-set-read-bundle-install-input-as-tar-archive?
+(define (update-rails-app-set-read-bundle-install-input-as-tar-archive
          bundle-install-input-as-tar-archive? services)
   (map
    (lambda (service)

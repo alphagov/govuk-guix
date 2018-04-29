@@ -132,7 +132,8 @@
           signon-instance-name
           use-high-ports
           use-https
-          signon-users)
+          signon-users
+          read-bundle-install-input-as-tar-archive)
 
   (define service-types-whitelist
     (append
@@ -247,6 +248,11 @@
                  #f
                  signon-instance-name))))))))))
 
+  (define (set-read-bundle-install-input-as-tar-archive services)
+    (update-rails-app-set-read-bundle-install-input-as-tar-archive
+     read-bundle-install-input-as-tar-archive
+     services))
+
   (define set-services-configuration
     (let
         ((service-setup-functions
@@ -256,6 +262,7 @@
            ;; be used
            set-routing-configuration
            set-signon-instance-name
+           set-read-bundle-install-input-as-tar-archive
            add-database-startup-scripts
            set-admin-environment-label
            set-rails-environment
@@ -422,6 +429,15 @@
                    (alist-cons 'signon-users
                                (parse-signon-user-argument arg)
                                result)))
+         (option '("read-bundle-install-input-as-tar-archive") #f #t
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons
+                           'read-bundle-install-input-as-tar-archive?
+                           (string=? arg "true")
+                           (alist-delete
+                            'read-bundle-install-input-as-tar-archive? result))
+                          rest)))
          %standard-build-options))
 
 (define (option-values opts key)
@@ -432,7 +448,10 @@
                  (_ #f))
                opts)))
 
-(define (opts->operating-system opts)
+(define* (opts->operating-system
+          opts
+          #:key
+          default-read-bundle-install-input-as-tar-archive?)
   (operating-system-for-services
    (assq-ref opts 'host-name)
    (option-values opts 'argument)
@@ -443,7 +462,9 @@
    (assq-ref opts 'signon-instance-name)
    (assq-ref opts 'use-high-ports?)
    (assq-ref opts 'use-https?)
-   (option-values opts 'signon-users)))
+   (option-values opts 'signon-users)
+   (option-value opts 'read-bundle-install-input-as-tar-archive?
+                 #:default default-read-bundle-install-input-as-tar-archive?)))
 
 (define (container-start-script os opts)
   (with-store store
@@ -494,15 +515,19 @@
 
             (dhcp-client-service)
 
-            (update-rails-app-set-read-bundle-install-input-as-tar-archive?
-             #t
-             (filter
-              (lambda (s)
-                (not (eq?
-                      'dummy-loopback-service
-                      (service-type-name
-                       (service-kind s)))))
-              (operating-system-user-services os)))))))
+            (filter
+             (lambda (s)
+               (not (eq?
+                     'dummy-loopback-service
+                     (service-type-name
+                      (service-kind s)))))
+             (operating-system-user-services os))))))
+
+(define* (option-value opts key #:key default)
+  (let ((values (option-values opts key)))
+    (if (null? values)
+        default
+        (car values))))
 
 (define (vm-image-and-system os opts)
   (define vm-os
@@ -626,7 +651,14 @@
   (let* ((opts (parse-command-line args options (list %default-options)))
          (type (or (assq-ref opts 'type)
                    'container-start-script))
-         (os   (opts->operating-system opts))
+         (os   (opts->operating-system
+                opts
+                #:default-read-bundle-install-input-as-tar-archive?
+                (assq-ref
+                 '((vm-image-and-system . #t)
+                   (vm-start-script . #t)
+                   (container-start-script . #f))
+                 type)))
          (build-function
           (assq-ref
            `((vm-image-and-system . ,vm-image-and-system)
@@ -670,7 +702,14 @@
                 (simple-format #t "start is not supported for type:~A\n"
                              type)
                 (exit 1))))
-         (os (opts->operating-system opts))
+         (os (opts->operating-system
+              opts
+              #:default-read-bundle-install-input-as-tar-archive?
+              (assq-ref
+               '((vm-image-and-system . #t)
+                 (vm-start-script . #t)
+                 (container-start-script . #f))
+               type)))
          (start-script (start-script-builder os opts)))
 
     (display-system-information os)
