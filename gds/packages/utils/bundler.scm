@@ -335,14 +335,15 @@
                           (assoc-ref inputs "tzdata") "/share/zoneinfo"
                           "'].freeze"))))))))
     (inputs
-     (cons*
-      (list "ruby" (bundle-package-ruby bundle-pkg))
-      (list "bundler" (bundler (bundle-package-ruby bundle-pkg)))
-      (list "gemrc" (gemrc (bundle-package-ruby bundle-pkg)))
-      (list "tzdata" tzdata)
-      (map (lambda (package)
-             (list (package-name package) package))
-           extra-inputs)))
+     (let ((ruby (bundle-package-ruby bundle-pkg)))
+       (cons*
+        (list "ruby" ruby)
+        (list "bundler" (bundler ruby))
+        (list "gemrc" (gemrc ruby))
+        (list "tzdata" tzdata)
+        (map (lambda (package)
+               (list (package-name package) package))
+             extra-inputs))))
     (synopsis "")
     (license "")
     (description "")
