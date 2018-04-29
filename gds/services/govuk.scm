@@ -1745,6 +1745,7 @@
                          ;; the content store directly
                          content-store
                          signon
+                         asset-manager
                          static)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
@@ -1753,22 +1754,24 @@
                   #~(lambda ()
                       (let ((user (getpwnam "whitehall")))
                         (for-each
-                         (lambda (suffix)
-                           (let ((directory
-                                  (string-append
-                                   "/data/uploads/whitehall/"
-                                   suffix)))
-                             (mkdir-p directory)
-                             (chown directory
+                         (lambda (name)
+                           (let ((mount-target
+                                  (string-append "/var/apps/whitehall/" name))
+                                 (mount-source
+                                  (string-append "/var/lib/whitehall/" name)))
+                             (mkdir-p mount-source)
+                             (chown mount-source
                                     (passwd:uid user)
-                                    (passwd:gid user))))
-                         '("attachment-cache"
-                           "bulk-upload-zip-file-tmp"
+                                    (passwd:gid user))
+                             (bind-mount mount-source mount-target)))
+                         '("incoming-uploads"
+                           "clean-uploads"
+                           "infected-uploads"
+                           "asset-manager-tmp"
                            "carrierwave-tmp"
-                           "clean"
-                           "incoming"
-                           "infected"))
-                        #t)))))
+                           "attachment-cache"
+                           "bulk-upload-zip-file-tmp")))
+                      #t))))
           #:run-as-root #t)
          (plek-config) (rails-app-config) whitehall
          (signon-application
@@ -1785,6 +1788,10 @@
             (cons
              (signon-authorisation
               (application-name "Publishing API"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Asset Manager"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))

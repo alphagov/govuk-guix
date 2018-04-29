@@ -49,19 +49,6 @@
       (apply compose (reverse service-setup-functions))))
 
   (modify-services (apply-general-configuration services)
-    (asset-manager-service-type
-     parameters =>
-     (map
-      (lambda (parameter)
-        (if (service-startup-config? parameter)
-            (service-startup-config-with-additional-environment-variables
-             parameter
-             '(("PROXY_PERCENTAGE_OF_ASSET_REQUESTS_TO_S3_VIA_NGINX" . "100")
-               ("PROXY_PERCENTAGE_OF_WHITEHALL_ASSET_REQUESTS_TO_S3_VIA_NGINX" . "100")
-               ("FAKE_S3_HOST" . "http://asset-manager-proxy")
-               ("ALLOW_FAKE_S3_IN_PRODUCTION_FOR_PUBLISHING_E2E_TESTS" . "true")))
-            parameter))
-      parameters))
     (publisher-service-type
      parameters =>
      (map

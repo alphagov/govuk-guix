@@ -218,6 +218,18 @@
                   .
                   ,(service-uri-from-plek-config
                     plek-config 'draft-router))))))))
+    (cons
+     asset-manager-service-type
+     (list
+      (cons service-startup-config?
+            (lambda (ssc)
+              (service-startup-config-with-additional-environment-variables
+               ssc
+               `(("ALLOW_FAKE_S3_IN_PRODUCTION_FOR_PUBLISHING_E2E_TESTS" . "true")
+                 ("FAKE_S3_HOST"
+                  .
+                  ,(service-uri-from-plek-config
+                    plek-config 'asset-manager))))))))
     (cons router-service-type
           (list
            (cons router-config?

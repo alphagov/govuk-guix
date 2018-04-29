@@ -1577,13 +1577,19 @@ content, as well as broadcasting changes to a message queue.")
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml))
-          (add-after 'install 'set-bulk-upload-zip-file-tmp
-                     (lambda* (#:key outputs #:allow-other-keys)
-                       (substitute* (string-append
-                                     (assoc-ref outputs "out")
-                                     "/config/initializers/bulk_upload_zip_file.rb")
-                         (("Rails\\.root\\.join\\('bulk-upload-zip-file-tmp'\\)")
-                          "\"/tmp/whitehall/bulk-upload-zip-file\"")))))))
+          (add-after 'install 'create-data-directories
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let ((out (assoc-ref outputs "out")))
+                (for-each (lambda (name)
+                            (mkdir-p (string-append out "/" name)))
+                          '("incoming-uploads"
+                            "clean-uploads"
+                            "infected-uploads"
+                            "asset-manager-tmp"
+                            "carrierwave-tmp"
+                            "attachment-cache"
+                            "bulk-upload-zip-file-tmp")))
+              #t)))))
      (synopsis "")
      (description "")
      (license #f)
