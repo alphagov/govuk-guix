@@ -71,11 +71,22 @@
       (invoke "bundle" "exec" "rake" "assets:precompile")))
 
 (define* (install #:key inputs outputs #:allow-other-keys)
-  (let* ((out (assoc-ref outputs "out")))
-    (copy-recursively
-     "."
-     out
-     #:log (%make-void-port "w"))))
+  (let* ((out (assoc-ref outputs "out"))
+         (files (scandir "."
+                         (negate (lambda (f)
+                                   (member f
+                                           '("." ".."
+                                             "test" "spec"
+                                             "tmp")))))))
+    (mkdir-p out)
+    (for-each (lambda (file)
+                (if (directory-exists? file)
+                    (copy-recursively
+                     file
+                     (string-append out "/" file)
+                     #:log (%make-void-port "w"))
+                    (copy-file file (string-append out "/" file))))
+              files)))
 
 (define* (wrap-bin-files-for-rails #:key inputs outputs #:allow-other-keys)
   (for-each
