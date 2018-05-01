@@ -1187,15 +1187,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1gw7kh5fayd4rvggxyykva0143gbqnmd9xwmr8371ypcih2ij5hf")))
+    (hash (base32 "1lchy1mm5j8ygwnjmff0wnl515275gaz1amcv3vw6hlx7njx868j")))
    (package
      (name "service-manual-frontend")
-     (version "release_150")
+     (version "release_152")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0cxf172nnq1f0yswg6227jcrqffrgj81h1qmwb0k28z6dpb7jlvl")))
+       #:hash (base32 "0zayr5nmnd93vr43g77wnhrb0fd3w2sprzd95swvi7pd63f7rha3")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
