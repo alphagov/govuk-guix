@@ -519,15 +519,15 @@ proxies requests to some upstream")
 (define-public government-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qffrhb02hxqrgnrl26kh1cbdhh48hazgxn7vl10xar5wj8i7rza")))
+    (hash (base32 "1iq2rvm5385ilzngczlvxvgq5ap6jk88z1qf55yg5sj4qj4q118g")))
    (package
      (name "government-frontend")
-     (version "release_740")
+     (version "release_741")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0izb8wg02acmqkp2a2nc3a5ws11gg9db48kyswa0dr4xryklfjgg")))
+       #:hash (base32 "1bb0kpf3w095cmqbj3101y4j5d5mblkg89d51ybqcgj88m8vvn4b")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
