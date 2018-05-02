@@ -24,6 +24,7 @@
             govuk-nginx-configuration-app-domain
             govuk-nginx-configuration-tls
             govuk-nginx-configuration-additional-server-blocks
+            govuk-nginx-configuration-origin-password-file
 
             <password-file>
             password-file
@@ -239,10 +240,20 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                       web-domain
                                       app-domain
                                       nginx-port
+                                      origin-password-file
                                       #:key https?
                                       include-port-in-host-header?)
+  (define base-nginx-server-configuration-for-origin
+    (if origin-password-file
+        (nginx-server-configuration
+         (inherit base-nginx-server-configuration)
+         (raw-content
+          `("auth_basic \"Access Restricted\";"
+            ("auth_basic_user_file " ,origin-password-file ";"))))
+        base-nginx-server-configuration))
+
     (cons*
-     (web-domain-server-configuration base-nginx-server-configuration
+     (web-domain-server-configuration base-nginx-server-configuration-for-origin
                                       origin-service
                                       web-domain)
      (draft-origin-server-configuration base-nginx-server-configuration
@@ -301,7 +312,9 @@ proxy_set_header Host whitehall-admin.~A~A;"
   (tls                            govuk-nginx-configuration-tls
                                   (default #f))
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
-                                  (default '())))
+                                  (default '()))
+  (origin-password-file           govuk-nginx-configuration-origin-password-file
+                                  (default #f)))
 
 (define-record-type* <password-file>
   password-file make-password-file
@@ -390,7 +403,8 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                     web-domain
                                     app-domain
                                     tls
-                                    additional-nginx-server-blocks)
+                                    additional-nginx-server-blocks
+                                    origin-password-file)
      (nginx-configuration
       (server-blocks
        (nginx-server-configurations (base-nginx-server-configuration config)
@@ -401,6 +415,7 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                     web-domain
                                     app-domain
                                     (or https-port http-port)
+                                    origin-password-file
                                     #:https? (number? https-port)
                                     #:include-port-in-host-header?
                                     include-port-in-host-header?))
