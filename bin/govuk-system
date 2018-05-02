@@ -133,6 +133,7 @@
           use-high-ports
           use-https
           signon-users
+          origin-basic-auth-usernames-and-passwords
           read-bundle-install-input-as-tar-archive
           http-ports-mode)
 
@@ -232,6 +233,18 @@
          admin-environment-label)
         services))
 
+  (define (set-origin-basic-auth services)
+    (if (null? origin-basic-auth-usernames-and-passwords)
+        services
+        (modify-services services
+          (govuk-nginx-service-type config =>
+                                    (govuk-nginx-configuration
+                                     (inherit config)
+                                     (origin-password-file
+                                      (password-file
+                                       (usernames-and-passwords
+                                        origin-basic-auth-usernames-and-passwords))))))))
+
   (define (set-signon-instance-name services)
     (update-services-parameters
      services
@@ -268,7 +281,8 @@
            add-database-startup-scripts
            set-admin-environment-label
            set-rails-environment
-           configure-signon-users)))
+           configure-signon-users
+           set-origin-basic-auth)))
 
       (apply compose (reverse service-setup-functions))))
 
@@ -431,6 +445,15 @@
                    (alist-cons 'signon-users
                                (parse-signon-user-argument arg)
                                result)))
+         (option '("origin-basic-auth") #t #f
+                 (lambda (opt name arg result)
+                   (alist-cons 'origin-basic-auth
+                               (match (string-split arg #\=)
+                                 ((username password)
+                                  (cons username password))
+                                 (_
+                                  (error "Unable to parse " arg)))
+                               result)))
          (option '("read-bundle-install-input-as-tar-archive") #f #t
                  (lambda (opt name arg result . rest)
                    (apply values
@@ -465,6 +488,7 @@
    (assq-ref opts 'use-high-ports?)
    (assq-ref opts 'use-https?)
    (option-values opts 'signon-users)
+   (option-values opts 'origin-basic-auth)
    (option-value opts 'read-bundle-install-input-as-tar-archive?
                  #:default default-read-bundle-install-input-as-tar-archive?)
    (assq-ref opts 'http-ports-mode)))
