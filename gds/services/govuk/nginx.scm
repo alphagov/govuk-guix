@@ -5,6 +5,7 @@
   #:use-module (guix records)
   #:use-module (guix gexp)
   #:use-module (gnu packages tls)
+  #:use-module (gnu packages web)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gds services govuk router)
@@ -23,6 +24,12 @@
             govuk-nginx-configuration-app-domain
             govuk-nginx-configuration-tls
             govuk-nginx-configuration-additional-server-blocks
+
+            <password-file>
+            password-file
+            password-file-name
+            password-file-usernames-and-passwords
+            password-file-htpasswd
 
             govuk-nginx-service-type))
 
@@ -295,6 +302,44 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                   (default #f))
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
                                   (default '())))
+
+(define-record-type* <password-file>
+  password-file make-password-file
+  password-file?
+  (name password-file-name
+        (default "password-file"))
+  (usernames-and-passwords password-file-usernames-and-passwords)
+  (htpasswd password-file-htpasswd
+            (default (file-append httpd "/bin/htpasswd"))))
+
+(define-gexp-compiler (password-file-compiler
+                       (record <password-file>) system target)
+  (match record
+    (($ <password-file> name usernames-and-passwords htpasswd)
+     (gexp->derivation
+      (string-append "make-" name)
+      #~(let* ((output (ungexp output "out"))
+               (usernames-and-passwords '#$usernames-and-passwords)
+               (first-user (car usernames-and-passwords))
+               (rest (cdr usernames-and-passwords)))
+          (define* (store-password username password #:key (create? #f))
+            (apply system*
+                   `(#$htpasswd
+                     ,@(if create?
+                           '("-c")
+                           '())
+                     "-b"
+                     ,output
+                     ,username
+                     ,password)))
+
+          (store-password (car first-user) (cdr first-user)
+                          #:create? #t)
+          (for-each (lambda (username-and-password)
+                      (store-password (car username-and-password)
+                                      (cdr username-and-password)))
+                    rest))
+      #:local-build? #t))))
 
 (define (apply-base-nginx-server-configuration
          govuk-nginx-config nginx-server-config)
