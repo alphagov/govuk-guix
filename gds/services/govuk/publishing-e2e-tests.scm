@@ -35,7 +35,8 @@
 
 (define (publishing-e2e-tests-environment-variables plek-config signon-users)
   (append
-   `(("SIGNON_USER_COUNT" . ,(number->string (length signon-users)))
+   `(("PATH" . "/var/apps/publishing-e2e-tests/bin")
+     ("SIGNON_USER_COUNT" . ,(number->string (length signon-users)))
      ("CAPYBARA_SAVE_PATH" . "/var/apps/publishing-e2e-tests/tmp/results")
      ("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas")
      ("SSL_CERT_FILE" .
