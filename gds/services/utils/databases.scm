@@ -56,7 +56,7 @@
   memcached-connection-config make-memcached-connection-config
   memcached-connection-config?
   (servers       memcached-connection-config-servers
-                 (default '("localhost" "11211"))))
+                 (default '(("localhost" "11211")))))
 
 (define (memcached-connection-config-port config)
   (second (first (memcached-connection-config-servers config))))
@@ -123,8 +123,8 @@
                                (map
                                 (match-lambda
                                   ((host) host)
-                                  ((host port) (string-append host ":" port))
-                                  ((host port weight) (string-append host ":" port ":" weight)))
+                                  ((host port) (simple-format #f "~A:~A" host port))
+                                  ((host port weight) (simple-format #f "~A:~A:~A" host port weight)))
                                 servers)))))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
@@ -169,11 +169,11 @@
    ((memcached-connection-config? config)
     (memcached-connection-config
      (servers (map (match-lambda*
-                     ((host)
+                     (((host))
                       (list host (port-for 'memcached)))
-                     ((host old-port)
+                     (((host old-port))
                       (list host (port-for 'memcached)))
-                     ((host old-port weight)
+                     (((host old-port weight))
                       (list host (port-for 'memcached) weight)))
                    (memcached-connection-config-servers config)))))
    (else (backtrace)
@@ -212,6 +212,8 @@
                          '()) ;; TODO
                         ((redis-connection-config? config)
                          '()) ;; redis does not require any setup
+                        ((memcached-connection-config? config)
+                         '()) ;; memcache does not require any setup
                         ((elasticsearch-connection-config? config)
                          '()) ;; TODO
                         (else

@@ -383,6 +383,7 @@
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (redis-connection-config)
+          (memcached-connection-config)
           (mysql-connection-config
            (user "collections-pub")
            (password (random-base16-string 30))
@@ -1268,6 +1269,7 @@
            (supported-permissions '("signin" "view_all")))
           (sidekiq-config
            (file "config/sidekiq.yml"))
+          (memcached-connection-config)
           (postgresql-connection-config
            (user "publishing-api")
            (port "5432")
@@ -1367,6 +1369,7 @@
          (service-startup-config
           (environment-variables
            '(("GOVUK_APP_NAME" . "government-frontend"))))
+         (memcached-connection-config)
          (plek-config) (rails-app-config) government-frontend)))
 
 (define-public draft-government-frontend-service-type
@@ -1382,6 +1385,7 @@
          (service-startup-config
           (environment-variables
            '(("GOVUK_APP_NAME" . "draft-government-frontend"))))
+         (memcached-connection-config)
          (plek-config) (rails-app-config) government-frontend)))
 
 ;;;
@@ -1743,7 +1747,8 @@
                          content-store
                          signon
                          asset-manager
-                         static)))
+                         static
+                         memcached)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((create-directories
@@ -1792,6 +1797,7 @@
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
+         (memcached-connection-config)
          (redis-connection-config)
          (mysql-connection-config
           (user "whitehall")
