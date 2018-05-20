@@ -22,6 +22,7 @@
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services utils databases elasticsearch)
+  #:use-module (gds services utils databases rabbitmq)
   #:export (<redis-connection-config>
             redis-connection-config
             redis-connection-config?
@@ -67,7 +68,8 @@
       (mongodb-connection-config? config)
       (redis-connection-config? config)
       (elasticsearch-connection-config? config)
-      (memcached-connection-config? config)))
+      (memcached-connection-config? config)
+      (rabbitmq-connection-config? config)))
 
 (define database-connection-config->environment-variables
   (match-lambda
@@ -126,6 +128,11 @@
                                   ((host port) (simple-format #f "~A:~A" host port))
                                   ((host port weight) (simple-format #f "~A:~A:~A" host port weight)))
                                 servers)))))
+    (($ <rabbitmq-connection-config> hosts vhost user password)
+     `(("RABBITMQ_HOSTS" . ,(string-join hosts))
+       ("RABBITMQ_VHOST" . ,vhost)
+       ("RABBITMQ_USER" . ,user)
+       ("RABBITMQ_PASSWORD" . ,password)))
     (unmatched
      (error "get-database-environment-variables no match for ~A"
             unmatched))))
@@ -176,6 +183,9 @@
                      (((host old-port weight))
                       (list host (port-for 'memcached) weight)))
                    (memcached-connection-config-servers config)))))
+   ((rabbitmq-connection-config? config)
+    ;; TODO
+    config)
    (else (backtrace)
          (error "unknown database connection config " config))))
 
@@ -216,6 +226,11 @@
                          '()) ;; memcache does not require any setup
                         ((elasticsearch-connection-config? config)
                          '()) ;; TODO
+                        ((rabbitmq-connection-config? config)
+                         `((rabbitmq
+                            .
+                            ,(rabbitmq-create-user-for-connection-config
+                              config))))
                         (else
                          (error "Unrecognised database config"))))
                      database-connection-configs))
