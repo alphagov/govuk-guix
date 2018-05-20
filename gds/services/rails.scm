@@ -176,60 +176,6 @@
          database-connection-config?
          parameters)))))
 
-(define (run-pre-startup-scripts-gexp name pre-startup-scripts)
-  (let
-      ((script-gexps
-        (map
-         (match-lambda
-           ((key . script)
-            #~(lambda ()
-                (simple-format #t "Running pre-startup-script ~A\n" '#$key)
-
-                (let* ((start-time (get-internal-run-time))
-                       (result
-                        (catch
-                          #t
-                          #$script
-                          (lambda (key . args) (cons key args))))
-                       (seconds-taken
-                        (/ (- (get-internal-run-time) start-time)
-                           internal-time-units-per-second)))
-                  (if (eq? result #t)
-                      (begin
-                        (format
-                         #t "pre-startup-script ~a succeeded (~1,2f seconds)\n"
-                         '#$key seconds-taken)
-                        #t)
-                      (begin
-                        (format
-                         #t "pre-startup-script ~a failed (~1,2f seconds)\n"
-                         '#$key seconds-taken)
-                        (format #t "result: ~A\n" result)
-                        #f))))))
-         pre-startup-scripts)))
-    (if (null? script-gexps)
-        #~#t
-        (with-imported-modules '((gds build utils))
-        #~(begin
-            (use-modules (gds build utils)
-                         (ice-9 format))
-            (simple-format
-             #t
-             "Running ~A startup scripts for ~A\n"
-             #$(length script-gexps)
-             '#$name)
-            (for-each
-             (lambda (key) (simple-format #t "  - ~A\n" key))
-             '#$(map car pre-startup-scripts))
-            (let run ((scripts (list #$@script-gexps)))
-              (if (null? scripts)
-                  #t
-                  (let
-                      ((result ((car scripts))))
-                    (if (eq? result #t)
-                        (run (cdr scripts))
-                        #f)))))))))
-
 (define (generic-rails-app-start-script
          name
          .
@@ -383,81 +329,26 @@
          root-directory
          rails-app-config
          rest)))
-    (with-imported-modules (source-module-closure
-                            '((guix build syscalls)
-                              (gnu build file-systems)))
-     #~(begin
-         (use-modules (guix build utils)
-                      (gnu build file-systems)
-                      (guix build syscalls)
-                      (ice-9 match)
-                      (ice-9 ftw)
-                      (srfi srfi-26))
 
-         #$@(if (rails-app-config-read-bundle-install-input-as-tar-archive?
-                 rails-app-config)
-                (list (read-bundle-install-input-as-tar-archive package))
-                '())
+    #~(begin
+        #$@(if (rails-app-config-read-bundle-install-input-as-tar-archive?
+                rails-app-config)
+               (list (read-bundle-install-input-as-tar-archive package))
+               '())
 
-         (let* ((string-name (symbol->string '#$name))
-                (user (getpwnam string-name))
-                (bundle (string-append #$root-directory "/bin/bundle")))
-           (if
-            (not (file-exists? #$root-directory))
-            (begin
-              (mkdir-p #$root-directory)
-              (chown #$root-directory (passwd:uid user) (passwd:gid user))
-              (bind-mount #$package #$root-directory)
+        #$(setup-app-directory string-name package)
 
+        (let* ((dir "/tmp/env.d/")
+               (file (string-append dir #$string-name)))
+          (mkdir-p dir)
+          (call-with-output-file file
+            (lambda (port)
               (for-each
-               (lambda (file)
-                 (if (file-exists? file)
-                     (mount "tmpfs" file "tmpfs")))
-               (map
-                (lambda (dir)
-                  (string-append #$root-directory "/" dir))
-                '("log"))))
-            (begin
-              (mkdir-p (string-append #$root-directory "/bin"))
-              (mount "tmpfs" (string-append #$root-directory "/bin") "tmpfs")
-              (copy-recursively
-               (string-append #$package "/bin")
-               (string-append #$root-directory "/bin")
-               #:log (%make-void-port "w")
-               #:follow-symlinks? #f)
-              (substitute* (find-files (string-append #$root-directory "/bin")
-                                       (lambda (name stat)
-                                         (access? name X_OK)))
-                           (((string-append #$package "/bin"))
-                            "${BASH_SOURCE%/*}"))
-              (substitute* (find-files (string-append #$root-directory "/bin")
-                                       (lambda (name stat)
-                                         (access? name X_OK)))
-                (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
-                 "File.expand_path('../.spring-real', __FILE__)"))
-              (for-each
-               (lambda (path)
-                 (mkdir-p (string-append #$root-directory path))
-                 (chmod (string-append #$root-directory path) #o777))
-               '("/tmp" "/log"))
-
-              (for-each
-               (cut chmod <> #o666)
-               (find-files (string-append #$root-directory "/log")
-                           #:directories? #f))))
-
-           (if (file-exists? (string-append #$root-directory "/tmp"))
-               (mount "tmpfs" (string-append #$root-directory "/tmp") "tmpfs"))
-
-           (let* ((dir (string-append "/tmp/env.d/"))
-                  (file (string-append dir string-name)))
-             (mkdir-p dir)
-             (call-with-output-file file
-               (lambda (port)
-                 (for-each
-                  (lambda (env-var)
-                    (simple-format port "export ~A=\"~A\"\n" (car env-var) (cdr env-var)))
-                  '#$environment-variables)))))))))
+               (lambda (env-var)
+                 (simple-format port "export ~A=\"~A\"\n"
+                                (car env-var)
+                                (cdr env-var)))
+               '#$environment-variables)))))))
 
 (define (generic-rails-app-shepherd-services
          name
