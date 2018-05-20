@@ -211,6 +211,17 @@
                    "proxy_set_header X-Forwarded-SSL 'on';")
                  '())
            ,(proxy-set-header-host include-port-in-host-header?))))
+      ,@(if (eq? service 'static)
+            (list
+             ;; This is a special location which is used for analytics
+             (nginx-location-configuration
+              (uri "/static/a")
+              (body (list "expires -1;
+add_header Last-Modified \"\";
+
+default_type text/plain;
+return 200 '';"))))
+            '())
       ,@(if (eq? service 'whitehall)
             (list
              (nginx-location-configuration
