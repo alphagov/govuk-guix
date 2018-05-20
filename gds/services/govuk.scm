@@ -23,10 +23,12 @@
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services utils databases elasticsearch)
+  #:use-module (gds services utils databases rabbitmq)
   #:use-module (gds services govuk plek)
   #:use-module (gds services sidekiq)
   #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
+  #:use-module (gds services govuk rummager)
   #:use-module (gds services govuk tailon)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk publishing-e2e-tests)
@@ -1636,33 +1638,22 @@
 ;;; Rummager
 ;;;
 
-(define-public rummager-service-type
-  ;; TODO: Rummager doesn't use Rails
-  (make-rails-app-using-plek-and-signon-service-type 'rummager))
-
 (define-public rummager-service
-  (service
-   rummager-service-type
-   (list (shepherd-service
-          (inherit default-shepherd-service)
-          (provision '(rummager))
-          (requirement '(publishing-api elasticsearch)))
-         (service-startup-config)
-         (signon-api-user
-          (name "Rummager")
-          (email "rummager@dev.gov.uk")
-          (authorisation-permissions
-           (list (cons
-                  (signon-authorisation
-                   (application-name "Publishing API"))
-                  '("signin")))))
-         (redis-connection-config)
-         (plek-config)
-         ;; TODO: Rummager doesn't use Rails
-         (rails-app-config
-          (assets? #f))
-         (elasticsearch-connection-config)
-         rummager)))
+  (service rummager-service-type
+           (list (service-startup-config-add-pre-startup-scripts
+                  (service-startup-config)
+                  `((publish-special-routes
+                     . ,#~(lambda ()
+                            (run-command
+                             "bundle" "exec"
+                             "rake" "message_queue:create_queues")))))
+                 (redis-connection-config)
+                 (plek-config)
+                 (sidekiq-config (file "config/sidekiq.yml"))
+                 (elasticsearch-connection-config)
+                 (rabbitmq-connection-config (user "rummager")
+                                             (password "rummager"))
+                 rummager)))
 
 ;;;
 ;;; Info Frontend

@@ -26,6 +26,7 @@
             plek-config->environment-variables
             plek-config->/etc/hosts-string
             service-uri-from-plek-config
+            service-port-from-plek-config
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config

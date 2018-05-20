@@ -18,6 +18,7 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
+  #:use-module (gds services govuk rummager)
   #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk plek)
