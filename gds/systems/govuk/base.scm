@@ -10,6 +10,7 @@
   #:use-module (gnu services networking)
   #:use-module (gnu services ssh)
   #:use-module (gnu services web)
+  #:use-module (gnu services message-broker)
   #:use-module (guix build utils)
   #:use-module (guix download)
   #:use-module (guix gexp)
@@ -26,6 +27,7 @@
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lsof)
   #:use-module (gnu packages ncdu)
+  #:use-module (gnu packages rabbitmq)
   #:use-module (gnu packages screen)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages version-control)
@@ -90,6 +92,7 @@
     (service mongodb-service-type)
     (service elasticsearch-service-type)
     (service mysql-service-type (mysql-configuration))
+    (service rabbitmq-service-type)
     govuk-content-schemas-service)))
 
 (define setup-services
@@ -125,6 +128,7 @@
    postgresql
    mariadb
    mongodb
+   rabbitmq
    redis
    mongo-tools
    htop
