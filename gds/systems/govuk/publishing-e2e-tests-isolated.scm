@@ -1,6 +1,7 @@
 (define-module (gds systems govuk publishing-e2e-tests-isolated)
   #:use-module (gnu system)
   #:use-module (gnu services)
+  #:use-module (gnu services base)
   #:use-module (gnu services networking)
   #:use-module (gds systems govuk publishing-e2e-tests))
 
