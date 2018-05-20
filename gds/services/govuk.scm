@@ -205,7 +205,6 @@
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (mysql-connection-config
-           (host "localhost")
            (user "signon")
            (port "-")
            (database "signon_production")
@@ -887,7 +886,6 @@
            (supported-permissions '("signin" "deploy")))
           (service-startup-config)
           (mysql-connection-config
-           (host "localhost")
            (user "release")
            (port "-")
            (database "release_production")
@@ -913,7 +911,6 @@
            (supported-permissions '("signin")))
           (service-startup-config)
           (mysql-connection-config
-           (host "localhost")
            (user "search_admin")
            (port "-")
            (database "search_admin_production")
@@ -1797,7 +1794,6 @@
           (file "config/sidekiq.yml"))
          (redis-connection-config)
          (mysql-connection-config
-          (host "localhost")
           (user "whitehall")
           (port "-")
           (database "whitehall_production")

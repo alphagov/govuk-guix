@@ -26,7 +26,7 @@
   mysql-connection-config make-mysql-connection-config
   mysql-connection-config?
   (host mysql-connection-config-host
-        (default "localhost"))
+        (default "127.0.0.1"))
   (user mysql-connection-config-user)
   (port mysql-connection-config-port
         (default 3306))
