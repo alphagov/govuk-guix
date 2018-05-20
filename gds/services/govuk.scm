@@ -1258,10 +1258,14 @@
            (provision '(publishing-api))
            (requirement '(content-store draft-content-store signon
                           govuk-content-schemas redis loopback postgres
-                          memcached)))
+                          rabbitmq memcached)))
+         (service-startup-config-add-pre-startup-scripts
           (service-startup-config
            (environment-variables
             '(("GOVUK_CONTENT_SCHEMAS_PATH" . "/var/apps/govuk-content-schemas"))))
+          `((setup-exchange
+             . ,#~(lambda ()
+                    (run-command "rake" "setup_exchange")))))
           (plek-config)
           (rails-app-config
            (assets? #f))
@@ -1276,6 +1280,8 @@
            (user "publishing-api")
            (port "5432")
            (database "publishing_api_production"))
+          (rabbitmq-connection-config (user "publishing_api")
+                                      (password "publishing_api"))
           (redis-connection-config))))
 
 ;;;
