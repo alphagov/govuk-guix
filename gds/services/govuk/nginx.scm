@@ -25,6 +25,7 @@
             govuk-nginx-configuration-tls
             govuk-nginx-configuration-additional-server-blocks
             govuk-nginx-configuration-origin-password-file
+            govuk-nginx-configuration-intercept-errors
 
             <password-file>
             password-file
@@ -65,21 +66,60 @@
       "proxy_set_header Host $host:$server_port;"
       "proxy_set_header Host $host;"))
 
+(define (error-page-locations
+         app-domain
+         https?
+         nginx-port)
+  (define (proxy-pass-to-static code)
+    (simple-format #f "proxy_pass ~A://static.~A:~A/templates/~A.html.erb;"
+                   (if https? "https" "http")
+                   app-domain
+                   nginx-port
+                   code))
+
+  (map (lambda (code)
+         (nginx-location-configuration
+          (uri (string-append "/" code ".html"))
+          (body (list (proxy-pass-to-static code)))))
+       '("404" "406" "410" "500" "503" "504")))
+
+(define error_pages
+  '("error_page 400 /400.html;"
+    "error_page 404 401 /404.html;"
+    "error_page 406 /406.html;"
+    "error_page 410 /410.html;"
+    "error_page 500 502 /500.html;"
+    "error_page 503 /503.html;"
+    "error_page 504 /504.html;"
+    "error_page 429 /503.html;"))
+
 (define (web-domain-server-configuration
          base-nginx-server-configuration
          origin-service
-         web-domain)
+         web-domain
+         app-domain
+         https?
+         nginx-port
+         intercept-errors?)
   (nginx-server-configuration
    (inherit base-nginx-server-configuration)
    (locations
-    (list
-     (nginx-location-configuration
-      (uri "/")
-      (body (list (simple-format
-                   #f "proxy_pass http://~A-proxy;" origin-service))))
-     (nginx-location-configuration
-      (uri "/api/content")
-      (body '("proxy_pass http://content-store-proxy;")))))
+    `(,(nginx-location-configuration
+        (uri "/")
+        (body (list (simple-format
+                     #f "proxy_pass http://~A-proxy;" origin-service))))
+      ,(nginx-location-configuration
+        (uri "/api/content")
+        (body '("proxy_pass http://content-store-proxy;")))
+      ,@(error-page-locations
+         app-domain
+         https?
+         nginx-port)))
+   (raw-content (append
+                 (if intercept-errors?
+                     '("proxy_intercept_errors on;")
+                     '())
+                 error_pages))
    (server-name (list (string-append web-domain)))))
 
 (define (draft-origin-server-configuration
@@ -87,26 +127,36 @@
          draft-origin-service
          app-domain
          https?
-         include-port-in-host-header?)
+         include-port-in-host-header?
+         nginx-port
+         intercept-errors?)
   (nginx-server-configuration
    (inherit base-nginx-server-configuration)
    (locations
-    (list
-     (nginx-location-configuration
-      (uri "/")
-      (body `(,(simple-format
-                #f "proxy_pass http://~A-proxy;\n" draft-origin-service)
-              ,(proxy-set-header-host include-port-in-host-header?)
-              ,@(if https?
-                    '("# Set X-Forwarded-SSL for OmniAuth"
-                      "proxy_set_header X-Forwarded-SSL 'on';")
-                    '()))))
-     ;; TODO: This should be reworked somehow, to add
-     ;; authentication. Maybe a special route could route
-     ;; /api/content directly through to the Content Store?
-     (nginx-location-configuration
-      (uri "/api/content")
-      (body '("proxy_pass http://draft-content-store-proxy;")))))
+    `(,(nginx-location-configuration
+        (uri "/")
+        (body `(,(simple-format
+                  #f "proxy_pass http://~A-proxy;\n" draft-origin-service)
+                ,(proxy-set-header-host include-port-in-host-header?)
+                ,@(if https?
+                      '("# Set X-Forwarded-SSL for OmniAuth"
+                        "proxy_set_header X-Forwarded-SSL 'on';")
+                      '()))))
+      ;; TODO: This should be reworked somehow, to add
+      ;; authentication. Maybe a special route could route
+      ;; /api/content directly through to the Content Store?
+      ,(nginx-location-configuration
+        (uri "/api/content")
+        (body '("proxy_pass http://draft-content-store-proxy;")))
+      ,@(error-page-locations
+         app-domain
+         https?
+         nginx-port)))
+   (raw-content (append
+                 (if intercept-errors?
+                     '("proxy_intercept_errors on;")
+                     '())
+                 error_pages))
    (server-name (list (string-append "draft-origin." app-domain)))))
 
 (define (assets-server-configuration
@@ -253,7 +303,8 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                       nginx-port
                                       origin-password-file
                                       #:key https?
-                                      include-port-in-host-header?)
+                                      include-port-in-host-header?
+                                      intercept-errors?)
   (define base-nginx-server-configuration-for-origin
     (if origin-password-file
         (nginx-server-configuration
@@ -266,12 +317,18 @@ proxy_set_header Host whitehall-admin.~A~A;"
     (cons*
      (web-domain-server-configuration base-nginx-server-configuration-for-origin
                                       origin-service
-                                      web-domain)
+                                      web-domain
+                                      app-domain
+                                      https?
+                                      nginx-port
+                                      intercept-errors?)
      (draft-origin-server-configuration base-nginx-server-configuration
                                         draft-origin-service
                                         app-domain
                                         https?
-                                        include-port-in-host-header?)
+                                        include-port-in-host-header?
+                                        nginx-port
+                                        intercept-errors?)
      (assets-server-configuration (let ((services (map car service-and-ports)))
                                     (filter (lambda (service)
                                               (memq service services))
@@ -325,7 +382,9 @@ proxy_set_header Host whitehall-admin.~A~A;"
   (additional-nginx-server-blocks govuk-nginx-configuration-additional-server-blocks
                                   (default '()))
   (origin-password-file           govuk-nginx-configuration-origin-password-file
-                                  (default #f)))
+                                  (default #f))
+  (intercept-errors               govuk-nginx-configuration-intercept-errors
+                                  (default #t)))
 
 (define-record-type* <password-file>
   password-file make-password-file
@@ -415,7 +474,8 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                     app-domain
                                     tls
                                     additional-nginx-server-blocks
-                                    origin-password-file)
+                                    origin-password-file
+                                    intercept-errors)
      (nginx-configuration
       (server-blocks
        (nginx-server-configurations (base-nginx-server-configuration config)
@@ -429,7 +489,8 @@ proxy_set_header Host whitehall-admin.~A~A;"
                                     origin-password-file
                                     #:https? (number? https-port)
                                     #:include-port-in-host-header?
-                                    include-port-in-host-header?))
+                                    include-port-in-host-header?
+                                    #:intercept-errors? intercept-errors))
       (upstream-blocks
        (nginx-upstream-configurations service-and-ports))
       (server-names-hash-bucket-size 128)))))
