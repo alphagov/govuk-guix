@@ -135,7 +135,8 @@
           signon-users
           origin-basic-auth-usernames-and-passwords
           read-bundle-install-input-as-tar-archive
-          http-ports-mode)
+          http-ports-mode
+          use-error-pages?)
 
   (define service-types-whitelist
     (append
@@ -245,6 +246,13 @@
                                        (usernames-and-passwords
                                         origin-basic-auth-usernames-and-passwords))))))))
 
+  (define (set-nginx-intercept-errors services)
+    (modify-services services
+      (govuk-nginx-service-type config =>
+                                (govuk-nginx-configuration
+                                 (inherit config)
+                                 (intercept-errors use-error-pages?)))))
+
   (define (set-signon-instance-name services)
     (update-services-parameters
      services
@@ -282,7 +290,8 @@
            set-admin-environment-label
            set-rails-environment
            configure-signon-users
-           set-origin-basic-auth)))
+           set-origin-basic-auth
+           set-nginx-intercept-errors)))
 
       (apply compose (reverse service-setup-functions))))
 
@@ -454,6 +463,13 @@
                                  (_
                                   (error "Unable to parse " arg)))
                                result)))
+         (option '("use-error-pages") #f #t
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'use-error-pages?
+                                      (string=? arg "true")
+                                      (alist-delete 'use-error-pages? result))
+                          rest)))
          (option '("read-bundle-install-input-as-tar-archive") #f #t
                  (lambda (opt name arg result . rest)
                    (apply values
@@ -491,7 +507,9 @@
    (option-values opts 'origin-basic-auth)
    (option-value opts 'read-bundle-install-input-as-tar-archive?
                  #:default default-read-bundle-install-input-as-tar-archive?)
-   (assq-ref opts 'http-ports-mode)))
+   (assq-ref opts 'http-ports-mode)
+   (option-value opts 'use-error-pages?
+                 #:default #f)))
 
 (define (container-start-script os opts)
   (with-store store
