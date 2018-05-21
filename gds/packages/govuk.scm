@@ -1420,7 +1420,10 @@ content, as well as broadcasting changes to a message queue.")
        #:hash (base32 "11rvqj8p68rwgprsp63hin8s8pz6gdwnfsf79cjzkzzzgn0vi52y")))
      (build-system rails-build-system)
      (arguments
-      '(#:phases
+      '(;; jasmine-rails seems to get annoyed if it's configuration
+        ;; doesn't exist in the spec directory
+        #:exclude-files ("tmp")
+        #:phases
         (modify-phases %standard-phases
           (add-after 'install 'remove-redundant-page-caching
             (lambda* (#:key outputs #:allow-other-keys)
