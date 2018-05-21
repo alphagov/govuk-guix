@@ -64,6 +64,7 @@
                       (search-paths '())
                       (outputs '("out"))
                       (precompile-rails-assets? #t)
+                      (exclude-files '("test" "spec" "tmp"))
                       (guile #f))
   "Build SOURCE with INPUTS."
   (define builder
@@ -84,6 +85,7 @@
                     #:system ,system
                     #:outputs %outputs
                     #:precompile-rails-assets? ,precompile-rails-assets?
+                    #:exclude-files ',exclude-files
                     #:inputs %build-inputs)))
 
   (define guile-for-build

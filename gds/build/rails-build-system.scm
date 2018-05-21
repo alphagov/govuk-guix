@@ -70,14 +70,16 @@
   (or (not precompile-rails-assets?)
       (invoke "bundle" "exec" "rake" "assets:precompile")))
 
-(define* (install #:key inputs outputs #:allow-other-keys)
+(define* (install #:key inputs outputs exclude-files #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out"))
-         (files (scandir "."
-                         (negate (lambda (f)
-                                   (member f
-                                           '("." ".."
-                                             "test" "spec"
-                                             "tmp")))))))
+         (install-file?
+          (negate (lambda (f)
+                    (member f
+                            (append exclude-files
+                                    '("." ".."))))))
+         (files (scandir "." install-file?)))
+
+    (simple-format #t "exclude-files: ~A\n" exclude-files)
     (mkdir-p out)
     (for-each (lambda (file)
                 (if (directory-exists? file)
