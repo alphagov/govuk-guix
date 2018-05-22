@@ -66,7 +66,8 @@
  (gds services utils databases)
  (gds systems utils)
  (gds systems govuk base)
- (gds systems govuk development))
+ (gds systems govuk development)
+ (gds scripts govuk system available-services))
 
 (define %build-default-options
   ;; Alist of default option values.
@@ -802,7 +803,8 @@
   (define commands
     `(("start" . ,start)
       ("build" . ,build)
-      ("passphrase" . ,passphrase)))
+      ("passphrase" . ,passphrase)
+      ("available-services" . ,available-services)))
 
   (display "\n")
   (with-error-handling
