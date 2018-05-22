@@ -1888,91 +1888,136 @@
           (password "whitehall")))))
 
 ;;;
-;;; Service Lists
+;;; Service Groups
 ;;;
 
-(define-public publishing-application-services
-  (list
-   collections-publisher-service
-   contacts-admin-service
-   content-tagger-service
-   local-links-manager-service
-   manuals-publisher-service
-   maslow-service
-   policy-publisher-service
-   publisher-service
-   service-manual-publisher-service
-   short-url-manager-service
-   specialist-publisher-service
-   travel-advice-publisher-service
-   whitehall-service))
+(define-record-type <service-group>
+  (service-group name description services)
+  service-group?
+  (name service-group-name)
+  (description service-group-description)
+  (services service-group-services))
 
-(define-public api-services
-  (list
-   content-store-service
-   draft-content-store-service
-   ;; email-alert-api-service Can't connect to Redis for some reason
-   ;; email-alert-service-service Missing dependency on RabbitMQ
-   imminence-service
-   publishing-api-service
-   rummager-service
-   asset-manager-service
-   router-api-service
-   draft-router-api-service
-   support-api-service
-   hmrc-manuals-api-service
-   ;; mapit-service
-   ))
+(define-public publishing-application-services
+  (service-group
+   "Publishing Applications"
+   "Applications which publish to GOV.UK"
+   (list collections-publisher-service
+         contacts-admin-service
+         content-tagger-service
+         local-links-manager-service
+         manuals-publisher-service
+         maslow-service
+         policy-publisher-service
+         publisher-service
+         service-manual-publisher-service
+         short-url-manager-service
+         specialist-publisher-service
+         travel-advice-publisher-service
+         whitehall-service)))
+
+(define-public backend-services
+  (service-group
+   "Backend Services"
+   "Services which are used by other services"
+   (list ;; email-alert-api-service Can't connect to Redis for some reason
+         ;; email-alert-service-service Missing dependency on RabbitMQ
+         imminence-service
+         rummager-service
+         asset-manager-service
+         support-api-service
+         hmrc-manuals-api-service
+         ;; mapit-service
+         )))
+
+(define-public publishing-platform-services
+  (service-group
+   "Publishing Platform"
+   "Services key to publishing on GOV.UK"
+   (list publishing-api-service
+         content-store-service
+         draft-content-store-service
+         router-api-service
+         draft-router-api-service
+         router-service
+         draft-router-service
+         authenticating-proxy-service)))
 
 (define-public supporting-application-services
-  (list
-   ;; bouncer-service
-   authenticating-proxy-service
-   content-audit-tool-service
-   content-performance-manager-service
-   link-checker-api-service
-   search-admin-service
-   signon-service
-   support-service
-   ;; transition-service
-   release-service
-   router-service
-   draft-router-service
-   (service publishing-e2e-tests-service-type)))
+  (service-group
+   "Supporting Applications"
+   "Applications to support GOV.UK"
+   (list content-audit-tool-service
+         content-performance-manager-service
+         link-checker-api-service
+         search-admin-service
+         signon-service
+         support-service
+         release-service)))
+
+(define-public transition-services
+  (service-group
+   "Transition Services"
+   "Services to support the transition sites to GOV.UK"
+   (list ;; bouncer-service
+         ;; transition-service
+    )))
+
+(define-public monitoring-services
+  (service-group
+   "Transition Services"
+   "Services to support the transition sites to GOV.UK"
+   (list smokey-service)))
+
+(define-public development-services
+  (service-group
+   "Development Services"
+   "Services to support the development of GOV.UK"
+   (list (service publishing-e2e-tests-service-type))))
 
 (define-public frontend-services
-  (list
-   calculators-service
-   calendars-service
-   collections-service
-   email-alert-frontend-service
-   feedback-service
-   finder-frontend-service
-   frontend-service
-   government-frontend-service
-   info-frontend-service
-   licence-finder-service
-   manuals-frontend-service
-   service-manual-frontend-service
-   smart-answers-service
-   smokey-service
-   static-service))
+  (service-group
+   "Frontend Services"
+   "Services responsible for rendering GOV.UK"
+   (list calculators-service
+         calendars-service
+         collections-service
+         email-alert-frontend-service
+         feedback-service
+         finder-frontend-service
+         frontend-service
+         government-frontend-service
+         info-frontend-service
+         licence-finder-service
+         manuals-frontend-service
+         service-manual-frontend-service
+         smart-answers-service
+         static-service)))
 
 (define-public draft-frontend-services
-  (list
-   draft-collections-service
-   draft-email-alert-frontend-service
-   draft-frontend-service
-   draft-government-frontend-service
-   draft-finder-frontend-service
-   draft-manuals-frontend-service
-   draft-service-manual-frontend-service
-   draft-static-service))
+  (service-group
+   "Frontend Services"
+   "Services responsible for rendering the draft GOV.UK"
+   (list draft-collections-service
+         draft-email-alert-frontend-service
+         draft-frontend-service
+         draft-government-frontend-service
+         draft-finder-frontend-service
+         draft-manuals-frontend-service
+         draft-service-manual-frontend-service
+         draft-static-service)))
+
+(define-public service-groups
+  (list publishing-application-services
+        backend-services
+        publishing-platform-services
+        supporting-application-services
+        transition-services
+        monitoring-services
+        development-services
+        frontend-services
+        draft-frontend-services))
 
 (define-public govuk-services
-  (append
-   publishing-application-services
-   api-services
-   supporting-application-services
-   frontend-services
-   draft-frontend-services))
+  (apply append
+         (map service-group-services service-groups)))
