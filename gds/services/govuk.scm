@@ -1758,15 +1758,6 @@
           (inherit default-shepherd-service)
           (provision '(info-frontend))
           (requirement '(content-store publishing-api static)))
-         (signon-api-user
-          (name "Info Frontend")
-          (email "info-frontend@guix-dev.gov.uk")
-          (authorisation-permissions
-           (list
-            (cons
-             (signon-authorisation
-              (application-name "Publishing API"))
-             '("signin")))))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((publish-special-routes
