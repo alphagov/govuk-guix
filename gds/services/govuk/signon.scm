@@ -387,6 +387,7 @@ end")
 (define-public signon-service-type
   (service-type
    (name 'signon)
+   (description "Single sign-on and user management service for GOV.UK")
    (extensions
     (service-extensions-modify-parameters
      (modify-service-extensions-for-plek

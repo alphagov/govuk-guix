@@ -1276,6 +1276,7 @@
 
 (define-public publishing-api-service-type
   (service-type (name 'publishing-api)
+                (description "Manages content and publishing on GOV.UK")
                 (extensions
                  (modify-service-extensions-for-signon-and-plek
                   name
