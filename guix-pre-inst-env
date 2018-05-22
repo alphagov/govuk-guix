@@ -35,7 +35,7 @@ eval "$GDS_GUIX_SEARCH_PATHS"
 # To avoid $XDG_CONFIG_HOME/guix/latest from being used
 export GUIX_UNINSTALLED="true"
 
-SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile git --search-paths)"
+SEARCH_PATHS="$(guix environment --fallback --pure --ad-hoc bash coreutils less nss-certs guix-gds guile guile-readline git --search-paths)"
 
 INCLUDED_VARIABLES=(HOME USER LOGNAME DISPLAY TERM TZ PAGER GUIX_GITHUB_TOKEN GUIX_DAEMON_SOCKET)
 
