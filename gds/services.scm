@@ -12,6 +12,7 @@
 
             service-startup-config-with-additional-environment-variables
             service-startup-config-add-pre-startup-scripts
+            service-extensions-modify-parameters
             service-type-extensions-modify-parameters
             run-pre-startup-scripts-gexp))
 
@@ -68,6 +69,16 @@
          (filter-out-replaced-scripts
           (service-startup-config-pre-startup-scripts ssc))
          scripts)))))
+
+(define (service-extensions-modify-parameters service-extensions f)
+  (map
+   (lambda (se)
+     (service-extension
+      (service-extension-target se)
+      (lambda (parameters)
+        ((service-extension-compute se)
+         (f parameters)))))
+   service-extensions))
 
 (define (service-type-extensions-modify-parameters type f)
   (service-type

@@ -48,7 +48,9 @@
             update-rails-app-config-environment-for-service
             run-db:setup-if-postgresql-or-mysql-is-used
             update-rails-app-config-with-random-secret-key-base-for-services
-            update-rails-app-set-read-bundle-install-input-as-tar-archive))
+            update-rails-app-set-read-bundle-install-input-as-tar-archive
+
+            standard-rails-service-type-extensions))
 
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
@@ -416,27 +418,24 @@
     (home-directory "/var/empty")
     (shell #~(string-append #$shadow "/sbin/nologin")))))
 
-(define (make-rails-app-service-type name)
-  (service-type
-   (name name)
-   (extensions
-    (list
-     (service-extension shepherd-root-service-type
-                        (lambda (parameters)
-                          (apply
-                           generic-rails-app-shepherd-services
-                           name
-                           parameters)))
-     (service-extension activation-service-type
-                        (lambda (parameters)
-                          (apply
-                           generic-rails-app-activation
-                           name
-                           parameters)))
-     (service-extension account-service-type
-                        (const
-                         (generic-rails-app-service-account
-                          (symbol->string name))))))))
+(define (standard-rails-service-type-extensions name)
+  (list
+   (service-extension shepherd-root-service-type
+                      (lambda (parameters)
+                        (apply
+                         generic-rails-app-shepherd-services
+                         name
+                         parameters)))
+   (service-extension activation-service-type
+                      (lambda (parameters)
+                        (apply
+                         generic-rails-app-activation
+                         name
+                         parameters)))
+   (service-extension account-service-type
+                      (const
+                       (generic-rails-app-service-account
+                        (symbol->string name))))))
 
 (define (rails-run-db:setup s)
   (define (rails-setup-or-migrate parameters)

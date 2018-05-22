@@ -7,8 +7,12 @@
   #:use-module (guix gexp)
   #:use-module (guix build utils)
   #:use-module (gnu services)
+  #:use-module (gnu services shepherd)
   #:use-module (gds services)
   #:use-module (gds services utils)
+  #:use-module (gds services rails)
+  #:use-module (gds services sidekiq)
+  #:use-module (gds services govuk tailon)
   #:use-module (gds services govuk plek)
   #:export (<signon-application>
             signon-application
@@ -64,7 +68,10 @@
             signon-dev-user-passphrase
             update-signon-service-add-users
             update-services-with-random-signon-secrets
-            set-random-devise-secrets-for-the-signon-service))
+            set-random-devise-secrets-for-the-signon-service
+
+            modify-service-extensions-for-signon
+            modify-service-extensions-for-signon-and-plek))
 
 (define-record-type* <signon-application>
   signon-application make-signon-application
@@ -379,9 +386,12 @@ end")
 
 (define-public signon-service-type
   (service-type
-   (inherit
-    (service-type-extensions-modify-parameters
-     (make-rails-app-using-plek-service-type 'signon)
+   (name 'signon)
+   (extensions
+    (service-extensions-modify-parameters
+     (modify-service-extensions-for-plek
+      name
+      (standard-rails-service-type-extensions name))
      (lambda (parameters)
        (let ((config (find signon-config? parameters)))
          (map
@@ -516,3 +526,120 @@ the Signon Dev user passphrase in\n")
             (signon-config-with-random-secrets parameter)
             parameter))
       parameters))))
+
+(define (update-service-startup-config-for-signon-application parameters)
+  (let ((signon-application (find signon-application? parameters)))
+    (if signon-application
+        (map
+         (lambda (parameter)
+           (if (service-startup-config? parameter)
+               (service-startup-config-with-additional-environment-variables
+                parameter
+                `(("OAUTH_ID" . ,(signon-application-oauth-id
+                                  signon-application))
+                  ("OAUTH_SECRET" . ,(signon-application-oauth-secret
+                                      signon-application))))
+               parameter))
+         parameters)
+        parameters)))
+
+(define (update-service-startup-config-for-signon-api-user parameters)
+  (map
+   (lambda (parameter)
+     (if (service-startup-config? parameter)
+         (service-startup-config-with-additional-environment-variables
+          parameter
+          (map
+           (match-lambda
+             (($ <signon-authorisation> application-name token
+                                        environment-variable)
+              (let ((name
+                     (or environment-variable
+                         (string-append
+                          (string-map
+                           (lambda (c)
+                             (if (eq? c #\space) #\_ c))
+                           (string-upcase application-name))
+                          "_BEARER_TOKEN"))))
+                (cons name token))))
+           (concatenate
+            (map
+             (match-lambda
+               (($ <signon-api-user> name email authorisation-permissions)
+                (map car authorisation-permissions)))
+             (filter signon-api-user? parameters)))))
+         parameter))
+   parameters))
+
+(define (update-signon-application name parameters)
+  (let ((plek-config (find plek-config? parameters)))
+    (if plek-config
+        (map
+         (lambda (parameter)
+           (if (signon-application? parameter)
+               (let ((service-uri
+                      (if (eq? name 'authenticating-proxy)
+                          (plek-config-draft-origin plek-config)
+                          (service-uri-from-plek-config plek-config
+                                                        name))))
+                 (signon-application
+                  (inherit parameter)
+                  (home-uri service-uri)
+                  (redirect-uri
+                   (string-append service-uri "/auth/gds/callback"))))
+               parameter))
+         parameters)
+        parameters)))
+
+(define (generic-rails-app-log-files name . rest)
+  (let*
+      ((string-name (symbol->string name))
+       (ss (find shepherd-service? rest))
+       (sidekiq-config (find sidekiq-config? rest))
+       (sidekiq-service-name
+        (string-append
+         (symbol->string
+          (first (shepherd-service-provision ss)))
+         "-sidekiq")))
+    (cons
+     (string-append "/var/log/" string-name ".log")
+     (if sidekiq-config
+         (list
+          (string-append "/var/log/" sidekiq-service-name ".log"))
+         '()))))
+
+(define (modify-service-extensions-for-signon name service-extensions)
+  (service-extensions-modify-parameters
+   (cons*
+    (service-extension signon-service-type
+                       (lambda (parameters)
+                         (filter
+                          (lambda (parameter)
+                            (or (signon-application? parameter)
+                                (signon-api-user? parameter)
+                                (signon-user? parameter)))
+                          parameters)))
+    ;; TODO Ideally this would not be in this module, as it's not
+    ;; directly related to Signon
+    (service-extension govuk-tailon-service-type
+                       (lambda (parameters)
+                         (let ((log-files
+                                (apply
+                                 generic-rails-app-log-files
+                                 name
+                                 parameters)))
+                           (if (eq? (length log-files) 1)
+                               log-files
+                               (list
+                                (cons (symbol->string name)
+                                      log-files))))))
+    service-extensions)
+   (lambda (parameters)
+     (update-service-startup-config-for-signon-application
+      (update-service-startup-config-for-signon-api-user
+       (update-signon-application name parameters))))))
+
+(define (modify-service-extensions-for-signon-and-plek name service-extensions)
+  (modify-service-extensions-for-signon
+   name
+   (modify-service-extensions-for-plek name service-extensions)))

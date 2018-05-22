@@ -30,8 +30,7 @@
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
-            extend-service-type-with-plek
-            make-rails-app-using-plek-service-type
+            modify-service-extensions-for-plek
             plek-config->domains))
 
 (define-record-type* <plek-config>
@@ -282,26 +281,19 @@
          parameter)))
      parameters)))
 
-(define (extend-service-type-with-plek type)
-  (service-type
-   (inherit type)
-   (extensions
-    (map
-     (lambda (se)
-       (service-extension
-        (service-extension-target se)
-        (lambda (parameters)
-          (apply
-           (service-extension-compute se)
-           (list
-            (update-service-extension-parameters-for-plek-config
-             (service-type-name type)
-             parameters))))))
-     (service-type-extensions type)))))
-
-(define (make-rails-app-using-plek-service-type name)
-  (extend-service-type-with-plek
-   (make-rails-app-service-type name)))
+(define (modify-service-extensions-for-plek name service-extensions)
+  (map
+   (lambda (se)
+     (service-extension
+      (service-extension-target se)
+      (lambda (parameters)
+        (apply
+         (service-extension-compute se)
+         (list
+          (update-service-extension-parameters-for-plek-config
+           name
+           parameters))))))
+   service-extensions))
 
 (define-public (plek-config->hosts-file plek-config)
   (plain-file "hosts"

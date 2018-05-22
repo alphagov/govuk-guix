@@ -1,5 +1,6 @@
 (define-module (gds services govuk)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-26)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
@@ -29,138 +30,20 @@
   #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk rummager)
-  #:use-module (gds services govuk tailon)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk publishing-e2e-tests)
   #:use-module (gds services rails)
   #:export (<router-api-config>
             router-api-config
             router-api-config?
-            router-api-config-nodes))
+            router-api-config-nodes
 
-;;;
-;;; Utilities
-;;;
-
-
-(define* (make-rails-app-using-plek-and-signon-service-type name
-                                                            #:key
-                                                            signon-plek-name)
-  (let ((base-service-type
-         (make-rails-app-using-plek-service-type name)))
-
-    (define (update-service-startup-config-for-signon-application parameters)
-      (let ((signon-application (find signon-application? parameters)))
-        (if signon-application
-            (map
-             (lambda (parameter)
-               (if (service-startup-config? parameter)
-                   (service-startup-config-with-additional-environment-variables
-                    parameter
-                    `(("OAUTH_ID" . ,(signon-application-oauth-id
-                                      signon-application))
-                      ("OAUTH_SECRET" . ,(signon-application-oauth-secret
-                                          signon-application))))
-                   parameter))
-             parameters)
-            parameters)))
-
-    (define (update-service-startup-config-for-signon-api-user parameters)
-      (map
-       (lambda (parameter)
-         (if (service-startup-config? parameter)
-             (service-startup-config-with-additional-environment-variables
-              parameter
-              (map
-               (match-lambda
-                 (($ <signon-authorisation> application-name token
-                                            environment-variable)
-                  (let ((name
-                         (or environment-variable
-                             (string-append
-                              (string-map
-                               (lambda (c)
-                                 (if (eq? c #\space) #\_ c))
-                               (string-upcase application-name))
-                              "_BEARER_TOKEN"))))
-                    (cons name token))))
-               (concatenate
-                (map
-                 (match-lambda
-                   (($ <signon-api-user> name email authorisation-permissions)
-                    (map car authorisation-permissions)))
-                 (filter signon-api-user? parameters)))))
-             parameter))
-       parameters))
-
-    (define (update-signon-application parameters)
-      (let ((plek-config (find plek-config? parameters)))
-        (if plek-config
-            (map
-             (lambda (parameter)
-               (if (signon-application? parameter)
-                   (let ((service-uri
-                          (if (eq? name 'authenticating-proxy)
-                              (plek-config-draft-origin plek-config)
-                              (service-uri-from-plek-config plek-config
-                                                            (or signon-plek-name
-                                                                name)))))
-                     (signon-application
-                      (inherit parameter)
-                      (home-uri service-uri)
-                      (redirect-uri
-                       (string-append service-uri "/auth/gds/callback"))))
-                   parameter))
-             parameters)
-            parameters)))
-
-    (define (generic-rails-app-log-files name . rest)
-      (let*
-          ((string-name (symbol->string name))
-           (ss (find shepherd-service? rest))
-           (sidekiq-config (find sidekiq-config? rest))
-           (sidekiq-service-name
-            (string-append
-             (symbol->string
-              (first (shepherd-service-provision ss)))
-             "-sidekiq")))
-        (cons
-         (string-append "/var/log/" string-name ".log")
-         (if sidekiq-config
-             (list
-              (string-append "/var/log/" sidekiq-service-name ".log"))
-             '()))))
-
-    (service-type-extensions-modify-parameters
-     (service-type
-      (inherit base-service-type)
-      (extensions
-       (cons*
-        (service-extension signon-service-type
-                           (lambda (parameters)
-                             (filter
-                              (lambda (parameter)
-                                (or (signon-application? parameter)
-                                    (signon-api-user? parameter)
-                                    (signon-user? parameter)))
-                              parameters)))
-        (service-extension govuk-tailon-service-type
-                           (lambda (parameters)
-                             (let ((log-files
-                                    (apply
-                                     generic-rails-app-log-files
-                                     name
-                                     parameters)))
-                               (if (eq? (length log-files) 1)
-                                   log-files
-                                   (list
-                                    (cons (symbol->string name)
-                                          log-files))))))
-        (service-type-extensions base-service-type))))
-     (lambda (parameters)
-       (update-service-startup-config-for-signon-application
-        (update-service-startup-config-for-signon-api-user
-         (update-signon-application parameters)))))))
+            <service-group>
+            service-group
+            service-group?
+            service-group-name
+            service-group-description
+            service-group-services))
 
 ;;;
 ;;; GOV.UK Content Schemas
@@ -218,7 +101,11 @@
 ;;;
 
 (define-public asset-manager-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'asset-manager))
+  (service-type (name 'asset-manager)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public asset-manager-service
   (service
@@ -266,7 +153,11 @@
 ;;;
 
 (define-public authenticating-proxy-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'authenticating-proxy))
+  (service-type (name 'authenticating-proxy)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public authenticating-proxy-service
   (service
@@ -291,7 +182,11 @@
 ;;;
 
 (define-public calculators-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'calculators))
+  (service-type (name 'calculators)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public calculators-service
   (service
@@ -308,7 +203,11 @@
 ;;;
 
 (define-public calendars-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'calendars))
+  (service-type (name 'calendars)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public calendars-service
   (service
@@ -325,7 +224,11 @@
 ;;;
 
 (define-public collections-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'collections))
+  (service-type (name 'collections)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public collections-service
   (service
@@ -340,7 +243,11 @@
            '(("GOVUK_APP_NAME" . "collections")))))))
 
 (define-public draft-collections-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-collections))
+  (service-type (name 'draft-collections)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-collections-service
   (service
@@ -359,7 +266,11 @@
 ;;;
 
 (define-public collections-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'collections-publisher))
+  (service-type (name 'collections-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public collections-publisher-service
   (service
@@ -396,7 +307,11 @@
 ;;;
 
 (define-public contacts-admin-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'contacts-admin))
+  (service-type (name 'contacts-admin)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public contacts-admin-service
   (service
@@ -430,7 +345,11 @@
 ;;;
 
 (define-public content-performance-manager-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'content-performance-manager))
+  (service-type (name 'content-performance-manager)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public content-performance-manager-service
   (service
@@ -465,7 +384,11 @@
 ;;;
 
 (define-public content-audit-tool-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'content-audit-tool))
+  (service-type (name 'content-audit-tool)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public content-audit-tool-service
   (service
@@ -500,7 +423,11 @@
 ;;;
 
 (define-public email-alert-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'email-alert-api))
+  (service-type (name 'email-alert-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public email-alert-api-service
   (service
@@ -523,7 +450,11 @@
 ;;;
 
 (define-public email-alert-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'email-alert-frontend))
+  (service-type (name 'email-alert-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public email-alert-frontend-service
   (service
@@ -536,7 +467,11 @@
           (service-startup-config))))
 
 (define-public draft-email-alert-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-email-alert-frontend))
+  (service-type (name 'draft-email-alert-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-email-alert-frontend-service
   (service
@@ -554,7 +489,11 @@
 
 ;; TODO: This is not actually a Rails app...
 (define-public email-alert-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'email-alert-service))
+  (service-type (name 'email-alert-service)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public email-alert-service-service
   (service
@@ -575,7 +514,11 @@
 ;;;
 
 (define-public feedback-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'feedback))
+  (service-type (name 'feedback)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public feedback-service
   (service
@@ -592,7 +535,11 @@
 ;;;
 
 (define-public finder-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'finder-frontend))
+  (service-type (name 'finder-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public finder-frontend-service
   (service
@@ -608,7 +555,11 @@
 )))
 
 (define-public draft-finder-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-finder-frontend))
+  (service-type (name 'draft-finder-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-finder-frontend-service
   (service
@@ -627,7 +578,11 @@
 ;;;
 
 (define-public hmrc-manuals-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'hmrc-manuals-api))
+  (service-type (name 'hmrc-manuals-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public hmrc-manuals-api-service
   (service
@@ -657,7 +612,11 @@
 ;;;
 
 (define-public licence-finder-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'licencefinder))
+  (service-type (name 'licencefinder)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public licence-finder-service
   (service
@@ -685,7 +644,11 @@
 ;;;
 
 (define-public link-checker-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'link-checker-api))
+  (service-type (name 'link-checker-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public link-checker-api-service
   (service
@@ -714,7 +677,11 @@
 ;;;
 
 (define-public local-links-manager-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'local-links-manager))
+  (service-type (name 'local-links-manager)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public local-links-manager-service
   (service
@@ -747,7 +714,11 @@
 ;;;
 
 (define-public imminence-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'imminence))
+  (service-type (name 'imminence)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public imminence-service
   (service
@@ -772,7 +743,11 @@
 ;;;
 
 (define-public manuals-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'manuals-frontend))
+  (service-type (name 'manuals-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public manuals-frontend-service
   (service
@@ -787,7 +762,11 @@
            (database "manuals_frontend")))))
 
 (define-public draft-manuals-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-manuals-frontend))
+  (service-type (name 'draft-manuals-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-manuals-frontend-service
   (service
@@ -806,7 +785,11 @@
 ;;;
 
 (define-public manuals-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'manuals-publisher))
+  (service-type (name 'manuals-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public manuals-publisher-service
   (service
@@ -842,7 +825,11 @@
 ;;;
 
 (define-public policy-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'policy-publisher))
+  (service-type (name 'policy-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public policy-publisher-service
   (service
@@ -874,7 +861,11 @@
 ;;;
 
 (define-public release-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'release))
+  (service-type (name 'release)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public release-service
   (service
@@ -899,7 +890,11 @@
 ;;;
 
 (define-public search-admin-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'search-admin-publisher))
+  (service-type (name 'search-admin)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public search-admin-service
   (service
@@ -924,7 +919,11 @@
 ;;;
 
 (define-public service-manual-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'service-manual-publisher))
+  (service-type (name 'service-manual-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public service-manual-publisher-service
   (service
@@ -956,7 +955,11 @@
 ;;;
 
 (define-public service-manual-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'service-manual-frontend))
+  (service-type (name 'service-manual-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public service-manual-frontend-service
   (service
@@ -969,7 +972,11 @@
           (service-startup-config))))
 
 (define-public draft-service-manual-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-service-manual-frontend))
+  (service-type (name 'draft-service-manual-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-service-manual-frontend-service
   (service
@@ -986,7 +993,11 @@
 ;;;
 
 (define-public short-url-manager-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'short-url-manager))
+  (service-type (name 'short-url-manager)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public short-url-manager-service
   (service
@@ -1017,7 +1028,11 @@
 ;;;
 
 (define-public smart-answers-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'smartanswers))
+  (service-type (name 'smartanswers)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public smart-answers-service
   (service
@@ -1166,7 +1181,11 @@
 ;;;
 
 (define-public support-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'support))
+  (service-type (name 'support)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public support-service
   (service
@@ -1187,7 +1206,11 @@
 ;;;
 
 (define-public support-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'support-api))
+  (service-type (name 'support-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public support-api-service
   (service
@@ -1210,7 +1233,11 @@
 ;;;
 
 (define-public travel-advice-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'travel-advice-publisher))
+  (service-type (name 'travel-advice-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public travel-advice-publisher-service
   (service
@@ -1248,7 +1275,11 @@
 ;;;
 
 (define-public publishing-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'publishing-api))
+  (service-type (name 'publishing-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public publishing-api-service
   (service
@@ -1289,7 +1320,11 @@
 ;;;
 
 (define-public content-store-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'content-store))
+  (service-type (name 'content-store)
+                (extensions
+                 (modify-service-extensions-for-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public content-store-service
   (service
@@ -1307,7 +1342,11 @@
            (database "content-store")))))
 
 (define-public draft-content-store-service-type
-  (make-rails-app-using-plek-service-type 'draft-content-store))
+  (service-type (name 'draft-content-store)
+                (extensions
+                 (modify-service-extensions-for-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-content-store-service
   (service
@@ -1329,7 +1368,11 @@
 ;;;
 
 (define-public specialist-publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'specialist-publisher))
+  (service-type (name 'specialist-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public specialist-publisher-service
   (service
@@ -1365,7 +1408,11 @@
 ;;;
 
 (define-public government-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'government-frontend))
+  (service-type (name 'government-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public government-frontend-service
   (service
@@ -1381,7 +1428,11 @@
          (plek-config) (rails-app-config) government-frontend)))
 
 (define-public draft-government-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-government-frontend))
+  (service-type (name 'draft-government-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-government-frontend-service
   (service
@@ -1401,7 +1452,11 @@
 ;;;
 
 (define-public frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'frontend))
+  (service-type (name 'frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public frontend-service
   (service
@@ -1433,7 +1488,11 @@
          (plek-config) (rails-app-config) frontend)))
 
 (define-public draft-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-frontend))
+  (service-type (name 'draft-frontend)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-frontend-service
   (service
@@ -1461,7 +1520,11 @@
 ;;;
 
 (define-public publisher-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'publisher))
+  (service-type (name 'publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public publisher-service
   (service
@@ -1539,7 +1602,11 @@
                 (default '())))
 
 (define-public router-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'router-api))
+  (service-type (name 'router-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public router-api-service
   (service
@@ -1557,7 +1624,11 @@
           default-router-database-connection-configs)))
 
 (define-public draft-router-api-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'draft-router-api))
+  (service-type (name 'draft-router-api)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-router-api-service
   (service
@@ -1579,7 +1650,11 @@
 ;;;
 
 (define-public content-tagger-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'content-tagger))
+  (service-type (name 'content-tagger)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public content-tagger-service
   (service
@@ -1614,7 +1689,11 @@
 ;;;
 
 (define-public maslow-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'maslow))
+  (service-type (name 'maslow)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public maslow-service
   (service
@@ -1666,7 +1745,11 @@
 ;;;
 
 (define-public info-frontend-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'info-frontend))
+  (service-type (name 'info-frontend)
+                (extensions
+                 (modify-service-extensions-for-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public info-frontend-service
   (service
@@ -1697,7 +1780,11 @@
 ;;;
 
 (define-public static-service-type
-  (make-rails-app-using-plek-service-type 'static))
+  (service-type (name 'static)
+                (extensions
+                 (modify-service-extensions-for-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public static-service
   (service
@@ -1710,7 +1797,11 @@
          static)))
 
 (define-public draft-static-service-type
-  (make-rails-app-using-plek-service-type 'draft-static))
+  (service-type (name 'draft-static)
+                (extensions
+                 (modify-service-extensions-for-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public draft-static-service
   (service
@@ -1729,8 +1820,11 @@
 ;;;
 
 (define-public whitehall-service-type
-  (make-rails-app-using-plek-and-signon-service-type 'whitehall
-                                                     #:signon-plek-name 'whitehall-admin))
+  (service-type (name 'whitehall)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  'whitehall-admin
+                  (standard-rails-service-type-extensions name)))))
 
 (define-public whitehall-service
   (service
