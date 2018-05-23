@@ -1,3 +1,6 @@
+(define-module (gds build-jobs govuk cuirass-specifications)
+  #:export (govuk-packages))
+
 (define govuk-packages
   `((#:name . "govuk-packages")
     (#:url . "govuk-guix")

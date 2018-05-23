@@ -1,6 +1,8 @@
-(use-modules (ice-9 match)
-             (ice-9 popen)
-             (ice-9 rdelim))
+(define-module (gds build-jobs cuirass-entry-point)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 popen)
+  #:use-module (ice-9 rdelim)
+  #:export (govuk-package-jobs))
 
 (define working-directory
   (getcwd))
