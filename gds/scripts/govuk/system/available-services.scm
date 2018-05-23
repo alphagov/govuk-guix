@@ -48,9 +48,14 @@
         (operating-system-user-services govuk-development-os)))
 
 (define (display-available-services-in-json)
+  (define (origin-sexp origin)
+    `((uri . ,(origin-uri origin))))
+
   (define (package-sexp package)
     `((name . ,(package-name package))
-      (version . ,(package-version package))))
+      (version . ,(package-version package))
+      (homepage . ,(package-home-page package))
+      (source . ,(origin-sexp (package-source package)))))
 
   (define (shepherd-services-sexp shepherd-services)
     (map (lambda (shepherd-service)
