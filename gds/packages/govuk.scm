@@ -529,6 +529,10 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "1mxyr23prnvw6lxxc6c9m5z8i7h2jmijzkz70jcz222gv4gadl2g")))
      (build-system rails-build-system)
+     (arguments
+      '(;; jasmine-rails seems to get annoyed if it's configuration
+        ;; doesn't exist in the spec directory
+        #:exclude-files ("tmp")))
      (synopsis "")
      (description "")
      (license #f)
