@@ -96,7 +96,15 @@ higher priority extracts appear later in the list"
            (time>? utc-time-b utc-time-a))))))
 
 (define* (load-extract extract database-connection-config
-                       #:key dry-run?)
+                       #:key dry-run?
+                       (use-local-files-directly? #f))
+
+  (define (transform-file file)
+    (if (and use-local-files-directly?
+             (local-file? file))
+        (local-file-absolute-file-name file)
+        file))
+
   (let* ((load-gexp
           (match extract
             (($ <data-extract> file datetime "postgresql" services)
@@ -105,17 +113,17 @@ higher priority extracts appear later in the list"
                (inherit database-connection-config)
                (user "postgres")
                (database "postgres"))
-              file
+              (transform-file file)
               #:dry-run? dry-run?))
             (($ <data-extract> file datetime "mongodb" services)
              (mongodb-restore-gexp
               database-connection-config
-              file
+              (transform-file file)
               #:dry-run? dry-run?))
             (($ <data-extract> file datetime "mysql" services)
              (mysql-run-file-gexp
               database-connection-config
-              file
+              (transform-file file)
               #:dry-run? dry-run?))
             (($ <data-extract> file datetime "elasticsearch" services)
              (elasticsearch-restore-gexp
@@ -123,7 +131,7 @@ higher priority extracts appear later in the list"
               (simple-format
                #f "govuk-~A"
                (date->string datetime "~d-~m-~Y"))
-              file
+              (transform-file file)
               #:alias "govuk"
               #:overrides "{\"settings\":{\"index\":{\"number_of_replicas\":\"0\",\"number_of_shards\":\"1\"}}}"
               #:batch-size 250
