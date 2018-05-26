@@ -273,7 +273,8 @@
                       database-connection-config))))))
          (display "\n")
          (load-extract data-extract database-connection-config
-                       #:dry-run? dry-run?))
+                       #:dry-run? dry-run?
+                       #:use-local-files-directly? #t))
        database-connection-configs)))
    extracts-and-database-connection-configs))
 
