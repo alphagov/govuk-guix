@@ -58,13 +58,22 @@
   (match database-connection
     (($ <mysql-connection-config> host user port database)
      #~(lambda ()
-         (let
-             ((command `(,(string-append #$pv "/bin/pv")
+         (let*
+             ((decompressor
+               (cond
+                ((string-suffix? "gz" #$file)
+                 '(#$(file-append gzip "/bin/gzip")
+                     "-d"
+                     "|"))
+                ((string-suffix "bz2" #$file)
+                 '(#$(file-append pbzip2 "/bin/pbzip2")
+                     "-d"
+                     "|"))
+                (else '())))
+              (command `(,(string-append #$pv "/bin/pv")
                          ,#$file
                          "|"
-                         ,(string-append #$pbzip2 "/bin/pbzip2")
-                         "-d"
-                         "|"
+                         ,@decompressor
                          ,(string-append #$mariadb "/bin/mysql")
                          "-h" #$host
                          "-u" "root"
