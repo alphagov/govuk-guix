@@ -78,6 +78,7 @@
                          "-h" #$host
                          "-u" "root"
                          "--protocol=tcp"
+                         ,#$(string-append "--database=" database)
                          "--password=''"
                          "-P" ,(number->string #$port))))
            #$@(if dry-run?

@@ -109,10 +109,7 @@ higher priority extracts appear later in the list"
           (match extract
             (($ <data-extract> file datetime "postgresql" services)
              (postgresql-import-gexp
-              (postgresql-connection-config
-               (inherit database-connection-config)
-               (user "postgres")
-               (database "postgres"))
+              database-connection-config
               (transform-file file)
               #:dry-run? dry-run?))
             (($ <data-extract> file datetime "mongodb" services)

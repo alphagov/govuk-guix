@@ -19,7 +19,9 @@
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)
-  #:export (govuk-puppet-data-source))
+  #:export (govuk-puppet-data-source
+
+            backups-directory))
 
 ;;;
 ;;; Source file handling
