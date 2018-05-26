@@ -256,7 +256,10 @@ proxies requests to some upstream")
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
      (arguments
-      `(#:phases
+      `(;; The mock_organisations_api, from the spec directory is used
+        ;; in development
+        #:exclude-files ("tmp")
+        #:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
                       ,govuk-admin-template-initialiser))))
