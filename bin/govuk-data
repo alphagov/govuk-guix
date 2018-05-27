@@ -77,53 +77,49 @@
                 (lambda (opt name arg result)
                   (alist-cons 'dry-run? #t result)))))
 
-(define (list-available-extracts . args)
-  (let-values
-      (((services data-extracts)
-        (options->services-and-data-extracts
-         (parse-command-line args options '(())))))
-    (for-each
-     (match-lambda
-      ((service-type . data-extracts)
-       (if (member service-type (map service-kind services))
-           (begin
-             (simple-format #t "service: ~A\n" (service-type-name
-                                                service-type))
-             (for-each
-              (match-lambda
+(define (list-available-extracts services data-extracts)
+  (for-each
+   (match-lambda
+     ((service-type . data-extracts)
+      (if (member service-type (map service-kind services))
+          (begin
+            (simple-format #t "service: ~A\n" (service-type-name
+                                               service-type))
+            (for-each
+             (match-lambda
                ((database . data-extracts)
                 (simple-format #t "  database: ~A\n" database)
                 (for-each
                  (match-lambda
-                  ((date . data-extracts)
-                   (simple-format
-                    #t "    - ~A\n"
-                    (date->string date "~d/~m/~Y"))
-                   (if (> (length data-extracts) 1)
-                       (for-each
-                        (lambda (data-extract priority-ordering)
-                          (let ((data-source
-                                 (data-extract-data-source
-                                  data-extract)))
-                            (format
-                             #t
-                             "      - ~A (~:r priority)\n"
-                             (data-source-name data-source)
-                             priority-ordering)))
-                        ;; Highest priority first, so reverse the sort order
-                        (reverse (sort-extracts data-extracts))
-                        (iota (length data-extracts) 1)))))
+                   ((date . data-extracts)
+                    (simple-format
+                     #t "    - ~A\n"
+                     (date->string date "~d/~m/~Y"))
+                    (if (> (length data-extracts) 1)
+                        (for-each
+                         (lambda (data-extract priority-ordering)
+                           (let ((data-source
+                                  (data-extract-data-source
+                                   data-extract)))
+                             (format
+                              #t
+                              "      - ~A (~:r priority)\n"
+                              (data-source-name data-source)
+                              priority-ordering)))
+                         ;; Highest priority first, so reverse the sort order
+                         (reverse (sort-extracts data-extracts))
+                         (iota (length data-extracts) 1)))))
                  (group-extracts data-extract-datetime data-extracts))))
-              (group-extracts data-extract-database data-extracts))))))
-     (stable-sort
-      (group-extracts data-extract-services
-                      (sort-extracts data-extracts))
-      (match-lambda* (((service-type1 . data-extracts1)
-                       (service-type2 . data-extracts2))
-                      (string<? (symbol->string
-                                 (service-type-name service-type1))
-                                (symbol->string
-                                 (service-type-name service-type2)))))))))
+             (group-extracts data-extract-database data-extracts))))))
+   (stable-sort
+    (group-extracts data-extract-services
+                    (sort-extracts data-extracts))
+    (match-lambda* (((service-type1 . data-extracts1)
+                     (service-type2 . data-extracts2))
+                    (string<? (symbol->string
+                               (service-type-name service-type1))
+                              (symbol->string
+                               (service-type-name service-type2))))))))
 
 (define (options->services-and-data-extracts opts)
   (let* ((service-names
@@ -147,7 +143,7 @@
            #:databases (if (null? databases) #f databases)
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))
-    (values services data-extracts)))
+    (list services data-extracts)))
 
 (define (get-services service-names)
   (let ((all-services
@@ -268,17 +264,13 @@
        database-connection-configs)))
    extracts-and-database-connection-configs))
 
-(define (load . args)
-  (let ((options (parse-command-line args options '(()))))
-    (let-values
-        (((services data-extracts)
-          (options->services-and-data-extracts options)))
-      (let ((extracts-and-database-connection-configs
-             (get-extracts-and-database-connection-configs services
-                                                           data-extracts)))
-        (show-selected-extracts extracts-and-database-connection-configs)
-        (load-selected-extracts extracts-and-database-connection-configs
-                                #:dry-run? (assq-ref options 'dry-run?))))))
+(define (load services data-extracts)
+  (let ((extracts-and-database-connection-configs
+         (get-extracts-and-database-connection-configs services
+                                                       data-extracts)))
+    (show-selected-extracts extracts-and-database-connection-configs)
+    (load-selected-extracts extracts-and-database-connection-configs
+                            #:dry-run? (assq-ref options 'dry-run?))))
 
 (define (govuk-data . args)
   (define commands
@@ -293,7 +285,9 @@
                (handler
                 (assoc-ref commands command)))
           (if handler
-              (apply handler (cddr args))
+              (apply handler (options->services-and-data-extracts
+                              (parse-command-line (cddr args) options '(()))))
+
               (leave (G_ "command ~A is not recognised") command))))))
 
 (apply govuk-data (command-line))
