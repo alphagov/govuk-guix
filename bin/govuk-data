@@ -51,7 +51,9 @@
  (gds systems govuk development)
  (gds data data-source)
  (gds data data-extract)
- (gds data govuk))
+ (gds data govuk)
+ (gds scripts govuk data list)
+ (gds scripts govuk data load))
 
 (define (parse-date str)
   (string->date str "~d/~m/~Y"))
@@ -77,50 +79,6 @@
                 (lambda (opt name arg result)
                   (alist-cons 'dry-run? #t result)))))
 
-(define (list-available-extracts services data-extracts)
-  (for-each
-   (match-lambda
-     ((service-type . data-extracts)
-      (if (member service-type (map service-kind services))
-          (begin
-            (simple-format #t "service: ~A\n" (service-type-name
-                                               service-type))
-            (for-each
-             (match-lambda
-               ((database . data-extracts)
-                (simple-format #t "  database: ~A\n" database)
-                (for-each
-                 (match-lambda
-                   ((date . data-extracts)
-                    (simple-format
-                     #t "    - ~A\n"
-                     (date->string date "~d/~m/~Y"))
-                    (if (> (length data-extracts) 1)
-                        (for-each
-                         (lambda (data-extract priority-ordering)
-                           (let ((data-source
-                                  (data-extract-data-source
-                                   data-extract)))
-                             (format
-                              #t
-                              "      - ~A (~:r priority)\n"
-                              (data-source-name data-source)
-                              priority-ordering)))
-                         ;; Highest priority first, so reverse the sort order
-                         (reverse (sort-extracts data-extracts))
-                         (iota (length data-extracts) 1)))))
-                 (group-extracts data-extract-datetime data-extracts))))
-             (group-extracts data-extract-database data-extracts))))))
-   (stable-sort
-    (group-extracts data-extract-services
-                    (sort-extracts data-extracts))
-    (match-lambda* (((service-type1 . data-extracts1)
-                     (service-type2 . data-extracts2))
-                    (string<? (symbol->string
-                               (service-type-name service-type1))
-                              (symbol->string
-                               (service-type-name service-type2))))))))
-
 (define (options->services-and-data-extracts opts)
   (let* ((service-names
           (filter-map (match-lambda
@@ -143,7 +101,8 @@
            #:databases (if (null? databases) #f databases)
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))
-    (list services data-extracts)))
+    (list services data-extracts
+          #:dry-run? (assq-ref opts 'dry-run?))))
 
 (define (get-services service-names)
   (let ((all-services
@@ -164,75 +123,11 @@
                    service-name)))
          service-names))))
 
-(define (show-selected-extracts extracts-and-database-connection-configs)
-  (display "Extracts selected:\n")
-  (map
-   (match-lambda
-     ((data-extract . database-connection-configs)
-      (for-each
-       (lambda (database-connection-config)
-         (match data-extract
-           (($ <data-extract> file datetime database services data-source)
-            (simple-format
-             #t " - ~A extract from ~A (~A) into the ~A database for"
-             database
-             (date->string datetime "~d/~m/~Y")
-             (data-source-name data-source)
-             (match database
-               ("elasticsearch" "elasticsearch")
-               (else
-                (database-connection-config->database-name
-                 database-connection-config))))
-            (if (eq? 1 (length services))
-                (simple-format #t " the ~A service\n"
-                               (service-type-name (first services)))
-                (begin
-                  (display ":\n")
-                  (for-each
-                   (lambda (service)
-                     (simple-format #t "   - ~A\n"
-                                    (service-type-name service)))
-                   services))))))
-       database-connection-configs)))
-   extracts-and-database-connection-configs)
-  (display "\n"))
-
-(define* (load-selected-extracts
-          extracts-and-database-connection-configs
-          #:key dry-run?)
-  (map
-   (match-lambda
-     ((data-extract . database-connection-configs)
-      (for-each
-       (lambda (database-connection-config)
-         (match data-extract
-           (($ <data-extract> file datetime database services)
-            (simple-format
-             #t "Importing extract from ~A in to ~A\n"
-             (date->string datetime "~d/~m/~Y")
-             (match database
-               ("elasticsearch" "elasticsearch")
-               (else (database-connection-config->database-name
-                      database-connection-config))))))
-         (display "\n")
-         (load-extract data-extract database-connection-config
-                       #:dry-run? dry-run?
-                       #:use-local-files-directly? #t))
-       database-connection-configs)))
-   extracts-and-database-connection-configs))
-
-(define (load services data-extracts)
-  (let ((extracts-and-database-connection-configs
-         (get-extracts-and-database-connection-configs services
-                                                       data-extracts)))
-    (show-selected-extracts extracts-and-database-connection-configs)
-    (load-selected-extracts extracts-and-database-connection-configs
-                            #:dry-run? (assq-ref options 'dry-run?))))
-
 (define (govuk-data . args)
   (define commands
     `(("list" . ,list-available-extracts)
-      ("load" . ,load)))
+      ("load" . ,load-extracts)
+      ("build-snapshot" . ,build-snapshot)))
 
   (display "\n")
   (with-error-handling
