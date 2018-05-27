@@ -7,6 +7,7 @@
   #:use-module (guix records)
   #:use-module (guix derivations)
   #:use-module (guix store)
+  #:use-module (gnu services)
   #:use-module (gds utils)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mongodb)
@@ -25,6 +26,7 @@
             filter-extracts
             group-extracts
             sort-extracts
+            get-extracts-and-database-connection-configs
             load-extract))
 
 (define-record-type* <data-extract>
@@ -94,6 +96,49 @@ higher priority extracts appear later in the list"
                 (or (data-source-priority data-source-a) -1)))
            ;; Is b more recent than a?
            (time>? utc-time-b utc-time-a))))))
+
+(define (database-connection-config-from-service-for-extract service extract)
+  (or
+   (find
+    (or
+     (assoc-ref
+      `(("postgresql"    . ,postgresql-connection-config?)
+        ("mongo"         . ,mongodb-connection-config?)
+        ("mysql"         . ,mysql-connection-config?)
+        ("elasticsearch" . ,elasticsearch-connection-config?))
+      (data-extract-database extract))
+     (error "Unrecognised database type ~A" (data-extract-database extract)))
+    (service-parameters service))
+   (begin
+     (display (service-parameters service))
+     (error
+      "Couldn't find a database connection configuration for ~A for the ~A service"
+      (data-extract-database extract)
+      (service-type-name (service-kind service))))))
+
+(define (get-extracts-and-database-connection-configs services extracts)
+  (fold
+   (lambda (service data-extracts-and-database-connection-configs)
+     (let ((service-extracts (filter-extracts
+                              extracts
+                              #:service-types (list
+                                               (service-kind
+                                                service)))))
+       (fold
+        (match-lambda*
+          (((database . extracts) data-extracts-and-database-connection-configs)
+           ;; The appropriate extract is always last in the list due
+           ;; to sorting
+           (let ((extract (last (sort-extracts extracts))))
+             (alist-add
+              extract
+              (database-connection-config-from-service-for-extract service
+                                                                   extract)
+              data-extracts-and-database-connection-configs))))
+        data-extracts-and-database-connection-configs
+        (group-extracts data-extract-database service-extracts))))
+   '()
+   services))
 
 (define* (load-extract extract database-connection-config
                        #:key dry-run?
