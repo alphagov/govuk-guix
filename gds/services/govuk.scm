@@ -669,8 +669,9 @@
           (authorisation-permissions (list)))
          (service-startup-config)
          (redis-connection-config)
-         (mongodb-connection-config
-          (database "link_checker_api")))))
+         (postgresql-connection-config
+          (user "link_checker_api")
+          (database "link_checker_api_production")))))
 
 ;;;
 ;;; Local Links Manager
