@@ -53,7 +53,8 @@
  (gds data data-extract)
  (gds data govuk)
  (gds scripts govuk data list)
- (gds scripts govuk data load))
+ (gds scripts govuk data load)
+ (gds scripts govuk data build-snapshot))
 
 (define (parse-date str)
   (string->date str "~d/~m/~Y"))
