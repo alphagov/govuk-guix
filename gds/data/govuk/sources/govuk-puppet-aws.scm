@@ -52,7 +52,7 @@
 
 (define (find-data-extracts backup-directory)
   (define (log message value)
-    (simple-format #t "~A: ~A\n" message value)
+    ;;(simple-format #t "~A: ~A\n" message value)
     value)
 
   (define (process-date-dir date stat . children)
