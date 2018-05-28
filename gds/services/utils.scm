@@ -102,52 +102,62 @@
 ;;; Service package sources
 ;;;
 
-(define (correct-services-package-source services
-                                         service-path-list
-                                         service-commit-ish-list)
-  (validate-custom-source-data service-path-list
-                               service-commit-ish-list
-                               (filter-map
-                                (lambda (service)
-                                  (let ((parameters (service-parameters service)))
-                                    (if (list? parameters)
-                                        (if (find package? parameters)
-                                            (symbol->string
-                                             (service-type-name
-                                              (service-kind service)))
-                                            #f)
-                                        #f)))
-                                services))
-  (map
-   (lambda (service)
-     (update-service-parameters
-      service
-      (list
-       (cons
-        package?
-        (lambda (pkg)
-          (correct-source-of (symbol->string
-                              (service-type-name (service-kind service)))
-                             pkg
-                             service-path-list
-                             service-commit-ish-list))))))
-   services))
+(define (correct-service-package-source service
+                                        service-revisions
+                                        service-path-list
+                                        service-commit-ish-list)
+  (define service-name
+    (symbol->string
+     (service-type-name (service-kind service))))
 
-(define (correct-services-package-source-from-environment services)
+  (update-service-parameters
+   service
+   (list
+    (cons
+     package?
+     (lambda (pkg)
+       (correct-source-of
+        service-name
+        pkg
+        (assoc-ref service-path-list service-name)
+        (or (assq-ref service-revisions (service-kind service))
+            (assoc-ref service-commit-ish-list service-name))))))))
+
+(define (correct-services-package-source service-revisions
+                                         services)
   (let* ((service-commit-ish-list
           (get-service-package-source-config-list-from-environment
            environment-variable-commit-ish-regex))
          (service-path-list
           (get-service-package-source-config-list-from-environment
-           environment-variable-path-regex))
-         (new-services
-          (correct-services-package-source
-           services
-           service-path-list
-           service-commit-ish-list)))
-      (log-service-package-path-list service-path-list)
-      (log-service-package-commit-ish-list service-commit-ish-list)
-      new-services))
+           environment-variable-path-regex)))
+
+    (validate-custom-source-data service-revisions
+                                 service-path-list
+                                 service-commit-ish-list
+                                 (filter-map
+                                  (lambda (service)
+                                    (let ((parameters
+                                           (service-parameters service)))
+                                      (if (list? parameters)
+                                          (if (find package? parameters)
+                                              (symbol->string
+                                               (service-type-name
+                                                (service-kind service)))
+                                              #f)
+                                          #f)))
+                                  services))
+
+    (log-service-package-path-list service-path-list)
+    (log-service-package-commit-ish-list service-commit-ish-list)
+
+    (map (lambda (service)
+           (correct-service-package-source
+            service
+            service-revisions
+            service-path-list
+            service-commit-ish-list))
+         services)))
 
 ;;;
 ;;; Apps

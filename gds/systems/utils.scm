@@ -6,7 +6,7 @@
   #:use-module (gnu system)
   #:use-module (gds services utils)
   #:export (system-without-unnecessary-services
-            update-system-services-package-source-from-environment
+            update-system-services-package-source
 
             shepherd-services-from-service
             find-missing-requirements
@@ -132,9 +132,12 @@
      (get-requirement->service-alist
       (operating-system-user-services system))))))
 
-(define (update-system-services-package-source-from-environment system)
+(define* (update-system-services-package-source
+          service-revisions
+          system)
   (operating-system
    (inherit system)
    (services
-    (correct-services-package-source-from-environment
+    (correct-services-package-source
+     service-revisions
      (operating-system-user-services system)))))

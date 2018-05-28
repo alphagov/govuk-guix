@@ -112,7 +112,8 @@
        service)))
    service-commit-ish-list))
 
-(define (validate-custom-source-data service-path-list
+(define (validate-custom-source-data service-revisions
+                                     service-path-list
                                      service-commit-ish-list
                                      service-names)
   (define (check-list list-to-check environment-variable-generator)
@@ -149,8 +150,8 @@
 
 (define (correct-source-of service-name
                            pkg
-                           service-path-list
-                           service-commit-ish-list)
+                           custom-path
+                           custom-revision)
   (define (update-inputs source inputs)
     (map
      (match-lambda
@@ -169,19 +170,15 @@
             (cons* name value rest))))
      inputs))
 
-  (let*
-      ((custom-path (assoc-ref service-path-list
-                               service-name))
-       (custom-commit-ish (assoc-ref service-commit-ish-list
-                                     service-name))
-       (custom-source
+  (let
+      ((custom-source
         (cond
-         ((and custom-commit-ish custom-path)
+         ((and custom-revision custom-path)
           (error "cannot specify custom-commit-ish and custom-path"))
-         (custom-commit-ish
+         (custom-revision
           (custom-github-archive-source-for-package
            pkg
-           custom-commit-ish))
+           custom-revision))
          (custom-path
           (local-file
            custom-path

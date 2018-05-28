@@ -100,32 +100,40 @@
       (use-https? . #f)
       ,@%build-default-options)))
 
-(define (service-names->service-types service-names)
+(define (parse-services services)
+  (define (no-service-called name)
+    (let
+        ((similarly-named-services
+          (find-similar-strings name
+                                (map (lambda (service)
+                                       (symbol->string
+                                        (service-type-name
+                                         (service-kind service))))
+                                     govuk-services))))
+      (if (null? similarly-named-services)
+          (leave (G_ "No service called ~A") name)
+          (leave (G_ "No service called ~A, did you mean ~A?")
+                 name (first similarly-named-services)))))
+
+  (define (service-name->type name)
+    (or (find (lambda (service-type)
+                (eq?
+                 (string->symbol name)
+                 (service-type-name service-type)))
+              (map service-kind govuk-services))
+        (no-service-called name)))
+
   (map
-   (lambda (service-name)
-     (or (find (lambda (service-type)
-                 (eq?
-                  (string->symbol service-name)
-                  (service-type-name service-type)))
-               (map service-kind govuk-services))
-         (begin
-           (let
-               ((similarly-named-services
-                 (find-similar-strings service-name
-                                       (map (lambda (service)
-                                              (symbol->string
-                                               (service-type-name
-                                                (service-kind service))))
-                                            govuk-services))))
-             (if (null? similarly-named-services)
-                 (leave (G_ "No service called ~A") service-name)
-                 (leave (G_ "No service called ~A, did you mean ~A?")
-                        service-name (first similarly-named-services)))))))
-   service-names))
+   (lambda (service)
+     (match (string-split service #\@)
+       ((name revision)
+        (cons (service-name->type name) revision))
+       ((name) (service-name->type name))))
+   services))
 
 (define* (operating-system-for-services
           host-name
-          service-names
+          services
           rails-environment
           app-domain
           web-domain
@@ -139,11 +147,19 @@
           http-ports-mode
           use-error-pages?)
 
+  (define parsed-services (parse-services services))
+
+  (define service-types
+    (map (match-lambda
+           ((type . revision) type)
+           (type type))
+         parsed-services))
+
   (define service-types-whitelist
     (append
-     (if (null? service-names)
+     (if (null? service-types)
          (map service-kind govuk-services)
-         (service-names->service-types service-names))
+         service-types)
      (cons*
       govuk-nginx-service-type
       ;; TODO: The authenticating-proxy service isn't required by
@@ -153,7 +169,8 @@
       (map service-kind base-services))))
 
   (define base-system
-    (update-system-services-package-source-from-environment
+    (update-system-services-package-source
+     (filter pair? parsed-services)
      (system-without-unnecessary-services
       (filter
        (lambda (service)
