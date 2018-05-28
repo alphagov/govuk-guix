@@ -23,7 +23,7 @@
       (name "guix-gds")
       (version (if local-source
                    "local"
-                   "release_22"))
+                   "release_23"))
       (arguments
        (if local-source
            (ensure-keyword-arguments
@@ -44,7 +44,7 @@
                    (url "http://git.cbaines.net/gds/gnu-guix")
                    (commit version)))
              (sha256
-              (base32 "04mmda3qsrb4pqvdfi1gn2mgbzl0sqq1wa3vn1k0zvp1fz787l14"))
+              (base32 "0sdki14msknqnrd6biw0vrhqkd69mn9hwbb6lirpv4f3gwyf7i7h"))
              (file-name (string-append "guix-" version "-checkout"))))))))
 
 (define-public guix-no-tests
