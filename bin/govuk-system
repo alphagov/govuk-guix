@@ -551,6 +551,7 @@
     (services
      (cons* (login-service)
 
+            (service virtual-terminal-service-type)
             (service console-font-service-type
                      (map (lambda (tty)
                             (cons tty %default-console-font))
