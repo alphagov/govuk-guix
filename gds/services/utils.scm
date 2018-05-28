@@ -11,9 +11,17 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (guix packages)
-  #:use-module (gds packages utils custom-sources))
+  #:use-module (gds packages utils custom-sources)
+  #:export (ensure-service-parameters
+            update-service-parameters
+            update-services-parameters
+            default-shepherd-service
+            random-base16-string
+            correct-services-package-source
+            correct-services-package-source-from-environment
+            setup-app-directory))
 
-(define-public (ensure-service-parameters s test-and-value-pairs)
+(define (ensure-service-parameters s test-and-value-pairs)
   (service
    s
    (fold
@@ -31,7 +39,7 @@
     (service-parameters s)
     test-and-value-pairs)))
 
-(define-public (update-service-parameters s test-and-function-pairs)
+(define (update-service-parameters s test-and-function-pairs)
   (define (update-parameter initial-parameter)
     (fold
      (match-lambda*
@@ -51,7 +59,7 @@
       (map update-parameter parameters)
       (update-parameter parameters)))))
 
-(define-public (update-services-parameters services tests-and-functions)
+(define (update-services-parameters services tests-and-functions)
   (map
    (lambda (service)
      (fold
@@ -69,7 +77,7 @@
    services))
 
 ;; Just specify #f for the fields without defaults
-(define-public default-shepherd-service
+(define default-shepherd-service
   (shepherd-service
    (provision #f)
    (start #f)))
@@ -86,7 +94,7 @@
     (proc bv-ptr bv-length)
     bv))
 
-(define-public (random-base16-string length)
+(define (random-base16-string length)
   (bytevector->base16-string
    (gen-random-bv length)))
 
@@ -94,8 +102,8 @@
 ;;; Service package sources
 ;;;
 
-(define-public (correct-services-package-source package-path-list
-                                                package-commit-ish-list services)
+(define (correct-services-package-source package-path-list
+                                         package-commit-ish-list services)
   (validate-custom-source-data package-path-list
                                package-commit-ish-list
                                (filter-map
@@ -118,7 +126,7 @@
                              pkg))))))
    services))
 
-(define-public (correct-services-package-source-from-environment
+(define (correct-services-package-source-from-environment
                 services)
   (let* ((package-commit-ish-list
           (get-package-source-config-list-from-environment
@@ -139,7 +147,7 @@
 ;;; Apps
 ;;;
 
-(define-public (setup-app-directory name package)
+(define (setup-app-directory name package)
   (with-imported-modules (source-module-closure
                           '((guix build syscalls)
                             (gnu build file-systems)))
