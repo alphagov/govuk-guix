@@ -102,15 +102,20 @@
 ;;; Service package sources
 ;;;
 
-(define (correct-services-package-source package-path-list
-                                         package-commit-ish-list services)
-  (validate-custom-source-data package-path-list
-                               package-commit-ish-list
+(define (correct-services-package-source services
+                                         service-path-list
+                                         service-commit-ish-list)
+  (validate-custom-source-data service-path-list
+                               service-commit-ish-list
                                (filter-map
                                 (lambda (service)
                                   (let ((parameters (service-parameters service)))
                                     (if (list? parameters)
-                                        (find package? parameters)
+                                        (if (find package? parameters)
+                                            (symbol->string
+                                             (service-type-name
+                                              (service-kind service)))
+                                            #f)
                                         #f)))
                                 services))
   (map
@@ -121,26 +126,27 @@
        (cons
         package?
         (lambda (pkg)
-          (correct-source-of package-path-list
-                             package-commit-ish-list
-                             pkg))))))
+          (correct-source-of (symbol->string
+                              (service-type-name (service-kind service)))
+                             pkg
+                             service-path-list
+                             service-commit-ish-list))))))
    services))
 
-(define (correct-services-package-source-from-environment
-                services)
-  (let* ((package-commit-ish-list
-          (get-package-source-config-list-from-environment
+(define (correct-services-package-source-from-environment services)
+  (let* ((service-commit-ish-list
+          (get-service-package-source-config-list-from-environment
            environment-variable-commit-ish-regex))
-         (package-path-list
-          (get-package-source-config-list-from-environment
+         (service-path-list
+          (get-service-package-source-config-list-from-environment
            environment-variable-path-regex))
          (new-services
           (correct-services-package-source
-           package-path-list
-           package-commit-ish-list
-           services)))
-      (log-package-path-list package-path-list)
-      (log-package-commit-ish-list package-commit-ish-list)
+           services
+           service-path-list
+           service-commit-ish-list)))
+      (log-service-package-path-list service-path-list)
+      (log-service-package-commit-ish-list service-commit-ish-list)
       new-services))
 
 ;;;

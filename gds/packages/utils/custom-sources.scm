@@ -18,10 +18,10 @@
   #:export (github-url-regex
             environment-variable-commit-ish-regex
             environment-variable-path-regex
-            get-package-source-config-list-from-environment
+            get-service-package-source-config-list-from-environment
             custom-github-archive-source-for-package
-            log-package-path-list
-            log-package-commit-ish-list
+            log-service-package-path-list
+            log-service-package-commit-ish-list
             correct-source-of
             validate-custom-source-data))
 
@@ -37,7 +37,7 @@
   (make-regexp
    "GDS_GUIX_([A-Z0-9_]*)_PATH=(.*)"))
 
-(define (package-name->custom-source-path-environment-variable name)
+(define (service-name->custom-source-path-environment-variable name)
   (string-append "GDS_GUIX_"
                  (string-map
                   (lambda (c)
@@ -45,7 +45,7 @@
                   (string-upcase name))
                  "_PATH"))
 
-(define (package-name->custom-source-commit-ish-environment-variable name)
+(define (service-name->custom-source-commit-ish-environment-variable name)
   (string-append "GDS_GUIX_"
                  (string-map
                   (lambda (c)
@@ -53,7 +53,7 @@
                   (string-upcase name))
                  "_COMMIT_ISH"))
 
-(define (get-package-source-config-list-from-environment regex)
+(define (get-service-package-source-config-list-from-environment regex)
   (map
    (lambda (name-value-match)
      (cons
@@ -90,64 +90,67 @@
         (match:end regexp-match 1))
        #:recursive? #t))))
 
-(define (log-package-path-list package-path-list)
+(define (log-service-package-path-list service-path-list)
   (for-each
    (match-lambda
-     ((package . path)
+     ((service . path)
       (simple-format
        #t
-       "Using path \"~A\" for the ~A package\n"
+       "Using path \"~A\" for the ~A service\n"
        path
-       package)))
-   package-path-list))
+       service)))
+   service-path-list))
 
-(define (log-package-commit-ish-list package-commit-ish-list)
+(define (log-service-package-commit-ish-list service-commit-ish-list)
   (for-each
    (match-lambda
-     ((package . commit-ish)
+     ((service . commit-ish)
       (simple-format
        #t
-       "Using commit-ish \"~A\" for the ~A package\n"
+       "Using commit-ish \"~A\" for the ~A service\n"
        commit-ish
-       package)))
-   package-commit-ish-list))
+       service)))
+   service-commit-ish-list))
 
-(define (validate-custom-source-data package-path-list package-commit-ish-list
-                                     packages)
+(define (validate-custom-source-data service-path-list
+                                     service-commit-ish-list
+                                     service-names)
   (define (check-list list-to-check environment-variable-generator)
-    (let* ((package-names (map package-name packages))
-           (unknown-package-names
+    (let* ((unknown-service-names
             (filter-map
-             (lambda (package-name)
-               (if (member package-name package-names)
+             (lambda (service-name)
+               (if (member service-name service-names)
                    #f
-                   package-name))
+                   service-name))
              (map car list-to-check))))
-      (if (not (null? unknown-package-names))
+      (if (not (null? unknown-service-names))
           (for-each
-           (lambda (unknown-package-name)
+           (lambda (unknown-service-name)
              (let
-                 ((similarly-named-packages
-                   (find-similar-strings unknown-package-name package-names)))
-               (if (null? similarly-named-packages)
-                   (leave (G_ "custom-sources: No package called \"~A\", set through ~A")
-                          unknown-package-name
-                          (environment-variable-generator unknown-package-name))
-                   (leave (G_ "custom-sources: No package called \"~A\", set through ~A, did you mean \"~A\" (~A)?")
-                          unknown-package-name
-                          (environment-variable-generator unknown-package-name)
-                          (first similarly-named-packages)
+                 ((similarly-named-services
+                   (find-similar-strings unknown-service-name service-names)))
+               (if (null? similarly-named-services)
+                   (leave (G_ "custom-sources: No services called \"~A\", set through ~A")
+                          unknown-service-name
+                          (environment-variable-generator unknown-service-name))
+                   (leave (G_ "custom-sources: No service called \"~A\", set through ~A, did you mean \"~A\" (~A)?")
+                          unknown-service-name
+                          (environment-variable-generator unknown-service-name)
+                          (first similarly-named-services)
                           (environment-variable-generator
-                           (first similarly-named-packages))))))
-           unknown-package-names)
+                           (first similarly-named-services))))))
+           unknown-service-names)
           #t)))
 
-  (check-list package-path-list
-              package-name->custom-source-path-environment-variable)
-  (check-list package-commit-ish-list
-              package-name->custom-source-commit-ish-environment-variable))
+  (check-list service-path-list
+              service-name->custom-source-path-environment-variable)
+  (check-list service-commit-ish-list
+              service-name->custom-source-commit-ish-environment-variable))
 
-(define (correct-source-of package-path-list package-commit-ish-list pkg)
+(define (correct-source-of service-name
+                           pkg
+                           service-path-list
+                           service-commit-ish-list)
   (define (update-inputs source inputs)
     (map
      (match-lambda
@@ -167,10 +170,10 @@
      inputs))
 
   (let*
-      ((custom-path (assoc-ref package-path-list
-                               (package-name pkg)))
-       (custom-commit-ish (assoc-ref package-commit-ish-list
-                                     (package-name pkg)))
+      ((custom-path (assoc-ref service-path-list
+                               service-name))
+       (custom-commit-ish (assoc-ref service-commit-ish-list
+                                     service-name))
        (custom-source
         (cond
          ((and custom-commit-ish custom-path)
