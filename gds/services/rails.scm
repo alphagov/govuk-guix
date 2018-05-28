@@ -294,27 +294,31 @@
                 #f)))
          (package-inputs package)))
 
-  #~(let* ((cache-directory "/var/cache/gems")
-           (bundle-install #$bundle-install-input)
-           (bundle-install-cache-directory
-            (string-append cache-directory
-                           (string-drop bundle-install
-                                        #$(string-length (%store-prefix))))))
+  (with-imported-modules (source-module-closure
+                          '((guix build syscalls)
+                            (gnu build file-systems)))
+    #~(let* ((cache-directory "/var/cache/gems")
+             (bundle-install #$bundle-install-input)
+             (bundle-install-cache-directory
+              (string-append cache-directory
+                             (string-drop bundle-install
+                                          #$(string-length (%store-prefix))))))
+        (use-modules (gnu build file-systems))
 
-      (mkdir-p cache-directory)
-      (unless (file-exists? bundle-install-cache-directory)
-        (simple-format #t "Caching ~A ...\n" bundle-install)
-        (mkdir bundle-install-cache-directory)
-        (system* #$(file-append tar "/bin/tar")
-                 "--extract"
-                 "--strip-components=3"
-                 "--file" #$(tar-archive
-                             (name (string-append (package-name package)
-                                                  "-bundle-install.tar"))
-                             (contents bundle-install-input))
-                 (string-append "--directory=" bundle-install-cache-directory))
-        (bind-mount bundle-install-cache-directory bundle-install)
-        (simple-format #t "Finished caching ~A\n" bundle-install))))
+        (mkdir-p cache-directory)
+        (unless (file-exists? bundle-install-cache-directory)
+          (simple-format #t "Caching ~A ...\n" bundle-install)
+          (mkdir bundle-install-cache-directory)
+          (system* #$(file-append tar "/bin/tar")
+                   "--extract"
+                   "--strip-components=3"
+                   "--file" #$(tar-archive
+                               (name (string-append (package-name package)
+                                                    "-bundle-install.tar"))
+                               (contents bundle-install-input))
+                   (string-append "--directory=" bundle-install-cache-directory))
+          (bind-mount bundle-install-cache-directory bundle-install)
+          (simple-format #t "Finished caching ~A\n" bundle-install)))))
 
 (define (generic-rails-app-activation
          name
