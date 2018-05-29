@@ -8,6 +8,8 @@
   #:use-module (guix store)
   #:use-module (guix monads)
   #:use-module (guix derivations)
+  #:use-module (gnu packages base)
+  #:use-module (gnu packages compression)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
   #:use-module (gds services govuk)
@@ -28,20 +30,27 @@
               (match-lambda
                 ((data-extract . database-connection-configs)
                  (map
-                  (lambda (database-connection-config)
-                    #~(let ((database #$(postgresql-connection-config-database
-                                         database-connection-config)))
-                        (system* "createdb" database)
-                        (ungzip-file-and-pipe-to-psql
-                         #$(data-extract-file data-extract)
-                         database)))
+                  (match-lambda
+                    (($ <postgresql-connection-config> port user host database)
+                     #~(let ((database #$database)
+                             (user #$user))
+                         (invoke "createuser" user)
+                         (invoke "createdb" database "-O" user)
+                         (ungzip-file-and-pipe-to-psql
+                          #$(data-extract-file data-extract)
+                          database))))
                   database-connection-configs)))
               extracts-and-database-connection-configs))))
 
-  (with-postgresql
-   (service postgresql-service-type)
-   operation
-   #:base-directory #~(string-append #$output "/var/lib/postgresql")))
+  #~(begin
+      #$(with-postgresql
+         (service postgresql-service-type)
+         operation)
+
+      (invoke #$(file-append tar "/bin/tar")
+              "--create"
+              "--file" #$output
+              "postgresql")))
 
 (define (mysql-load-extracts extracts-and-database-connection-configs)
   (define operation
@@ -67,10 +76,15 @@
                   database-connection-configs)))
               extracts-and-database-connection-configs))))
 
-  (with-mysql
-   (service mysql-service-type)
-   operation
-   #:base-directory #~(string-append #$output "/var/lib/mysql")))
+  #~(begin
+      #$(with-mysql
+         (service mysql-service-type)
+         operation)
+
+      (invoke #$(file-append tar "/bin/tar")
+              "--create"
+              "--file" #$output
+              "mysql")))
 
 (define* (snapshot-data-transformations all-data-extracts
                                         #:key dry-run?)
@@ -108,7 +122,7 @@
                                (map car extracts-and-database-connection-configs)))
 
                  (data-transformation
-                  (output-name (string-append database "-snapshot"))
+                  (output-name (string-append database "-snapshot.tar.gz"))
                   (operation (load-extracts
                               extracts-and-database-connection-configs))))))))
    (group-extracts data-extract-database all-data-extracts)))
@@ -118,15 +132,35 @@
   (define data-transformations
     (snapshot-data-transformations data-extracts
                                    #:dry-run? dry-run?))
+
+  (define snapshot-union-gexp
+    (with-imported-modules '((guix build utils))
+      #~(let ((output-var-lib
+               (string-append #$output "/var/lib")))
+
+          (use-modules (guix build utils))
+          (mkdir-p output-var-lib)
+
+          #$@(map (lambda (data-transformation)
+                    #~(symlink #$data-transformation
+                               (string-append
+                                output-var-lib "/"
+                                #$(car (string-split
+                                        (data-transformation-output-name
+                                         data-transformation)
+                                        #\-)))))
+                  data-transformations)
+
+          (exit 0))))
+
+
   (define (build-snapshot-union)
     (with-store store
       (run-with-store store
         (mlet %store-monad
-            ((derivation (lower-object
-                          (directory-union
-                           "snapshot"
-                           (snapshot-data-transformations data-extracts
-                                                          #:dry-run? dry-run?)))))
+            ((derivation (gexp->derivation
+                          "snapshot"
+                          snapshot-union-gexp)))
           (mbegin %store-monad
             (built-derivations (list derivation))
             (return (derivation->output-path derivation)))))))
