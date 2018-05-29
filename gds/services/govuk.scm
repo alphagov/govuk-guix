@@ -1226,8 +1226,8 @@
           (file "config/sidekiq.yml"))
          (redis-connection-config)
          (postgresql-connection-config
-          (user "support-api")
-          (database "support_api")))))
+          (user "support_contacts")
+          (database "support_contacts")))))
 
 ;;;
 ;;; Travel Advice Publisher
