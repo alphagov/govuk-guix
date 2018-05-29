@@ -82,7 +82,4 @@
           (sleep 10)
           (let ((result
                  (#$gexp-to-run '())))
-            (if result
-                (exit 0)
-                (begin (simple-format #t "failed: ~A\n" result)
-                       (exit 1))))))))
+            result)))))
