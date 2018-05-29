@@ -119,7 +119,9 @@
                  (if intercept-errors?
                      '("proxy_intercept_errors on;")
                      '())
-                 error_pages))
+                 error_pages
+                 (nginx-server-configuration-raw-content
+                  base-nginx-server-configuration)))
    (server-name (list (string-append web-domain)))))
 
 (define (draft-origin-server-configuration
