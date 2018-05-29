@@ -1172,12 +1172,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "118l027b94sm7p2ng3gbb3565cjrbmi1vv6whlg86q940y24pilq")))
    (package
      (name "search-admin")
-     (version "release_175")
+     (version "release_176")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "12hhhxnzqgnjlzd60141vi39vjz9c56mc72kiwx59i4i4snhqxzz")))
+       #:hash (base32 "1mcm1hrhknykqnsg3wrql8158jv70sz2fa7906ycfvhwl1c56s06")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
