@@ -63,6 +63,7 @@
  (gds services govuk signon)
  (gds services govuk admin-environment-style)
  (gds services govuk routing-configuration)
+ (gds services govuk data-snapshot)
  (gds services utils databases)
  (gds systems utils)
  (gds systems govuk base)
@@ -145,7 +146,8 @@
           origin-basic-auth-usernames-and-passwords
           read-bundle-install-input-as-tar-archive
           http-ports-mode
-          use-error-pages?)
+          use-error-pages?
+          data-snapshot)
 
   (define parsed-services (parse-services services))
 
@@ -294,6 +296,14 @@
      read-bundle-install-input-as-tar-archive
      services))
 
+  (define (add-load-data-snapshot-service-if-necessary services)
+    (if data-snapshot
+        (append
+         services
+         (list
+          (service load-data-snapshot-service-type
+                   data-snapshot)))))
+
   (define set-services-configuration
     (let
         ((service-setup-functions
@@ -309,7 +319,8 @@
            set-rails-environment
            configure-signon-users
            set-origin-basic-auth
-           set-nginx-intercept-errors)))
+           set-nginx-intercept-errors
+           add-load-data-snapshot-service-if-necessary)))
 
       (apply compose (reverse service-setup-functions))))
 
@@ -382,6 +393,11 @@
                                       "/var/lib"))
                              ((key . value) #f))
                            result)))
+         (option '("data-snapshot") #f #t
+                 (lambda (opt namg arg result)
+                   (alist-cons 'data-snapshot
+                               arg
+                               (alist-delete 'data-snapshot result))))
          (option '("rails-environment") #t #f
                  (lambda (opt name arg result . rest)
                    (apply values
@@ -527,6 +543,8 @@
                  #:default default-read-bundle-install-input-as-tar-archive?)
    (assq-ref opts 'http-ports-mode)
    (option-value opts 'use-error-pages?
+                 #:default #f)
+   (option-value opts 'data-snapshot
                  #:default #f)))
 
 (define (container-start-script os opts)
