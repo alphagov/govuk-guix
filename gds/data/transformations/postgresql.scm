@@ -57,6 +57,7 @@
                     (string-append #$gzip "/bin")
                     (search-path-as-string->list (getenv "PATH")))
                    ":"))
+          (setenv "PGUSER" "postgres")
 
           (define data-directory
             (string-append base-directory "/data"))
@@ -65,11 +66,10 @@
             (simple-format #t "activating PostgreSQL\n")
             (mkdir-p data-directory)
             (chmod data-directory #o700)
-            (or (zero?
-                 (system* "initdb"
-                          "-D"
-                          data-directory))
-                (error "error: initdb failed")))
+            (invoke "initdb"
+                    "-U" "postgres"
+                    "-D"
+                    data-directory))
 
           (define (start)
             (simple-format #t "starting PostgreSQL\n")
