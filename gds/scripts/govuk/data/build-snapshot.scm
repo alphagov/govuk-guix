@@ -97,15 +97,16 @@
        ", "))
 
     (begin
-      (simple-format #t "~A:\n" database)
+      (simple-format #t "  ~A:\n" database)
       (for-each (lambda (data-extract)
-                  (simple-format #t "  - ~A (~A)\n"
+                  (simple-format #t "    - ~A (~A)\n"
                                  (services-string (data-extract-services
                                                    data-extract))
                                  (date->string (data-extract-datetime data-extract)
                                                "~d/~m/~Y")))
                 data-extracts)))
 
+  (simple-format #t "\nsnapshot:\n")
   (filter-map
    (match-lambda
      ((database . data-extracts)
@@ -117,9 +118,9 @@
                       (get-extracts-and-database-connection-configs govuk-services
                                                                     data-extracts)))
 
-                 (if dry-run? (display-data-extracts
-                               database
-                               (map car extracts-and-database-connection-configs)))
+                 (display-data-extracts
+                  database
+                  (map car extracts-and-database-connection-configs))
 
                  (data-transformation
                   (output-name (string-append database "-snapshot.tar.gz"))
