@@ -4,6 +4,7 @@
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
+  #:use-module (json)
   #:use-module (guix gexp)
   #:use-module (guix store)
   #:use-module (guix monads)
@@ -128,6 +129,47 @@
                               extracts-and-database-connection-configs))))))))
    (group-extracts data-extract-database all-data-extracts)))
 
+(define (snapshot-manifest all-data-extracts)
+
+  (define (data-extracts-for-database-sexp data-extracts)
+    (let ((extracts-and-database-connection-configs
+           (get-extracts-and-database-connection-configs govuk-services
+                                                         data-extracts)))
+
+      (map (match-lambda
+             ((data-extract . database-connection-configs)
+
+              `((datetime . ,(date->string (data-extract-datetime data-extract)
+                                           "~d/~m/~Y"))
+                (services . ,(map service-type-name
+                                  (data-extract-services data-extract)))
+                (database-connection-configs
+                 . ,(map (match-lambda
+                           (($ <postgresql-connection-config>
+                               port user host database)
+                            `((user . ,user)
+                              (database . ,database)))
+                           (($ <mysql-connection-config>
+                               host user port database)
+                            `((user . ,user)
+                              (database . ,database))))
+                         database-connection-configs)))))
+
+           extracts-and-database-connection-configs)))
+
+  (define extracts-sexp
+    (filter-map (match-lambda
+                  ((database . data-extracts)
+                   (if (member database
+                               '("postgresql" "mysql"))
+                       (cons database
+                             (data-extracts-for-database-sexp data-extracts)))))
+                (group-extracts data-extract-database all-data-extracts)))
+
+  (scm->json-string
+   `((extracts . ,extracts-sexp))
+   #:pretty #t))
+
 (define* (build-snapshot services data-extracts
                          #:key dry-run?)
   (define data-transformations
@@ -141,6 +183,11 @@
 
           (use-modules (guix build utils))
           (mkdir-p output-var-lib)
+
+          (call-with-output-file (string-append #$output "/manifest.json")
+            (lambda (port)
+              (display #$(snapshot-manifest data-extracts)
+                       port)))
 
           #$@(map (lambda (data-transformation)
                     #~(symlink #$data-transformation
