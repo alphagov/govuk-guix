@@ -302,7 +302,8 @@
          services
          (list
           (service load-data-snapshot-service-type
-                   data-snapshot)))))
+                   data-snapshot)))
+        services))
 
   (define set-services-configuration
     (let
