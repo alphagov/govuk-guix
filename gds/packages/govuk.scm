@@ -943,7 +943,9 @@ service setup.")
      (description "")
      (license license:expat)
      (home-page "https://github.com/alphagov/organisations-publisher"))
-   #:extra-inputs (list libffi sqlite)))
+   #:extra-inputs (list libffi postgresql
+                        ;; TODO Remove sqlite if it's unused, it's still in the Gemfile
+                        sqlite)))
 
 (define-public policy-publisher
   (package-with-bundler
