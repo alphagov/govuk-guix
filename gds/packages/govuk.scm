@@ -932,12 +932,12 @@ service setup.")
     (hash (base32 "04fdqqlpbzmhs18xc8l1sa2qscz4rp3awkb05f77y0r5yvkl58w7")))
    (package
      (name "organisations-publisher")
-     (version "release_2")
+     (version "release_3")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0gq16r3zikvaw9x4yvq3da2faqrcv6ii227phaixf9imljfcp1l3")))
+       #:hash (base32 "16fxx2fp7n1ab9qjayypbqymprf1mi7567iyw25j12cdmq7l89hp")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
