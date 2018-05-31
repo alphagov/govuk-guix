@@ -2,6 +2,12 @@
 -*- scheme -*-
 !#
 
+(define govuk-guix-root
+  (or (and=> (current-filename)
+             (lambda (x)
+               (dirname (dirname x))))
+      (getenv "GOVUK_GUIX_ROOT")))
+
 ;; To allow this script to be run directly, even from the Git
 ;; repository, check if the environment is setup by checking if the
 ;; (gds services) module is loadable. If it's not loadable, start this
@@ -13,10 +19,7 @@
     (resolve-interface '(gds services)))
   (lambda args
     (let* ((govuk-guix-root
-            (or (and=> (current-filename)
-                       (lambda (x)
-                         (dirname (dirname x))))
-                (getenv "GOVUK_GUIX_ROOT")
+            (or govuk-guix-root
                 (error "Unable to locate the govuk-guix root")))
            (command-full-path
             (string-append govuk-guix-root "/bin/govuk-system")))
