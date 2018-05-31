@@ -205,6 +205,9 @@
 
   (define (build-snapshot-union)
     (with-store store
+      (set-build-options store
+                         #:max-build-jobs 1)
+
       (run-with-store store
         (mlet %store-monad
             ((derivation (gexp->derivation
