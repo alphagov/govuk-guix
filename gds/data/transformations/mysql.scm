@@ -54,7 +54,7 @@
                        port)
               (display (string-append "socket=" socket-file "\n")
                        port)
-              (display "max_allowed_packet=16M\n" port)
+              (display "max_allowed_packet=1G\n" port)
               (display "\n" port)))
 
           (mkdir-p base-directory)
@@ -67,6 +67,12 @@
           ((make-forkexec-constructor
             (list #$(file-append mysql "/bin/mysqld")
                   (string-append "--defaults-file=" configuration-file)
+                  "--innodb_buffer_pool_size=1GB"
+                  "--skip-innodb_doublewrite"
+                  "--innodb_flush_log_at_trx_commit=0"
+                  "--innodb_flush_method=nosync"
+                  "--innodb_io_capacity=2000"
+                  "--innodb_io_capacity_max=3000"
                   "--pid-file=/tmp/mysql.pid")
             #:pid-file "/tmp/mysql.pid"))
 
