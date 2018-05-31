@@ -1310,7 +1310,7 @@
            (file "config/sidekiq.yml"))
           (memcached-connection-config)
           (postgresql-connection-config
-           (user "publishing-api")
+           (user "publishing_api")
            (port "5432")
            (database "publishing_api_production"))
           (rabbitmq-connection-config (user "publishing_api")
