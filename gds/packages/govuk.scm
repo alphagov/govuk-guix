@@ -926,6 +926,25 @@ service setup.")
      (home-page "https://github.com/alphagov/maslow"))
    #:extra-inputs (list libffi)))
 
+(define-public organisations-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "04fdqqlpbzmhs18xc8l1sa2qscz4rp3awkb05f77y0r5yvkl58w7")))
+   (package
+     (name "organisations-publisher")
+     (version "release_2")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0gq16r3zikvaw9x4yvq3da2faqrcv6ii227phaixf9imljfcp1l3")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/organisations-publisher"))
+   #:extra-inputs (list libffi sqlite)))
+
 (define-public policy-publisher
   (package-with-bundler
    (bundle-package
