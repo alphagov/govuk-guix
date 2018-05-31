@@ -387,7 +387,13 @@
   (cons* (option '("share") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'file-system-mapping
-                               (specification->file-system-mapping arg #t)
+                               (if (string-any (char-set #\/) arg)
+                                   (specification->file-system-mapping arg #t)
+                                   (file-system-mapping
+                                    (source (string-append (dirname govuk-guix-root)
+                                                           "/" arg))
+                                    (target (string-append "/var/apps/" arg))
+                                    (writable? #t)))
                                result)))
          (option '("no-data-persistence") #f #f
                  (lambda (opt name arg result)
