@@ -163,7 +163,8 @@
                    (if (member database
                                '("postgresql" "mysql"))
                        (cons database
-                             (data-extracts-for-database-sexp data-extracts)))))
+                             (data-extracts-for-database-sexp data-extracts))
+                       #f)))
                 (group-extracts data-extract-database all-data-extracts)))
 
   (scm->json-string
