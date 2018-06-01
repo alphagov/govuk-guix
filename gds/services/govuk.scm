@@ -91,7 +91,6 @@
            (file "config/sidekiq.yml"))
           (mysql-connection-config
            (user "signon")
-           (port "-")
            (database "signon_production")
            (password ""))
           (redis-connection-config))))
@@ -882,7 +881,6 @@
           (service-startup-config)
           (mysql-connection-config
            (user "release")
-           (port "-")
            (database "release_production")
            (password "")))))
 
@@ -911,7 +909,6 @@
           (service-startup-config)
           (mysql-connection-config
            (user "search_admin")
-           (port "-")
            (database "search_admin_production")
            (password "")))))
 
@@ -1311,7 +1308,6 @@
           (memcached-connection-config)
           (postgresql-connection-config
            (user "publishing_api")
-           (port "5432")
            (database "publishing_api_production"))
           (rabbitmq-connection-config (user "publishing_api")
                                       (password "publishing_api"))
@@ -1683,7 +1679,6 @@
           (file "config/sidekiq.yml"))
          (postgresql-connection-config
           (user "content_tagger")
-          (port "5432")
           (database "content_tagger_production")))))
 
 ;;;
@@ -1885,7 +1880,6 @@
          (redis-connection-config)
          (mysql-connection-config
           (user "whitehall")
-          (port "-")
           (database "whitehall_production")
           (password "whitehall")))))
 
