@@ -455,7 +455,8 @@
                  (lambda (opt name arg result . rest)
                    (apply values
                           (alist-cons 'use-high-ports?
-                                      (string=? arg "true")
+                                      (or (eq? arg #f) ; No value provided
+                                          (string=? arg "true"))
                                       (alist-delete 'use-high-ports? result))
                           rest)))
          (option '("http-ports-mode") #f #t
@@ -511,7 +512,8 @@
                  (lambda (opt name arg result . rest)
                    (apply values
                           (alist-cons 'use-error-pages?
-                                      (string=? arg "true")
+                                      (eq? (eq? arg #f) ; No value provided
+                                           (string=? arg "true"))
                                       (alist-delete 'use-error-pages? result))
                           rest)))
          (option '("read-bundle-install-input-as-tar-archive") #f #t
@@ -519,7 +521,8 @@
                    (apply values
                           (alist-cons
                            'read-bundle-install-input-as-tar-archive?
-                           (string=? arg "true")
+                           (or (eq? arg #f) ; No value provided
+                               (string=? arg "true"))
                            (alist-delete
                             'read-bundle-install-input-as-tar-archive? result))
                           rest)))
