@@ -49,6 +49,8 @@
          operation)
 
       (invoke #$(file-append tar "/bin/tar")
+              (string-append "--use-compress-program="
+                             #$(file-append pigz "/bin/pigz"))
               "--create"
               "--file" #$output
               "postgresql")))
@@ -83,6 +85,8 @@
          operation)
 
       (invoke #$(file-append tar "/bin/tar")
+              (string-append "--use-compress-program="
+                             #$(file-append pigz "/bin/pigz"))
               "--create"
               "--file" #$output
               "mysql")))
