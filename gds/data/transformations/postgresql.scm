@@ -71,15 +71,19 @@
                     "-D"
                     data-directory))
 
-          (define (start)
-            (simple-format #t "starting PostgreSQL\n")
-            ((make-forkexec-constructor
-              `(,(string-append #$postgresql "/bin/postgres")
-                "-D" ,data-directory))))
+          (define (pg_ctl . args)
+            (let ((command
+                   `(,(string-append #$postgresql "/bin/pg_ctl")
+                     "-D" ,data-directory
+                     ,@args)))
+              (simple-format #t "running: ~A\n" (string-join command " "))
+              (apply invoke command)))
 
           (activate)
-          (start)
-          (sleep 10)
+          (pg_ctl "start")
           (let ((result
                  (#$gexp-to-run '())))
+
+            (pg_ctl "stop")
+
             result)))))

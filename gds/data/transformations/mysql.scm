@@ -64,18 +64,38 @@
           (simple-format #t "\nSuccessfully boostrapped MySQL\n\n")
           (force-output)
 
-          ((make-forkexec-constructor
-            (list #$(file-append mysql "/bin/mysqld")
-                  (string-append "--defaults-file=" configuration-file)
-                  "--innodb_buffer_pool_size=1GB"
-                  "--skip-innodb_doublewrite"
-                  "--innodb_flush_log_at_trx_commit=0"
-                  "--innodb_flush_method=nosync"
-                  "--innodb_io_capacity=2000"
-                  "--innodb_io_capacity_max=3000"
-                  "--pid-file=/tmp/mysql.pid")
-            #:pid-file "/tmp/mysql.pid"))
+          ;; TODO: This might work in the future, but currently fails
+          ;; as the mysql.server script and mysqld_safe use sed,
+          ;; hostname, ... and can't access them
+          (define (mysql.server . args)
+            (let ((command
+                   `(#$(file-append mysql
+                                    "/share/mysql/support-files/mysql.server")
+                     ,@args)))
+              (simple-format #t "running: ~A\n" (string-join command " "))
+              (force-output)
+              (apply invoke command)))
 
-          (let ((result
+          (define (start-mysql)
+            ((make-forkexec-constructor
+              (list #$(file-append mysql "/bin/mysqld")
+                    (string-append "--defaults-file=" configuration-file)
+                    "--innodb_buffer_pool_size=1GB"
+                    "--skip-innodb_doublewrite"
+                    "--innodb_flush_log_at_trx_commit=0"
+                    "--innodb_flush_method=nosync"
+                    "--innodb_io_capacity=2000"
+                    "--innodb_io_capacity_max=3000"
+                    "--pid-file=/tmp/mysql.pid")
+              #:pid-file "/tmp/mysql.pid")))
+
+          (let ((mysql-pid (start-mysql))
+                (result
                  (#$gexp-to-run)))
+
+            (simple-format #t "Stopping MySQL\n")
+            ((make-kill-destructor) mysql-pid)
+            ;; TODO: Fix this
+            (sleep 10)
+
             result)))))
