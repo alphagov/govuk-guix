@@ -33,6 +33,7 @@
                    (cons* #$(file-append mysql "/bin")
                           #$(file-append pv "/bin")
                           #$(file-append gzip "/bin")
+                          (string-append #$xz "/bin")
                           ;; TODO: mysql_install_db uses mkdir and sed
                           #$(file-append coreutils "/bin")
                           #$(file-append sed "/bin")

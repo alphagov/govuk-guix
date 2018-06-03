@@ -1,12 +1,20 @@
 (define-module (gds data transformations build mysql)
-  #:export (ungzip-file-and-pipe-to-mysql))
+  #:use-module (srfi srfi-1)
+  #:export (decompress-file-and-pipe-to-mysql))
 
-(define* (ungzip-file-and-pipe-to-mysql file database)
+(define* (decompress-file-and-pipe-to-mysql file database)
+  (define decompressor
+    (assoc-ref '(("gz" . "gzip")
+                 ("xz" . "xz"))
+               (last (string-split file #\.))))
+
   (let ((command
          (string-join
           `("set -eo pipefail;"
             "pv" "--force" ,file "|"
-            "gzip" "-d" "|"
+            ,@(if decompressor
+                  `(,decompressor "-d" "|")
+                  '())
             "mysql" ,(string-append "--database=" database))
           " ")))
     (simple-format #t "ungzip-file-and-pipe-to-mysql running:\n  ~A\n"

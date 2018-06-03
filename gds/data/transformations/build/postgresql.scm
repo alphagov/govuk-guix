@@ -1,7 +1,8 @@
 (define-module (gds data transformations build postgresql)
+  #:use-module (srfi srfi-1)
   #:export (pg-restore
             pg-dump
-            ungzip-file-and-pipe-to-psql))
+            decompress-file-and-pipe-to-psql))
 
 (define* (pg-restore file)
   (let ((command
@@ -29,12 +30,19 @@
      (zero? (apply system* command))
      (error "pg_dump failed"))))
 
-(define* (ungzip-file-and-pipe-to-psql file database)
+(define* (decompress-file-and-pipe-to-psql file database)
+  (define decompressor
+    (assoc-ref '(("gz" . "gzip")
+                 ("xz" . "xz"))
+               (last (string-split file #\.))))
+
   (let ((command
          (string-join
           `("set -eo pipefail;"
             "pv" "--force" ,file "|"
-            "gzip" "-d" "|"
+            ,@(if decompressor
+                  `(,decompressor "-d" "|")
+                  '())
             "psql" "--no-psqlrc" "--quiet" ,database)
           " ")))
     (simple-format #t "ungzip-file-and-pipe-to-psql running:\n  ~A\n"

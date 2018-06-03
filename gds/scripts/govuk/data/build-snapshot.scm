@@ -37,7 +37,7 @@
                              (user #$user))
                          (invoke "createuser" user)
                          (invoke "createdb" database "-O" user)
-                         (ungzip-file-and-pipe-to-psql
+                         (decompress-file-and-pipe-to-psql
                           #$(data-extract-file data-extract)
                           database))))
                   database-connection-configs)))
@@ -73,7 +73,7 @@
                           "CREATE DATABASE " database ";"
                           "GRANT ALL ON " database ".* TO ''@'localhost';"))
 
-                        (ungzip-file-and-pipe-to-mysql
+                        (decompress-file-and-pipe-to-mysql
                          #$(data-extract-file data-extract)
                          database)))
                   database-connection-configs)))

@@ -55,6 +55,7 @@
                      "/bin")
                     (string-append #$pv "/bin")
                     (string-append #$gzip "/bin")
+                    (string-append #$xz "/bin")
                     (search-path-as-string->list (getenv "PATH")))
                    ":"))
           (setenv "PGUSER" "postgres")
