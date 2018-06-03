@@ -63,47 +63,59 @@
   (define (process-database-dir date database stat . children)
     (cond
      ((string=? database "postgresql")
-      (filter-map
-       (cut apply process-file date database <>)
-       children))
+      (create-extracts-from-files postgresql-extracts
+                                  date
+                                  database
+                                  children))
 
      ((string=? database "mysql")
       (append-map (match-lambda*
                     (((filename stat . children))
                      (if (string=? filename "mysql-master")
-                         (filter-map
-                          (cut apply process-file date database <>)
-                          children)
+                         (create-extracts-from-files mysql-extracts
+                                                     date
+                                                     database
+                                                     children)
                          '())))
                   children))
 
      (else
       '())))
 
-  (define (process-file date database filename stat . children)
-    (and=> (log (simple-format #f "services for ~A" filename)
-                (assoc-ref (assoc-ref `(("postgresql" . ,postgresql-extracts)
-                                        ("mysql" . ,mysql-extracts))
-                                      database)
-                           (string-drop-right
-                            filename
-                            (string-length ".dump.gz"))))
-           (lambda (services)
-             (data-extract
-              (file (local-file
-                     (string-join
-                      `(,backup-directory
-                        ,date
-                        ,database
-                        ,@(if (string=? "mysql" database)
-                              '("mysql-master")
-                              '())
-                        ,filename)
-                      "/")))
-              (datetime (string->date date "~Y-~m-~d"))
-              (database database)
-              (services services)
-              (data-source govuk-puppet-aws-data-source)))))
+  (define (create-extracts-from-files extracts date database files)
+    (define filenames
+      (map car files))
+
+    (define (filename-for-extract extract-prefix)
+      (find (lambda (filename)
+              (member filename filenames))
+            (list (string-append extract-prefix ".dump.xz")
+                  (string-append extract-prefix ".dump.gz"))))
+
+    (define (create-data-extract filename services)
+      (data-extract
+       (file (local-file
+              (string-join
+               `(,backup-directory
+                 ,date
+                 ,database
+                 ,@(if (string=? "mysql" database)
+                       '("mysql-master")
+                       '())
+                 ,filename)
+               "/")))
+       (datetime (string->date date "~Y-~m-~d"))
+       (database database)
+       (services services)
+       (data-source govuk-puppet-aws-data-source)))
+
+    (filter-map (match-lambda
+                  ((extract-prefix . services)
+                   (and=> (filename-for-extract extract-prefix)
+                          (lambda (filename)
+                            (create-data-extract filename
+                                                 services)))))
+                extracts))
 
   (let ((tree (file-system-tree backup-directory)))
     (append-map
