@@ -4,7 +4,8 @@
 (define* (ungzip-file-and-pipe-to-mysql file database)
   (let ((command
          (string-join
-          `("pv" "--force" ,file "|"
+          `("set -eo pipefail;"
+            "pv" "--force" ,file "|"
             "gzip" "-d" "|"
             "mysql" ,(string-append "--database=" database))
           " ")))

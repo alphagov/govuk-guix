@@ -32,7 +32,8 @@
 (define* (ungzip-file-and-pipe-to-psql file database)
   (let ((command
          (string-join
-          `("pv" "--force" ,file "|"
+          `("set -eo pipefail;"
+            "pv" "--force" ,file "|"
             "gzip" "-d" "|"
             "psql" "--no-psqlrc" "--quiet" ,database)
           " ")))
