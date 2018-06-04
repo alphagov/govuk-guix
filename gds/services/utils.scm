@@ -177,14 +177,13 @@
           (chown root-directory (passwd:uid user) (passwd:gid user))
           (bind-mount #$package root-directory)
 
-          (for-each
-           (lambda (file)
-             (if (file-exists? file)
-                 (mount "tmpfs" file "tmpfs")))
-           (map
-            (lambda (dir)
-              (string-append root-directory "/" dir))
-            '("log"))))
+          (let ((source #$(string-append "/var/log/apps/" name))
+                (target (string-append root-directory "/log")))
+            (if (file-exists? target)
+                (begin
+                  (mkdir-p source)
+                  (chown source (passwd:uid user) (passwd:gid user))
+                  (bind-mount source target)))))
 
         (define (tweak-existing-app-directory)
           (mkdir-p (string-append root-directory "/bin"))
