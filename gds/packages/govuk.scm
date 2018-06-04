@@ -470,11 +470,6 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0yk1kmv3g2bamyxalrvzmrkhgjyj8wrwjdcm97128dp1bzghp49s")))
      (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser))))
      (synopsis "")
      (description "")
      (license #f)
