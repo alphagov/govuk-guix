@@ -49,6 +49,8 @@
          operation)
 
       (invoke #$(file-append tar "/bin/tar")
+              "--checkpoint=1000"
+              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
               (string-append "--use-compress-program="
                              #$(file-append pigz "/bin/pigz"))
               "--create"
@@ -85,6 +87,8 @@
          operation)
 
       (invoke #$(file-append tar "/bin/tar")
+              "--checkpoint=1000"
+              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
               (string-append "--use-compress-program="
                              #$(file-append pigz "/bin/pigz"))
               "--create"
