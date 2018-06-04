@@ -1274,6 +1274,9 @@ content, as well as broadcasting changes to a message queue.")
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser))))
+     (inputs
+      `(;; hostname is needed by the redis-lock gem
+        ("inetutils" ,inetutils)))
      (synopsis "")
      (description "")
      (license #f)
