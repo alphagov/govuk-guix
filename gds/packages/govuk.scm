@@ -419,15 +419,15 @@ proxies requests to some upstream")
 (define-public email-alert-service
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01d3rzgs87996j3xa9q0q107pmfq90r6idyhasfx8wycgrrb1fmr")))
+    (hash (base32 "08h1yld1fh3yxkmqjs6x8ipycvsgs8p6prz40mibh669zc6xqman")))
    (package
      (name "email-alert-service")
-     (version "release_155")
+     (version "release_156")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0g9jny5sc2lwwpvrwjgx2qm6m2zh6fqy1jjqma2iv810dq3kzwv1")))
+       #:hash (base32 "04qjbliy8kam3ia8ls1xkv8d2xz5nqhdmm9hlx1fgn87rzv10rfl")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)))
