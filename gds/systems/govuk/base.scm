@@ -72,16 +72,18 @@
                                        "/bin/sh"))
               ("/bin/bash" ,(file-append (canonical-package bash)
                                          "/bin/bash"))))
-   (service govuk-tailon-service-type
-            (tailon-configuration
-             (config-file
-              (tailon-configuration-file
-               (bind "localhost:54001")
-               (files '("/var/log/shepherd.log"
-                        ("NGinx Logs" "/var/log/nginx/*.access.log")))))))
    pretend-loopback-service
    (service govuk-nginx-service-type)
    (service govuk-skeletons-service-type)))
+
+(define tailon-service
+  (service govuk-tailon-service-type
+           (tailon-configuration
+            (config-file
+             (tailon-configuration-file
+              (bind "localhost:54001")
+              (files '("/var/log/shepherd.log"
+                       ("NGinx Logs" "/var/log/nginx/*.access.log"))))))))
 
 (define optional-services
   (append
@@ -94,6 +96,7 @@
     (service elasticsearch-service-type)
     (service mysql-service-type (mysql-configuration))
     (service rabbitmq-service-type)
+    tailon-service
     govuk-content-schemas-service)))
 
 (define setup-services

@@ -622,18 +622,18 @@ the Signon Dev user passphrase in\n")
                           parameters)))
     ;; TODO Ideally this would not be in this module, as it's not
     ;; directly related to Signon
-    (service-extension govuk-tailon-service-type
-                       (lambda (parameters)
-                         (let ((log-files
-                                (apply
-                                 generic-rails-app-log-files
-                                 name
-                                 parameters)))
-                           (if (eq? (length log-files) 1)
-                               log-files
-                               (list
-                                (cons (symbol->string name)
-                                      log-files))))))
+    ;; (service-extension govuk-tailon-service-type
+    ;;                    (lambda (parameters)
+    ;;                      (let ((log-files
+    ;;                             (apply
+    ;;                              generic-rails-app-log-files
+    ;;                              name
+    ;;                              parameters)))
+    ;;                        (if (eq? (length log-files) 1)
+    ;;                            log-files
+    ;;                            (list
+    ;;                             (cons (symbol->string name)
+    ;;                                   log-files))))))
     service-extensions)
    (lambda (parameters)
      (update-service-startup-config-for-signon-application
