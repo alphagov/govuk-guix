@@ -76,6 +76,11 @@
                   (alist-cons 'after
                               (parse-date arg)
                               result)))
+        (option '("exclude-service") #t #f
+                (lambda (opt name arg result)
+                  (alist-cons 'exclude-service
+                              arg
+                              result)))
         (option '("dry-run") #f #f
                 (lambda (opt name arg result)
                   (alist-cons 'dry-run? #t result)))))
@@ -86,19 +91,29 @@
                        (('argument . a) a)
                        (_ #f))
                       opts))
+         (service-names-to-exclude
+          (map string->symbol
+               (filter-map (match-lambda
+                             (('exclude-service . a) a)
+                             (_ #f))
+                           opts)))
          (databases
           (filter-map (match-lambda
                        (('database . d) d)
                        (_ #f))
                       opts))
-         (services (get-services service-names))
+         (services (if (null? service-names)
+                       govuk-services
+                       (get-services service-names)))
          (service-types (map service-kind services))
          (data-extracts
           (filter-extracts
            (all-extracts)
-           #:service-types (if (null? service-types)
-                               #f
-                               service-types)
+           #:service-types (filter
+                            (lambda (service-type)
+                              (not (member (service-type-name service-type)
+                                           service-names-to-exclude)))
+                            service-types)
            #:databases (if (null? databases) #f databases)
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))
@@ -106,23 +121,17 @@
           #:dry-run? (assq-ref opts 'dry-run?))))
 
 (define (get-services service-names)
-  (let ((all-services
-         ;; TODO: Maybe this wants to be the services from a
-         ;; particular system instead?
-         (operating-system-user-services govuk-development-os)))
-    (if (null? service-names)
-        all-services
-        (map
-         (lambda (service-name)
-           (or
-            (find (lambda (service)
-                    (eq?
-                     (string->symbol service-name)
-                     (service-type-name (service-kind service))))
-                  all-services)
-            (leave (G_ "Could not find service with name ~A")
-                   service-name)))
-         service-names))))
+  (map
+   (lambda (service-name)
+     (or
+      (find (lambda (service)
+              (eq?
+               (string->symbol service-name)
+               (service-type-name (service-kind service))))
+            govuk-services)
+      (leave (G_ "Could not find service with name ~A")
+             service-name)))
+   service-names))
 
 (define (govuk-data . args)
   (define commands
