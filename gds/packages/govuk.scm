@@ -1267,11 +1267,15 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0685bx3rpl8ak66fhl3psqkczrr1lp9qqrmihrgbnh5sba48iv2s")))
      (build-system rails-build-system)
-     ;; Asset precompilation fails due to trying to connect to MongoDB
      (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
+          (add-before 'precompile-rails-assets 'set-production-rails-environment
+            (lambda _
+              ;; Short URL Manager attempts to create a 'Test User' when
+              ;; running in development, which causes asset
+              ;; precompilation to break
+              (setenv "RAILS_ENV" "test")))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser))))
      (inputs
