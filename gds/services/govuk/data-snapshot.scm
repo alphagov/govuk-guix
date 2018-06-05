@@ -39,7 +39,9 @@
                       (if (file-exists? archive-name)
                           (rm "-rf" archive-name))
 
-                      (tar "--extract"
+                      (tar (string-append "--use-compress-program="
+                                          #$(file-append pigz "/bin/pigz"))
+                           "--extract"
                            "--file" (string-append snapshot-var-lib
                                                    "/" archive-name)))
                     (scandir snapshot-var-lib
