@@ -41,6 +41,8 @@
 
                       (tar (string-append "--use-compress-program="
                                           #$(file-append pigz "/bin/pigz"))
+                           "--checkpoint=1000"
+                           "--checkpoint-action=echo='%ds: %{read,wrote}T'"
                            "--extract"
                            "--file" (string-append snapshot-var-lib
                                                    "/" archive-name)))
