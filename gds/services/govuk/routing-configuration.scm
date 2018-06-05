@@ -90,6 +90,7 @@
   (make-custom-plek-config
    (service-to-port-mapping services use-high-ports?)
    #:app-domain app-domain
+   #:app-domain-external app-domain
    #:web-domain web-domain
    #:use-https? use-https?
    #:port (if use-high-ports?
