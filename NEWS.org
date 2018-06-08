@@ -2,11 +2,80 @@
 #+STARTUP: content hidestars
 
 * 2018
+** June
+*** Provide feedback when loading and building data snapshots
+*** Fix the short-url-manager and feedback packages
+*** Add the --exclude-service option to govuk-data
+*** Store app logs in /var/log/apps
+*** Disable Tailon
+
+It wasn't being used, and posed a security problem when deploying
+govuk-guix systems.
+
+*** Compress the data in data snapshots
+*** govuk-puppet-aws data source improvements
+
+Including adding support for xz compression
+
+** May
+*** Add support for protecting the origin with basic authentication
+*** Make the error pages configurable through govuk-system
+*** Add the available-services subcommand to govuk-system
+*** Support loading local extracts directly through govuk-data
+*** Add a govuk-puppet-aws data source
+*** Add a new (gds data transformations) module
+*** Add a build-snapshot command to govuk-data
+*** Support specifying custom revisions through govuk-system
+*** Add data-snapshot support to govuk-system
+*** Support passing service names to --share for govuk-system
+*** Services
+**** Enable memcached for more services
+**** Add RabbitMQ
+**** Refactor defining the service types
+**** Fix the link-checker-api database connection
+**** Fix the support-api database connection config
+**** Change the Publishing API database user
+*** Packages
+**** Don't remove the spec directory from static, as it uses it at runtime
+**** Don't exclude the spec directory in Contacts Admin, as it's used at runtime
+**** Add a package for the new Organisations Publisher
+*** Update Guix release_21 -> release_22 -> release_23
+** April
+*** Support Virtual Machines through govuk-system
+*** Make the http ports used more flexible
+
+Add the option to use the standard port 80 and 443.
+
+*** Support specifying the hostname through govuk-system
+*** Add support for customising the label used by the govuk_admin_template
+*** Add a wrapper for govuk-cli
+*** Support having bundle packages loaded as tar archives through govuk-system
+*** Packages
+**** Add a package for the Content Audit Tool
+**** Add a package for the Link Checker API
+**** Slim down the packages, by not installing tests by default
+*** Services
+**** Add content-store as a requirement of Whitehall
+**** Change Contacts Admin to use the contacts database by default
+**** Enable Sidekiq for several services
+
+ - Collections Publisher
+ - Imminence
+ - Manuals Publisher
+ - Support API
+
+**** Add a service for the Content Audit Tool
+**** Add a service for the Link Checker API
+**** Support setting the instance name for Signon
+**** Improve the Whitehall and Asset Manager configuration
+*** Update Guix release_19 -> release_20 -> release_21
 ** March
 *** Improve the Signon users support in govuk-system
 *** Support reading bundle install inputs as tar archives
 This massively improves startup time for Rails services.
 *** Support Virtual Machines through govuk-system
+*** Packages
+**** Fix the license-finder and frontend package builds
 *** Update Guix release_17 -> release_18 -> release_19
 ** February
 *** Customise the Rails precompiled assets
