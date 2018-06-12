@@ -41,7 +41,7 @@
            (origin
              (method git-fetch)
              (uri (git-reference
-                   (url "http://git.cbaines.net/gds/gnu-guix")
+                   (url "https://git.cbaines.net/gds/gnu-guix")
                    (commit version)))
              (sha256
               (base32 "0sdki14msknqnrd6biw0vrhqkd69mn9hwbb6lirpv4f3gwyf7i7h"))
