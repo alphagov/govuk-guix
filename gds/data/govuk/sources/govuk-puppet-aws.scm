@@ -83,26 +83,26 @@
   (define (process-database-dir date database stat . children)
     (cond
      ((string=? database "postgresql")
-      (create-extracts-from-files postgresql-extracts
-                                  date
-                                  database
-                                  children))
+      (create-extracts-from-sql-dump-files postgresql-extracts
+                                           date
+                                           database
+                                           children))
 
      ((string=? database "mysql")
       (append-map (match-lambda*
                     (((filename stat . children))
                      (if (string=? filename "mysql-master")
-                         (create-extracts-from-files mysql-extracts
-                                                     date
-                                                     database
-                                                     children)
+                         (create-extracts-from-sql-dump-files mysql-extracts
+                                                              date
+                                                              database
+                                                              children)
                          '())))
                   children))
 
      (else
       '())))
 
-  (define (create-extracts-from-files extracts date database files)
+  (define (create-extracts-from-sql-dump-files extracts date database files)
     (define filenames
       (map car files))
 
