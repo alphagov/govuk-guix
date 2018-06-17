@@ -740,6 +740,11 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "0l5gbhlpfqmignx8qa3i4a1h042syn4hw2fx50xd616hxazhabvj")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+                       (add-after 'install 'replace-mongoid.yml
+                                  ,(replace-mongoid.yml)))))
      (synopsis "")
      (description "")
      (license #f)
