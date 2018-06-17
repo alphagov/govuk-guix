@@ -51,24 +51,24 @@
     ("whitehall_production" . (,whitehall-service-type))))
 
 (define mongodb-extracts
-  `(("mongo"
-     ("content_store_production" . (,content-store-service-type))
-     ("draft_content_store_production" . (,draft-content-store-service-type)))
-     ("govuk_assets_production" . (,asset-manager-service-type))
-     ("govuk_content_production" . (,publisher-service-type
-                                    ,manuals-publisher
-                                    ,specialist-publisher-service-type))
-     ("imminence_production" . (,imminence-service-type))
-     ("licence_finder_production" . (,licence-finder-service-type))
-     ("maslow_production" . (,maslow-service-type))
-     ("short_url_manager_production" . (,short-url-manager-service-type))
-     ("travel_advice_publisher_production" .
-      (,travel-advice-publisher-service-type))
-    ("router_backend"
-     ("authenticating_proxy_production" . (,authenticating-proxy-service-type))
-     ("draft_router" . (,draft-router-service-type
-                        ,draft-router-api-service-type))
-     ("router" . (,router-service-type ,router-api-service-type)))))
+  `(("mongo" .
+     (("content_store_production" . (,content-store-service-type))
+      ("draft_content_store_production" . (,draft-content-store-service-type))
+      ("govuk_assets_production" . (,asset-manager-service-type))
+      ("govuk_content_production" . (,publisher-service-type
+                                     ,manuals-publisher-service-type
+                                     ,specialist-publisher-service-type))
+      ("imminence_production" . (,imminence-service-type))
+      ("licence_finder_production" . (,licence-finder-service-type))
+      ("maslow_production" . (,maslow-service-type))
+      ("short_url_manager_production" . (,short-url-manager-service-type))
+      ("travel_advice_publisher_production" .
+       (,travel-advice-publisher-service-type))))
+     ("router_backend" .
+      (("authenticating_proxy_production" . (,authenticating-proxy-service-type))
+       ("draft_router" . (,draft-router-service-type
+                          ,draft-router-api-service-type))
+       ("router" . (,router-service-type ,router-api-service-type))))))
 
 (define (find-data-extracts backup-directory)
   (define (log message value)
