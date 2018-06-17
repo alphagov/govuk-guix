@@ -99,8 +99,54 @@
                          '())))
                   children))
 
+     ((string=? database "mongo")
+      (append-map (match-lambda*
+                    (((filename stat . children))
+                     (or (and=> (assoc-ref mongodb-extracts
+                                       filename)
+                                (lambda (extracts)
+                                  (create-extracts-from-mongodb-dump-files extracts
+                                                                           date
+                                                                           filename
+                                                                           children)))
+                         '())))
+                  children))
+
      (else
       '())))
+
+  (define (create-extracts-from-mongodb-dump-files extracts date subdirectory files)
+    (define filenames (map car files))
+
+    (define (filename-for-extract extract-prefix)
+      (find (lambda (filename)
+              (member filename filenames))
+            (map (lambda (suffix)
+                   (string-append extract-prefix suffix))
+                 '(".tar.xz" "tar.gz"))))
+
+    (define (create-data-extract filename services)
+      (data-extract
+       (file (local-file
+              (string-join
+               `(,backup-directory
+                 ,date
+                 "mongo"
+                 ,subdirectory
+                 ,filename)
+               "/")))
+       (datetime (string->date date "~Y-~m-~d"))
+       (database "mongo")
+       (services services)
+       (data-source govuk-puppet-aws-data-source)))
+
+    (filter-map (match-lambda
+                  ((extract-prefix . services)
+                   (and=> (filename-for-extract extract-prefix)
+                          (lambda (filename)
+                            (create-data-extract filename
+                                                 services)))))
+                extracts))
 
   (define (create-extracts-from-sql-dump-files extracts date database files)
     (define filenames
