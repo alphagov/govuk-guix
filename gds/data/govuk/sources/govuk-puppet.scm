@@ -101,7 +101,11 @@
 
         (if (file-exists? directory)
             directory
-            (error "The backups directory does not exist" directory)))))
+            (error
+             (string-append
+              "The backups directory does not exist" directory
+              "\nTo use a different directory, set the "
+              "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY environment variable"))))))
 
 (define-record-type <govuk-puppet-source-file>
   (govuk-puppet-source-file date database hostname file)
