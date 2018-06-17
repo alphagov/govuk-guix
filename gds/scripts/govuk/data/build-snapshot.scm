@@ -16,11 +16,13 @@
   #:use-module (gds services govuk)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
+  #:use-module (gds services utils databases mongodb)
   #:use-module (gds data govuk)
   #:use-module (gds data data-extract)
   #:use-module (gds data transformations)
   #:use-module (gds data transformations postgresql)
   #:use-module (gds data transformations mysql)
+  #:use-module (gds data transformations mongodb)
   #:export (build-snapshot))
 
 (define (postgresql-load-extracts extracts-and-database-connection-configs)
@@ -95,6 +97,42 @@
               "--file" #$output
               "mysql")))
 
+(define (mongodb-load-extracts extracts-and-database-connection-configs)
+  (define operation
+    #~(lambda _
+        #$@(map
+            (match-lambda
+              ((data-extract . database-connection-configs)
+               #~(let ((dump-directory "dump"))
+                   (mkdir-p dump-directory)
+                   (chdir dump-directory)
+                   (invoke #$(file-append tar "/bin/tar")
+                           "--extract"
+                           "--xz"
+                           "--strip-components=1"
+                           "--file" #$(data-extract-file data-extract))
+                   (chdir "..")
+                   (invoke "mongorestore"
+                           "-d" #$(mongodb-connection-config-database
+                                   (car database-connection-configs))
+                           dump-directory)
+                   (delete-file-recursively dump-directory))))
+            extracts-and-database-connection-configs)))
+
+  #~(begin
+      #$(with-mongodb
+         (service mongodb-service-type)
+         operation)
+
+      (invoke #$(file-append tar "/bin/tar")
+              "--checkpoint=1000"
+              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+              (string-append "--use-compress-program="
+                             #$(file-append pigz "/bin/pigz"))
+              "--create"
+              "--file" #$output
+              "mongodb")))
+
 (define* (snapshot-data-transformations all-data-extracts
                                         #:key dry-run?)
   (define (display-data-extracts database data-extracts)
@@ -120,7 +158,8 @@
    (match-lambda
      ((database . data-extracts)
       (and=> (assoc-ref `(("postgresql" . ,postgresql-load-extracts)
-                          ("mysql" . ,mysql-load-extracts))
+                          ("mysql" . ,mysql-load-extracts)
+                          ("mongo" . ,mongodb-load-extracts))
                         database)
              (lambda (load-extracts)
                (let ((extracts-and-database-connection-configs
@@ -160,7 +199,10 @@
                            (($ <mysql-connection-config>
                                host user port database)
                             `((user . ,user)
-                              (database . ,database))))
+                              (database . ,database)))
+                           (($ <mongodb-connection-config>
+                               port database)
+                            `((database . ,database))))
                          database-connection-configs)))))
 
            extracts-and-database-connection-configs)))
@@ -169,7 +211,7 @@
     (filter-map (match-lambda
                   ((database . data-extracts)
                    (if (member database
-                               '("postgresql" "mysql"))
+                               '("postgresql" "mysql" "mongo"))
                        (cons database
                              (data-extracts-for-database-sexp data-extracts))
                        #f)))
@@ -214,7 +256,8 @@
   (define (build-snapshot-union)
     (with-store store
       (set-build-options store
-                         #:max-build-jobs 1)
+                         #:max-build-jobs 1
+                         #:keep-failed? #t)
 
       (run-with-store store
         (mlet %store-monad
