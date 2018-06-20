@@ -1044,6 +1044,15 @@
                           imminence
                           static
                           whitehall)))
+         (signon-api-user
+          (name "Smart Answers")
+          (email "smart-answers@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
           (plek-config) (rails-app-config) smart-answers
           (service-startup-config))))
 
