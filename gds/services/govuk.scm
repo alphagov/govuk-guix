@@ -1476,13 +1476,9 @@
                          content-store
                          ;; For publishing special routes
                          publishing-api)))
-         (service-startup-config-add-pre-startup-scripts
-          (service-startup-config
-           (environment-variables
-            '(("GOVUK_APP_NAME" . "frontend"))))
-          `((publish-special-routes
-             . ,#~(lambda ()
-                    (run-command "rake" "publishing_api:publish_special_routes")))))
+         (service-startup-config
+          (environment-variables
+           '(("GOVUK_APP_NAME" . "frontend"))))
          (signon-api-user
           (name "Frontend")
           (email "frontend@guix-dev.gov.uk")
