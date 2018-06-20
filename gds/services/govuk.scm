@@ -881,8 +881,8 @@
           (service-startup-config)
           (mysql-connection-config
            (user "release")
-           (database "release_production")
-           (password "")))))
+           (password "release")
+           (database "release_production")))))
 
 ;;;
 ;;; Search Admin
