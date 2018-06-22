@@ -479,15 +479,15 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1xsp1djvkgv4qi3b72kb7s6ivzm0rv4vckrm5my0ngr5p16836xm")))
+    (hash (base32 "06p63q28pk17gb4n6iqgiy0ynzibdxllr5f8qllyqw5ymk421863")))
    (package
      (name "finder-frontend")
-     (version "release_485")
+     (version "release_486")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "11na8zwgpwrl7wdqc7zk4ja2j929sbmzlyv47yvqchf52qws5y1m")))
+       #:hash (base32 "1v8hznzlznw86vysbr9n5qjindkkbm4bf5f9b9m4fjravpzvwnyv")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
