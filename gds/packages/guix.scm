@@ -9,6 +9,7 @@
   #:use-module (guix utils)
   #:use-module (guix build utils)
   #:use-module (guix git-download)
+  #:use-module (gnu packages guile)
   #:use-module ((gnu packages package-management) #:prefix gnu:))
 
 (define-public guix
@@ -33,6 +34,12 @@
             ;; development.
             '(#:tests? #f))
            (package-arguments gnu:guix)))
+      (propagated-inputs
+       `(,@(package-propagated-inputs gnu:guix)
+         ,@(if (member "guile-sqlite3"
+                       (map car (package-propagated-inputs gnu:guix)))
+               '()
+               `(("guile-sqlite3" ,guile-sqlite3)))))
       (source
        (if local-source
            (local-file (getenv "GDS_GNU_GUIX_PATH") "guix-gds"
