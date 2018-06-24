@@ -3,8 +3,7 @@
 set -e
 
 if [ ! -n "$BASH" ] ; then
-    echo Please run $0 with bash;
-    exit 1;
+    exec bash "$0" $@
 fi
 
 export GOVUK_GUIX_ROOT="$(readlink -f $(dirname ${BASH_SOURCE[0]}))"
