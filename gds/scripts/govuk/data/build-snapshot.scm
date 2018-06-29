@@ -112,6 +112,32 @@
                            "--strip-components=1"
                            "--file" #$(data-extract-file data-extract))
                    (chdir "..")
+                   (simple-format #t "\nload-extracts: data extracted...\n\n")
+                   (simple-format #t "checking metadata files in ~A\n"
+                                  dump-directory)
+                   (force-output)
+
+                   ;; Work around some broken collections by
+                   ;; deleting them, this is necessary for Travel
+                   ;; Advice Publisher
+                   (for-each (lambda (file)
+                               (simple-format #t "deleting ~A\n" file)
+                               (delete-file file))
+                             (find-files dump-directory
+                                         "^\\{"))
+
+                   ;; Work around an issue with the
+                   ;; extracts. mongorestore seems to fail when trying
+                   ;; to use the options thing, so remove it.
+                   (for-each (lambda (file)
+                               (simple-format #t "removing options from ~A\n" file)
+                               (substitute* file
+                                 (("\\\"options\\\" [^}]*\\},")
+                                  "")))
+                             (find-files dump-directory
+                                         ".*\\.metadata\\.json$"))
+                   (simple-format #t "\n\nload-extracts: starting mongorestore\n\n")
+                   (force-output)
                    (invoke "mongorestore"
                            "-d" #$(mongodb-connection-config-database
                                    (car database-connection-configs))
@@ -119,19 +145,22 @@
                    (delete-file-recursively dump-directory))))
             extracts-and-database-connection-configs)))
 
-  #~(begin
-      #$(with-mongodb
-         (service mongodb-service-type)
-         operation)
+  (with-imported-modules '((guix build utils))
+    #~(begin
+        (use-modules (guix build utils))
 
-      (invoke #$(file-append tar "/bin/tar")
-              "--checkpoint=1000"
-              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
-              (string-append "--use-compress-program="
-                             #$(file-append pigz "/bin/pigz"))
-              "--create"
-              "--file" #$output
-              "mongodb")))
+        #$(with-mongodb
+           (service mongodb-service-type)
+           operation)
+
+        (invoke #$(file-append tar "/bin/tar")
+                "--checkpoint=1000"
+                "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+                (string-append "--use-compress-program="
+                               #$(file-append pigz "/bin/pigz"))
+                "--create"
+                "--file" #$output
+                "mongodb"))))
 
 (define* (snapshot-data-transformations all-data-extracts
                                         #:key dry-run?)
