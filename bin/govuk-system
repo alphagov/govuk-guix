@@ -512,8 +512,8 @@
                  (lambda (opt name arg result . rest)
                    (apply values
                           (alist-cons 'use-error-pages?
-                                      (eq? (eq? arg #f) ; No value provided
-                                           (string=? arg "true"))
+                                      (or (eq? arg #f) ; No value provided
+                                          (string=? arg "true"))
                                       (alist-delete 'use-error-pages? result))
                           rest)))
          (option '("read-bundle-install-input-as-tar-archive") #f #t
