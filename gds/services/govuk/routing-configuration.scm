@@ -269,7 +269,7 @@
                     (postgresql-configuration
                      (config-file #f)
                      (data-directory #f))))
-    (mongodb . 27107)
+    (mongodb . 27017)
     (redis . ,((@@ (gnu services databases) redis-configuration-port)
                (redis-configuration)))
     (elasticsearch . ,(elasticsearch-configuration-port
