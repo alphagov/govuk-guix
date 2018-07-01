@@ -818,7 +818,7 @@
            (file "config/sidekiq.yml"))
           (redis-connection-config)
           (mongodb-connection-config
-           (database "manuals_publisher")))))
+           (database "govuk_content_production")))))
 
 ;;;
 ;;; Policy Publisher
@@ -1407,7 +1407,7 @@
              '("signin")))))
          (service-startup-config)
          (mongodb-connection-config
-          (database "specialist_publisher"))
+          (database "govuk_content_production"))
          (redis-connection-config))))
 
 ;;;
