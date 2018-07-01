@@ -1339,8 +1339,12 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-store))
-           (requirement '(router-api mongodb)))
+           (requirement '(router-api nginx mongodb)))
+         (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
+          `((register-backends
+             . ,#~(lambda ()
+                    (run-command "rake" "register_backends")))))
           (plek-config)
           (rails-app-config
            (assets? #f))
@@ -1361,8 +1365,12 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(draft-content-store))
-          (requirement '(draft-router-api mongodb)))
-         (service-startup-config)
+          (requirement '(draft-router-api nginx mongodb)))
+         (service-startup-config-add-pre-startup-scripts
+          (service-startup-config)
+          `((register-backends
+             . ,#~(lambda ()
+                    (run-command "rake" "register_backends")))))
          (plek-config)
          (rails-app-config
           (assets? #f))
