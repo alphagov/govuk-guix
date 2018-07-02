@@ -1237,12 +1237,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0siwxqcp1k4by6hwzdi155knvf4c67bnc6d569ff57q2klghd26q")))
    (package
      (name "service-manual-publisher")
-     (version "release_382")
+     (version "release_383")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1rl700s48jc33lqdxg3gyfg4vp07hf8f1r9dm1xzqxdpl70ln7rf")))
+       #:hash (base32 "0asqnzicf4zn551zanx7vsdjxhvj4q0486v173vhh53k5731bs52")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
