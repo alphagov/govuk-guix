@@ -975,15 +975,15 @@ service setup.")
 (define-public publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0agj5skkqbj2qwy5jsxh1hvyjwpgh30j73vv8a350pzd9ah48qqx")))
+    (hash (base32 "0wgpbn28sa6q5rgk4ir5xkryyahpv4k900yzn6y50cly2c7gab18")))
    (package
      (name "publisher")
-     (version "release_1992")
+     (version "release_1994")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1bzcpv0kwysmbbwafdbab57vga2xpn50xw13v629037rvq2z6v4r")))
+       #:hash (base32 "1p3dv06bb8xad35xc81nmcmyq4wnfiqqvybfflahfslqrjdm62z9")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
