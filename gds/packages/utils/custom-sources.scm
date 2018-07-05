@@ -80,15 +80,16 @@
         (regexp-exec github-url-regex old-url)))
     (if (not (regexp-match? regexp-match))
         (error "No match"))
-    (with-store store
-      (download-to-store
-       store
-       (string-replace
-        old-url
-        commit-ish
-        (match:start regexp-match 1)
-        (match:end regexp-match 1))
-       #:recursive? #t))))
+    (or (with-store store
+          (download-to-store
+           store
+           (string-replace
+            old-url
+            commit-ish
+            (match:start regexp-match 1)
+            (match:end regexp-match 1))
+           #:recursive? #t))
+        (error "download failed"))))
 
 (define (log-service-package-path-list service-path-list)
   (for-each
