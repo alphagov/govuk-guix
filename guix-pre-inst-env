@@ -44,7 +44,7 @@ for var in $(env -0 | tr -d '\n' | tr '\0' '\n' | cut -d '=' -f 1); do
        continue
     fi
 
-    if [[ $var == GOVUK_GUIX* ]]
+    if [[ $var == GOVUK_* ]]
     then
        continue
     fi
