@@ -115,16 +115,20 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
   (match database-connection
     (($ <postgresql-connection-config> host user port database)
      #~(lambda _
+         (use-modules (srfi srfi-1))
          (let*
              ((psql (string-append #$postgresql "/bin/psql"))
-              (gzip (string-append #$gzip "/bin/gzip"))
+              (decompressor
+               (assoc-ref '(("gz" . #$(file-append gzip "/bin/gzip"))
+                            ("xz" . #$(file-append xz "/bin/xz")))
+                          (last (string-split #$file #\.))))
               (pv (string-append #$pv "/bin/pv"))
               (command
                (string-join
                 `(,pv
                   ,#$file
                   "|"
-                  ,gzip
+                  ,decompressor
                   "-d"
                   "|"
                   ,psql
