@@ -43,6 +43,7 @@
  (gnu system)
  (gds utils)
  (gds services govuk)
+ (gds services govuk routing-configuration)
  (gds services utils databases)
  (gds services utils databases mysql)
  (gds services utils databases mongodb)
@@ -121,6 +122,14 @@
           #:dry-run? (assq-ref opts 'dry-run?))))
 
 (define (get-services service-names)
+  (define all-services
+    (set-routing-configuration-for-services
+     govuk-services
+     ;; Currently when using this, high ports are being used for the
+     ;; databases, so use the same configuration here as well to make
+     ;; the port numbers match
+     #:use-high-ports? #t))
+
   (map
    (lambda (service-name)
      (or
@@ -128,7 +137,7 @@
               (eq?
                (string->symbol service-name)
                (service-type-name (service-kind service))))
-            govuk-services)
+            all-services)
       (leave (G_ "Could not find service with name ~A")
              service-name)))
    service-names))
