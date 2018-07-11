@@ -1611,6 +1611,9 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-before 'precompile-rails-assets 'shared-mustache-compile
+            (lambda _
+              (invoke "bundle" "exec" "rake" "shared_mustache:compile")))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
