@@ -221,7 +221,10 @@
           (extra-inputs '()))
   (package
     (name (string-append (package-name pkg) "-bundle-install"))
-    (version (package-version pkg))
+    (version (string-take
+              (bytevector->nix-base32-string
+               (bundle-package-hash bundle-pkg))
+              10))
     (source (bundle-package
              (inherit bundle-pkg)
              (location (bundle-package-location bundle-pkg))
