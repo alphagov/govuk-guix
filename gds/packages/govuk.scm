@@ -322,6 +322,26 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/content-performance-manager"))
    #:extra-inputs (list postgresql libffi)))
 
+(define-public content-publisher
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "1x7q2q1gkvv77igh9w9yqny9cxi4js3bvb77wy9xqrlb4y18j15m")))
+   (package
+     (name "content-publisher")
+     (version "release_8")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "08y901dg50cmxqkbfwsjbbi4xvizqx20452wvqj3da0pr69saycc")))
+     (build-system rails-build-system)
+     (synopsis "")
+     (description "")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/content-publisher"))
+   #:extra-inputs (list libffi
+                        postgresql)))
+
 (define-public content-store
   (package-with-bundler
    (bundle-package
