@@ -418,6 +418,44 @@
            (database "content_audit_tool_production")))))
 
 ;;;
+;;; Content Publisher
+;;;
+
+(define-public content-publisher-service-type
+  (service-type (name 'content-publisher)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
+
+(define-public content-publisher-service
+  (service
+   content-publisher-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(content-publisher))
+          (requirement '(publishing-api whitehall signon)))
+         (plek-config)
+         (rails-app-config)
+         content-publisher
+         (signon-application
+          (name "Content Publisher")
+          (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Content Publisher")
+          (email "content-publisher@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
+         (service-startup-config)
+         (postgresql-connection-config
+          (user "content_publisher")
+          (database "content_publisher_production")))))
+
+;;;
 ;;; Email Alert API
 ;;;
 
@@ -1913,6 +1951,7 @@
    "Applications which publish to GOV.UK"
    (list collections-publisher-service
          contacts-admin-service
+         content-publisher-service
          content-tagger-service
          local-links-manager-service
          manuals-publisher-service
