@@ -335,6 +335,11 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "1xsagagljjzy6swg3sn74ajdj443ridl397jnnhcs3n77ddbfvdp")))
      (build-system rails-build-system)
+     (arguments
+      `(#:phases
+        (modify-phases %standard-phases
+         (add-after 'install 'replace-database.yml
+          ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license license:expat)

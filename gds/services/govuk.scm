@@ -434,7 +434,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(content-publisher))
-          (requirement '(publishing-api whitehall signon)))
+          (requirement '(publishing-api signon)))
          (plek-config)
          (rails-app-config)
          content-publisher
