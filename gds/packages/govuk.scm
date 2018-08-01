@@ -338,6 +338,12 @@ proxies requests to some upstream")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+         (add-before 'precompile-rails-assets 'set-fake-SECRET_KEY_BASE
+          (lambda _
+            ;; TODO: Active Storage seems to require the
+            ;; SECRET_KEY_BASE Not sure why, so set a fake one to make
+            ;; asset precompilation work
+            (setenv "SECRET_KEY_BASE" "fake")))
          (add-after 'install 'replace-database.yml
           ,(use-blank-database.yml)))))
      (synopsis "")
