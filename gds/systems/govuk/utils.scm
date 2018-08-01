@@ -46,7 +46,9 @@
                 (simple-format #f "export ~A=~A\n" name value)))
              `(("PGPORT" . ,(postgresql-connection-config-port
                              postgresql-connection-config))
-               ("PGUSER" . "postgres"))))))))
+               ("PGUSER" . "postgres")
+               ("PAGER" . "less")
+               ("LC_ALL" . "en_GB.UTF-8"))))))))
 
 (define govuk-skeletons-service-type
   (service-type
