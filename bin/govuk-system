@@ -78,6 +78,7 @@
   `((graft? . #t)
     (substitutes? . #t)
     (build-hook? . #t)
+    (fallback? . #t)
     (print-build-trace? . #t)
     (verbosity . 0)))
 
