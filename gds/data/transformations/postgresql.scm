@@ -7,6 +7,7 @@
   #:use-module (guix records)
   #:use-module (guix monads)
   #:use-module (gnu packages admin)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages pv)
   #:use-module (gnu services)
@@ -55,9 +56,12 @@
                      "/bin")
                     (string-append #$pv "/bin")
                     (string-append #$gzip "/bin")
+                    (string-append #$glibc "/bin")
                     (string-append #$xz "/bin")
                     (search-path-as-string->list (getenv "PATH")))
                    ":"))
+          (setenv "GUIX_LOCPATH" #$(file-append glibc-locales "/lib/locale"))
+          (setenv "LC_ALL" "en_GB.UTF-8")
           (setenv "PGUSER" "postgres")
 
           (define data-directory
@@ -68,6 +72,7 @@
             (mkdir-p data-directory)
             (chmod data-directory #o700)
             (invoke "initdb"
+                    "--locale=en_GB.UTF-8"
                     "-U" "postgres"
                     "-D"
                     data-directory))
