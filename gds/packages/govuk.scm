@@ -826,12 +826,12 @@ service setup.")
     (hash (base32 "1gkfzk00z8y8yb2h039znc787r9lsqffiygp4wf760h4jpami41y")))
    (package
      (name "link-checker-api")
-     (version "release_143")
+     (version "release_144")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1yvzjpkhz53rmf5rmdqadfdpi8kwgfccbp6p25vshmls7n9fwlbi")))
+       #:hash (base32 "1l5w0q767l4f3yvi3dpqf27d9d3xd8i6dhm4q38ihn2f8amxmnhg")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
