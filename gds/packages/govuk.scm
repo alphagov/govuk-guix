@@ -807,12 +807,12 @@ service setup.")
     (hash (base32 "1bylkwf4c1icxsabrlwba87x5d7lgxs79mlbg4iw3dlaz2pkj8ms")))
    (package
      (name "licence-finder")
-     (version "release_434")
+     (version "release_435")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0n887qsr55m76q35cjrwd80w0kakza2xk2kjl6jym1yy4r994ph7")))
+       #:hash (base32 "016zz4szlxlarf7xybr8a9vv57cgp4r7hhzvyiqagapi2yw79qd0")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
