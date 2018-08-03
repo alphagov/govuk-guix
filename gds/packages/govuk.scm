@@ -196,15 +196,15 @@ proxies requests to some upstream")
 (define-public collections
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0lasnpdlr2y6wykfcn7cqcrzwr13pkdy1gmb47m7b07ifm2rz701")))
+    (hash (base32 "0ghzy1ry4skqg8r69hbrpb02xqs292mn26nyhwg3h7cr0956rblw")))
    (package
      (name "collections")
-     (version "release_668")
+     (version "release_669")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0skpcxy9ydhds2g6kj0mz5xbkhz95k1kbfrjd3r5wbqkm7ww56v0")))
+       #:hash (base32 "0klb6ba3hm593qdza4cymn6v2857nn2nlxdgr59xc96ywqjbx8d0")))
      (build-system rails-build-system)
      (synopsis "Collections serves the new GOV.UK navigation and other pages")
      (description "")
