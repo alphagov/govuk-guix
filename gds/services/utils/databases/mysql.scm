@@ -65,7 +65,7 @@
                  '(#$(file-append gzip "/bin/gzip")
                      "-d"
                      "|"))
-                ((string-suffix "bz2" #$file)
+                ((string-suffix? "bz2" #$file)
                  '(#$(file-append pbzip2 "/bin/pbzip2")
                      "-d"
                      "|"))
