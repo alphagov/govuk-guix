@@ -69,6 +69,10 @@
                  '(#$(file-append pbzip2 "/bin/pbzip2")
                      "-d"
                      "|"))
+                ((string-suffix? "xz" #$file)
+                 '(#$(file-append xz "/bin/xz")
+                     "-d"
+                     "|"))
                 (else '())))
               (command `(,(string-append #$pv "/bin/pv")
                          ,#$file
