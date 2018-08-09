@@ -263,12 +263,15 @@
                    #:user (passwd:uid user)
                    #:directory #$root-directory
                    #:environment-variables environment-variables)))
-              (if (zero? (cdr (waitpid pid)))
-                  #t
-                  (begin
-                    (simple-format #t "~A: pre-startup-scripts failed\n"
-                                   #$string-name)
-                    #f))))
+              (let ((exit-code (cdr (waitpid pid))))
+                (if (eq? exit-code 0)
+                    #t
+                    (begin
+                      (simple-format
+                       #t "~A: pre-startup-scripts failed (exit-code ~A)\n"
+                       #$string-name
+                       exit-code)
+                      #f)))))
            (begin (simple-format #t "starting ~A: ~A\n"
                                  '#$name '#$start-command)
                   #t)
