@@ -1884,6 +1884,7 @@
                          ;; The frontend component of Whitehall uses
                          ;; the content store directly
                          content-store
+                         rummager
                          signon
                          asset-manager
                          static
