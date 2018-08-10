@@ -221,7 +221,8 @@
           (for-each
            (lambda (string) (display string port))
            (list #$@(map (lambda (pair)
-                           #~(string-append #$(car pair)
+                           #~(string-append "export "
+                                            #$(car pair)
                                             "=\""
                                             #$(cdr pair)
                                             "\"\n"))
