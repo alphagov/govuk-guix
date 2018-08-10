@@ -14,6 +14,7 @@
   #:use-module (gds services utils databases)
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk plek)
+  #:use-module (gds services govuk signon)
   #:export (rummager-service-type))
 
 (define (queue-listener-shepherd-services package environment-variables)
@@ -237,10 +238,12 @@
 (define rummager-service-type
   (service-type (name 'rummager)
                 (extensions
-                 (list
-                  (service-extension shepherd-root-service-type
-                                     rummager-shepherd-services)
-                  (service-extension activation-service-type
-                                     rummager-activation)
-                  (service-extension account-service-type
-                                     rummager-accounts)))))
+                 (modify-service-extensions-for-signon
+                  name
+                  (list
+                   (service-extension shepherd-root-service-type
+                                      rummager-shepherd-services)
+                   (service-extension activation-service-type
+                                      rummager-activation)
+                   (service-extension account-service-type
+                                      rummager-accounts))))))

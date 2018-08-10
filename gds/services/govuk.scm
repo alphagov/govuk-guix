@@ -1781,6 +1781,15 @@
                              "bundle" "exec"
                              "rake" "message_queue:create_queues")))))
                  (redis-connection-config)
+                 (signon-api-user
+                  (name "Rummager")
+                  (email "rummager@guix-dev.gov.uk")
+                  (authorisation-permissions
+                   (list
+                    (cons
+                     (signon-authorisation
+                      (application-name "Publishing API"))
+                     '("signin")))))
                  (plek-config)
                  (sidekiq-config (file "config/sidekiq.yml"))
                  (elasticsearch-connection-config)
