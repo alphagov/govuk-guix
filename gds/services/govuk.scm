@@ -1811,7 +1811,7 @@
 (define-public info-frontend-service-type
   (service-type (name 'info-frontend)
                 (extensions
-                 (modify-service-extensions-for-plek
+                 (modify-service-extensions-for-signon-and-plek
                   name
                   (standard-rails-service-type-extensions name)))))
 
@@ -1822,6 +1822,15 @@
           (inherit default-shepherd-service)
           (provision '(info-frontend))
           (requirement '(content-store publishing-api static)))
+         (signon-api-user
+          (name "Info Frontend")
+          (email "info-frontend@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin")))))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((publish-special-routes
