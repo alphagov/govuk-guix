@@ -12,6 +12,7 @@
             postgresql-connection-config-user
             postgresql-connection-config-host
             postgresql-connection-config-database
+            postgresql-connection-config-superuser?
 
             run-with-psql-port
             postgresql-ensure-user-exists-gexp
@@ -29,7 +30,9 @@
   (user postgresql-connection-config-user)
   (port postgresql-connection-config-port
         (default 5432))
-  (database postgresql-connection-config-database))
+  (database postgresql-connection-config-database)
+  (superuser? postgresql-connection-config-superuser?
+              (default #f)))
 
 (define (run-with-psql-port database-connection operations)
   (match database-connection
@@ -88,7 +91,7 @@
                          name)))
                  lines)))))))
 
-(define (postgresql-ensure-user-exists-gexp user)
+(define (postgresql-ensure-user-exists-gexp user superuser?)
   #~(lambda (port)
       (simple-format port "
 DO
@@ -99,11 +102,11 @@ BEGIN
       FROM   pg_catalog.pg_user
       WHERE  usename = '~A') THEN
 
-      CREATE ROLE \"~A\" LOGIN CREATEDB;
+      CREATE ROLE \"~A\" LOGIN CREATEDB~A;
    END IF;
 END
 $body$;
-" #$user #$user)))
+" #$user #$user #$(if superuser? " SUPERUSER" ""))))
 
 (define (postgresql-create-database-gexp database owner)
   #~(lambda (port)
@@ -153,9 +156,10 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
     (run-with-psql-port
      database-connection-with-postgres-user
      (match database-connection
-       (($ <postgresql-connection-config> host user port database)
+       (($ <postgresql-connection-config> host user port database
+                                          superuser?)
         (list
-         (postgresql-ensure-user-exists-gexp user)))))))
+         (postgresql-ensure-user-exists-gexp user superuser?)))))))
 
 (define (postgresql-create-user-and-database-for-database-connection
          database-connection)
@@ -168,7 +172,8 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
     (run-with-psql-port
      database-connection-with-postgres-user
      (match database-connection
-       (($ <postgresql-connection-config> host user port database)
+       (($ <postgresql-connection-config> host user port database
+                                          superuser?)
         (list
          (postgresql-ensure-user-exists-gexp user)
          #~(lambda (port)
@@ -177,4 +182,6 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                   (map car (#$(postgresql-list-databases-gexp
                                database-connection-with-postgres-user))))
                  #t
-                 (#$(postgresql-create-database-gexp database user) port)))))))))
+                 (#$(postgresql-create-database-gexp database user
+                                                     superuser?)
+                  port)))))))))
