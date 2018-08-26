@@ -28,6 +28,9 @@
     #~(let ((command (cons*
                       (string-append #$rabbitmq "/sbin/rabbitmqctl")
                       (list #$@args))))
+        ;; Set the correct value for the .erlang-cookie
+        (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
+
         (simple-format #t "Running ~A\n" (string-join command))
         (let ((exit-val
                (status:exit-val (apply system* command))))
@@ -42,6 +45,9 @@
       (use-modules (ice-9 popen)
                    (ice-9 rdelim)
                    (ice-9 regex))
+      ;; Set the correct value for the .erlang-cookie
+      (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
+
       (let* ((command `(,(string-append #$rabbitmq "/sbin/rabbitmqctl")
                         "list_users" "-q"))
              (p (apply open-pipe* OPEN_READ command))
