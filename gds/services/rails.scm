@@ -424,6 +424,7 @@
     (group "nogroup")
     (system? #t)
     (home-directory "/var/empty")
+    (create-home-directory? #f)
     (shell #~(string-append #$shadow "/sbin/nologin")))))
 
 (define (standard-rails-service-type-extensions name)
