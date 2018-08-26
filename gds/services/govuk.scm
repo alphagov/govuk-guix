@@ -132,12 +132,19 @@
                  #~(lambda ()
                      (use-modules (gds build utils)
                                   (gnu build file-systems))
+
                      (for-each
                       (lambda (directory)
+                        ;; TODO: This shouldn't be necessary
+                        (define bind-mount
+                          (@ (gnu build file-systems) bind-mount))
+
                         (let ((app-dir
                                (string-append "/var/apps/asset-manager/" directory))
                               (storage-dir
                                (string-append "/var/lib/asset-manager/" directory)))
+                          (simple-format #t "asset-manager: setting up directory: ~A\n"
+                                         directory)
                           (mkdir-p storage-dir)
                           (bind-mount storage-dir app-dir)
                           (chmod app-dir #o777)))

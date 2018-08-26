@@ -1,7 +1,7 @@
 (define-module (gds packages utils bundler-build)
   #:use-module (ice-9 match)
   #:use-module (guix build utils)
-  #:use-module (gnu build install)
+  #:use-module (guix store database)
   #:export (run-bundle-package))
 
 (define (run-bundle-package source
