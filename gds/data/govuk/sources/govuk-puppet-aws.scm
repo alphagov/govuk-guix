@@ -183,7 +183,7 @@
                                                  services)))))
                 extracts))
 
-  (let ((tree (file-system-tree backup-directory)))
+  (let ((tree (file-system-tree backup-directory (const #t) stat)))
     (append-map
      (cut apply process-date-dir <>)
      (cddr tree))))

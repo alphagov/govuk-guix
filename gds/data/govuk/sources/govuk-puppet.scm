@@ -187,7 +187,7 @@
             (list backup-directory date database hostname (first files))
             "/")))))
 
-  (let ((tree (file-system-tree backup-directory)))
+  (let ((tree (file-system-tree backup-directory (const #t) stat)))
     (concatenate
      (map (cut apply process-date-dir <>) (cddr tree)))))
 
