@@ -1735,6 +1735,7 @@
          (plek-config) (rails-app-config) content-tagger
          (sidekiq-config
           (file "config/sidekiq.yml"))
+         (redis-connection-config)
          (postgresql-connection-config
           (user "content_tagger")
           (database "content_tagger_production")))))
