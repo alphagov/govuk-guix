@@ -33,7 +33,8 @@
                 #f))))))
     (substitute* files
       (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
-       "File.expand_path('../.spring-real', __FILE__)"))))
+       "File.expand_path('../.spring-real', __FILE__)")))
+  #t)
 
 (define* (wrap-with-relative-path #:key outputs
                                   #:allow-other-keys)
@@ -51,7 +52,8 @@
                 #f))))))
     (substitute* files
       (((string-append out "/bin"))
-       "${BASH_SOURCE%/*}"))))
+       "${BASH_SOURCE%/*}")))
+  #t)
 
 (define* (create-tmp-directory #:key outputs
                               #:allow-other-keys)
@@ -88,7 +90,8 @@
                      (string-append out "/" file)
                      #:log (%make-void-port "w"))
                     (copy-file file (string-append out "/" file))))
-              files)))
+              files))
+  #t)
 
 (define* (wrap-bin-files-for-rails #:key inputs outputs #:allow-other-keys)
   (for-each
@@ -107,7 +110,8 @@
         (access? name X_OK)
         (begin
           (simple-format #t "Skipping wrapping ~A as its not executable\n" name)
-          #f)))))))
+          #f))))))
+  #t)
 
 (define* (patch-bin-files #:key inputs outputs #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out")))
@@ -120,7 +124,8 @@
             (begin
               (simple-format #t "Skipping patching ~A as its not executable\n" name)
               #f))))
-      (("/usr/bin/env") (which "env")))))
+      (("/usr/bin/env") (which "env"))))
+  #t)
 
 (define %standard-phases
   (modify-phases gnu:%standard-phases

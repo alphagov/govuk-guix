@@ -48,7 +48,8 @@
        (lambda ()
          (display "GovukAdminTemplate.environment_style = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONMENT_STYLE', 'development')
 GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONMENT_LABEL', 'Development')
-")))))
+")))
+     #t))
 
 (define-public asset-manager
   (package-with-bundler
@@ -1315,7 +1316,8 @@ content, as well as broadcasting changes to a message queue.")
               ;; Short URL Manager attempts to create a 'Test User' when
               ;; running in development, which causes asset
               ;; precompilation to break
-              (setenv "RAILS_ENV" "test")))
+              (setenv "RAILS_ENV" "test")
+              #t))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser))))
      (inputs

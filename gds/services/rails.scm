@@ -137,7 +137,8 @@
                           (value (cdr var)))
                       (simple-format #t "  ~A=~A\n" key value)
                       (setenv key value)))
-                  ',environment-variables))))))))))
+                  ',environment-variables)
+                 #t)))))))))
 
 (define (package-from-parameters parameters)
   (let ((rails-app-config (find rails-app-config?
