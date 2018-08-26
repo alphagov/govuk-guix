@@ -1665,7 +1665,9 @@ content, as well as broadcasting changes to a message queue.")
         (modify-phases %standard-phases
           (add-before 'precompile-rails-assets 'shared-mustache-compile
             (lambda _
+              (chmod "app/assets/javascripts/templates.js" #o666)
               (invoke "bundle" "exec" "rake" "shared_mustache:compile")))
+          (delete 'reset-gzip-timestamps)
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
