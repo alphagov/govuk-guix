@@ -1999,8 +1999,8 @@
   (service-group
    "Backend Services"
    "Services which are used by other services"
-   (list ;; email-alert-api-service Can't connect to Redis for some reason
-         ;; email-alert-service-service Missing dependency on RabbitMQ
+   (list email-alert-api-service
+         email-alert-service-service
          imminence-service
          rummager-service
          asset-manager-service
