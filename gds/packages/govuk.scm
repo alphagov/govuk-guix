@@ -1536,11 +1536,16 @@ content, as well as broadcasting changes to a message queue.")
        #:hash (base32 "122w9jp83dvj4bankap5kqg26pv3xghrqjc0rq89125vjbqxh9ab")))
      (build-system rails-build-system)
      (arguments
-      `(#:precompile-rails-assets? #f ;; Asset precompilation fails,
-                                      ;; as it tries to connect to
-                                      ;; redis
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
+          (add-after 'unpack 'patch-gds_sso-initializer
+            (lambda _
+              ;; TODO: Disable the creation of the development user,
+              ;; as this breaks asset precompilation
+              (substitute* "config/initializers/gds-sso.rb"
+                (("if Rails.env == \"development\"")
+                 "if Rails.env.development? and false"))
+              #t))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after
