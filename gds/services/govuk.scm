@@ -551,6 +551,8 @@
          (plek-config)
          (rails-app-config
           (run-with "bin/email_alert_service"))
+         (rabbitmq-connection-config (user "email_alert_service")
+                                     (password "email_alert_service"))
          email-alert-service
          (service-startup-config)
          (redis-connection-config))))
