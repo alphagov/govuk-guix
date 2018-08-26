@@ -1311,6 +1311,14 @@ content, as well as broadcasting changes to a message queue.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
+          (add-after 'unpack 'patch-gds_sso-initializer
+            (lambda _
+              ;; TODO: Disable the creation of the development user,
+              ;; as this breaks asset precompilation
+              (substitute* "config/initializers/gds_sso.rb"
+                (("if Rails\\.env\\.development\\?")
+                 "if Rails.env.development? and false"))
+              #t))
           (add-before 'precompile-rails-assets 'set-production-rails-environment
             (lambda _
               ;; Short URL Manager attempts to create a 'Test User' when
