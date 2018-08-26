@@ -841,11 +841,7 @@ service setup.")
        #:hash (base32 "0ph9iq8v4yj3fbridagzbapr356kya4nj1hvzspavn7x7lr2ik7j")))
      (build-system rails-build-system)
      (arguments
-      `(#:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-          (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser))))
+      `(#:precompile-rails-assets? #f))
      (synopsis "")
      (description "")
      (license #f)
