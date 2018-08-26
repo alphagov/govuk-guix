@@ -547,7 +547,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(email-alert-service))
-           (requirement '()))
+           (requirement '(rabbitmq email-alert-api)))
          (plek-config)
          (rails-app-config
           (run-with "bin/email_alert_service"))
