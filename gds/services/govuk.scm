@@ -487,7 +487,9 @@
            (file "config/sidekiq.yml"))
           (postgresql-connection-config
            (user "email-alert-api")
-           (database "email_alert_api")))))
+           (database "email_alert_api")
+           ;; Required for creating the uuid-ossp extension
+           (superuser? #t)))))
 
 ;;;
 ;;; Email Alert Frontend
