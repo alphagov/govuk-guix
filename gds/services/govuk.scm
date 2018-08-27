@@ -479,10 +479,16 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(email-alert-api))
-           (requirement '(postgres content-store)))
+           (requirement '(postgres
+                          signon
+                          publishing-api
+                          content-store)))
           (plek-config) (rails-app-config) email-alert-api
           (service-startup-config)
           (redis-connection-config)
+          (signon-application
+           (name "Email Alert API")
+           (supported-permissions '("signin" "internal_app")))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (postgresql-connection-config
@@ -508,9 +514,21 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(email-alert-frontend))
-           (requirement '()))
-          (plek-config) (rails-app-config) email-alert-frontend
-          (service-startup-config))))
+           (requirement '(content-store
+                          email-alert-api
+                          static
+                          publishing-api)))
+         (plek-config) (rails-app-config) email-alert-frontend
+         (signon-api-user
+          (name "Email Alert Frontend")
+          (email "email-alert-frontend@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Email Alert API"))
+             '("signin" "internal_app")))))
+         (service-startup-config))))
 
 (define-public draft-email-alert-frontend-service-type
   (service-type (name 'draft-email-alert-frontend)
@@ -525,9 +543,21 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(draft-email-alert-frontend))
-           (requirement '()))
-          (plek-config) (rails-app-config) email-alert-frontend
-          (service-startup-config))))
+           (requirement '(draft-content-store
+                          email-alert-api
+                          draft-static
+                          publishing-api)))
+         (signon-api-user
+          (name "Draft Email Alert Frontend")
+          (email "draft-email-alert-frontend@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Email Alert API"))
+             '("signin" "internal_app")))))
+         (plek-config) (rails-app-config) email-alert-frontend
+         (service-startup-config))))
 
 ;;;
 ;;; Email Alert Service
