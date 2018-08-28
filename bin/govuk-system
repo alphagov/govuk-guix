@@ -136,6 +136,17 @@
        ((name) (service-name->type name))))
    services))
 
+(define %default-services
+  (apply append
+         (map service-group-services
+              (list publishing-application-services
+                    backend-services
+                    publishing-platform-services
+                    supporting-application-services
+                    transition-services
+                    frontend-services
+                    draft-frontend-services))))
+
 (define* (operating-system-for-services
           host-name
           services
@@ -164,7 +175,7 @@
   (define service-types-whitelist
     (append
      (if (null? service-types)
-         (map service-kind govuk-services)
+         (map service-kind %default-services)
          service-types)
      (cons*
       govuk-nginx-service-type
