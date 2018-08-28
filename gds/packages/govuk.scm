@@ -207,6 +207,10 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0n65pqh8h0l3r4332d1k69cp54frjx2xa9wg7p8ghdr3wl88qk61")))
      (build-system rails-build-system)
+     (arguments
+      '(;; jasmine-rails seems to get annoyed if it's configuration
+        ;; doesn't exist in the spec directory
+        #:exclude-files ("tmp")))
      (synopsis "Collections serves the new GOV.UK navigation and other pages")
      (description "")
      (license license:expat)
@@ -927,7 +931,10 @@ service setup.")
                             (assoc-ref outputs "out")
                             "/config/secrets.yml")
                 (("SECRET_TOKEN")
-                "SECRET_KEY_BASE")))))))
+                 "SECRET_KEY_BASE")))))
+        ;; jasmine-rails seems to get annoyed if it's configuration
+        ;; doesn't exist in the spec directory
+        #:exclude-files ("tmp")))
      (synopsis "")
      (description "")
      (license #f)
@@ -1263,6 +1270,10 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "07375kyzj1mj7jycm7mncj3wxbj4jdj7zcf701rrpmrjixpyhscw")))
      (build-system rails-build-system)
+     (arguments
+      '(;; jasmine-rails seems to get annoyed if it's configuration
+        ;; doesn't exist in the spec directory
+        #:exclude-files ("tmp")))
      (synopsis "")
      (description "")
      (license #f)
