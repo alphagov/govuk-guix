@@ -335,12 +335,12 @@ proxies requests to some upstream")
     (hash (base32 "0929g64p1gvx1h00l0mpnd2mkdd8171zh2glqvrcvwckqsk127w0")))
    (package
      (name "content-publisher")
-     (version "release_158")
+     (version "release_159")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1gxwc694m4bgm1b8x72r6dii7wxv7bs9y74xibmq8k85447ma3as")))
+       #:hash (base32 "1q09mj20rmiw0ckhvz2zrm5vcz465246jpbb154b3xrchkfkf564")))
      (build-system rails-build-system)
      (arguments
       `(;; TODO: Content Publisher requires Yarn now for precompiling
