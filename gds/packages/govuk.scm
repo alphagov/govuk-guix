@@ -332,15 +332,15 @@ proxies requests to some upstream")
 (define-public content-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "12i2wjx0ifvhijr3wrwfi9dcs49ajvy68p186czi10kmz1p65dyi")))
+    (hash (base32 "1jyaqikz21nnipap49f2cd5vfxlv37mgbdwmf2nh32vgbwynl9m4")))
    (package
      (name "content-publisher")
-     (version "release_162")
+     (version "release_163")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0zmgvrcjxm4x7qb1gv4ni32jkgghm2k75fj96l7c7bkprh2bnd12")))
+       #:hash (base32 "0q1gckp25vws1pdwcx380vhlm4j4krvnrv0x484nry7k5kpjnc2f")))
      (build-system rails-build-system)
      (arguments
       `(;; TODO: Content Publisher requires Yarn now for precompiling
