@@ -972,15 +972,15 @@ service setup.")
 (define-public organisations-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "13mwdahp7cixc2cjm14kbgk0jx42d7c389ifllygn4p3pdn8hpg6")))
+    (hash (base32 "0x4jgvdikiwyw7apir2l0ax82x705m48b4xl6alq8f0wnjpa0fqv")))
    (package
      (name "organisations-publisher")
-     (version "release_6")
+     (version "release_7")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0y13mvm8jw4k3c50bazfhngm537r50msq7b31lglz50763c2qib2")))
+       #:hash (base32 "1fk3izvnjib95df16437941byf5di440hf4sz1dg7r1y5d26h94h")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
