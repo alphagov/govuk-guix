@@ -343,11 +343,7 @@ proxies requests to some upstream")
        #:hash (base32 "1s0ffnkf2cg40201vfc2qv8zb023akfqb8hnpmqi5bgd9fwdrlga")))
      (build-system rails-build-system)
      (arguments
-      `(;; TODO: Content Publisher requires Yarn now for precompiling
-        ;; assets, yet another package manager, and unlike Bundler,
-        ;; one that doesn't interoperate yet with Guix.
-        #:precompile-rails-assets? #f
-        #:phases
+      `(#:phases
         (modify-phases %standard-phases
          (add-before 'precompile-rails-assets 'set-fake-SECRET_KEY_BASE
           (lambda _
