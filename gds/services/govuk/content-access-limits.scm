@@ -24,6 +24,10 @@
      (list
       (cons service-startup-config? add-environment-variable)))
     (cons
+     content-publisher-service-type
+     (list
+      (cons service-startup-config? add-environment-variable)))
+    (cons
      whitehall-service-type
      (list
       (cons service-startup-config? add-environment-variable))))))
