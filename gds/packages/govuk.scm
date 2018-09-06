@@ -350,7 +350,10 @@ proxies requests to some upstream")
             ;; TODO: Active Storage seems to require the
             ;; SECRET_KEY_BASE Not sure why, so set a fake one to make
             ;; asset precompilation work
-            (setenv "SECRET_KEY_BASE" "fake")))
+            (setenv "SECRET_KEY_BASE" "fake")
+            ;; assets:precompile seems to fail without the
+            ;; JWT_AUTH_SECRET being set
+            (setenv "JWT_AUTH_SECRET" "fake")))
          (add-after 'install 'replace-database.yml
           ,(use-blank-database.yml)))))
      (synopsis "")
