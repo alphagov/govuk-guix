@@ -457,7 +457,9 @@
              (signon-authorisation
               (application-name "Publishing API"))
              '("signin")))))
-         (service-startup-config)
+         (service-startup-config
+          (environment-variables
+           '(("ACTIVE_STORAGE_SERVICE" . "local"))))
          (postgresql-connection-config
           (user "content_publisher")
           (database "content_publisher_production")))))
