@@ -1048,15 +1048,15 @@ service setup.")
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0k86qz9c21p6mqf7d0ngzams81lnq7xxzqnhf3qqg9b9bak0qa8p")))
+    (hash (base32 "0jgn4alvmdr557fgpdj7bmgq9w52vyrfskq23ldzgwpi3s8jbbvx")))
    (package
      (name "publishing-api")
-     (version "release_1264")
+     (version "release_1268")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "058pnfxmz3ilkb93da1g9cvggjc9cm2bijakrcqlg825mbgrmmgf")))
+       #:hash (base32 "0v8a9v0vfa8z083q0hkrpaq0kl4rb7i9wyjiqx1kwkjiflm84jp2")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
