@@ -66,10 +66,8 @@
                 (("current_value = self\\.send\\(attr_name\\)")
                  "current_value = self.send(attr_name)\n      current_value = current_value.sort if %i(files test_files).include? attr_name  # patched through govuk-guix"))))))))))
 
-(define default-ruby guix:ruby)
-
 (define (ruby-for-package pkg)
-  (define* (ruby-from-package-arguments #:key (ruby default-ruby)
+  (define* (ruby-from-package-arguments #:key (ruby (default-ruby))
                                         #:allow-other-keys)
     ruby)
 

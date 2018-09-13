@@ -2,6 +2,7 @@
   #:use-module (guix store)
   #:use-module (guix utils)
   #:use-module (guix packages)
+  #:use-module (guix download)
   #:use-module (guix derivations)
   #:use-module (guix search-paths)
   #:use-module (guix build-system)
@@ -11,7 +12,9 @@
   #:use-module (gnu packages node)
   #:export (%rails-build-system-modules
             rails-build
-            rails-build-system))
+            rails-build-system
+
+            default-ruby))
 
 (define %rails-build-system-modules
   ;; Build side modules imported by default
@@ -21,7 +24,18 @@
 
 (define (default-ruby)
   (let ((ruby-mod (resolve-interface '(gnu packages ruby))))
-    (module-ref ruby-mod 'ruby)))
+    (package
+      (inherit (module-ref ruby-mod 'ruby))
+      (version "2.5.1")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append "http://cache.ruby-lang.org/pub/ruby/"
+                             (version-major+minor version)
+                             "/ruby-" version ".tar.xz"))
+         (sha256
+          (base32
+           "0kbm3gkv689d1mb8fh261z8s79d6hw07p0xyk735yfqyskpcasl8")))))))
 
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
