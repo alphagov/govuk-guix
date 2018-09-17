@@ -889,15 +889,15 @@ service setup.")
 (define-public manuals-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mchbahs9grmwfw8qn01d1kfk2fwqqnk2smxrf173xsqvd2rnrj8")))
+    (hash (base32 "1fin95rj2iw80plll5yz028cv6a3xig54a4pi951fdmnyibqfr1v")))
    (package
      (name "manuals-frontend")
-     (version "release_383")
+     (version "release_384")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1aa8nh8n03yvaww1aalrvhq8rnxsdcz3ak3rjvs5fg460az18d7f")))
+       #:hash (base32 "0jzqikxdbsza356frcary1p5njv8hgk03jnx370xscr8q5j7jpy1")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
