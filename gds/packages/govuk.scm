@@ -1652,15 +1652,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public whitehall
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0m6i195bhimwdqld8fz2g577i96s4gff0cgsgasxdf65slsqv8js")))
+    (hash (base32 "1v3a6p7wql41hpq4vnifp2d1dag863zffwzgj7jgrl8fyrhjmawh")))
    (package
      (name "whitehall")
-     (version "release_13726")
+     (version "release_13727")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0nsb6rxzivjh1526j6llm1dywr3vs4ba86div1npgcq16lflw2j5")))
+       #:hash (base32 "0kz7x4d3s43xwk8v2mgg90hj7bpkggdb5iyhms257wzmx0dbx4g7")))
      (build-system rails-build-system)
      (inputs
       `(("node" ,node)
