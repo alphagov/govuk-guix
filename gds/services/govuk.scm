@@ -528,6 +528,10 @@
            (list
             (cons
              (signon-authorisation
+              (application-name "Publishing API"))
+             '("signin"))
+            (cons
+             (signon-authorisation
               (application-name "Email Alert API"))
              '("signin" "internal_app")))))
          (service-startup-config))))
