@@ -1942,6 +1942,7 @@
                          ;; the content store directly
                          content-store
                          rummager
+                         email-alert-api
                          signon
                          asset-manager
                          static
@@ -1988,6 +1989,10 @@
              (signon-authorisation
               (application-name "Publishing API"))
              '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Email Alert API"))
+             '("signin" "internal_app"))
             (cons
              (signon-authorisation
               (application-name "Asset Manager"))
