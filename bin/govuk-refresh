@@ -37,7 +37,7 @@
  (srfi srfi-37)
  (ice-9 match)
  (guix ui)
- (guix hash)
+ (gcrypt hash)
  (guix store)
  (guix scripts)
  (guix packages)

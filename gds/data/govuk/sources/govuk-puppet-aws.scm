@@ -8,7 +8,7 @@
   #:use-module (web uri)
   #:use-module (json)
   #:use-module (guix gexp)
-  #:use-module (guix hash)
+  #:use-module (gcrypt hash)
   #:use-module (guix base32)
   #:use-module (guix download)
   #:use-module (guix packages)

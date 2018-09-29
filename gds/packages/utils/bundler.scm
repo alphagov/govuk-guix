@@ -26,6 +26,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages guile)
+  #:use-module (gnu packages gnupg)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages xml)
@@ -139,14 +140,18 @@
            (('gnu _ ...) #t)
            (_ #f)))
 
+       (define gcrypt-sqlite3&co
+         ;; Guile-Gcrypt, Guile-SQLite3, and their propagated inputs.
+         (append-map (lambda (package)
+                       (cons package
+                             (package-transitive-propagated-inputs package)))
+                     (list guile-gcrypt guile-sqlite3)))
+
        (define build
-         (with-extensions (cons
-                           guile-sqlite3
-                           (package-transitive-propagated-inputs guile-sqlite3))
+         (with-extensions gcrypt-sqlite3&co
            (with-imported-modules `((gds packages utils bundler-build)
                                     ((guix config)
-                                     => ,(make-config.scm
-                                          #:libgcrypt libgcrypt))
+                                     => ,(make-config.scm))
                                     ,@(source-module-closure
                                        '((guix build utils)
                                          ;; for reset-timestamps

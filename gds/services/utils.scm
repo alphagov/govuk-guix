@@ -4,7 +4,7 @@
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
   #:use-module (guix base16)
-  #:use-module (guix gcrypt)
+  #:use-module (gcrypt random)
   #:use-module (guix utils)
   #:use-module (guix gexp)
   #:use-module (guix modules)
@@ -85,14 +85,6 @@
 ;;;
 ;;; Crypto
 ;;;
-
-(define* (gen-random-bv #:optional (bv-length 50))
-  (let* ((ptr (libgcrypt-func "gcry_create_nonce"))
-         (proc (pointer->procedure void ptr `(* ,size_t))) ; buffer, length
-         (bv (make-bytevector bv-length))
-         (bv-ptr (bytevector->pointer bv)))
-    (proc bv-ptr bv-length)
-    bv))
 
 (define (random-base16-string length)
   (bytevector->base16-string
