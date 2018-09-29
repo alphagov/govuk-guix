@@ -112,7 +112,7 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(asset-manager))
-          (requirement '(publishing-api signon redis)))
+          (requirement '(signon redis)))
          (plek-config)
          (rails-app-config
           (precompiled-assets-are-environment-specific? #f))
@@ -363,7 +363,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-performance-manager))
-           (requirement '(publishing-api whitehall signon)))
+           (requirement '(signon)))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (plek-config) (rails-app-config) content-performance-manager
@@ -1339,7 +1339,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(travel-advice-publisher))
-           (requirement '(publishing-api signon static rummager asset-manager)))
+           (requirement '(publishing-api signon static asset-manager)))
           (plek-config) (rails-app-config) travel-advice-publisher
           (signon-application
            (name "Travel Advice Publisher")
@@ -1631,7 +1631,7 @@
           (inherit default-shepherd-service)
           (provision '(publisher))
           (requirement '(publishing-api frontend draft-frontend
-                         rummager asset-manager calendars signon)))
+                         asset-manager calendars signon)))
          (service-startup-config)
          (plek-config) (rails-app-config) publisher
          (redis-connection-config)
