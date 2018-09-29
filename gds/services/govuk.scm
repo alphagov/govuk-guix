@@ -486,7 +486,9 @@
                           publishing-api
                           content-store)))
           (plek-config) (rails-app-config) email-alert-api
-          (service-startup-config)
+          (service-startup-config
+           (environment-variables
+            `(("EMAIL_ALERT_AUTH_TOKEN" . ,(random-base16-string 30)))))
           (redis-connection-config)
           (signon-application
            (name "Email Alert API")
