@@ -5,17 +5,24 @@
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:use-module (web uri)
+  #:use-module (json)
   #:use-module (guix gexp)
+  #:use-module (guix base32)
+  #:use-module (guix download)
   #:use-module (guix modules)
   #:use-module (guix store)
+  #:use-module (guix packages)
   #:use-module (guix derivations)
   #:use-module (gnu services)
   #:use-module (gnu packages guile)
+  #:use-module (gds services govuk)
+  #:use-module (gds services utils databases)
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
+  #:use-module (gds data s3)
   #:use-module (gds data govuk sources govuk-puppet)
+  #:use-module (gds data govuk sources govuk-puppet-aws)
   #:export (data-directory-with-index
-
             data-directory-with-index-data-source))
 
 (define (all-extracts data-sources)
@@ -25,28 +32,42 @@
       ((data-source-list-extracts data-source)))
     data-sources)))
 
-(define (store-item-size item)
+(define (store-item-path-info item)
   (with-store store
     (let* ((derivation
             ((lower-object item) store))
-           (output-path (derivation->output-path derivation)))
+           (output-path (if (derivation? derivation)
+                            (derivation->output-path derivation)
+                            derivation)))
       (if (build-derivations store (list derivation))
-          (path-info-nar-size
-           (query-path-info store output-path))
+          (query-path-info store output-path)
           (error "Unable to build " item)))))
 
-(define data-extract->details-list
-  (match-lambda
-   (($ <data-extract> file datetime database services)
-    ;; G-expressions handle lists, so construct a list from the record
-    ;; fields
-    (list file
-          (date->string datetime "~Y-~m-~d")
-          database
-          (map service-type-name services)
-          (store-item-size file)))))
+(define (data-extract->details-list services data-extract)
+  (match data-extract
+    (($ <data-extract> file datetime database extract-service-types)
+     (let ((path-info (store-item-path-info file)))
+       ;; G-expressions handle lists, so construct a list from the record
+       ;; fields
+       (list file
+             (date->string datetime "~Y-~m-~d")
+             database
+             (map (lambda (service-type)
+                    (cons
+                     (service-type-name service-type)
+                     (database-connection-config->alist
+                      (database-connection-config-from-service-for-extract
+                       (find (lambda (service)
+                               (eq? (service-kind service) service-type))
+                             services)
+                       data-extract))))
+                  extract-service-types)
+             (path-info-nar-size path-info)
+             (bytevector->nix-base32-string
+              (path-info-hash path-info)))))))
 
 (define* (data-extracts->data-directory-with-index
+          services
           data-extracts
           #:key (name "govuk-data-extracts"))
   (define build
@@ -61,11 +82,12 @@
                        (guix build utils))
 
           (let* ((data-extract-details-lists
-                  '#$(map data-extract->details-list
+                  '#$(map (lambda (extract)
+                            (data-extract->details-list services extract))
                           data-extracts))
                  (data-extract-destinations
                   (map (match-lambda
-                        ((file datetime database services size)
+                        ((file datetime database services size sha256-hash)
                          ;; Create filenames like:
                          ;; datetime/database/file
                          (string-join
@@ -93,12 +115,13 @@
                  (scm->json-string
                   `((extracts
                      . ,(map (match-lambda*
-                              (((file date database services size)
+                              (((file date database services size sha256-hash)
                                 url)
                                `((date . ,date)
                                  (database . ,database)
                                  (services . ,services)
                                  (size . ,size)
+                                 (sha256-hash . ,sha256-hash)
                                  ;; This URL is relative to the
                                  ;; location of this index.json file.
                                  (url . ,url))))
@@ -109,59 +132,73 @@
 
   (computed-file name build))
 
-(define* (data-directory-with-index
-          data-sources
-          #:key extract-filters data-source-specific-filters)
-  (let ((data-extracts
-         (apply filter-extracts (all-extracts data-sources) extract-filters)))
+(define* (data-directory-with-index services data-extracts
+                                    #:key (data-source-specific-filters '()))
+  (let* ((data-sources
+          (list govuk-puppet-aws-data-source))
+         (data-sources-with-data-directories
+          (filter data-source-data-directory-with-index
+                  data-sources)))
 
     (computed-file
      "data-directory-with-index"
      #~(begin
          (mkdir #$output)
-         (symlink #$(data-extracts->data-directory-with-index data-extracts)
-                  (string-append #$output
-                                 "/data-extracts"))
+         (symlink #$(data-extracts->data-directory-with-index services data-extracts)
+                  (string-append #$output "/data-extracts"))
 
          (mkdir (string-append #$output "/data-sources"))
+
          (for-each
           (lambda (source-name directory)
             (symlink directory
                      (string-append #$output
                                     "/data-sources/"
                                     source-name)))
-          '#$(map data-source-name data-sources)
+          '#$(map data-source-name data-sources-with-data-directories)
           '#$(map (lambda (data-source)
-                    (let ((filters (assq-ref data-source-specific-filters
-                                             data-source)))
+                    (let ((filters (or (assq-ref data-source-specific-filters
+                                                 data-source)
+                                       '())))
                       (apply (data-source-data-directory-with-index data-source)
                              filters)))
-                  data-sources))))))
-
-(define (build-data-directory-with-index . args)
-  (with-store store
-    (let ((derivation
-           ((lower-object (apply
-                           data-directory-with-index
-                           (list govuk-puppet-data-source)
-                           args))
-            store)))
-      (build-derivations store (list derivation))
-      (derivation->output-path derivation))))
+                  data-sources-with-data-directories))))))
 
 ;;;
 ;;; data-directory-with-index-data-source
 ;;;
 
+(define (get-base-url)
+  (or (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")
+      "s3://govuk-development-data-test"))
+
+(define (cache-directory)
+  (string-append (or (getenv "XDG_CACHE_HOME")
+                     (string-append (getenv "HOME") "/.cache"))
+                 "/govuk-guix"))
+
 (define (with-index-file url function)
   (let ((uri (string->uri url)))
     (cond
      ((eq? 'file (uri-scheme uri))
-      (call-with-input-file (uri-path uri) function))
+      (if (file-exists? (uri-path uri))
+          (call-with-input-file (uri-path uri) function)
+          '()))
+     ((eq? 's3 (uri-scheme uri))
+      (let* ((target
+              (string-append (cache-directory)
+                             "/data-extracts/index.json"))
+             (command
+              `("govuk" "aws" "--profile" "govuk-test" "--"
+                "s3" "cp"
+                ,url
+                ,target)))
+        (apply system* command)
+        (call-with-input-file target function)))
      (else (error "Unrecognised scheme" (uri-scheme uri))))))
 
 (define (list-extracts)
-  (let ((base-url (getenv "GOVUK_GUIX_DATA_DIRECTORY_BASE_URL")))
+  (let ((base-url (get-base-url)))
     (define (override-data-source extracts)
       (map (lambda (extract)
              (data-extract
@@ -169,28 +206,72 @@
               (data-source data-directory-with-index-data-source)))
            extracts))
 
-    (if base-url
-        (append-map
-         (match-lambda
-          (($ <data-source> name list-extracts
-                            list-extracts-from-data-directory-index
-                            data-directory-with-index)
-           (if list-extracts-from-data-directory-index
-               (override-data-source
-                (or (let ((data-source-base-url
-                           (string-append base-url "data-sources/" name "/")))
-                      (with-index-file
-                       (string-append data-source-base-url "index.json")
-                       (cut list-extracts-from-data-directory-index
-                            <>
-                            data-source-base-url)))
-                    '()))
-               '())))
-         (list govuk-puppet-data-source))
-        (begin
-          (simple-format
-           #t "info: not using the data-directory-with-index-data source, as GOVUK_GUIX_DATA_DIRECTORY_BASE_URL is unset\n")
-          '()))))
+    ;; Currently unused, as the source-data separation isn't really
+    ;; useful anymore
+    (define (data-extracts-from-source-data)
+      (append-map
+       (match-lambda
+         (($ <data-source> name list-extracts
+                           list-extracts-from-data-directory-index
+                           data-directory-with-index)
+          (if list-extracts-from-data-directory-index
+              (override-data-source
+               (or (let* ((data-source-base-url
+                           (string-append base-url "/data-sources/" name "/"))
+                          (data-source-index
+                           (string-append data-source-base-url "index.json")))
+
+                     (with-index-file
+                      data-source-index
+                      (cut list-extracts-from-data-directory-index
+                        <>
+                        data-source-base-url)))
+                   '()))
+              '())))
+       (list govuk-puppet-data-source)))
+
+    (define (data-extracts)
+      (with-index-file
+       (string-append base-url "/data-extracts/index.json")
+       (lambda (data-extracts-index)
+         (map
+          (lambda (data-extract-data)
+            (data-extract
+             (file (origin
+                     (method (let ((scheme (uri-scheme (string->uri base-url))))
+                               (cond ((eq? scheme 'file)
+                                      url-fetch)
+                                     ((eq? scheme 's3)
+                                      (s3-fetch-for-profile "govuk-test"))
+                                     (else (error "Unrecognised scheme"
+                                                  scheme)))))
+                     (uri (string-append base-url
+                                         "/data-extracts/"
+                                         (hash-ref data-extract-data
+                                                   "url")))
+                     (file-name (string-append
+                                 (hash-ref data-extract-data "date")
+                                 "_"
+                                 (basename (hash-ref data-extract-data "url"))))
+                     (sha256 (nix-base32-string->bytevector
+                              (hash-ref data-extract-data "sha256-hash")))))
+             (datetime (string->date
+                        (hash-ref data-extract-data "date") "~Y-~m-~d"))
+             (database (hash-ref data-extract-data "database"))
+             (services (filter-map
+                        (lambda (service-name)
+                          (find (lambda (service-type)
+                                  (string=? (symbol->string
+                                             (service-type-name service-type))
+                                            service-name))
+                                (map service-kind govuk-services)))
+                        (hash-map->list (lambda (key value)
+                                          key)
+                                        (hash-ref data-extract-data "services"))))
+             (data-source data-directory-with-index-data-source)))
+          (hash-ref (json->scm data-extracts-index) "extracts")))))
+
+    (data-extracts)))
 
 (define data-directory-with-index-data-source
   (data-source
