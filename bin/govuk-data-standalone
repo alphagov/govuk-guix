@@ -3,19 +3,50 @@
 require 'uri'
 require 'json'
 require 'optparse'
+require 'fileutils'
 
 def data_directory_base_url
-  ENV['GOVUK_GUIX_DATA_DIRECTORY_BASE_URL']
+  ENV['GOVUK_GUIX_DATA_DIRECTORY_BASE_URL'] || 's3://govuk-development-data-test'
+end
+
+def cache_directory
+  base = ENV['XDG_CACHE_HOME'] || "#{ENV['HOME']}/.cache"
+
+  "#{base}/govuk-guix"
+end
+
+def aws_s3(*args)
+  status = system(*(%w[govuk aws --profile govuk-test -- s3] + args))
+
+  unless status
+    puts "error: aws s3 command failed: #{args.join(' ')}"
+    exit 1
+  end
+end
+
+def data_storage_directory
+  if Dir.exists? '/var/govuk'
+    directory = '/var/govuk/development-data'
+  elsif Dir.exists? "#{ENV['HOME']}/govuk"
+    directory = "#{ENV['HOME']}/govuk/development-data"
+  else
+    directory = "#{cache_directory}/development-data"
+  end
+
+  FileUtils.mkdir_p directory
+  directory
 end
 
 def retrieve_index
   base_uri = URI(data_directory_base_url)
 
-  data_extracts_index = "#{base_uri.path}data-extracts/index.json"
-
   case base_uri.scheme
   when "file"
+    data_extracts_index = "#{base_uri.path}data-extracts/index.json"
     JSON.parse(File.read(data_extracts_index))
+  when "s3"
+    aws_s3('cp', "#{data_directory_base_url}/data-extracts/index.json", "#{cache_directory}/data-extracts/")
+    JSON.parse(File.read("#{cache_directory}/data-extracts/index.json"))
   when "http"
   when "https"
   when "ssh"
@@ -27,12 +58,19 @@ end
 
 def get_local_path_to_extract_data(extract, dry_run)
   extract_data_uri = URI(
-    "#{data_directory_base_url}data-extracts/#{extract[:url]}"
+    File.join(data_directory_base_url, 'data-extracts', extract[:url])
   )
 
   case extract_data_uri.scheme
   when "file"
     extract_data_uri.path
+  when "s3"
+    storage_directory = data_storage_directory
+
+    puts "downloading #{extract_data_uri} to #{storage_directory}/\n"
+    #aws_s3('cp', extract_data_uri.to_s, "#{storage_directory}/")
+
+    File.join(storage_directory, File.basename(extract[:url]))
   when "http"
   when "https"
   when "ssh"
@@ -55,7 +93,11 @@ end
 def group_extracts(field, extracts)
   extracts.each_with_object(Hash.new { |h,k| h[k] = [] }) do |extract, result|
     key = extract[field]
-    key = [key] unless key.kind_of?(Array)
+    if key.kind_of?(Hash)
+      key = key.keys
+    elsif !key.kind_of?(Array)
+      key = [key]
+    end
 
     key.each do |key_value|
       result[key_value].push(extract)
@@ -76,7 +118,7 @@ def filter_extracts(extracts,
                     after_date: false)
   extracts.select do |extract|
     next if services and
-      services.all? { |service| !extract[:services].include? service }
+      services.all? { |service| !extract[:services].keys.include? service }
 
     next if database and !database.include? extract[:database]
     next if before_date and extract[:before_date] > before_date
@@ -87,7 +129,7 @@ def filter_extracts(extracts,
 end
 
 def all_services(extracts)
-  extracts.map(&:services).flatten.unique
+  extracts.map(&:services).map(&:keys).flatten.unique
 end
 
 def list(options)
@@ -131,9 +173,46 @@ def show_extracts_to_load(extracts_by_service_and_database)
   end
 end
 
-def load_postgresql_extract(extract, dry_run)
+def get_decompressor(filename)
+  if filename.end_with? 'xz'
+    'xz'
+  elsif filename.end_with? 'gz'
+    'gzip'
+  end
+end
+
+def load_postgresql_extract(extract, service, dry_run)
   local_file = get_local_path_to_extract_data(extract, dry_run)
-  command = "pv #{local_file} | gzip -d | psql --no-psqlrc --quiet"
+  decompressor = get_decompressor(local_file)
+  target_database = extract[:services][service]['database']
+  command = "pv #{local_file} | #{decompressor} -d | psql --no-psqlrc --quiet #{target_database}"
+
+  if dry_run
+    puts "Would run command: #{command}"
+  else
+    puts "Running command: #{command}"
+    system(command)
+  end
+end
+
+def load_mysql_extract(extract, service, dry_run)
+  local_file = get_local_path_to_extract_data(extract, dry_run)
+  decompressor = get_decompressor(local_file)
+  target_database = extract[:services][service]['database']
+  command = "pv #{local_file} | #{decompressor} -d | mysql #{target_database}"
+
+  if dry_run
+    puts "Would run command: #{command}"
+  else
+    puts "Running command: #{command}"
+    system(command)
+  end
+end
+
+def load_mongo_extract(extract, service, dry_run)
+  local_file = get_local_path_to_extract_data(extract, dry_run)
+  target_database = extract[:services][service]['database']
+  command = "mongorestore -d #{target_database} #{local_file}"
 
   if dry_run
     puts "Would run command: #{command}"
@@ -149,7 +228,16 @@ def load_extracts(extracts_by_service_and_database, dry_run)
       puts "#{dry_run ? 'Would import' : 'Importing'} extract from #{extract[:date]} into the #{service} database"
       puts
 
-      load_postgresql_extract(extract, dry_run)
+      if database == "postgresql"
+        load_postgresql_extract(extract, service, dry_run)
+      elsif database == "mysql"
+        load_mysql_extract(extract, service, dry_run)
+      elsif database == "mongo"
+        load_mongo_extract(extract, service, dry_run)
+      else
+        puts "unknown database: #{database}"
+        exit 1
+      end
     end
   end
 end
@@ -157,7 +245,7 @@ end
 def load(options)
   all_extracts = filter_extracts(
     retrieve_extracts,
-    **options.keep_if { |k| FILTER_OPTIONS.include? k }
+    **options.select { |k, _v| FILTER_OPTIONS.include? k }
   )
 
   services = options[:services] or all_services(all_extracts)
