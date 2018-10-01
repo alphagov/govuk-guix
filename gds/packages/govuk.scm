@@ -1395,15 +1395,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public smart-answers
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0yxdycj6s8f837dr38ldbdq9q2cmwm5jzb26fnk0k435dxm3rap3")))
+    (hash (base32 "1ik87ma75x0ccqx0n7h71aqp9ywk7r8s1mq6klyw6hkd58faifh9")))
    (package
      (name "smart-answers")
-     (version "release_4126")
+     (version "release_4127")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1rm4wmqzk1drxs18yr2nznarpgr1jxfx0pm7nvrava9as12gidnf")))
+       #:hash (base32 "0ly42gw18lyalds6hjhj6rz19v5mmv5p83x6k286iakhykc7wd0c")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
