@@ -27,6 +27,7 @@
             group-extracts
             sort-extracts
             get-extracts-and-database-connection-configs
+            database-connection-config-from-service-for-extract
             load-extract))
 
 (define-record-type* <data-extract>
