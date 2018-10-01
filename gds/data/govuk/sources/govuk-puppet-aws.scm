@@ -103,7 +103,7 @@
       (append-map (match-lambda*
                     (((filename stat . children))
                      (or (and=> (assoc-ref mongodb-extracts
-                                       filename)
+                                           filename)
                                 (lambda (extracts)
                                   (create-extracts-from-mongodb-dump-files extracts
                                                                            date
