@@ -6,6 +6,7 @@
   #:use-module (guix utils)
   #:use-module (guix gexp)
   #:use-module (guix build-system gnu)
+  #:use-module (guix build-system guile)
   #:use-module (guix build-system trivial)
   #:use-module (guix build-system ruby)
   #:use-module (guix download)
@@ -21,6 +22,7 @@
   #:use-module (gnu packages certs)
   #:use-module (gnu packages commencement)
   #:use-module (gnu packages guile)
+  #:use-module (gnu packages gnupg)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages xml)
@@ -29,6 +31,8 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu packages node)
   #:use-module (gnu packages imagemagick)
+  #:use-module (gnu packages pv)
+  #:use-module (gnu packages python-web)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages web)
   #:use-module (gnu packages pkg-config)
@@ -651,104 +655,103 @@ service setup.")
    (license #f)
    (home-page #f)))
 
-(define-public current-govuk-guix
+(define-public govuk-guix
+  (package
+    (name "govuk-guix")
+    (version "release_2")
+    (source
+     (github-archive
+      #:repository name
+      #:commit-ish version
+      #:hash (base32 "0632b4ycs7biifv3nnlpr9f6kwgvg6vh6clzwf3xlrvsbacbmidv")))
+    (build-system guile-build-system)
+    (inputs
+     `(("coreutils" ,coreutils)
+       ("bash" ,bash)
+       ("guix" ,guix)
+       ("guile" ,guile-2.2)
+       ("guile-gcrypt" ,guile-gcrypt)
+       ("awscli" ,awscli)
+       ("ruby" ,ruby)
+       ("pv" ,pv)
+       ("pigz" ,pigz)
+       ("xz" ,xz)))
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (add-after 'build 'install-bin
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((out (assoc-ref outputs "out")))
+               (install-file "bin/govuk" (string-append out "/bin"))
+               (for-each (lambda (file)
+                           (install-file
+                            file
+                            (string-append  out "/share/govuk-guix/bin")))
+                         (find-files "bin")))
+             #t))
+         (add-after 'install 'wrap-bin-files
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (use-modules (ice-9 rdelim)
+                          (ice-9 popen))
+             (let* ((out (assoc-ref outputs "out"))
+                    (effective (read-line
+                                (open-pipe* OPEN_READ
+                                            "guile" "-c"
+                                            "(display (effective-version))")))
+                    (module-dir (string-append out "/share/guile/site/"
+                                               effective)))
+
+               (copy-recursively
+                "gds/systems/govuk/skeletons"
+                (string-append module-dir
+                               "/gds/systems/govuk/skeletons"))
+
+               (wrap-program (string-append out "/bin/govuk")
+                 `("PATH" prefix (,(string-append
+                                    (assoc-ref inputs "coreutils")
+                                    "/bin")
+                                  ,(string-append
+                                    (assoc-ref inputs "guile")
+                                    "/bin")
+                                  ,(string-append
+                                    (assoc-ref inputs "bash") "/bin")))
+                 `("GUILE_LOAD_COMPILED_PATH" =
+                   (,(getenv "GUILE_LOAD_COMPILED_PATH")))
+                 `("GUILE_LOAD_PATH" = (,(string-append
+                                          (getenv "GUILE_LOAD_PATH")
+                                          ":"
+                                          module-dir)))
+                 `("GOVUK_EXEC_PATH" suffix
+                   (,(string-append out "/share/govuk-guix/bin")))
+                 `("GUIX_PACKAGE_PATH" = (,module-dir))
+                 `("GUIX_UNINSTALLED" = ("true")))
+
+               (wrap-program
+                   (string-append out
+                                  "/share/govuk-guix/bin/govuk-download-backups")
+                 `("PATH" prefix
+                   ,(map (lambda (input)
+                           (string-append (assoc-ref inputs input) "/bin"))
+                         (list "awscli" "ruby" "pv" "pigz" "xz")))))
+
+             #t)))))
+    (home-page "https://github.com/alphagov/govuk-guix")
+    (synopsis "Package, service and system definitions for GOV.UK")
+    (description "")
+    (license #f)))
+
+(define-public (current-govuk-guix)
   (let* ((repository-root (canonicalize-path
                            (string-append (current-source-directory)
                                           "/../..")))
          (select? (delay (git-predicate repository-root))))
-    (lambda ()
-      (package
-        (name "govuk-guix")
-        (version "0")
-        (source (local-file repository-root "govuk-guix-current"
-                            #:recursive? #t
-                            #:select? (force select?)))
-        (build-system gnu-build-system)
-        (inputs
-         `(("coreutils" ,coreutils)
-           ("bash" ,bash)
-           ("guix" ,guix)
-           ("guile" ,guile-2.2)))
-        (arguments
-         '(#:phases
-           (modify-phases %standard-phases
-             (replace 'configure (lambda args #t))
-             (replace 'build (lambda args #t))
-             (replace 'check (lambda args #t))
-             (replace 'install
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (use-modules (ice-9 rdelim)
-                              (ice-9 popen))
-                 (let* ((out (assoc-ref outputs "out"))
-                        (effective (read-line
-                                    (open-pipe* OPEN_READ
-                                                "guile" "-c"
-                                                "(display (effective-version))")))
-                        (module-dir (string-append out "/share/guile/site/"
-                                                   effective))
-                        (object-dir (string-append out "/lib/guile/" effective
-                                                   "/site-ccache"))
-                        (prefix     (string-length module-dir)))
-                   (install-file "bin/govuk" (string-append out "/bin"))
-                   (for-each (lambda (file)
-                               (install-file
-                                file
-                                (string-append  out "/share/govuk-guix/bin")))
-                             (find-files "bin"))
-                   (copy-recursively
-                    "gds"
-                    (string-append module-dir "/gds")
-                    #:log (%make-void-port "w"))
-                   (setenv "GUILE_AUTO_COMPILE" "0")
-                   (for-each (lambda (file)
-                               (let* ((base (string-drop (string-drop-right file 4)
-                                                         prefix))
-                                      (go   (string-append object-dir base ".go")))
-                                 (invoke "guild" "compile"
-                                          "--warn=unused-variable"
-                                          "--warn=unused-toplevel"
-                                          "--warn=unbound-variable"
-                                          "--warn=arity-mismatch"
-                                          "--warn=duplicate-case-datum"
-                                          "--warn=bad-case-datum"
-                                          "--warn=format"
-                                          "-L" module-dir
-                                          file "-o" go)))
-                             (find-files module-dir "\\.scm$"))
-                   (setenv "GUIX_PACKAGE_PATH" module-dir)
-                   (setenv "GUILE_LOAD_PATH" (string-append
-                                              (getenv "GUILE_LOAD_PATH")
-                                              ":"
-                                              module-dir))
-                   (setenv "GUILE_LOAD_COMPILED_PATH"
-                           (string-append
-                            (getenv "GUILE_LOAD_COMPILED_PATH")
-                            ":"
-                            object-dir))
-                   #t)))
-             (add-after 'install 'wrap-bin-files
-               (lambda* (#:key inputs outputs #:allow-other-keys)
-                 (let ((out (assoc-ref outputs "out")))
-                   (wrap-program (string-append out "/bin/govuk")
-                     `("PATH" prefix (,(string-append
-                                        (assoc-ref inputs "coreutils")
-                                        "/bin")
-                                      ,(string-append
-                                        (assoc-ref inputs "guile")
-                                        "/bin")
-                                      ,(string-append
-                                        (assoc-ref inputs "bash") "/bin")))
-                     `("GUILE_LOAD_COMPILED_PATH" =
-                       (,(getenv "GUILE_LOAD_COMPILED_PATH")))
-                     `("GUILE_LOAD_PATH" = (,(getenv "GUILE_LOAD_PATH")))
-                     `("GOVUK_EXEC_PATH" suffix
-                       (,(string-append out "/share/govuk-guix/bin")))
-                     `("GUIX_PACKAGE_PATH" = (,(getenv "GUIX_PACKAGE_PATH")))
-                     `("GUIX_UNINSTALLED" = ("true")))))))))
-        (home-page #f)
-        (synopsis "Package, service and system definitions for GOV.UK")
-        (description "")
-        (license #f)))))
+    (package
+      (inherit govuk-guix)
+      (version (string-append (package-version govuk-guix)
+                              "-snapshot"))
+      (source (local-file repository-root "govuk-guix-current"
+                          #:recursive? #t
+                          #:select? (force select?))))))
 
 (define-public hmrc-manuals-api
   (package-with-bundler
