@@ -55,7 +55,8 @@
  (gds data govuk)
  (gds scripts govuk data list)
  (gds scripts govuk data load)
- (gds scripts govuk data build-snapshot))
+ (gds scripts govuk data build-snapshot)
+ (gds scripts govuk data build-data-directory-with-index))
 
 (define (parse-date str)
   (string->date str "~d/~m/~Y"))
@@ -146,7 +147,8 @@
   (define commands
     `(("list" . ,list-available-extracts)
       ("load" . ,load-extracts)
-      ("build-snapshot" . ,build-snapshot)))
+      ("build-snapshot" . ,build-snapshot)
+      ("build-data-directory-with-index" . ,build-data-directory-with-index)))
 
   (display "\n")
   (with-error-handling
