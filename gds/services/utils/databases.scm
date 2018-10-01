@@ -36,7 +36,8 @@
             database-connection-config->environment-variables
             update-database-connection-config-port
             ensure-database-user-exists-on-service-startup
-            database-connection-config->database-name))
+            database-connection-config->database-name
+            database-connection-config->alist))
 
 (define-record-type* <redis-connection-config>
   redis-connection-config make-redis-connection-config
@@ -142,6 +143,20 @@
     (($ <redis-connection-config> host port db-number namespace) namespace)
     (unmatched
      (error "database-connection-config->database-name no match for ~A"
+            unmatched))))
+
+(define database-connection-config->alist
+  (match-lambda
+    (($ <postgresql-connection-config> host user port database)
+     `((host . ,host) (user . ,user) (port . ,port) (database . ,database)))
+    (($ <mysql-connection-config> host user port database)
+     `((host . ,host) (user . ,user) (port . ,port) (database . ,database)))
+    (($ <mongodb-connection-config> user password host port database)
+     `((user . ,user) (password . ,password) (host . ,host) (port . ,port) (database . ,database)))
+    (($ <redis-connection-config> host port db-number namespace)
+     `((host . ,host) (port . ,port) (db-number . ,db-number) (namespace . ,namespace)))
+    (unmatched
+     (error "database-connection-config->alist no match for ~A"
             unmatched))))
 
 (define (update-database-connection-config-port port-for config)
