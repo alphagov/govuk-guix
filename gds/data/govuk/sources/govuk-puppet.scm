@@ -180,7 +180,7 @@
           (scandir
            (string-join (list backup-directory date database hostname) "/")
            (lambda (name) (string-suffix? ".tgz" name)))))
-      (if (null? files)
+      (if (or (eq? files #f) (null? files))
           #f
           (local-file
            (string-join
