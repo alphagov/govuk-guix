@@ -157,7 +157,7 @@ higher priority extracts appear later in the list"
               database-connection-config
               (transform-file file)
               #:dry-run? dry-run?))
-            (($ <data-extract> file datetime "mongodb" services)
+            (($ <data-extract> file datetime "mongo" services)
              (mongodb-restore-gexp
               database-connection-config
               (transform-file file)
