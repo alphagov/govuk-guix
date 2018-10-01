@@ -1,0 +1,76 @@
+#!/bin/sh
+
+set -e
+
+eval "$(govuk aws --profile govuk-integration --export)"
+
+BACKUPS="$GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY"
+DATE="$(date '+%Y-%m-%d')"
+
+aws s3 sync s3://govuk-integration-database-backups/postgres/$DATE/ "$BACKUPS/$DATE/postgresql/"
+aws s3 sync s3://govuk-integration-database-backups/mysql/$DATE/ "$BACKUPS/$DATE/mysql/mysql-master/"
+
+MONGODB_HOSTNAMES=(router_backend mongo)
+MONGODB_FILES=()
+
+for SRC_HOSTNAME in "${MONGODB_HOSTNAMES[@]}"
+do
+    echo "$SRC_HOSTNAME"
+    remote_file_details=$(aws s3 ls s3://govuk-integration-database-backups/mongodb/daily/${SRC_HOSTNAME}/ | grep "$DATE" || true)
+    if [ -z "$remote_file_details" ]; then
+        echo "missing $DATE for $SRC_HOSTNAME"
+        MONGODB_FILES+=("")
+        continue
+    fi
+    arr_file_details=($remote_file_details)
+    FILE_NAME=${arr_file_details[3]}
+
+    aws s3 sync s3://govuk-integration-database-backups/mongodb/daily/${SRC_HOSTNAME}/ "$BACKUPS/$DATE/mongo/$SRC_HOSTNAME/" --exclude "*" --include "${FILE_NAME}"
+
+    MONGODB_FILES+=("$FILE_NAME")
+done
+
+export XZ_OPT="-e -9 -T0"
+
+for index in "${!MONGODB_HOSTNAMES[@]}"
+do
+    SRC_HOSTNAME="${MONGODB_HOSTNAMES[$index]}"
+
+    if [ -z "${MONGODB_FILES[$index]}" ]; then
+        continue
+    fi
+
+    file="$BACKUPS/$DATE/mongo/$SRC_HOSTNAME/${MONGODB_FILES[$index]}"
+    var_directory="$BACKUPS/$DATE/mongo/$SRC_HOSTNAME/var"
+
+    if [ -d "$var_directory" ]; then
+        echo "$var_directory already exists"
+    else
+        echo "unpacking $file"
+
+        tar -I pigz -xf "$file" -C "$(dirname $file)"
+
+        for database in $(find "$var_directory/lib/mongodb/backup/mongodump/" -type d | tail -n+2); do
+            echo "Processing $(basename $database)"
+            tar -cJf "$(dirname $var_directory)/$(basename $database).tar.xz" -C "$(dirname $database)" "$(basename $database)"
+
+            rm -r "$database"
+        done
+
+        rmdir --ignore-fail-on-non-empty --parents "$var_directory/lib/mongodb/backup/mongodump"
+        mkdir "$var_directory" # so that this isn't processed again
+    fi
+done
+
+for file in $(find "$BACKUPS/$DATE" -name "*.dump.gz"); do
+    echo "$file"
+
+    newfile="${file/dump.gz/dump.xz}"
+
+    if [ -f "$newfile" ]; then
+        echo "$newfile already exists"
+    else
+        echo "creating ${newfile}..."
+        pv "$file" | gzip -d | xz -e -9 -z -T0 -c > "$newfile"
+    fi
+done
