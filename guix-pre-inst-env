@@ -65,6 +65,8 @@ set -u
 
 eval "$SEARCH_PATHS"
 
+export PATH="$GOVUK_GUIX_ROOT/bin:$PATH"
+
 export GUIX_ENVIRONMENT="$(dirname $(dirname $(type -p guix)))"
 
 export SSL_CERT_FILE="$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt"
