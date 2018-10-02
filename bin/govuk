@@ -6,6 +6,10 @@
 
 set -e
 
+if [ ! -n "$BASH" ] ; then
+    exec bash "$0" $@
+fi
+
 function log {
     if [ "$GOVUK_EXEC_DEBUG" != "" ]; then
         echo "$1"

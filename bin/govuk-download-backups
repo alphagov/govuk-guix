@@ -2,6 +2,10 @@
 
 set -e
 
+if [ ! -n "$BASH" ] ; then
+    exec bash "$0" $@
+fi
+
 eval "$(govuk aws --profile govuk-integration --export)"
 
 BACKUPS="$GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY"

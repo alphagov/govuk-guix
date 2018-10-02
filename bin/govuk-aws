@@ -2,6 +2,10 @@
 
 set -e
 
+if [ ! -n "$BASH" ] ; then
+    exec bash "$0" $@
+fi
+
 profile="${PROFILE:-govuk-integration}"
 
 cache_directory="${XDG_CACHE_HOME-$HOME/.cache}/govuk-guix"
