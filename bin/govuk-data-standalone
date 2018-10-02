@@ -12,7 +12,7 @@ end
 def cache_directory
   base = ENV['XDG_CACHE_HOME'] || "#{ENV['HOME']}/.cache"
 
-  "#{base}/govuk-guix"
+  "#{base}/govuk-guix/development-data"
 end
 
 def aws_s3(*args)
@@ -30,7 +30,7 @@ def data_storage_directory
   elsif Dir.exists? "#{ENV['HOME']}/govuk"
     directory = "#{ENV['HOME']}/govuk/development-data"
   else
-    directory = "#{cache_directory}/development-data"
+    directory = "#{cache_directory}"
   end
 
   FileUtils.mkdir_p directory
