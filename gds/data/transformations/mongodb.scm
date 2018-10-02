@@ -7,12 +7,15 @@
   #:use-module (guix records)
   #:use-module (guix monads)
   #:use-module (gnu packages admin)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages pv)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu services databases)
+  #:use-module (gds data data-extract)
+  #:use-module (gds services utils databases mongodb)
   #:export (with-mongodb
 
             mongodb-load-extracts))

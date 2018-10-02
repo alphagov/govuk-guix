@@ -13,6 +13,8 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu services databases)
+  #:use-module (gds data data-extract)
+  #:use-module (gds services utils databases postgresql)
   #:export (with-postgresql
 
             postgresql-load-extracts))

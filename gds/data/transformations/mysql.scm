@@ -1,4 +1,6 @@
 (define-module (gds data transformations mysql)
+  #:use-module (srfi srfi-1)
+  #:use-module (ice-9 match)
   #:use-module (guix gexp)
   #:use-module (gnu packages base)
   #:use-module (gnu packages admin)
@@ -6,6 +8,8 @@
   #:use-module (gnu packages pv)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
+  #:use-module (gds data data-extract)
+  #:use-module (gds services utils databases mysql)
   #:export (with-mysql
 
             mysql-load-extracts))
