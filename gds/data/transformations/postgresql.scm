@@ -13,7 +13,9 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu services databases)
-  #:export (with-postgresql))
+  #:export (with-postgresql
+
+            postgresql-load-extracts))
 
 (define* (with-postgresql
           postgresql-service
@@ -93,3 +95,37 @@
             (pg_ctl "stop")
 
             result)))))
+
+(define (postgresql-load-extracts extracts-and-database-connection-configs)
+  (define operation
+    (with-imported-modules '((gds data transformations build postgresql))
+      #~(lambda _
+          #$@(append-map
+              (match-lambda
+                ((data-extract . database-connection-configs)
+                 (map
+                  (match-lambda
+                    (($ <postgresql-connection-config> port user host database)
+                     #~(let ((database #$database)
+                             (user #$user))
+                         (invoke "createuser" user)
+                         (invoke "createdb" database "-O" user)
+                         (decompress-file-and-pipe-to-psql
+                          #$(data-extract-file data-extract)
+                          database))))
+                  database-connection-configs)))
+              extracts-and-database-connection-configs))))
+
+  #~(begin
+      #$(with-postgresql
+         (service postgresql-service-type)
+         operation)
+
+      (invoke #$(file-append tar "/bin/tar")
+              "--checkpoint=1000"
+              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+              (string-append "--use-compress-program="
+                             #$(file-append pigz "/bin/pigz"))
+              "--create"
+              "--file" #$output
+              "postgresql")))

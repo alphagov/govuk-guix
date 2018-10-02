@@ -13,7 +13,9 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu services databases)
-  #:export (with-mongodb))
+  #:export (with-mongodb
+
+            mongodb-load-extracts))
 
 (define* (with-mongodb
           mongodb-service
@@ -66,3 +68,68 @@
             (force-output)
 
             result)))))
+
+(define (mongodb-load-extracts extracts-and-database-connection-configs)
+  (define operation
+    #~(lambda _
+        #$@(map
+            (match-lambda
+              ((data-extract . database-connection-configs)
+               #~(let ((dump-directory "dump"))
+                   (mkdir-p dump-directory)
+                   (chdir dump-directory)
+                   (invoke #$(file-append tar "/bin/tar")
+                           "--extract"
+                           "--xz"
+                           "--strip-components=1"
+                           "--file" #$(data-extract-file data-extract))
+                   (chdir "..")
+                   (simple-format #t "\nload-extracts: data extracted...\n\n")
+                   (simple-format #t "checking metadata files in ~A\n"
+                                  dump-directory)
+                   (force-output)
+
+                   ;; Work around some broken collections by
+                   ;; deleting them, this is necessary for Travel
+                   ;; Advice Publisher
+                   (for-each (lambda (file)
+                               (simple-format #t "deleting ~A\n" file)
+                               (delete-file file))
+                             (find-files dump-directory
+                                         "^\\{"))
+
+                   ;; Work around an issue with the
+                   ;; extracts. mongorestore seems to fail when trying
+                   ;; to use the options thing, so remove it.
+                   (for-each (lambda (file)
+                               (simple-format #t "removing options from ~A\n" file)
+                               (substitute* file
+                                 (("\\\"options\\\" [^}]*\\},")
+                                  "")))
+                             (find-files dump-directory
+                                         ".*\\.metadata\\.json$"))
+                   (simple-format #t "\n\nload-extracts: starting mongorestore\n\n")
+                   (force-output)
+                   (invoke "mongorestore"
+                           "-d" #$(mongodb-connection-config-database
+                                   (car database-connection-configs))
+                           dump-directory)
+                   (delete-file-recursively dump-directory))))
+            extracts-and-database-connection-configs)))
+
+  (with-imported-modules '((guix build utils))
+    #~(begin
+        (use-modules (guix build utils))
+
+        #$(with-mongodb
+           (service mongodb-service-type)
+           operation)
+
+        (invoke #$(file-append tar "/bin/tar")
+                "--checkpoint=1000"
+                "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+                (string-append "--use-compress-program="
+                               #$(file-append pigz "/bin/pigz"))
+                "--create"
+                "--file" #$output
+                "mongodb"))))

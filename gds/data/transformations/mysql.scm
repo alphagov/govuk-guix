@@ -6,7 +6,9 @@
   #:use-module (gnu packages pv)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
-  #:export (with-mysql))
+  #:export (with-mysql
+
+            mysql-load-extracts))
 
 (define* (with-mysql
           mysql-service
@@ -100,3 +102,41 @@
             (sleep 10)
 
             result)))))
+
+(define (mysql-load-extracts extracts-and-database-connection-configs)
+  (define operation
+    (with-imported-modules '((gds data transformations build mysql))
+      #~(lambda _
+          (use-modules (gds data transformations build mysql))
+          #$@(append-map
+              (match-lambda
+                ((data-extract . database-connection-configs)
+                 (map
+                  (lambda (database-connection-config)
+                    #~(let ((database #$(mysql-connection-config-database
+                                         database-connection-config)))
+                        (invoke
+                         "mysql" "--user=root" "-e"
+                         (string-append
+                          "CREATE DATABASE " database ";"
+                          "GRANT ALL ON " database ".* TO ''@'localhost';"))
+
+                        (decompress-file-and-pipe-to-mysql
+                         #$(data-extract-file data-extract)
+                         database)))
+                  database-connection-configs)))
+              extracts-and-database-connection-configs))))
+
+  #~(begin
+      #$(with-mysql
+         (service mysql-service-type)
+         operation)
+
+      (invoke #$(file-append tar "/bin/tar")
+              "--checkpoint=1000"
+              "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+              (string-append "--use-compress-program="
+                             #$(file-append pigz "/bin/pigz"))
+              "--create"
+              "--file" #$output
+              "mysql")))
