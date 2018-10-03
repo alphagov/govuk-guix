@@ -76,12 +76,15 @@ fi
 
 log # empty line in log output
 
-if [[ "$COMMAND" == data* ]]; then
-    if [ "$COMMAND" = "data-standalone" ]; then
-        ruby "$COMMAND_FULL_PATH" "${@:2}"
+if [[ "$COMMAND" == "data" ]]; then
+    GUIX=$(type -pf guile || echo "")
+    if [ -z "$GUIX" ]; then
+        ruby "$(type -p govuk-data-standalone)" "${@:2}"
     else
         $GUILE "$COMMAND_FULL_PATH" "${@:2}"
     fi
+elif [ "$COMMAND" = "data-standalone" ]; then
+    ruby "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "system" ]; then
     $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "refresh" ]; then
