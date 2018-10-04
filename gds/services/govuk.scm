@@ -171,7 +171,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(authenticating-proxy))
-           (requirement '(signon)))
+           (requirement '(signon draft-router)))
          (plek-config)
          (rails-app-config
           (assets? #f))
