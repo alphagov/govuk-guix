@@ -83,7 +83,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(signon))
-           (requirement '(mysql loopback)))
+           (requirement '(mysql loopback redis)))
           (service-startup-config)
           (plek-config) (rails-app-config) (@ (gds packages govuk) signon)
           (signon-config)
@@ -363,7 +363,7 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-performance-manager))
-           (requirement '(signon)))
+           (requirement '(signon postgres)))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (plek-config) (rails-app-config) content-performance-manager
