@@ -1,7 +1,6 @@
 (define-module (gds packages utils bundler-build)
   #:use-module (ice-9 match)
   #:use-module (guix build utils)
-  #:use-module (guix store database)
   #:export (run-bundle-package))
 
 (define (run-bundle-package source
@@ -115,5 +114,4 @@
               ((".*s\\.date = \".*\"")
                "  # date removed by govuk-guix")
               ((".*s\\.rubygems\\_version = .*$")
-               "  # rubygems_version removed by govuk-guix\n")))))
-    (reset-timestamps output-path)))
+               "  # rubygems_version removed by govuk-guix\n")))))))
