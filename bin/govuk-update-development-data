@@ -2,7 +2,13 @@
 
 set -e
 
-govuk download-backups
+if [ ! -n "$BASH" ] ; then
+    exec bash "$0" $@
+fi
+
+if [ "$1" != "--no-download" ]; then
+    govuk download-backups
+fi
 
 TWO_WEEKS_AGO="$(date --date="2 weeks ago" '+%d/%m/%Y')"
 
