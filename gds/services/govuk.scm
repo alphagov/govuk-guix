@@ -425,6 +425,44 @@
            (database "content_audit_tool_production")))))
 
 ;;;
+;;; Content Data Admin
+;;;
+
+(define-public content-data-admin-service-type
+  (service-type (name 'content-data-admin)
+                (extensions
+                 (modify-service-extensions-for-signon-and-plek
+                  name
+                  (standard-rails-service-type-extensions name)))))
+
+(define-public content-data-admin-service
+  (service
+   content-data-admin-service-type
+   (list (shepherd-service
+          (inherit default-shepherd-service)
+          (provision '(content-data-admin))
+          (requirement '(content-performance-manager
+                         signon
+                         postgres)))
+         (plek-config) (rails-app-config) content-data-admin
+         (signon-application
+          (name "Content Data Admin")
+          (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Content Data Admin")
+          (email "content-data-admin@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Content Performance Manager"))
+             '("signin")))))
+         (service-startup-config)
+         (postgresql-connection-config
+          (user "content_data_admin")
+          (database "content_audit_tool_production")))))
+
+;;;
 ;;; Content Publisher
 ;;;
 
@@ -2070,6 +2108,7 @@
    "Supporting Applications"
    "Applications to support GOV.UK"
    (list content-audit-tool-service
+         content-data-admin-service
          content-performance-manager-service
          link-checker-api-service
          search-admin-service

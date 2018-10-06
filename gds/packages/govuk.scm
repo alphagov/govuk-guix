@@ -307,6 +307,25 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/content-audit-tool"))
    #:extra-inputs (list postgresql libffi)))
 
+(define-public content-data-admin
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0fz2j9h9hp352nx7lb337va2rpx8sh0qanrbi1v9a1s3qjajbadn")))
+   (package
+     (name "content-data-admin")
+     (version "release_99")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0sf754kcc8hgb140wzigfl0crh21fwwwpbqhxmyhx24nzdp8am7l")))
+     (build-system rails-build-system)
+     (synopsis "A front end for the data warehouse")
+     (description "")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/content-data-admin"))
+   #:extra-inputs (list postgresql libffi)))
+
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
