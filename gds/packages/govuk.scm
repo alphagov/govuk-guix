@@ -1372,7 +1372,8 @@ content, as well as broadcasting changes to a message queue.")
           (add-before 'precompile-rails-assets 'set-dummy-devise-environment
             (lambda _
               (setenv "DEVISE_PEPPER" "dummy-govuk-guix-value")
-              (setenv "DEVISE_SECRET_KEY" "dummy-govuk-guix-value")))
+              (setenv "DEVISE_SECRET_KEY" "dummy-govuk-guix-value")
+              #t))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           ;; Ideally this would be configurable, but as it's not, lets
