@@ -167,7 +167,8 @@
          app-domain
          nginx-port
          https?
-         include-port-in-host-header?)
+         include-port-in-host-header?
+         asset-manager-service-available?)
 
   (define special-cases
     '((whitehall-frontend
@@ -200,20 +201,23 @@
    (inherit base-nginx-server-configuration)
    (locations
     (append
+     (if asset-manager-service-available?
+         (list
+          (nginx-location-configuration
+           (uri "/media")
+           (body `(,@access-control-headers
+                   "proxy_pass http://asset-manager-proxy;")))
+          (nginx-location-configuration
+           (uri "~ /fake-s3/(.*)")
+           (body `(,(proxy-set-header-host include-port-in-host-header?)
+                   "proxy_pass http://asset-manager-proxy;"))))
+         '())
      (list
-      (nginx-location-configuration
-       (uri "/media")
-       (body `(,@access-control-headers
-               "proxy_pass http://asset-manager-proxy;")))
       (nginx-location-configuration
        (uri "~ /cloud-storage-proxy/(.*)")
        (body '("internal;"
                "set $download_url $1$is_args$args;"
-               "proxy_pass $download_url;")))
-      (nginx-location-configuration
-       (uri "~ /fake-s3/(.*)")
-       (body `(,(proxy-set-header-host include-port-in-host-header?)
-               "proxy_pass http://asset-manager-proxy;"))))
+               "proxy_pass $download_url;"))))
      (append-map
       (match-lambda
         ((service . locations)
@@ -316,42 +320,49 @@ proxy_set_header Host whitehall-admin.~A~A;"
             ("auth_basic_user_file " ,origin-password-file ";"))))
         base-nginx-server-configuration))
 
-    (cons*
-     (web-domain-server-configuration base-nginx-server-configuration-for-origin
-                                      origin-service
-                                      web-domain
-                                      app-domain
-                                      https?
-                                      nginx-port
-                                      intercept-errors?)
-     (draft-origin-server-configuration base-nginx-server-configuration
-                                        draft-origin-service
-                                        app-domain
-                                        https?
-                                        include-port-in-host-header?
-                                        nginx-port
-                                        intercept-errors?)
-     (assets-server-configuration (let ((services (map car service-and-ports)))
-                                    (filter (lambda (service)
-                                              (memq service services))
-                                            %services-to-proxy-assets-for))
-                                  base-nginx-server-configuration
-                                  app-domain
-                                  nginx-port
-                                  https?
-                                  include-port-in-host-header?)
-     (map
-      (match-lambda
-        ((service . port)
-         (service-nginx-server-configuration
-          base-nginx-server-configuration
-          app-domain
-          server-aliases
-          service
-          port
-          https?
-          include-port-in-host-header?)))
-      service-and-ports)))
+  (filter
+   nginx-server-configuration?
+   (cons*
+    (if origin-service
+        (web-domain-server-configuration base-nginx-server-configuration-for-origin
+                                         origin-service
+                                         web-domain
+                                         app-domain
+                                         https?
+                                         nginx-port
+                                         intercept-errors?))
+    (if draft-origin-service
+        (draft-origin-server-configuration base-nginx-server-configuration
+                                           draft-origin-service
+                                           app-domain
+                                           https?
+                                           include-port-in-host-header?
+                                           nginx-port
+                                           intercept-errors?))
+    (assets-server-configuration (let ((services (map car service-and-ports)))
+                                   (filter (lambda (service)
+                                             (memq service services))
+                                           %services-to-proxy-assets-for))
+                                 base-nginx-server-configuration
+                                 app-domain
+                                 nginx-port
+                                 https?
+                                 include-port-in-host-header?
+                                 (memq 'asset-manager
+                                       (map car
+                                            service-and-ports)))
+    (map
+     (match-lambda
+       ((service . port)
+        (service-nginx-server-configuration
+         base-nginx-server-configuration
+         app-domain
+         server-aliases
+         service
+         port
+         https?
+         include-port-in-host-header?)))
+     service-and-ports))))
 
 (define-record-type* <govuk-nginx-configuration>
   govuk-nginx-configuration make-govuk-nginx-configuration

@@ -172,18 +172,27 @@
            (type type))
          parsed-services))
 
-  (define service-types-whitelist
+  (define required-service-types
     (append
      (if (null? service-types)
          (map service-kind %default-services)
          service-types)
-     (cons*
-      govuk-nginx-service-type
-      ;; TODO: The authenticating-proxy service isn't required by
-      ;; anything.
-      authenticating-proxy-service-type
-      asset-manager-service-type
-      (map service-kind base-services))))
+     `(,govuk-nginx-service-type
+       ;; Only include the authenticating proxy if needed
+       ,@(if (any (lambda (draft-frontend-service-type)
+                    (memq draft-frontend-service-type service-types))
+                  (map service-kind (service-group-services
+                                     draft-frontend-services)))
+             (list authenticating-proxy-service-type)
+             '())
+       ;; Include the router if any frontend service is present
+       ,@(if (any (lambda (frontend-service-type)
+                    (memq frontend-service-type service-types))
+                  (map service-kind (service-group-services
+                                     frontend-services)))
+             (list router-service-type)
+             '())
+       ,@(map service-kind base-services))))
 
   (define base-system
     (update-system-services-package-source
@@ -191,7 +200,7 @@
      (system-without-unnecessary-services
       (filter
        (lambda (service)
-         (member (service-kind service) service-types-whitelist))
+         (member (service-kind service) required-service-types))
        (operating-system-user-services govuk-development-os))
       govuk-development-os)))
 

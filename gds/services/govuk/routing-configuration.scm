@@ -182,6 +182,15 @@
             (list add-the-certbot-activation-service)
             '())))
 
+  (define service-names
+    (map service-type-name
+         (map service-kind services)))
+
+  (define (service-name-if-it-exists service-name)
+    (if (memq service-name service-names)
+        service-name
+        #f))
+
   (update-services-parameters
    ((apply compose (reverse service-setup-functions)) services)
    (list
@@ -197,10 +206,13 @@
                (include-port-in-host-header? use-high-ports?)
                (tls use-https?)
                (service-and-ports ports)
-               (origin-service 'router)
+               (origin-service (service-name-if-it-exists
+                                'router))
                (draft-origin-service (if authenticated-draft-origin?
-                                         'authenticating-proxy
-                                         'draft-router))
+                                         (service-name-if-it-exists
+                                          'authenticating-proxy)
+                                         (service-name-if-it-exists
+                                          'draft-router)))
                (server-aliases (map (match-lambda
                                       ((name . aliases)
                                        (cons name
