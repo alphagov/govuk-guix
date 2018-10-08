@@ -1524,7 +1524,10 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(specialist-publisher))
-          (requirement '(publishing-api asset-manager signon mongodb nginx)))
+          (requirement '(publishing-api
+                         asset-manager
+                         email-alert-api
+                         signon mongodb nginx)))
          (plek-config) (rails-app-config) specialist-publisher
          (signon-application
           (name "Specialist Publisher")
@@ -1547,6 +1550,8 @@
               (application-name "Asset Manager"))
              '("signin")))))
          (service-startup-config)
+         (sidekiq-config
+          (file "config/sidekiq.yml"))
          (mongodb-connection-config
           (database "govuk_content_production"))
          (redis-connection-config))))
