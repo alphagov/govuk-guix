@@ -1393,6 +1393,10 @@
               '("signin"))
              (cons
               (signon-authorisation
+               (application-name "Email Alert API"))
+              '("signin" "internal_app"))
+             (cons
+              (signon-authorisation
                (application-name "Asset Manager"))
               '("signin")))))
           (service-startup-config)
@@ -1534,6 +1538,10 @@
              (signon-authorisation
               (application-name "Publishing API"))
              '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Email Alert API"))
+             '("signin" "internal_app"))
             (cons
              (signon-authorisation
               (application-name "Asset Manager"))
