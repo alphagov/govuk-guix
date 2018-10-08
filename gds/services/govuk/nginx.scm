@@ -107,7 +107,8 @@
     `(,(nginx-location-configuration
         (uri "/")
         (body (list (simple-format
-                     #f "proxy_pass http://~A-proxy;" origin-service))))
+                     #f "proxy_set_header GOVUK-Request-Id $pid-$msec-$remote_addr-$request_length;
+proxy_pass http://~A-proxy;" origin-service))))
       ,(nginx-location-configuration
         (uri "/api/content")
         (body '("proxy_pass http://content-store-proxy;")))
@@ -138,7 +139,8 @@
     `(,(nginx-location-configuration
         (uri "/")
         (body `(,(simple-format
-                  #f "proxy_pass http://~A-proxy;\n" draft-origin-service)
+                  #f "proxy_set_header GOVUK-Request-Id $pid-$msec-$remote_addr-$request_length;
+proxy_pass http://~A-proxy;\n" draft-origin-service)
                 ,(proxy-set-header-host include-port-in-host-header?)
                 ,@(if https?
                       '("# Set X-Forwarded-SSL for OmniAuth"
@@ -261,6 +263,7 @@
         (name "app")
         (body
          `(,(simple-format #f "access_log /var/log/nginx/~A.access.log;" service)
+           "proxy_set_header GOVUK-Request-Id $pid-$msec-$remote_addr-$request_length;"
            ,(simple-format #f "proxy_pass http://~A-proxy;" service)
            ,@(if https?
                  '("# Set X-Forwarded-SSL for OmniAuth"
