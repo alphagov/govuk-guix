@@ -28,6 +28,7 @@
 
 (define postgresql-extracts
   `(("content_audit_tool_production" . (,content-audit-tool-service-type))
+    ("content_data_admin_production" . (,content-data-admin-service-type))
     ("content_performance_manager_production" .
      (,content-performance-manager-service-type))
     ("content_tagger_production" . (,content-tagger-service-type))
