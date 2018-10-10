@@ -460,7 +460,7 @@
          (service-startup-config)
          (postgresql-connection-config
           (user "content_data_admin")
-          (database "content_audit_tool_production")))))
+          (database "content_data_admin_production")))))
 
 ;;;
 ;;; Content Publisher
