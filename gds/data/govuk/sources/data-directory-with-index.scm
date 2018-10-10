@@ -185,15 +185,20 @@
           (call-with-input-file (uri-path uri) function)
           '()))
      ((eq? 's3 (uri-scheme uri))
-      (let* ((target
-              (string-append (cache-directory)
-                             "/data-extracts/index.json"))
-             (command
-              `("govuk" "aws" "--profile" "govuk-test" "--"
-                "s3" "cp"
-                ,url
-                ,target)))
-        (apply system* command)
+      (let ((target (string-append (cache-directory)
+                                   "/data-extracts/index.json")))
+
+        (if (or (not (file-exists? target))
+                (> (- (time-second (current-time)) (stat:ctime (stat target)))
+                   ;; 1 hour (in seconds)
+                   (* 60 60)))
+            (let ((download-command
+                   `("govuk" "aws" "--profile" "govuk-test" "--"
+                     "s3" "cp"
+                     ,url
+                     ,target)))
+              (apply system* download-command)))
+
         (call-with-input-file target function)))
      (else (error "Unrecognised scheme" (uri-scheme uri))))))
 
