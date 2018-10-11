@@ -34,6 +34,7 @@
  (srfi srfi-1)
  (srfi srfi-11)
  (srfi srfi-19)
+ (srfi srfi-26)
  (srfi srfi-37)
  (ice-9 match)
  (ice-9 format)
@@ -87,6 +88,16 @@
                 (lambda (opt name arg result)
                   (alist-cons 'dry-run? #t result)))))
 
+(define (configure-services services)
+  (set-routing-configuration-for-services
+   (map
+    (cut update-service-database-connection-config-for-environment "development" <>)
+    services)
+   ;; Currently when using this, high ports are being used for the
+   ;; databases, so use the same configuration here as well to make
+   ;; the port numbers match
+   #:use-high-ports? #t))
+
 (define (options->services-and-data-extracts opts)
   (let* ((service-names
           (filter-map (match-lambda
@@ -104,9 +115,10 @@
                        (('database . d) d)
                        (_ #f))
                       opts))
-         (services (if (null? service-names)
-                       govuk-services
-                       (get-services service-names)))
+         (services (configure-services
+                    (if (null? service-names)
+                        govuk-services
+                        (get-services service-names))))
          (service-types (map service-kind services))
          (data-extracts
           (filter-extracts
@@ -123,14 +135,6 @@
           #:dry-run? (assq-ref opts 'dry-run?))))
 
 (define (get-services service-names)
-  (define all-services
-    (set-routing-configuration-for-services
-     govuk-services
-     ;; Currently when using this, high ports are being used for the
-     ;; databases, so use the same configuration here as well to make
-     ;; the port numbers match
-     #:use-high-ports? #t))
-
   (map
    (lambda (service-name)
      (or

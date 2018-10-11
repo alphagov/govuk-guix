@@ -15,6 +15,7 @@
   #:use-module (gnu packages databases)
   #:use-module (gds packages govuk)
   #:use-module (gds services)
+  #:use-module (gds services utils)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
   #:use-module (gds services utils databases mongodb)
@@ -35,6 +36,8 @@
             database-connection-config?
             database-connection-config->environment-variables
             update-database-connection-config-port
+            update-database-connection-config-for-environment
+            update-service-database-connection-config-for-environment
             ensure-database-user-exists-on-service-startup
             database-connection-config->database-name
             database-connection-config->alist))
@@ -200,6 +203,54 @@
     config)
    (else (backtrace)
          (error "unknown database connection config " config))))
+
+(define (update-database-connection-config-for-environment environment config)
+  (define (replace-environment original-str)
+    (if (string? original-str)
+        (fold (lambda (environment-to-replace str)
+                (string-replace-substring
+                 str
+                 environment-to-replace
+                 environment))
+              original-str
+              '("production" "staging" "development"))
+        original-str))
+
+  (cond
+   ((postgresql-connection-config? config)
+    (postgresql-connection-config
+     (inherit config)
+     (database (replace-environment
+                (postgresql-connection-config-database config)))))
+   ((mysql-connection-config? config)
+    (mysql-connection-config
+     (inherit config)
+     (database (replace-environment
+                (mysql-connection-config-database config)))))
+   ((mongodb-connection-config? config)
+    (mongodb-connection-config
+     (inherit config)
+     (database (replace-environment
+                (mongodb-connection-config-database config)))))
+   ((elasticsearch-connection-config? config)
+    config)
+   ((redis-connection-config? config)
+    config)
+   ((memcached-connection-config? config)
+    config)
+   ((rabbitmq-connection-config? config)
+    config)
+   (else (backtrace)
+         (error "unknown database connection config " config))))
+
+(define (update-service-database-connection-config-for-environment environment service)
+  (update-service-parameters
+   service
+   (list
+    (cons
+     database-connection-config?
+     (lambda (config)
+       (update-database-connection-config-for-environment environment config))))))
 
 (define (ensure-database-user-exists-on-service-startup s)
   (let

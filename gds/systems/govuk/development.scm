@@ -18,6 +18,9 @@
          (cut map
            (cut update-rails-app-config-environment-for-service "development" <>)
            <>)
+         (cut map
+           (cut update-service-database-connection-config-for-environment "development" <>)
+           <>)
          (cut set-routing-configuration-for-services <>
               #:use-high-ports? #t
               #:use-https? #f
