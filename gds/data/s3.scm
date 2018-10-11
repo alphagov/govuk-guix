@@ -5,12 +5,13 @@
   #:use-module (json)
   #:use-module (guix gexp)
   #:use-module (guix monads)
+  #:use-module (guix memoization)
   #:use-module (guix store)
   #:use-module (guix packages)
   #:use-module (gnu packages python-web)
   #:export (s3-fetch-for-profile))
 
-(define* (s3-fetch-for-profile profile)
+(define (s3-fetch-for-profile-internal profile)
   (define environment-variables
     (let* ((json-data
             (read-line
@@ -53,3 +54,5 @@
                         #:hash hash
                         #:recursive? #t
                         #:guile-for-build guile))))
+
+(define s3-fetch-for-profile (memoize s3-fetch-for-profile-internal))
