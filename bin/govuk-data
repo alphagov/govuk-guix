@@ -142,7 +142,7 @@
               (eq?
                (string->symbol service-name)
                (service-type-name (service-kind service))))
-            all-services)
+            govuk-services)
       (leave (G_ "Could not find service with name ~A")
              service-name)))
    service-names))
