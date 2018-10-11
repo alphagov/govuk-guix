@@ -184,10 +184,6 @@
     (redis-connection-config
      (inherit config)
      (port (port-for 'redis))))
-   ((elasticsearch-connection-config? config)
-    (elasticsearch-connection-config
-     (inherit config)
-     (port (port-for 'elasticsearch))))
    ((memcached-connection-config? config)
     (memcached-connection-config
      (servers (map (match-lambda*
