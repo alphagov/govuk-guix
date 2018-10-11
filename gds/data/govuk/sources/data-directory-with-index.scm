@@ -276,7 +276,9 @@
              (data-source data-directory-with-index-data-source)))
           (hash-ref (json->scm data-extracts-index) "extracts")))))
 
-    (data-extracts)))
+    (if (string=? base-url "")
+        '()
+        (data-extracts))))
 
 (define data-directory-with-index-data-source
   (data-source
