@@ -747,6 +747,13 @@ service setup.")
                  `("GUIX_PACKAGE_PATH" = (,module-dir))
                  `("GUIX_UNINSTALLED" = ("true")))
 
+               (wrap-program (string-append
+                              out "/share/govuk-guix/bin/govuk-aws")
+                 `("PATH" =
+                   ,(map (lambda (input)
+                           (string-append (assoc-ref inputs input) "/bin"))
+                         (list "coreutils" "awscli" "ruby" "gawk"))))
+
                (wrap-program
                    (string-append out
                                   "/share/govuk-guix/bin/govuk-download-backups")
