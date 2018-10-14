@@ -262,6 +262,25 @@ def load(options)
   load_extracts(extracts, options[:dry_run])
 end
 
+def fetch(options)
+  all_extracts = filter_extracts(
+    retrieve_extracts,
+    **options.select { |k, _v| FILTER_OPTIONS.include? k }
+  )
+
+  extracts = extracts_to_load_by_service_and_database(all_extracts)
+
+  show_extracts_to_load(extracts)
+  puts
+
+  extracts.each do |service, extracts_by_database|
+    extracts_by_database.each do |database, extract|
+      local_file = get_local_path_to_extract_data(extract, options[:dry_run])
+      puts "govuk: data: finished fetching #{local_file}"
+    end
+  end
+end
+
 def check_prerequsites
   aws_config = "#{ENV['HOME']}/.aws/config"
   unless File.exist? aws_config
@@ -300,6 +319,8 @@ def main
     list(options)
   when "load"
     load(options)
+  when "fetch"
+    fetch(options)
   else
     STDERR.puts "error: command #{command} is not recognised"
     exit 1
