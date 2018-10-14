@@ -44,7 +44,7 @@
   #:use-module (gds packages guix)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler)
-  #:use-module (gds packages third-party phantomjs))
+  #:use-module (gds packages third-party chromium))
 
 (define govuk-admin-template-initialiser
   '(lambda _
@@ -1120,7 +1120,7 @@ content, as well as broadcasting changes to a message queue.")
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
-        ("phantomjs" ,phantomjs)))
+        ("chromium" ,chromium)))
      (arguments
       `(#:phases
         (modify-phases %standard-phases
@@ -1499,7 +1499,7 @@ content, as well as broadcasting changes to a message queue.")
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
-        ("phantomjs" ,phantomjs)))
+        ("chromium" ,chromium)))
      (arguments
       `(#:phases
         (modify-phases %standard-phases

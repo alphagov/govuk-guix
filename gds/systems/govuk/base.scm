@@ -24,6 +24,8 @@
   #:use-module (gnu packages code)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages fontutils)
+  #:use-module (gnu packages fonts)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lsof)
   #:use-module (gnu packages ncdu)
@@ -124,6 +126,8 @@
 (define useful-packages
   (cons*
    smokey
+   fontconfig
+   font-dejavu
    govuk-setenv
    strace
    (specification->package+output "bind" "utils")
