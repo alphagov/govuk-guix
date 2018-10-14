@@ -370,15 +370,6 @@
           (signon-application
            (name "Content Performance Manager")
            (supported-permissions '("signin" "inventory_management")))
-          (signon-api-user
-           (name "Content Performance Manager")
-           (email "content-performance-manager@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
           (service-startup-config)
           (redis-connection-config)
           (postgresql-connection-config
