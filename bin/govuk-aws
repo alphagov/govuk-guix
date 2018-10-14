@@ -56,6 +56,7 @@ run_aws_assume_role() {
     fi
 
     aws_assume_role="aws sts assume-role \
+                    --profile gds \
                     --role-arn $ROLE_ARN \
                     --role-session-name $SESSION_NAME \
                     --serial-number $MFA_SERIAL \
