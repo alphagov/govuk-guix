@@ -20,6 +20,12 @@ prompt_for_mfa_token() {
 }
 
 read_aws_config_file() {
+    if [ ! -f ~/.aws/config ]; then
+        echo "govuk: aws: ~/.aws/config doesn't exist" >&2
+        echo "govuk: aws: please setup the relevant GOV.UK AWS configuration" >&2
+        exit 1
+    fi
+
     ROLE_ARN=$(awk '/profile '"$profile"'/ {profile=1} /role_arn/ && profile==1 {print $3; exit}' ~/.aws/config)
     MFA_SERIAL=$(awk '/profile '"$profile"'/ {profile=1} /mfa_serial/ && profile==1 {print $3; exit}' ~/.aws/config)
     SOURCE_PROFILE=$(awk '/profile '"$profile"'/ {profile=1} /source_profile/ && profile==1 {print $3; exit}' ~/.aws/config)
