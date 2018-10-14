@@ -262,6 +262,14 @@ def load(options)
   load_extracts(extracts, options[:dry_run])
 end
 
+def check_prerequsites
+  aws_config = "#{ENV['HOME']}/.aws/config"
+  unless File.exist? aws_config
+    STDERR.puts "error: #{aws_config} not found, see https://docs.publishing.service.gov.uk/manual/aws-cli-access.html for setup instructions"
+    exit 1
+  end
+end
+
 def parse_options
   options = {}
 
@@ -284,6 +292,8 @@ def main
     STDERR.puts "error: no command specified"
     exit 1
   end
+
+  check_prerequsites
 
   case command
   when "list"
