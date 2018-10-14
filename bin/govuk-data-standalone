@@ -19,7 +19,7 @@ def aws_s3(*args)
   status = system(*(%w[govuk aws --profile govuk-test -- s3] + args))
 
   unless status
-    puts "error: aws s3 command failed: #{args.join(' ')}"
+    STDERR.puts "error: aws s3 command failed: #{args.join(' ')}"
     exit 1
   end
 end
@@ -79,7 +79,8 @@ def get_local_path_to_extract_data(extract, dry_run)
   when "ssh"
     raise "#{base_uri.scheme} not yet supported"
   else
-    puts "error: unrecognised URI scheme #{base_uri.scheme}"
+    STDERR.puts "error: unrecognised URI scheme #{base_uri.scheme}"
+    exit 1
   end
 end
 
@@ -238,7 +239,7 @@ def load_extracts(extracts_by_service_and_database, dry_run)
       elsif database == "mongo"
         load_mongo_extract(extract, service, dry_run)
       else
-        puts "unknown database: #{database}"
+        STDERR.puts "unknown database: #{database}"
         exit 1
       end
     end
@@ -280,7 +281,7 @@ def main
   command = ARGV.shift
   options[:services] = ARGV if !ARGV.empty?
   unless command
-    puts "error: no command specified"
+    STDERR.puts "error: no command specified"
     exit 1
   end
 
@@ -290,7 +291,7 @@ def main
   when "load"
     load(options)
   else
-    puts "error: command #{command} is not recognised"
+    STDERR.puts "error: command #{command} is not recognised"
     exit 1
   end
 end
