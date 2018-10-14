@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'etc'
 require 'uri'
 require 'json'
 require 'optparse'
@@ -195,28 +196,53 @@ def load_postgresql_extract(extract, service, dry_run)
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
   target_database = extract[:services][service]['database']
-  command = "pv #{local_file} | #{decompressor} -d | psql --no-psqlrc --quiet #{target_database}"
-
-  if dry_run
-    puts "Would run command: #{command}"
+  if Etc.getlogin == 'vagrant'
+    user = 'postgres'
+    psql_command = "sudo -E -u postgres psql"
   else
-    puts "Running command: #{command}"
-    system(command)
+    user = extract[:services][service]['user']
+    psql_command = "psql"
   end
+
+  commands = [
+    "#{psql_command} -c \"DROP DATABASE IF EXISTS \\\"#{target_database}\\\"\"",
+    "#{psql_command} -c \"CREATE DATABASE \\\"#{target_database}\\\"\"",
+    "pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
+  ]
+
+  commands.each do |command|
+    if dry_run
+      puts "Would run command: #{command}"
+    else
+      puts "Running command: #{command}"
+      system(command)
+    end
+  end
+
+  puts "\nSuccessfully created #{target_database}"
 end
 
 def load_mysql_extract(extract, service, dry_run)
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
   target_database = extract[:services][service]['database']
-  command = "pv #{local_file} | #{decompressor} -d | mysql #{target_database}"
 
-  if dry_run
-    puts "Would run command: #{command}"
-  else
-    puts "Running command: #{command}"
-    system(command)
+  commands = [
+    "mysql -u root -e \"DROP DATABASE IF EXISTS #{target_database}\"",
+    "mysql -u root -e \"CREATE DATABASE #{target_database}\"",
+    "pv #{local_file} | #{decompressor} -d | mysql -u root #{target_database}"
+  ]
+
+  commands.each do |command|
+    if dry_run
+      puts "Would run command: #{command}"
+    else
+      puts "Running command: #{command}"
+      system(command)
+    end
   end
+
+  puts "\nSuccessfully created #{target_database}"
 end
 
 def load_mongo_extract(extract, service, dry_run)
