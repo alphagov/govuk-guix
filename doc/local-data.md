@@ -12,12 +12,6 @@ __If you encounter any difficulties or problems with govuk-guix, please [open an
 
 ## Quickstart
 
-Currently, the only available source of data is the
-["govuk-puppet" data source](#govuk-puppet-data-source), so its
-necessary to have some files downloaded through the
-`replicate-data-local.sh` script for the `govuk data` command to be
-useful.
-
 To check what data is available, run `govuk data list`. The results
 can be filtered by service name, as well as the database and date. For
 example, `govuk data list publishing-api --before=01/01/2017` will
@@ -53,6 +47,11 @@ returned item must have:
    - The database the data was extracted from.
  - services (e.g. publishing-api-service-type)
    - The services that can use this data.
+
+#### data-directory-with-index data source
+
+This data source works from a generated set of data, with an index
+file. By default, it uses a data directory fetched from AWS S3.
 
 #### govuk-puppet data source
 
