@@ -18,7 +18,7 @@ def cache_directory
 end
 
 def aws_s3(*args)
-  status = system(*(%w[govuk aws --profile govuk-test -- s3] + args))
+  status = system(*(%w[govuk aws --profile govuk-integration -- s3] + args))
 
   unless status
     STDERR.puts "error: aws s3 command failed: #{args.join(' ')}"
