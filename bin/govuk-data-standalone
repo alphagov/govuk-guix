@@ -3,6 +3,7 @@
 require 'etc'
 require 'uri'
 require 'json'
+require 'open3'
 require 'optparse'
 require 'fileutils'
 
@@ -192,7 +193,8 @@ def get_decompressor(filename)
   end
 end
 
-def load_postgresql_extract(extract, service, dry_run)
+def load_postgresql_extract(extract, service, options)
+  dry_run = options[:dry_run]
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
   target_database = extract[:services][service]['database']
@@ -202,6 +204,9 @@ def load_postgresql_extract(extract, service, dry_run)
   else
     user = extract[:services][service]['user']
     psql_command = "psql"
+  end
+  if options[:load_via_tcp]
+    psql_command += " -U postgres --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
   end
 
   commands = [
@@ -215,7 +220,35 @@ def load_postgresql_extract(extract, service, dry_run)
       puts "Would run command: #{command}"
     else
       puts "Running command: #{command}"
-      system(command)
+      unless system(command)
+        STDERR.puts "error: creating #{target_database} failed"
+        exit 1
+      end
+    end
+  end
+
+  alter_owner_queries = {
+    table: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';",
+    view: "SELECT table_name FROM information_schema.views WHERE table_schema = 'public';",
+    sequence: "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public';"
+  }
+
+  alter_owner_queries.each do |type, query|
+    command = "#{psql_command} -qXAt -c \"#{query}\" #{target_database}"
+    object_names, status = Open3.capture2(command)
+
+    unless status.success?
+      STDERR.puts "error: command failed: #{command}"
+      exit 1
+    end
+
+    object_names.each_line do |name|
+      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.upcase} \\\"#{name.strip}\\\" OWNER TO vagrant\" #{target_database}"
+
+      unless system(change_owner_command)
+        STDERR.puts "error: command failed: #{change_owner_command}"
+        exit 1
+      end
     end
   end
 
@@ -276,7 +309,7 @@ def load_extracts(extracts_by_service_and_database, options)
       puts
 
       if database == "postgresql"
-        load_postgresql_extract(extract, service, dry_run)
+        load_postgresql_extract(extract, service, options)
       elsif database == "mysql"
         load_mysql_extract(extract, service, options)
       elsif database == "mongo"
