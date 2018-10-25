@@ -265,6 +265,13 @@
      services
      routing-configuration-arguments))
 
+  (define (set-database-configuration services)
+    (map
+     (cut update-service-database-connection-config-for-environment
+       rails-environment
+       <>)
+     services))
+
   (define (set-rails-environment services)
     (map
      (cut update-rails-app-config-environment-for-service
@@ -338,6 +345,7 @@
            ;; be used
            set-routing-configuration
            set-signon-instance-name
+           set-database-configuration
            set-read-bundle-install-input-as-tar-archive
            add-database-startup-scripts
            set-admin-environment-label
