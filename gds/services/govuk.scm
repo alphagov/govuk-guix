@@ -937,42 +937,6 @@
            (database "govuk_content_production")))))
 
 ;;;
-;;; Policy Publisher
-;;;
-
-(define-public policy-publisher-service-type
-  (service-type (name 'policy-publisher)
-                (extensions
-                 (modify-service-extensions-for-signon-and-plek
-                  name
-                  (standard-rails-service-type-extensions name)))))
-
-(define-public policy-publisher-service
-  (service
-   policy-publisher-service-type
-   (list (shepherd-service
-           (inherit default-shepherd-service)
-           (provision '(policy-publisher))
-           (requirement '(publishing-api signon)))
-          (plek-config) (rails-app-config) policy-publisher
-          (signon-application
-           (name "Policy Publisher")
-           (supported-permissions '("signin")))
-          (signon-api-user
-           (name "Policy Publisher")
-           (email "policy-publisher@guix-dev.gov.uk")
-           (authorisation-permissions
-            (list
-             (cons
-              (signon-authorisation
-               (application-name "Publishing API"))
-              '("signin")))))
-          (service-startup-config)
-          (postgresql-connection-config
-           (user "policy_publisher")
-           (database "policy-publisher_production")))))
-
-;;;
 ;;; Release
 ;;;
 
@@ -2075,7 +2039,6 @@
          local-links-manager-service
          manuals-publisher-service
          maslow-service
-         policy-publisher-service
          publisher-service
          service-manual-publisher-service
          short-url-manager-service

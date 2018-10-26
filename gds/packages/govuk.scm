@@ -1020,31 +1020,6 @@ service setup.")
                         ;; TODO Remove sqlite if it's unused, it's still in the Gemfile
                         sqlite)))
 
-(define-public policy-publisher
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "0ip2yzn113pscxm69vd26rvzdjgbfswzwwcg97hb39m5f4klgjlq")))
-   (package
-     (name "policy-publisher")
-     (version "release_315")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "02k7jyxhj37skn5v2qx61ybbngzdnza3jsfchn9x3748bc31zf0x")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/policy-publisher"))
-   #:extra-inputs (list libffi
-                        postgresql)))
-
 (define-public publisher
   (package-with-bundler
    (bundle-package
