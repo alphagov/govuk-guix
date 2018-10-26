@@ -46,9 +46,7 @@
     (bootloader (bootloader-configuration
                  (bootloader grub-bootloader)
                  (target "/dev/sdX")))
-    ;; TODO: Including this causes an error for some reason...
-    ;; ERROR: Unbound variable: useful-packages
-    ;(packages useful-packages)
+    (packages useful-packages)
     (skeletons (remove (match-lambda
                          ((file source)
                           (member file '(".bashrc"))))
