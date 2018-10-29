@@ -38,6 +38,8 @@
           (define (start-mongodb)
             ((make-forkexec-constructor
               (list #$(file-append mongodb "/bin/mongod")
+                    "--wiredTigerCacheSizeGB=1"
+                    "--nojournal"
                     (string-append "--pidfilepath=" pid-file)
                     "--dbpath" base-directory)
               #:pid-file "/tmp/mongodb.pid")))
