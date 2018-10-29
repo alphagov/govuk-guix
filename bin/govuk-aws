@@ -111,7 +111,9 @@ if [ "$1" == "--profile" ]; then
         exec aws "${@:3}"
     else
         exit 1
-    fi
+    elif
+fi [ "$1" == "--" ]; then
+    exec aws "${@:2}"
 else
     exit 1
 fi
