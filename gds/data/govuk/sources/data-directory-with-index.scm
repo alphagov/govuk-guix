@@ -193,7 +193,11 @@
                    ;; 1 hour (in seconds)
                    (* 60 60)))
             (let ((download-command
-                   `("govuk" "aws" "--profile" "govuk-test" "--"
+                   `("govuk" "aws"
+                     ,@(if (getenv "AWS_ACCESS_KEY_ID")
+                           '()
+                           '("--profile" "govuk-integration"))
+                     "--"
                      "s3" "cp"
                      ,url
                      ,target)))
@@ -247,7 +251,8 @@
                                (cond ((eq? scheme 'file)
                                       url-fetch)
                                      ((eq? scheme 's3)
-                                      (s3-fetch-for-profile "govuk-test"))
+                                      (s3-fetch-with-access-key-or-profile
+                                       "govuk-integration"))
                                      (else (error "Unrecognised scheme"
                                                   scheme)))))
                      (uri (string-append base-url
