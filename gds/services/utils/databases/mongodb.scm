@@ -3,6 +3,8 @@
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages pv)
   #:export (<mongodb-connection-config>
             mongodb-connection-config
             mongodb-connection-config?
@@ -116,18 +118,51 @@ if (db.getUser(username) === null) {
   (match database-connection
     (($ <mongodb-connection-config> user password host port database)
      #~(lambda ()
-         (let ((command
-                `(,(string-append #$mongo-tools "/bin/mongorestore")
-                  "--host" ,(simple-format #f "~A:~A" #$host (number->string #$port))
-                  #$@(if user `("-u" #$user) '())
-                  #$@(if password `("-p" #$password) '())
-                  "-d" #$database
-                  "--drop" ;; TODO: Make this optional
-                  #$file)))
-           #$@(if dry-run?
-                  '((simple-format
-                     #t "Would run command: ~A\n"
-                     (string-join command " ")))
-                  '((simple-format #t "Running command: ~A\n" (string-join command " "))
-                    (zero?
-                     (apply system* command)))))))))
+         (use-modules (srfi srfi-1))
+         (if (string-suffix? ".mongo.xz" #$file)
+             (let* ((pv (string-append #$pv "/bin/pv"))
+                    (decompressor
+                     (assoc-ref '(("gz" . #$(file-append gzip "/bin/gzip"))
+                                  ("xz" . #$(file-append xz "/bin/xz")))
+                                (last (string-split #$file #\.))))
+                    (command
+                     (string-join
+                      `(,pv
+                        ,#$file
+                        "|"
+                        ,decompressor
+                        "-d"
+                        "|"
+                        ,(string-append #$mongo-tools "/bin/mongorestore")
+                        "--quiet"
+                        "--host" ,(simple-format #f "~A:~A"
+                                                 #$host
+                                                 (number->string #$port))
+                        #$@(if user `("-u" #$user) '())
+                        #$@(if password `("-p" #$password) '())
+                        "-d" #$database
+                        "--drop" ;; TODO: Make this optional
+                        "--archive"
+                      " "))))
+               #$@(if dry-run?
+                      '((simple-format #t "Would run command: ~A\n"
+                                       command))
+                      '((simple-format #t "Running command: ~A\n" command)
+                        (zero? (system command)))))
+             (let ((command
+                    `(,(string-append #$mongo-tools "/bin/mongorestore")
+                      "--host" ,(simple-format #f "~A:~A"
+                                               #$host
+                                               (number->string #$port))
+                      #$@(if user `("-u" #$user) '())
+                      #$@(if password `("-p" #$password) '())
+                      "-d" #$database
+                      "--drop" ;; TODO: Make this optional
+                      #$file)))
+               #$@(if dry-run?
+                      '((simple-format
+                         #t "Would run command: ~A\n"
+                         (string-join command " ")))
+                      '((simple-format #t "Running command: ~A\n" (string-join command " "))
+                        (zero?
+                         (apply system* command))))))))))
