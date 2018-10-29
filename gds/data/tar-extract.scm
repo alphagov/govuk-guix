@@ -30,7 +30,7 @@
     (($ <tar-extract> name archive member strip-components)
      (mlet %store-monad ((guile (package->derivation (default-guile) system)))
 
-       (define inputs (list gzip bzip2))
+       (define inputs (list gzip bzip2 xz))
 
        (define build
          (with-imported-modules `((guix build utils))
