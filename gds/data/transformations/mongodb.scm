@@ -25,7 +25,7 @@
           gexp-to-run
           #:key (base-directory #~(string-append
                                    (getcwd)
-                                   "/mongodb")))
+                                   "/mongo")))
   (let ((mongodb (mongodb-configuration-mongodb
                   (service-parameters mongodb-service))))
     (with-imported-modules '((guix build utils))
@@ -126,13 +126,4 @@
 
         #$(with-mongodb
            (service mongodb-service-type)
-           operation)
-
-        (invoke #$(file-append tar "/bin/tar")
-                "--checkpoint=1000"
-                "--checkpoint-action=echo='%ds: %{read,wrote}T'"
-                (string-append "--use-compress-program="
-                               #$(file-append pigz "/bin/pigz"))
-                "--create"
-                "--file" #$output
-                "mongodb"))))
+           operation))))

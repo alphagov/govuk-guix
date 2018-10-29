@@ -64,8 +64,18 @@
 
                  (data-transformation
                   (output-name (string-append database "-snapshot.tar.gz"))
-                  (operation (load-extracts
-                              extracts-and-database-connection-configs))))))))
+                  (operation
+                   #~(begin
+                       #$(load-extracts extracts-and-database-connection-configs)
+
+                       (invoke #$(file-append tar "/bin/tar")
+                               "--checkpoint=1000"
+                               "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+                               (string-append "--use-compress-program="
+                                              #$(file-append pigz "/bin/pigz"))
+                               "--create"
+                               "--file" #$output
+                               #$database)))))))))
    (group-extracts data-extract-database all-data-extracts)))
 
 (define (snapshot-manifest all-data-extracts)
