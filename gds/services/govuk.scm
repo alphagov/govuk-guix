@@ -526,7 +526,7 @@
            (file "config/sidekiq.yml"))
           (postgresql-connection-config
            (user "email-alert-api")
-           (database "email_alert_api")
+           (database "email_alert_api-production")
            ;; Required for creating the uuid-ossp extension
            (superuser? #t)))))
 
@@ -1313,7 +1313,7 @@
          (redis-connection-config)
          (postgresql-connection-config
           (user "support_contacts")
-          (database "support_contacts")))))
+          (database "support_contacts_production")))))
 
 ;;;
 ;;; Travel Advice Publisher
