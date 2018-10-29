@@ -125,16 +125,19 @@
                    (string-append extract-prefix suffix))
                  '(".tar.xz" "tar.gz"))))
 
-    (define (create-data-extract filename services)
+    (define (create-data-extract extract-prefix filename services)
       (data-extract
-       (file (local-file
-              (string-join
-               `(,backup-directory
-                 ,date
-                 "mongo"
-                 ,subdirectory
-                 ,filename)
-               "/")))
+       (file (tar-extract
+              (name extract-prefix)
+              (archive (local-file
+                        (string-join
+                         `(,backup-directory
+                           ,date
+                           "mongo"
+                           ,subdirectory
+                           ,filename)
+                         "/")))
+             (member (string-append extract-prefix))))
        (datetime (string->date date "~Y-~m-~d"))
        (database "mongo")
        (services services)
@@ -144,7 +147,8 @@
                   ((extract-prefix . services)
                    (and=> (filename-for-extract extract-prefix)
                           (lambda (filename)
-                            (create-data-extract filename
+                            (create-data-extract extract-prefix
+                                                 filename
                                                  services)))))
                 extracts))
 
