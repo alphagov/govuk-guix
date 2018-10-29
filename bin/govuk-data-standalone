@@ -205,7 +205,7 @@ def load_postgresql_extract(extract, service, options)
     user = extract[:services][service]['user']
     psql_command = "psql"
   end
-  if options[:load_via_tcp]
+  if options[:for_govuk_guix_system]
     psql_command += " -U postgres --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
   end
 
@@ -261,7 +261,7 @@ def load_mysql_extract(extract, service, options)
   decompressor = get_decompressor(local_file)
   target_database = extract[:services][service]['database']
   mysql_args = "-u root"
-  if options[:load_via_tcp]
+  if options[:for_govuk_guix_system]
     mysql_args += " --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
   end
   puts extract[:services][service]
@@ -373,7 +373,7 @@ def parse_options
     opt.on('--before BEFORE') { |o| options[:before_date] = o }
     opt.on('--after AFTER') { |o| options[:after_date] = o }
     opt.on('--dry-run') { |o| options[:dry_run] = true }
-    opt.on('--load-via-tcp') { |o| options[:load_via_tcp] = true }
+    opt.on('--for-govuk-guix-system') { |o| options[:for_govuk_guix_system] = true }
   end.parse!
 
   options
