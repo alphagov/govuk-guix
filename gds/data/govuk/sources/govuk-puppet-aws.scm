@@ -19,6 +19,7 @@
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)
+  #:use-module (gds data transformations mongodb)
   #:use-module (gds data govuk sources govuk-puppet)
   #:export (govuk-puppet-aws-data-source))
 
@@ -127,17 +128,16 @@
 
     (define (create-data-extract extract-prefix filename services)
       (data-extract
-       (file (tar-extract
-              (name extract-prefix)
-              (archive (local-file
-                        (string-join
-                         `(,backup-directory
-                           ,date
-                           "mongo"
-                           ,subdirectory
-                           ,filename)
-                         "/")))
-             (member (string-append extract-prefix))))
+       (file (mongodb-convert-tar-archive-to-archive-dump
+              (local-file
+               (string-join
+                `(,backup-directory
+                  ,date
+                  "mongo"
+                  ,subdirectory
+                  ,filename)
+                "/"))
+              extract-prefix))
        (datetime (string->date date "~Y-~m-~d"))
        (database "mongo")
        (services services)
