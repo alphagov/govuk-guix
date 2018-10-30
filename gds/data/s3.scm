@@ -10,7 +10,8 @@
   #:use-module (guix packages)
   #:use-module (gnu packages python-web)
   #:export (s3-fetch-for-profile
-            s3-fetch-with-access-key))
+            s3-fetch-with-access-key
+            s3-fetch-with-access-key-or-profile))
 
 (define (s3-fetch-for-profile-internal profile)
   (define environment-variables
