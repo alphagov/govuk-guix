@@ -235,6 +235,12 @@ def load_postgresql_extract(extract, service, options)
 
   alter_owner_queries.each do |type, query|
     command = "#{psql_command} -qXAt -c \"#{query}\" #{target_database}"
+
+    if dry_run
+      puts "Would run command: #{command}"
+      next
+    end
+
     object_names, status = Open3.capture2(command)
 
     unless status.success?
@@ -252,7 +258,7 @@ def load_postgresql_extract(extract, service, options)
     end
   end
 
-  puts "\nSuccessfully created #{target_database}"
+  puts "\nSuccessfully created #{target_database}" unless dry_run
 end
 
 def load_mysql_extract(extract, service, options)
@@ -281,10 +287,10 @@ def load_mysql_extract(extract, service, options)
         STDERR.puts "error: creating #{target_database} failed"
         exit 1
       end
+
+      puts "\nSuccessfully created #{target_database}"
     end
   end
-
-  puts "\nSuccessfully created #{target_database}"
 end
 
 def load_mongo_extract(extract, service, options)
@@ -304,7 +310,12 @@ def load_mongo_extract(extract, service, options)
     puts "Would run command: #{command}"
   else
     puts "Running command: #{command}"
-    system(command)
+    unless system(command)
+      STDERR.puts "error: creating #{target_database} failed"
+      exit 1
+    end
+
+    puts "\nSuccessfully created #{target_database}"
   end
 end
 
