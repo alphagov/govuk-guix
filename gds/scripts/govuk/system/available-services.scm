@@ -7,12 +7,8 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu system)
   #:use-module (gds services govuk)
-  #:use-module (gds systems govuk base)
   #:use-module (gds systems govuk development)
   #:export (available-services))
-
-(define base-service-types
-  (map service-kind base-services))
 
 (define (shepherd-services service)
   (let* ((shepherd-service-extension
