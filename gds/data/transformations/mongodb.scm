@@ -145,6 +145,7 @@
   (define operation
     (with-imported-modules '((gds data transformations build mongodb))
       #~(lambda _
+          (use-modules (gds data transformations build mongodb))
           #$@(map
               (match-lambda
                 ((data-extract . database-connection-configs)
