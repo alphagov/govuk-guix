@@ -46,7 +46,7 @@
     (bootloader (bootloader-configuration
                  (bootloader grub-bootloader)
                  (target "/dev/sdX")))
-    (packages useful-packages)
+    (packages (useful-packages))
     (skeletons (remove (match-lambda
                          ((file source)
                           (member file '(".bashrc"))))

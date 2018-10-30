@@ -361,7 +361,7 @@
    (inherit base-system)
    (host-name host-name)
    (hosts-file (plek-config->hosts-file plek-config))
-   (packages useful-packages)
+   (packages (useful-packages))
    (services (set-services-configuration
               (operating-system-user-services base-system)))))
 

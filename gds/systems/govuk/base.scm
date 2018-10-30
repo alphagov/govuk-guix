@@ -123,7 +123,7 @@
 
     (apply compose (reverse service-setup-functions))))
 
-(define useful-packages
+(define (useful-packages)
   (cons*
    smokey
    fontconfig
