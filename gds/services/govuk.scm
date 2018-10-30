@@ -152,7 +152,7 @@
                      #t))))))
          (redis-connection-config)
          (mongodb-connection-config
-          (database "asset_manager")))))
+          (database "asset_manager_production")))))
 
 ;;;
 ;;; Authenticating Proxy
@@ -181,7 +181,7 @@
           (name "Content Preview")
           (supported-permissions '("signin")))
          (mongodb-connection-config
-          (database "authenticating_proxy")))))
+          (database "authenticating_proxy_production")))))
 
 ;;;
 ;;; Calculators
@@ -752,7 +752,7 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (database "licence_finder")))))
+           (database "licence_finder_production")))))
 
 ;;;
 ;;; Link Checker API
@@ -852,7 +852,7 @@
           (service-startup-config)
           (redis-connection-config)
           (mongodb-connection-config
-           (database "imminence")))))
+           (database "imminence_production")))))
 
 ;;;
 ;;; Manuals Frontend
@@ -1099,7 +1099,7 @@
               '("signin")))))
           (service-startup-config)
           (mongodb-connection-config
-           (database "short_url_manager")))))
+           (database "short_url_manager_production")))))
 
 ;;;
 ;;; Smart Answers
@@ -1359,7 +1359,7 @@
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (mongodb-connection-config
-           (database "travel_advice_publisher")))))
+           (database "travel_advice_publisher_production")))))
 
 ;;;
 ;;; Publishing API Service
@@ -1434,7 +1434,7 @@
            (assets? #f))
           content-store
           (mongodb-connection-config
-           (database "content-store")))))
+           (database "content_store_production")))))
 
 (define-public draft-content-store-service-type
   (service-type (name 'draft-content-store)
@@ -1460,7 +1460,7 @@
           (assets? #f))
          content-store
          (mongodb-connection-config
-          (database "draft-content-store")))))
+          (database "draft_content_store_production")))))
 
 ;;;
 ;;; Specialist Publisher
@@ -1684,7 +1684,7 @@
 (define default-draft-router-database-connection-configs
   (list
    (mongodb-connection-config
-    (database "draft-router"))))
+    (database "draft_router"))))
 
 (define-public draft-router-service-type
   (make-router-service-type 'draft-router))
@@ -1824,7 +1824,7 @@
              '("signin")))))
          (plek-config) (rails-app-config) maslow
          (mongodb-connection-config
-          (database "maslow")))))
+          (database "maslow_production")))))
 
 ;;;
 ;;; Rummager
