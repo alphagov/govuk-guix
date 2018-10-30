@@ -12,6 +12,6 @@ fi
 
 TWO_WEEKS_AGO="$(date --date="2 weeks ago" '+%d/%m/%Y')"
 
-DATA_DIRECTORY_WITH_INDEX="$(govuk data build-data-directory-with-index --after=$TWO_WEEKS_AGO --database=mysql --database=postgresql | tail -n1)"
+DATA_DIRECTORY_WITH_INDEX="$(govuk data build-data-directory-with-index --after=$TWO_WEEKS_AGO | tail -n1)"
 
 govuk aws --profile govuk-test -- s3 sync --delete "$DATA_DIRECTORY_WITH_INDEX" s3://govuk-development-data-test/
