@@ -175,13 +175,12 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
        (($ <postgresql-connection-config> host user port database
                                           superuser?)
         (list
-         (postgresql-ensure-user-exists-gexp user)
+         (postgresql-ensure-user-exists-gexp user superuser?)
          #~(lambda (port)
              (if (member
                   #$database
                   (map car (#$(postgresql-list-databases-gexp
                                database-connection-with-postgres-user))))
                  #t
-                 (#$(postgresql-create-database-gexp database user
-                                                     superuser?)
+                 (#$(postgresql-create-database-gexp database user)
                   port)))))))))
