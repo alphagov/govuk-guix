@@ -5,6 +5,7 @@
 # environment.
 
 set -e
+set -o pipefail
 
 if [ ! -n "$BASH" ] ; then
     exec bash "$0" $@
