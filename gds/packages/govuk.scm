@@ -356,15 +356,15 @@ proxies requests to some upstream")
 (define-public content-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "06xwvnsbxnplvhjdsyyzznpc1bikjajd3kri50wyzlvgrqn0k4i6")))
+    (hash (base32 "1fy74cfrbzy0085wrjz3blj9xpzgiavqa56i6gw3k7npj45q9p46")))
    (package
      (name "content-publisher")
-     (version "release_378")
+     (version "release_381")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1xv3vgqv5iq51pr4f7yr0ah2rag4mp400d2z8lb8i5ibi7wf5k90")))
+       #:hash (base32 "1769xj09y0pndvjrzr9zvmh880zs6zqkdgdpvzk9a4avi61fy9j0")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
