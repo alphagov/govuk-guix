@@ -1219,15 +1219,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public rummager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1p7lvb1jpz9pxn6gg1q1fdp1jq1h3jzkf5zn1jk8vlxk13h1bwpg")))
+    (hash (base32 "1hhjhd3khv8j3n7i031npca216xnn7kdi8pc1wwbpv8k7zc32nsi")))
    (package
      (name "rummager")
-     (version "release_1817")
+     (version "release_1818")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "09zy8y2sg7clcwxzhqg8n3wadrm4f6w65xx3s6pyhyx1v1mi9gmh")))
+       #:hash (base32 "124awkrnff2yzwxbq36006vbfzp7m3yyd5jbwa6063d2n35k9yfh")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
