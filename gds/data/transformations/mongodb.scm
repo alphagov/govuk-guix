@@ -80,7 +80,10 @@
 (define (mongodb-convert-tar-archive-to-archive-dump file database-name)
   (define operation
     #~(lambda _
-        (let ((dump-directory "dump"))
+        (let ((dump-directory "dump")
+              (tmp-archive-filename "temp.mongodb.archive"))
+          ;; Extract the tarball, as mongorestore needs the unpacked
+          ;; form to work with
           (mkdir-p dump-directory)
           (chdir dump-directory)
           (invoke #$(file-append tar "/bin/tar")
@@ -89,7 +92,7 @@
                   "--strip-components=1"
                   "--file" #$file)
           (chdir "..")
-          (simple-format #t "\nload-extracts: data extracted...\n\n")
+          (display "\ndata extracted\n\n")
           (simple-format #t "checking metadata files in ~A\n"
                          dump-directory)
           (force-output)
@@ -113,23 +116,49 @@
                                     "")))
                     (find-files dump-directory
                                 ".*\\.metadata\\.json$"))
-          (simple-format #t "\n\nload-extracts: starting mongorestore\n\n")
+
+          (display "\nfinished checking metadata files\n")
+
+          ;; Run mongorestore to populate the database
+          (display "starting mongorestore\n\n")
           (force-output)
+
           (invoke "mongorestore" "-d" #$database-name
                   dump-directory)
           (delete-file-recursively dump-directory)
 
+          (display "\n\nfinished running mongorestore\n")
+
+          ;; Run mongodump to generate the archive file
+          (display "starting mongodump to generate archive\n\n")
+          (force-output)
+
+          (invoke "mongodump"
+                  "-d" #$database-name
+                  (string-append "--archive=" tmp-archive-filename))
+
+          (display "\n\nfinished running mongodump\n\n")
+
+          ;; Create the xz compressed MongoDB archive file
+          (display "starting xz to compress the archive\n\n")
+          (force-output)
+
           (let ((command
                  (string-join
                   `("set -eo pipefail;"
-                    "mongodump" "-d" ,#$database-name "--archive" "|"
+                    "pv" "--force" ,tmp-archive-filename "|"
                     "xz" "-e" "-9" "-z" "-T0" "-c" ">"
                     ,#$output)
                   " ")))
             (or (zero? (system command))
                 (error (string-append "command "
                                       (string-join command)
-                                      " failed")))))))
+                                      " failed"))))
+
+          (display "\n\nfinished generating output\n")
+          (force-output)
+
+          #t)))
 
   (data-transformation
    (output-name (string-append database-name ".mongo.xz"))
