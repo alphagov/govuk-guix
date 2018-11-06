@@ -48,25 +48,21 @@
 (define (data-extract->details-list services data-extract)
   (match data-extract
     (($ <data-extract> file datetime database extract-service-types)
-     (let ((path-info (store-item-path-info file)))
-       ;; G-expressions handle lists, so construct a list from the record
-       ;; fields
-       (list file
-             (date->string datetime "~Y-~m-~d")
-             database
-             (map (lambda (service-type)
-                    (cons
-                     (service-type-name service-type)
-                     (database-connection-config->alist
-                      (database-connection-config-from-service-for-extract
-                       (find (lambda (service)
-                               (eq? (service-kind service) service-type))
-                             services)
-                       data-extract))))
-                  extract-service-types)
-             (path-info-nar-size path-info)
-             (bytevector->nix-base32-string
-              (path-info-hash path-info)))))))
+     ;; G-expressions handle lists, so construct a list from the record
+     ;; fields
+     (list file
+           (date->string datetime "~Y-~m-~d")
+           database
+           (map (lambda (service-type)
+                  (cons
+                   (service-type-name service-type)
+                   (database-connection-config->alist
+                    (database-connection-config-from-service-for-extract
+                     (find (lambda (service)
+                             (eq? (service-kind service) service-type))
+                           services)
+                     data-extract))))
+                extract-service-types)))))
 
 (define* (data-extracts->data-directory-with-index
           services
@@ -89,7 +85,7 @@
                           data-extracts))
                  (data-extract-destinations
                   (map (match-lambda
-                        ((file datetime database services size sha256-hash)
+                        ((file datetime database services)
                          ;; Create filenames like:
                          ;; datetime/database/file
                          (string-join
@@ -117,13 +113,13 @@
                  (scm->json-string
                   `((extracts
                      . ,(map (match-lambda*
-                              (((file date database services size sha256-hash)
-                                url)
+                              (((file date database servicesm) url)
                                `((date . ,date)
                                  (database . ,database)
                                  (services . ,services)
-                                 (size . ,size)
-                                 (sha256-hash . ,sha256-hash)
+                                 ;; TODO Get actual values for the size and hash
+                                 (size . 0)
+                                 (sha256-hash . "")
                                  ;; This URL is relative to the
                                  ;; location of this index.json file.
                                  (url . ,url))))
