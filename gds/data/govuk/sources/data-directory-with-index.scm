@@ -7,7 +7,7 @@
   #:use-module (web uri)
   #:use-module (json)
   #:use-module (guix gexp)
-  #:use-module (guix base32)
+  #:use-module (guix base16)
   #:use-module (guix download)
   #:use-module (guix modules)
   #:use-module (guix store)
@@ -15,6 +15,7 @@
   #:use-module (guix derivations)
   #:use-module (gnu services)
   #:use-module (gnu packages guile)
+  #:use-module (gnu packages gnupg)
   #:use-module (gds services govuk)
   #:use-module (gds services utils databases)
   #:use-module (gds data data-source)
@@ -69,14 +70,20 @@
           data-extracts
           #:key (name "govuk-data-extracts"))
   (define build
-    (with-imported-modules '((guix build utils))
+    (with-imported-modules '((guix base16)
+                             (guix build utils))
       #~(begin
           (add-to-load-path #$(file-append guile-json
+                                           "/share/guile/site/"
+                                           (effective-version)))
+          (add-to-load-path #$(file-append guile-gcrypt
                                            "/share/guile/site/"
                                            (effective-version)))
           (use-modules (json)
                        (ice-9 match)
                        (srfi srfi-1)
+                       (gcrypt hash)
+                       (guix base16)
                        (guix build utils))
 
           (let* ((data-extract-details-lists
@@ -119,7 +126,9 @@
                                  (services . ,services)
                                  ;; TODO Get actual values for the size and hash
                                  (size . 0)
-                                 (sha256-hash . "")
+                                 (sha256-hash . ,(bytevector->base16-string
+                                                  (call-with-input-file
+                                                      file port-sha256)))
                                  ;; This URL is relative to the
                                  ;; location of this index.json file.
                                  (url . ,url))))
@@ -244,25 +253,30 @@
          (map
           (lambda (data-extract-data)
             (data-extract
-             (file (origin
-                     (method (let ((scheme (uri-scheme (string->uri base-url))))
-                               (cond ((eq? scheme 'file)
-                                      url-fetch)
-                                     ((eq? scheme 's3)
-                                      (s3-fetch-with-access-key-or-profile
-                                       "govuk-integration"))
-                                     (else (error "Unrecognised scheme"
-                                                  scheme)))))
-                     (uri (string-append base-url
-                                         "/data-extracts/"
-                                         (hash-ref data-extract-data
-                                                   "url")))
-                     (file-name (string-append
-                                 (hash-ref data-extract-data "date")
-                                 "_"
-                                 (basename (hash-ref data-extract-data "url"))))
-                     (sha256 (nix-base32-string->bytevector
-                              (hash-ref data-extract-data "sha256-hash")))))
+             (file (if (string-prefix? "file:///gnu/store/" base-url)
+                       (readlink
+                        (string-append (uri-path (string->uri base-url))
+                                       "/data-extracts/"
+                                       (hash-ref data-extract-data "url")))
+                       (origin
+                         (method (let ((scheme (uri-scheme (string->uri base-url))))
+                                   (cond ((eq? scheme 'file)
+                                          url-fetch)
+                                         ((eq? scheme 's3)
+                                          (s3-fetch-with-access-key-or-profile
+                                           "govuk-integration"))
+                                         (else (error "Unrecognised scheme"
+                                                      scheme)))))
+                         (uri (string-append base-url
+                                             "/data-extracts/"
+                                             (hash-ref data-extract-data
+                                                       "url")))
+                         (file-name (string-append
+                                     (hash-ref data-extract-data "date")
+                                     "_"
+                                     (basename (hash-ref data-extract-data "url"))))
+                         (sha256 (base16-string->bytevector
+                                  (hash-ref data-extract-data "sha256-hash"))))))
              (datetime (string->date
                         (hash-ref data-extract-data "date") "~Y-~m-~d"))
              (database (hash-ref data-extract-data "database"))
