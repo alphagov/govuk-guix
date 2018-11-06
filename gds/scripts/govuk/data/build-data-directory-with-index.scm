@@ -9,6 +9,9 @@
 
 (define* (build-data-directory-with-index services data-extracts #:key dry-run?)
   (with-store store
+    (set-build-options store
+                       #:max-build-jobs 1)
+
     (let ((derivation
            ((lower-object (data-directory-with-index services data-extracts))
             store)))
