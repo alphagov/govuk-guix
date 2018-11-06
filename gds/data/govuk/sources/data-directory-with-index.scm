@@ -124,8 +124,7 @@
                                `((date . ,date)
                                  (database . ,database)
                                  (services . ,services)
-                                 ;; TODO Get actual values for the size and hash
-                                 (size . 0)
+                                 (size . ,(stat:size (stat file)))
                                  (sha256-hash . ,(bytevector->base16-string
                                                   (call-with-input-file
                                                       file port-sha256)))
