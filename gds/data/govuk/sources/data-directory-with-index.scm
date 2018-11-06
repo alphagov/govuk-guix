@@ -39,6 +39,8 @@
            (output-path (if (derivation? derivation)
                             (derivation->output-path derivation)
                             derivation)))
+      (simple-format #t "store-item-path-info: building: ~A\n"
+                     derivation)
       (if (build-derivations store (list derivation))
           (query-path-info store output-path)
           (error "Unable to build " item)))))
