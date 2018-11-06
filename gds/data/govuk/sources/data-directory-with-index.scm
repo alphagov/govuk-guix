@@ -113,7 +113,7 @@
                  (scm->json-string
                   `((extracts
                      . ,(map (match-lambda*
-                              (((file date database servicesm) url)
+                              (((file date database services) url)
                                `((date . ,date)
                                  (database . ,database)
                                  (services . ,services)
