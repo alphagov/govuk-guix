@@ -78,10 +78,12 @@
             result)))))
 
 (define (mongodb-convert-tar-archive-to-archive-dump file database-name)
-  (define operation
+  (define tmp-archive-filename
+    "temp.mongodb.archive")
+
+  (define create-tmp-archive-file
     #~(lambda _
-        (let ((dump-directory "dump")
-              (tmp-archive-filename "temp.mongodb.archive"))
+        (let ((dump-directory "dump"))
           ;; Extract the tarball, as mongorestore needs the unpacked
           ;; form to work with
           (mkdir-p dump-directory)
@@ -135,9 +137,20 @@
 
           (invoke "mongodump"
                   "-d" #$database-name
-                  (string-append "--archive=" tmp-archive-filename))
+                  (string-append "--archive=" #$tmp-archive-filename))
 
-          (display "\n\nfinished running mongodump\n\n")
+          (display "\n\nfinished running mongodump\n\n"))))
+
+  (data-transformation
+   (output-name (string-append database-name ".mongo.xz"))
+   (operation
+    (with-imported-modules '((guix build utils))
+      #~(begin
+          (use-modules (guix build utils))
+
+          #$(with-mongodb
+             (service mongodb-service-type)
+             create-tmp-archive-file)
 
           ;; Create the xz compressed MongoDB archive file
           (display "starting xz to compress the archive\n\n")
@@ -146,7 +159,7 @@
           (let ((command
                  (string-join
                   `("set -eo pipefail;"
-                    "pv" "--force" ,tmp-archive-filename "|"
+                    "pv" "--force" ,#$tmp-archive-filename "|"
                     "xz" "-e" "-9" "-z" "-T0" "-c" ">"
                     ,#$output)
                   " ")))
@@ -156,19 +169,7 @@
                                       " failed"))))
 
           (display "\n\nfinished generating output\n")
-          (force-output)
-
-          #t)))
-
-  (data-transformation
-   (output-name (string-append database-name ".mongo.xz"))
-   (operation
-    (with-imported-modules '((guix build utils))
-      #~(begin
-          (use-modules (guix build utils))
-          #$(with-mongodb
-             (service mongodb-service-type)
-             operation))))))
+          (force-output))))))
 
 (define (mongodb-load-extracts extracts-and-database-connection-configs)
   (define operation
