@@ -70,10 +70,11 @@
                 (result (#$gexp-to-run '())))
 
             (simple-format #t "Stopping MongoDB\n")
+            (force-output)
             ((make-kill-destructor) mongodb-pid)
+
             ;; TODO: Fix this
             (sleep 20)
-            (force-output)
 
             result)))))
 
