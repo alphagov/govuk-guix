@@ -174,7 +174,9 @@
                                       " failed"))))
 
           (display "\n\nfinished generating output\n")
-          (force-output))))))
+          (force-output)
+
+          (exit 0))))))
 
 (define (mongodb-load-extracts extracts-and-database-connection-configs)
   (define operation
