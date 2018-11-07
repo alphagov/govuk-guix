@@ -69,6 +69,10 @@
           (let ((mongodb-pid (start-mongodb))
                 (result (#$gexp-to-run '())))
 
+            ;; (shepherd service) sets up a handler, so remove it to
+            ;; avoid it breaking
+            (sigaction SIGCHLD #f)
+
             (simple-format #t "Stopping MongoDB\n")
             (force-output)
             ((make-kill-destructor) mongodb-pid)
