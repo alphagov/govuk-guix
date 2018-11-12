@@ -1,11 +1,11 @@
 #!/bin/sh
 
-set -e
-set -o pipefail
-
 if [ ! -n "$BASH" ] ; then
     exec bash "$0" $@
 fi
+
+set -e
+set -o pipefail
 
 profile="${PROFILE:-govuk-integration}"
 

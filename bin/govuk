@@ -4,12 +4,12 @@
 # related to GOV.UK, while helping to handle differences in
 # environment.
 
-set -e
-set -o pipefail
-
 if [ ! -n "$BASH" ] ; then
     exec bash "$0" $@
 fi
+
+set -e
+set -o pipefail
 
 function log {
     if [ "$GOVUK_EXEC_DEBUG" != "" ]; then
