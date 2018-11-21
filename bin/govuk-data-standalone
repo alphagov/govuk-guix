@@ -198,15 +198,15 @@ def load_postgresql_extract(extract, service, options)
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
   target_database = extract[:services][service]['database']
-  if Etc.getlogin == 'vagrant'
-    user = 'postgres'
-    psql_command = "sudo -E -u postgres psql"
-  else
-    user = extract[:services][service]['user']
-    psql_command = "psql"
-  end
+
   if options[:for_govuk_guix_system]
-    psql_command += " -U postgres --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
+    user = extract[:services][service]['user']
+    psql_command = "psql -U postgres --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
+    owner = extract[:services][service]['user']
+  else
+    user = 'postgres'
+    psql_command = 'sudo -E -u postgres psql'
+    owner = 'vagrant'
   end
 
   commands = [
@@ -249,7 +249,7 @@ def load_postgresql_extract(extract, service, options)
     end
 
     object_names.each_line do |name|
-      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.upcase} \\\"#{name.strip}\\\" OWNER TO vagrant\" #{target_database}"
+      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.upcase} \\\"#{name.strip}\\\" OWNER TO #{owner}\" #{target_database}"
 
       unless system(change_owner_command)
         STDERR.puts "error: command failed: #{change_owner_command}"
