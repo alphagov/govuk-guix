@@ -160,52 +160,7 @@
                           '((guix build syscalls)
                             (gnu build file-systems)))
 
-    #~(let* ((user (getpwnam #$name))
-             (root-directory #$(string-append "/var/apps/" name))
-             (bundle (string-append root-directory "/bin/bundle")))
-
-        (define (bind-mount-package-in-store)
-          (mkdir-p root-directory)
-          (chown root-directory (passwd:uid user) (passwd:gid user))
-          (bind-mount #$package root-directory)
-
-          (let ((source #$(string-append "/var/log/apps/" name))
-                (target (string-append root-directory "/log")))
-            (if (file-exists? target)
-                (begin
-                  (mkdir-p source)
-                  (chown source (passwd:uid user) (passwd:gid user))
-                  (bind-mount source target)))))
-
-        (define (tweak-existing-app-directory)
-          (mkdir-p (string-append root-directory "/bin"))
-          (mount "tmpfs" (string-append root-directory "/bin") "tmpfs")
-          (copy-recursively
-           (string-append #$package "/bin")
-           (string-append root-directory "/bin")
-           #:log (%make-void-port "w")
-           #:follow-symlinks? #f)
-          (substitute* (find-files (string-append root-directory "/bin")
-                                   (lambda (name stat)
-                                     (access? name X_OK)))
-            (((string-append #$package "/bin"))
-             "${BASH_SOURCE%/*}"))
-          (substitute* (find-files (string-append root-directory "/bin")
-                                   (lambda (name stat)
-                                     (access? name X_OK)))
-            (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
-             "File.expand_path('../.spring-real', __FILE__)"))
-          (for-each
-           (lambda (path)
-             (mkdir-p (string-append root-directory path))
-             (chmod (string-append root-directory path) #o777))
-           '("/tmp" "/log"))
-
-          (for-each
-           (cut chmod <> #o666)
-           (find-files (string-append root-directory "/log")
-                       #:directories? #f)))
-
+    #~(begin
         (use-modules (guix build utils)
                      (gnu build file-systems)
                      (guix build syscalls)
@@ -213,9 +168,55 @@
                      (ice-9 ftw)
                      (srfi srfi-26))
 
-        (if (file-exists? root-directory)
-            (tweak-existing-app-directory)
-            (bind-mount-package-in-store))
+        (let* ((user (getpwnam #$name))
+               (root-directory #$(string-append "/var/apps/" name))
+               (bundle (string-append root-directory "/bin/bundle")))
 
-        (if (file-exists? (string-append root-directory "/tmp"))
-            (mount "tmpfs" (string-append root-directory "/tmp") "tmpfs")))))
+          (define (bind-mount-package-in-store)
+            (mkdir-p root-directory)
+            (chown root-directory (passwd:uid user) (passwd:gid user))
+            (bind-mount #$package root-directory)
+
+            (let ((source #$(string-append "/var/log/apps/" name))
+                  (target (string-append root-directory "/log")))
+              (if (file-exists? target)
+                  (begin
+                    (mkdir-p source)
+                    (chown source (passwd:uid user) (passwd:gid user))
+                    (bind-mount source target)))))
+
+          (define (tweak-existing-app-directory)
+            (mkdir-p (string-append root-directory "/bin"))
+            (mount "tmpfs" (string-append root-directory "/bin") "tmpfs")
+            (copy-recursively
+             (string-append #$package "/bin")
+             (string-append root-directory "/bin")
+             #:log (%make-void-port "w")
+             #:follow-symlinks? #f)
+            (substitute* (find-files (string-append root-directory "/bin")
+                                     (lambda (name stat)
+                                       (access? name X_OK)))
+                         (((string-append #$package "/bin"))
+                          "${BASH_SOURCE%/*}"))
+            (substitute* (find-files (string-append root-directory "/bin")
+                                     (lambda (name stat)
+                                       (access? name X_OK)))
+                         (("File\\.expand_path\\([\"']\\.\\./spring[\"'], __FILE__\\)")
+                          "File.expand_path('../.spring-real', __FILE__)"))
+            (for-each
+             (lambda (path)
+               (mkdir-p (string-append root-directory path))
+               (chmod (string-append root-directory path) #o777))
+             '("/tmp" "/log"))
+
+            (for-each
+             (cut chmod <> #o666)
+             (find-files (string-append root-directory "/log")
+                         #:directories? #f)))
+
+          (if (file-exists? root-directory)
+              (tweak-existing-app-directory)
+              (bind-mount-package-in-store))
+
+          (if (file-exists? (string-append root-directory "/tmp"))
+              (mount "tmpfs" (string-append root-directory "/tmp") "tmpfs"))))))
