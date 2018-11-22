@@ -39,6 +39,34 @@ def data_storage_directory
   directory
 end
 
+def filename_for_local_extract(extract)
+  extract_data_uri = URI(
+    File.join(data_directory_base_url, 'data-extracts', extract[:url])
+  )
+
+  case extract_data_uri.scheme
+  when "file"
+    extract_data_uri.path
+  when "s3"
+    File.join(
+      data_storage_directory,
+      extract[:date],
+      File.basename(extract[:url])
+    )
+  when "http"
+  when "https"
+  when "ssh"
+    raise "#{base_uri.scheme} not yet supported"
+  else
+    STDERR.puts "error: unrecognised URI scheme #{base_uri.scheme}"
+    exit 1
+  end
+end
+
+def extract_exists_locally?(extract)
+  File.exist? filename_for_local_extract(extract)
+end
+
 def retrieve_index
   base_uri = URI(data_directory_base_url)
 
