@@ -183,7 +183,9 @@ def list(options)
     group_extracts(:database, extracts).each do |database, extracts|
       puts "  database: #{database}"
       extracts.each do |extract|
-        puts "    - #{extract[:date]}"
+        print "    - #{extract[:date]}"
+        print " (downloaded)" if extract_exists_locally?(extract)
+        puts
       end
     end
   end
