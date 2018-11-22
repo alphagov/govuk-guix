@@ -146,7 +146,7 @@ end
 
 def list(options)
   extracts = filter_extracts(
-    retrieve_extracts,
+    sort_extracts(retrieve_extracts),
     **options.keep_if { |k| FILTER_OPTIONS.include? k }
   )
 
