@@ -314,12 +314,12 @@ proxies requests to some upstream")
     (hash (base32 "0gx9qfc64kcdqk5jdida788j95s69mpjj6ppzydig3nz1pvf2rhy")))
    (package
      (name "content-data-admin")
-     (version "release_200")
+     (version "release_201")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "01n9x4c4swy7i4mzl0nbmy2jcy5s8g6x65cxagidpf1msc5gvh6l")))
+       #:hash (base32 "0byrbhvch66yx721al0sdszgyqy9ndr8iiks2a6cg6wwkpc63sgj")))
      (build-system rails-build-system)
      (synopsis "A front end for the data warehouse")
      (description "")
