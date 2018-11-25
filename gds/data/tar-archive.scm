@@ -25,7 +25,7 @@
     (($ <tar-archive> name contents)
      (mlet %store-monad ((guile (package->derivation (default-guile) system)))
 
-       (define inputs (list gzip))
+       (define inputs (list gzip xz))
 
        (define build
          (with-imported-modules `((guix build utils))
@@ -33,12 +33,17 @@
                      (list
                       (string-append #$tar "/bin/tar")
                       "--create"
+                      "--verbose"
+                      "--auto-compress"
                       "--file"
                       #$output
-                      #$contents)))
+                      "--directory"
+                      #$contents
+                      ".")))
                (use-modules (srfi srfi-1)
                             (ice-9 ftw)
                             (guix build utils))
+               (setenv "XZ_OPT" "-e9")
                (set-path-environment-variable
                 "PATH" '("bin" "sbin") '#+inputs)
 
