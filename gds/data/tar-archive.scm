@@ -43,7 +43,7 @@
                (use-modules (srfi srfi-1)
                             (ice-9 ftw)
                             (guix build utils))
-               (setenv "XZ_OPT" "-e9")
+               (setenv "XZ_OPT" "-e -9 -T0")
                (set-path-environment-variable
                 "PATH" '("bin" "sbin") '#+inputs)
 
