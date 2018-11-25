@@ -20,6 +20,7 @@
   #:use-module (gds services utils databases)
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
+  #:use-module (gds data tar-archive)
   #:use-module (gds data s3)
   #:use-module (gds data govuk sources govuk-puppet)
   #:use-module (gds data govuk sources govuk-puppet-aws)
@@ -48,10 +49,17 @@
 
 (define (data-extract->details-list services data-extract)
   (match data-extract
-    (($ <data-extract> file datetime database extract-service-types)
+    (($ <data-extract> name file datetime database extract-service-types
+                       data-source variant-name variant-label
+                       variant-properties directory?)
      ;; G-expressions handle lists, so construct a list from the record
      ;; fields
-     (list file
+     (list name
+           (if directory?
+               (tar-archive
+                (name (string-append name "-" variant-name ".tar.xz"))
+                (contents file))
+               file)
            (date->string datetime "~Y-~m-~d")
            database
            (map (lambda (service-type)
@@ -63,7 +71,11 @@
                              (eq? (service-kind service) service-type))
                            services)
                      data-extract))))
-                extract-service-types)))))
+                extract-service-types)
+           variant-name
+           variant-label
+           variant-properties
+           directory?))))
 
 (define* (data-extracts->data-directory-with-index
           services
@@ -92,7 +104,9 @@
                           data-extracts))
                  (data-extract-destinations
                   (map (match-lambda
-                        ((file datetime database services)
+                        ((name file datetime database services
+                               variant-name variant-label variant-properties
+                               directory?)
                          ;; Create filenames like:
                          ;; datetime/database/file
                          (string-join
@@ -120,17 +134,25 @@
                  (scm->json-string
                   `((extracts
                      . ,(map (match-lambda*
-                              (((file date database services) url)
-                               `((date . ,date)
-                                 (database . ,database)
-                                 (services . ,services)
-                                 (size . ,(stat:size (stat file)))
-                                 (sha256-hash . ,(bytevector->base16-string
-                                                  (call-with-input-file
-                                                      file port-sha256)))
-                                 ;; This URL is relative to the
-                                 ;; location of this index.json file.
-                                 (url . ,url))))
+                               (((name file date database services
+                                  variant-name variant-label
+                                  variant-properties directory?) url)
+                                `((name . ,name)
+                                  (date . ,date)
+                                  (database . ,database)
+                                  (services . ,services)
+                                  (variant
+                                   . ((name . ,variant-name)
+                                      (label . ,variant-label)
+                                      (properties . ,variant-properties)))
+                                  (size . ,(stat:size (stat file)))
+                                  (sha256-hash . ,(bytevector->base16-string
+                                                   (call-with-input-file
+                                                       file port-sha256)))
+                                  ;; This URL is relative to the
+                                  ;; location of this index.json file.
+                                  (url . ,url)
+                                  (directory? . ,directory?))))
                              data-extract-details-lists
                              data-extract-destinations)))
                   #:pretty #t)
@@ -252,6 +274,7 @@
          (map
           (lambda (data-extract-data)
             (data-extract
+             (name (hash-ref data-extract-data "name"))
              (file (if (string-prefix? "file:///gnu/store/" base-url)
                        (readlink
                         (string-append (uri-path (string->uri base-url))

@@ -17,11 +17,16 @@
   #:export (<data-extract>
             data-extract
             data-extract?
+            data-extract-name
             data-extract-file
             data-extract-datetime
             data-extract-database
             data-extract-services
             data-extract-data-source
+            data-extract-variant-name
+            data-extract-variant-label
+            data-extract-variant-properties
+            data-extract-directory?
 
             filter-extracts
             group-extracts
@@ -33,11 +38,20 @@
 (define-record-type* <data-extract>
   data-extract make-data-extract
   data-extract?
+  (name       data-extract-name)
   (file       data-extract-file)
   (datetime   data-extract-datetime)
   (database   data-extract-database)
   (services   data-extract-services)
-  (data-source data-extract-data-source))
+  (data-source data-extract-data-source)
+  (variant-name data-extract-variant-name
+                (default '()))
+  (variant-label data-extract-variant-label
+                 (default '()))
+  (variant-properties data-extract-variant-properties
+                      (default '()))
+  (directory? data-extract-directory?
+              (default #f)))
 
 (define* (filter-extracts extracts
                           #:optional #:key
@@ -92,9 +106,17 @@ higher priority extracts appear later in the list"
        (if (time=? utc-time-a utc-time-b)
            (let ((data-source-a (data-extract-data-source a))
                  (data-source-b (data-extract-data-source b)))
-             ;; Does b have a higher priority than a?
-             (> (or (data-source-priority data-source-b) -1)
-                (or (data-source-priority data-source-a) -1)))
+             (if (eq? data-source-a data-source-b)
+                 ;; Does b have a higher priority than a?
+                 (> (or (assoc-ref (data-extract-variant-properties b)
+                                   'priority)
+                        0)
+                    (or (assoc-ref (data-extract-variant-properties a)
+                                   'priority)
+                        0))
+                 ;; Does b have a higher priority than a?
+                 (> (or (data-source-priority data-source-b) -1)
+                    (or (data-source-priority data-source-a) -1))))
            ;; Is b more recent than a?
            (time>? utc-time-b utc-time-a))))))
 

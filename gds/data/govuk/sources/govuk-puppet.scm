@@ -276,6 +276,7 @@
              (if services
                  (list
                   (data-extract
+                   (name "elasticsearch")
                    (file file)
                    (datetime date)
                    (database database)
@@ -290,6 +291,7 @@
                                   ("mongo" . ,mongo-extract-file))
                                 database)))
                 (data-extract
+                 (name extract-name)
                  (file (get-extract-file local-file extract-name))
                  (datetime date)
                  (database database)

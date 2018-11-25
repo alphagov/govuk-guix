@@ -71,6 +71,21 @@
                           ,draft-router-api-service-type))
        ("router" . (,router-service-type ,router-api-service-type))))))
 
+(define (add-mongodb-extract-variants base-extract database-name)
+  (list base-extract
+        (data-extract
+         (inherit base-extract)
+         (file
+          (mongodb-convert-archive-to-directory
+           (data-extract-file base-extract)
+           database-name))
+         (variant-name "directory")
+         (variant-label "Dump directory")
+         (variant-properties
+          '((format . directory)
+            (priority . 0)))
+         (directory? #t))))
+
 (define (find-data-extracts backup-directory)
   (define (log message value)
     ;;(simple-format #t "~A: ~A\n" message value)
@@ -128,6 +143,7 @@
 
     (define (create-data-extract extract-prefix filename services)
       (data-extract
+       (name extract-prefix)
        (file (mongodb-convert-tar-archive-to-archive-dump
               (local-file
                (string-join
@@ -140,16 +156,27 @@
               extract-prefix))
        (datetime (string->date date "~Y-~m-~d"))
        (database "mongo")
+       (variant-name "archive")
+       (variant-label "Archive file")
+       (variant-properties
+        '((format . archive)
+          ;; Treat the archive file as higher priority than the directory, as
+          ;; it's easier to manage
+          (priority . 1)))
        (services services)
        (data-source govuk-puppet-aws-data-source)))
 
-    (filter-map (match-lambda
+    (append-map (match-lambda
                   ((extract-prefix . services)
-                   (and=> (filename-for-extract extract-prefix)
-                          (lambda (filename)
-                            (create-data-extract extract-prefix
-                                                 filename
-                                                 services)))))
+                   (or
+                    (and=> (filename-for-extract extract-prefix)
+                           (lambda (filename)
+                             (add-mongodb-extract-variants
+                              (create-data-extract extract-prefix
+                                                   filename
+                                                   services)
+                              extract-prefix)))
+                    '())))
                 extracts))
 
   (define (create-extracts-from-sql-dump-files extracts date database files)
@@ -164,6 +191,7 @@
 
     (define (create-data-extract filename services)
       (data-extract
+       (name filename)
        (file (local-file
               (string-join
                `(,backup-directory

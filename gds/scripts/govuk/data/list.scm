@@ -49,7 +49,9 @@
                                    data-extract)))
                              (format
                               #t
-                              "      - ~A (~:r priority)\n"
+                              "      - ~A: ~A ~A (~:r priority)\n"
+                              (data-extract-variant-name data-extract)
+                              (data-extract-variant-label data-extract)
                               (data-source-name data-source)
                               priority-ordering)))
                          ;; Highest priority first, so reverse the sort order

@@ -165,6 +165,13 @@ def filter_extracts(extracts,
                     before_date: false,
                     after_date: false)
   extracts.select do |extract|
+    next if (
+        extract[:database] == 'mongo' &&
+        # mongorestore in the govuk-puppet devleopment VM doesn't support the
+        # archive format yet
+        extract.dig(:variant, :name) == 'archive'
+      )
+
     next if services and
       services.all? { |service| !extract[:services].keys.include? service }
 
@@ -186,14 +193,31 @@ def list(options)
     **options.keep_if { |k| FILTER_OPTIONS.include? k }
   )
 
-  group_extracts(:services, extracts).each do |service, extracts|
+  group_extracts(:services, extracts).each do |service, extracts_for_service|
     puts "service: #{service}"
-    group_extracts(:database, extracts).each do |database, extracts|
+    group_extracts(
+      :database,
+      extracts_for_service
+    ).each do |database, extracts_for_database|
       puts "  database: #{database}"
-      extracts.each do |extract|
-        print "    - #{extract[:date]}"
-        print " (downloaded)" if extract_exists_locally?(extract)
-        puts
+      group_extracts(
+        :date,
+        extracts_for_database
+      ).each  do |date, extracts_for_date|
+        if extracts_for_date.length > 1
+          puts "    - #{date}"
+          extracts_for_date.each do |extract|
+            puts "      - %<name>s: %<label>s%<downloaded>s" % {
+              downloaded: extract_exists_locally?(extract) ? ' (downloaded)' : ''
+            }.merge(extract[:variant])
+          end
+        else
+          print "    - #{date}"
+          print " (downloaded)" if extract_exists_locally?(
+                                     extracts_for_date.first
+                                   )
+          puts
+        end
       end
     end
   end
