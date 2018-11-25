@@ -120,13 +120,21 @@ def get_local_path_to_extract_data(extract, dry_run)
   end
 end
 
+def symbolize_keys(h)
+  h.each_with_object({}) do |(key, value), result|
+    result[key.to_sym] = if value.is_a?(Hash)
+                           symbolize_keys(value)
+                         else
+                           value
+                         end
+  end
+end
+
 def retrieve_extracts
   index_data = retrieve_index
 
   index_data['extracts'].map do |extract_hash|
-    extract_hash.each_with_object({}) do |(key, value), result|
-      result[key.to_sym] = value
-    end
+    symbolize_keys(extract_hash)
   end
 end
 
