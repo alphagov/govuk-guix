@@ -20,6 +20,7 @@
   #:export (with-mongodb
 
             mongodb-convert-tar-archive-to-archive-dump
+            mongodb-convert-archive-to-directory
 
             mongodb-load-extracts))
 
@@ -175,6 +176,38 @@
 
           (display "\n\nfinished generating output\n")
           (force-output)
+
+          (exit 0))))))
+
+(define (mongodb-convert-archive-to-directory file database-name)
+  (define load-and-then-dump-data
+    #~(lambda _
+        (let ((command
+               (string-join
+                `("set -eo pipefail;"
+                  "pv" "--force" ,#$file "|"
+                  "xz" "-d" "-T0" "-c" "|"
+                  ,"mongorestore" "--archive" "-d" ,#$database-name)
+                " ")))
+          (or (zero? (system command))
+              (error (string-append "command "
+                                    (string-join command)
+                                    " failed"))))
+
+        (invoke "mongodump"
+                "-d" #$database-name
+                "--out" #$output)))
+
+  (data-transformation
+   (output-name (string-append database-name))
+   (operation
+    (with-imported-modules '((guix build utils))
+      #~(begin
+          (use-modules (guix build utils))
+
+          #$(with-mongodb
+             (service mongodb-service-type)
+             load-and-then-dump-data)
 
           (exit 0))))))
 
