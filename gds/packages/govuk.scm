@@ -359,12 +359,12 @@ proxies requests to some upstream")
     (hash (base32 "0bjch2wpk11pdnb121n3jb32676y88lcxhnvcjjxx33a6pkj42g2")))
    (package
      (name "content-publisher")
-     (version "release_454")
+     (version "release_455")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0vgwg0ssxd570kijg1qqgi0w5g3dbhpyvcmwngdny7ba9237qcxw")))
+       #:hash (base32 "0a0x76kjs5s3vypg7asqm1v45y0w9c5iy8a4dgm0fvab8wlbw05j")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
