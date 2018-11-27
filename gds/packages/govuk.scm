@@ -1057,12 +1057,12 @@ service setup.")
     (hash (base32 "1xn2pvwi8db5bmdk1b7lhh7ikaabsg7lylr92f1fvrpvwqc0xbf5")))
    (package
      (name "publishing-api")
-     (version "release_1322")
+     (version "release_1323")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "069skhmqhkjkc82ya9s0mn6k45z98vykqsss3bplzw0q9q32ngk9")))
+       #:hash (base32 "0r7hi0ajv6hzg1qigr9jh9ysi5h7q8kqlzpi769q0npjsma5g70k")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
