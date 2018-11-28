@@ -125,7 +125,7 @@
                           (mkdir-p (dirname full-destination))
                           (symlink file full-destination)))
                       data-extract-destinations
-                      (map first data-extract-details-lists))
+                      (map second data-extract-details-lists))
 
             (mkdir-p #$output)
             (call-with-output-file (string-append #$output "/index.json")
