@@ -292,6 +292,7 @@ def load_postgresql_extract(extract, service, options)
   alter_owner_queries = {
     table: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';",
     view: "SELECT table_name FROM information_schema.views WHERE table_schema = 'public';",
+    materialized_view: "SELECT matviewname FROM pg_matviews WHERE schemaname = 'public';",
     sequence: "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public';"
   }
 
@@ -311,7 +312,7 @@ def load_postgresql_extract(extract, service, options)
     end
 
     object_names.each_line do |name|
-      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.upcase} \\\"#{name.strip}\\\" OWNER TO #{owner}\" #{target_database}"
+      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.gsub('_', ' ').upcase} \\\"#{name.strip}\\\" OWNER TO #{owner}\" #{target_database}"
 
       unless system(change_owner_command)
         STDERR.puts "error: command failed: #{change_owner_command}"
