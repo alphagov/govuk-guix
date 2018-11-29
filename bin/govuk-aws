@@ -108,7 +108,6 @@ if [ "$1" == "--profile" ]; then
         export AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY"
         export AWS_SESSION_TOKEN="$SESSION_TOKEN"
 
-        echo
         exec aws "${@:3}"
     else
         exit 1
