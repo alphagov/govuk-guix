@@ -26,6 +26,24 @@ def aws_s3(*args)
   end
 end
 
+def aws_s3_download_and_unpack_tar(target, directory)
+  FileUtils.mkdir_p directory
+
+  command = (
+    "govuk aws --profile govuk-integration -- "\
+    "s3 cp #{target} - | "\
+    "xz -d -T0 | "\
+    "tar --extract --directory #{directory}"
+  )
+
+  status = system(command)
+
+  unless status
+    STDERR.puts "error: aws s3 command failed: #{command}"
+    exit 1
+  end
+end
+
 def data_storage_directory
   if Dir.exists? '/var/govuk'
     directory = '/var/govuk/development-data'
@@ -48,10 +66,11 @@ def filename_for_local_extract(extract)
   when "file"
     extract_data_uri.path
   when "s3"
+    suffix_to_remove = '-directory.tar.xz' if extract[:directory?]
     File.join(
       data_storage_directory,
       extract[:date],
-      File.basename(extract[:url])
+      File.basename(extract[:url], suffix_to_remove)
     )
   when "http"
   when "https"
@@ -103,7 +122,14 @@ def get_local_path_to_extract_data(extract, dry_run)
         puts "would download #{extract_data_uri} to #{storage_directory}/"
       else
         puts "downloading #{extract_data_uri} to #{storage_directory}/\n"
-        aws_s3('cp', extract_data_uri.to_s, "#{storage_directory}/")
+        if extract[:directory?]
+          aws_s3_download_and_unpack_tar(
+            extract_data_uri.to_s,
+            storage_directory
+          )
+        else
+          aws_s3('cp', extract_data_uri.to_s, "#{storage_directory}/")
+        end
       end
     else
       puts "using existing file for #{extract_data_uri}"
@@ -359,15 +385,29 @@ end
 def load_mongo_extract(extract, service, options)
   dry_run = options[:dry_run]
   local_file = get_local_path_to_extract_data(extract, dry_run)
-  decompressor = get_decompressor(local_file)
-  target_database = extract[:services][service]['database']
-  from_database = target_database.sub('development', 'production')
-  mongorestore_args = "--nsFrom=\"#{from_database}.*\" --nsTo=\"#{target_database}.*\" --archive --drop --quiet"
-  if options[:for_govuk_guix_system]
-    mongorestore_args += " --host=127.0.0.1:37017"
-  end
 
-  command = "pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
+  if extract[:variant][:name] == 'archive'
+    decompressor = get_decompressor(local_file)
+    target_database = extract[:services][service.to_sym][:database]
+    from_database = target_database.sub('development', 'production')
+    mongorestore_args = "--nsFrom=\"#{from_database}.*\" --nsTo=\"#{target_database}.*\" --archive --drop --quiet"
+    if options[:for_govuk_guix_system]
+      mongorestore_args += " --host=127.0.0.1:37017"
+    end
+
+    command = "pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
+  elsif extract[:variant][:name] == 'directory'
+    target_database = extract[:services][service.to_sym][:database]
+    mongorestore_args = "--drop --quiet -d #{target_database}"
+    if options[:for_govuk_guix_system]
+      mongorestore_args += " --host=127.0.0.1:37017"
+    end
+
+    command = "mongorestore #{mongorestore_args}"
+  else
+    STDERR.puts "error: unknown mongo variant #{extract[:variant][:name]}"
+    exit 1
+  end
 
   if dry_run
     puts "Would run command: #{command}"
