@@ -1568,10 +1568,7 @@ content, as well as broadcasting changes to a message queue.")
                  "if Rails.env.development? and false"))
               #t))
           (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser)
-          (add-after
-           'install 'replace-redis.yml
-           ,(replace-redis.yml)))))
+            ,govuk-admin-template-initialiser))))
      (synopsis "")
      (description "")
      (license #f)
