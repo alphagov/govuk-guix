@@ -2,18 +2,62 @@
 #+STARTUP: content hidestars
 
 * 2018
+** November
+*** Project now going for 2 years
+*** Data
+**** More MongoDB support improvements
+**** Lots of improvements to govuk-data-standalone
+** October
+*** Add govuk-aws script
+*** Data
+**** Add initial S3 support to the data-directory-with-index data source
+**** Automatically fallback to govuk-data-standalone
+**** Add content-data-admin to the govuk-puppet-aws data source
+**** Use the development configuration in govuk-data
+**** Add fetch option to govuk-data-standalone
+**** Lots of improvements to govuk-data-standalone
+**** MongoDB data handling improvements
+*** Packages
+**** Add package for Content Data Admin
+**** Import a package definition for chromium
+**** Remove Policy Publisher
+*** Services
+**** Add service for Content Data Admin
+**** Set the GOVUK-Request-Id header through NGinx
+**** Connect Travel Advice Publisher and Specialist Publisher with the Email Alert API
+**** Enable Sidekiq for Specialist Publisher
+**** Fix driver issues with the Publishing E2E Tests
+**** Remove Policy Publisher
+** September
+*** Packages
+**** Use Ruby 2.5.1 for Rails apps
+** August
+*** Services
+**** Enable Rummager to use Signon
+**** Support creating superuser PostgreSQL users
+**** Enable the email related services
+**** Use a more sensible list of default services
+*** Packages
+**** Fix a few cases where package phases don't return #t
+
+** July
+*** Packages
+**** Add a package for Content Publisher
+
 ** June
+*** Packages
+**** Fix the short-url-manager and feedback packages
 *** Provide feedback when loading and building data snapshots
-*** Fix the short-url-manager and feedback packages
-*** Add the --exclude-service option to govuk-data
 *** Store app logs in /var/log/apps
 *** Disable Tailon
 
 It wasn't being used, and posed a security problem when deploying
 govuk-guix systems.
 
-*** Compress the data in data snapshots
-*** govuk-puppet-aws data source improvements
+*** Data
+**** Compress the data in data snapshots
+**** Add the --exclude-service option to govuk-data
+**** govuk-puppet-aws data source improvements
 
 Including adding support for xz compression
 
