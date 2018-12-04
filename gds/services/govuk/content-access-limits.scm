@@ -20,6 +20,10 @@
      (list
       (cons service-startup-config? add-environment-variable)))
     (cons
+     asset-manager-service-type
+     (list
+      (cons service-startup-config? add-environment-variable)))
+    (cons
      publisher-service-type
      (list
       (cons service-startup-config? add-environment-variable)))
