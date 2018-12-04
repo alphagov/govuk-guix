@@ -285,12 +285,12 @@ def load_postgresql_extract(extract, service, options)
   dry_run = options[:dry_run]
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
-  target_database = extract[:services][service]['database']
+  target_database = extract[:services][service][:database]
 
   if options[:for_govuk_guix_system]
-    user = extract[:services][service]['user']
-    psql_command = "psql -U postgres --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
-    owner = extract[:services][service]['user']
+    user = extract[:services][service][:user]
+    psql_command = "psql -U postgres --host=127.0.0.1 --port=#{extract[:services][service][:port]}"
+    owner = extract[:services][service][:user]
   else
     user = 'postgres'
     psql_command = 'sudo -E -u postgres psql'
@@ -354,10 +354,10 @@ def load_mysql_extract(extract, service, options)
   dry_run = options[:dry_run]
   local_file = get_local_path_to_extract_data(extract, dry_run)
   decompressor = get_decompressor(local_file)
-  target_database = extract[:services][service]['database']
+  target_database = extract[:services][service][:database]
   mysql_args = "-u root"
   if options[:for_govuk_guix_system]
-    mysql_args += " --host=127.0.0.1 --port=#{extract[:services][service]['port']}"
+    mysql_args += " --host=127.0.0.1 --port=#{extract[:services][service][:port]}"
   end
   puts extract[:services][service]
 
