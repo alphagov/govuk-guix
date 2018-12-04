@@ -66,7 +66,7 @@ def filename_for_local_extract(extract)
   when "file"
     extract_data_uri.path
   when "s3"
-    suffix_to_remove = '-directory.tar.xz' if extract[:directory?]
+    suffix_to_remove = extract[:directory?] ? '-directory.tar.xz' : ''
     File.join(
       data_storage_directory,
       extract[:date],
@@ -398,7 +398,7 @@ def load_mongo_extract(extract, service, options)
     command = "pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
   elsif extract[:variant][:name] == 'directory'
     target_database = extract[:services][service.to_sym][:database]
-    mongorestore_args = "--drop --quiet -d #{target_database}"
+    mongorestore_args = "--drop -d #{target_database} #{local_file}"
     if options[:for_govuk_guix_system]
       mongorestore_args += " --host=127.0.0.1:37017"
     end
