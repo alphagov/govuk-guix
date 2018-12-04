@@ -285,15 +285,15 @@ proxies requests to some upstream")
 (define-public content-audit-tool
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0hxq4zhq7aq9dxp6yxb99fzjxsfc9348lpalv4nxsgxkaj8wfrga")))
+    (hash (base32 "0hpzw0vlc9j0p3nvbjyl2bg2wx7lpkdbcfpp5lbyyznbnrxz33iy")))
    (package
      (name "content-audit-tool")
-     (version "release_531")
+     (version "release_532")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1xln1ajpbxyjfascgylpxmmzg4v12vkkdgzhl1sb0qwc5px2h0dv")))
+       #:hash (base32 "0k48smkzbb4cjigprxxadlrxnia80jg34zlmwy7m98a5mnlbk9yy")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
