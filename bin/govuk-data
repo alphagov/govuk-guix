@@ -101,36 +101,73 @@
    ;; the port numbers match
    #:use-high-ports? #t))
 
-(define (options->services-and-data-extracts opts)
-  (let* ((service-names
-          (filter-map (match-lambda
+(define (options->services-and-variant-names opts)
+  (define (service-name->service service-name)
+    (or
+     (find (lambda (service)
+             (eq?
+              (string->symbol service-name)
+              (service-type-name (service-kind service))))
+           govuk-services)
+     (leave (G_ "Could not find service with name ~A")
+            service-name)))
+
+  (define service-names-to-exclude
+    (map string->symbol
+         (filter-map (match-lambda
+                       (('exclude-service . a) a)
+                       (_ #f))
+                     opts)))
+
+  (define (remove-excluded-services services-and-variant-names)
+    (filter (match-lambda
+              ((service . variant-name)
+               (not (member (service-type-name (service-kind service))
+                            service-names-to-exclude))))
+            services-and-variant-names))
+
+  (let ((values
+         (filter-map (match-lambda
                        (('argument . a) a)
                        (_ #f))
-                      opts))
-         (service-names-to-exclude
-          (map string->symbol
-               (filter-map (match-lambda
-                             (('exclude-service . a) a)
-                             (_ #f))
-                           opts)))
+                     opts)))
+
+    (remove-excluded-services
+     (if (null? values)
+         ;; If no services are specified, just filter on all services, with no
+         ;; restrictions on the variant names.
+         (map (lambda (service)
+                (cons service '()))
+              govuk-services)
+         (map (lambda (value)
+                (match (string-split value #\:)
+                  ((service-name variant-name)
+                   (cons (service-name->service service-name)
+                         variant-name))
+                  ((service-name)
+                   (cons (service-name->service service-name)
+                         '()))))
+              values)))))
+
+(define (options->services-and-data-extracts opts)
+  (let* ((services-and-variant-names
+          (options->services-and-variant-names opts))
          (databases
           (filter-map (match-lambda
                        (('database . d) d)
                        (_ #f))
                       opts))
          (services (configure-services
-                    (if (null? service-names)
-                        govuk-services
-                        (get-services service-names))))
-         (service-types (map service-kind services))
+                    (map first services-and-variant-names)))
          (data-extracts
           (filter-extracts
            (all-extracts)
-           #:service-types (filter
-                            (lambda (service-type)
-                              (not (member (service-type-name service-type)
-                                           service-names-to-exclude)))
-                            service-types)
+           #:service-types-and-extract-variant-names
+           (map (match-lambda
+                  ((service . variant-names)
+                   (cons (service-kind service)
+                         variant-names)))
+                services-and-variant-names)
            #:databases (if (null? databases) #f databases)
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))

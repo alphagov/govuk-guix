@@ -55,7 +55,7 @@
 
 (define* (filter-extracts extracts
                           #:optional #:key
-                          service-types
+                          service-types-and-extract-variant-names
                           databases
                           before-date
                           after-date)
@@ -63,10 +63,17 @@
    (lambda (extract)
      (and
       (let ((services (data-extract-services extract)))
-        (if (and services service-types)
-            (any (lambda (service-type)
-                   (member service-type (data-extract-services extract)))
-                 service-types)
+        (if (and services service-types-and-extract-variant-names)
+            (any (match-lambda
+                   ((service-type . variant-name)
+                    (and (member service-type (data-extract-services extract))
+                         (or (null? variant-name)
+                             (and (not
+                                   (null? (data-extract-variant-name extract)))
+                                  (string=?
+                                   variant-name
+                                   (data-extract-variant-name extract)))))))
+                 service-types-and-extract-variant-names)
             #t))
       (if databases
           (member (data-extract-database extract) databases)
@@ -144,9 +151,10 @@ higher priority extracts appear later in the list"
    (lambda (service data-extracts-and-database-connection-configs)
      (let ((service-extracts (filter-extracts
                               extracts
-                              #:service-types (list
-                                               (service-kind
-                                                service)))))
+                              #:service-types-and-extract-variant-names
+                              (list (cons
+                                     (service-kind service)
+                                     '())))))
        (fold
         (match-lambda*
           (((database . extracts) data-extracts-and-database-connection-configs)
