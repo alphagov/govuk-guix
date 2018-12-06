@@ -86,7 +86,10 @@
                               result)))
         (option '("dry-run") #f #f
                 (lambda (opt name arg result)
-                  (alist-cons 'dry-run? #t result)))))
+                  (alist-cons 'dry-run? #t result)))
+        (option '("verbose") #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'verbose? #t result)))))
 
 (define (configure-services services)
   (set-routing-configuration-for-services
@@ -132,7 +135,8 @@
            #:before-date (assq-ref opts 'before)
            #:after-date (assq-ref opts 'after))))
     (list services data-extracts
-          #:dry-run? (assq-ref opts 'dry-run?))))
+          #:dry-run? (assq-ref opts 'dry-run?)
+          #:verbose? (assq-ref opts 'verbose?))))
 
 (define (get-services service-names)
   (map

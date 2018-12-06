@@ -23,7 +23,7 @@
   #:export (list-available-extracts))
 
 (define* (list-available-extracts services data-extracts
-                                  #:key dry-run?)
+                                  #:key dry-run? verbose?)
   (for-each
    (match-lambda
      ((service-type . data-extracts)
@@ -41,7 +41,8 @@
                     (simple-format
                      #t "    - ~A\n"
                      (date->string date "~d/~m/~Y"))
-                    (if (> (length data-extracts) 1)
+                    (if (or verbose?
+                            (> (length data-extracts) 1))
                         (for-each
                          (lambda (data-extract priority-ordering)
                            (let ((data-source

@@ -7,7 +7,8 @@
   #:use-module (gds data govuk sources data-directory-with-index)
   #:export (build-data-directory-with-index))
 
-(define* (build-data-directory-with-index services data-extracts #:key dry-run?)
+(define* (build-data-directory-with-index services data-extracts
+                                          #:key dry-run? verbose?)
   (with-store store
     (set-build-options store
                        #:max-build-jobs 1)

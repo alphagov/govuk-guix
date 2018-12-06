@@ -80,7 +80,7 @@
    extracts-and-database-connection-configs))
 
 (define* (load-extracts services data-extracts
-                        #:key dry-run?)
+                        #:key dry-run? verbose?)
   (let ((extracts-and-database-connection-configs
          (get-extracts-and-database-connection-configs services
                                                        data-extracts)))

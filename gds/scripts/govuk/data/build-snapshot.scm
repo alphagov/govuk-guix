@@ -124,7 +124,7 @@
    #:pretty #t))
 
 (define* (build-snapshot services data-extracts
-                         #:key dry-run?)
+                         #:key dry-run? verbose?)
   (define data-transformations
     (snapshot-data-transformations data-extracts
                                    #:dry-run? dry-run?))
