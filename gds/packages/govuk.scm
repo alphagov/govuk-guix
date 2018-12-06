@@ -367,7 +367,10 @@ proxies requests to some upstream")
        #:hash (base32 "09a359j3c3djipdb9j6yjbh9h7j0i80sv82h72vpa2mlfkc6vmhn")))
      (build-system rails-build-system)
      (arguments
-      `(#:phases
+      `(;; TODO: Asset precompilation is now failing, due to npm not
+        ;; being used to download some JavaScript.
+        #:precompile-rails-assets? #f
+        #:phases
         (modify-phases %standard-phases
          (add-before 'precompile-rails-assets 'set-fake-SECRET_KEY_BASE
           (lambda _
