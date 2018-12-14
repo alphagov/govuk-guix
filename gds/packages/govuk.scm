@@ -359,12 +359,12 @@ proxies requests to some upstream")
     (hash (base32 "137wsgnzvki88rcvxvd8728f6cg6glv56ixxsfn1cbjvv04dw7s3")))
    (package
      (name "content-publisher")
-     (version "release_537")
+     (version "release_538")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0gdavg53iyiyilgqx5jpnhm37bv6g4c2v9kql767lj4mkcpm3prd")))
+       #:hash (base32 "0h86z4flvx43za8mlnr1mfwb10jy3id242bfwm340f3gl0s864xi")))
      (build-system rails-build-system)
      (arguments
       `(;; TODO: Asset precompilation is now failing, due to npm not
