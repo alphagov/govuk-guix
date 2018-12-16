@@ -20,6 +20,10 @@
          `("pg_dump"
            ,database-name
            ,(string-append "--file=" output-path)
+           "--verbose"
+           ,@(if (string=? format "directory")
+                 '("--jobs=8")
+                 '())
            ,@(if format
                  `(,(simple-format #f "--format=~A" format))
                  '()))))
