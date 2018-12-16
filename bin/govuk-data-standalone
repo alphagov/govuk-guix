@@ -291,10 +291,12 @@ def load_postgresql_extract(extract, service, options)
 
   if options[:for_govuk_guix_system]
     user = extract[:services][service][:user]
-    psql_command = "psql -U postgres --host=127.0.0.1 --port=#{extract[:services][service][:port]}"
+    host_and_port_arguments = "--host=127.0.0.1 --port=#{extract[:services][service][:port]}"
+    psql_command = "psql -U postgres #{host_and_port_arguments}"
     owner = extract[:services][service][:user]
   else
     user = 'postgres'
+    host_and_port_arguments = ''
     psql_command = 'sudo -E -u postgres psql'
     owner = 'vagrant'
   end
@@ -304,6 +306,20 @@ def load_postgresql_extract(extract, service, options)
     "#{psql_command} -c \"CREATE DATABASE \\\"#{target_database}\\\"\"",
     "pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
   ]
+
+  format = extract[:variant][:properties][:format]
+  if format == 'plain'
+    commands.push(
+      "pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
+    )
+  elsif format == 'directory'
+    commands.push(
+      "pg_restore #{host_and_port_arguments} --username=#{user} #{target_database} --jobs=8 --exit-on-error #{local_file}"
+    )
+  else
+    STDERR.puts "error: unknown pg_dump format #{format}"
+    exit 1
+  end
 
   commands.each do |command|
     if dry_run
