@@ -1,8 +1,12 @@
 (define-module (gds data transformations build postgresql)
   #:use-module (srfi srfi-1)
+  #:use-module (ice-9 popen)
+  #:use-module (ice-9 ftw)
   #:export (pg-restore
             pg-dump
-            decompress-file-and-pipe-to-psql))
+            decompress-file-and-pipe-to-psql
+            run-with-psql-port
+            pg-dump-parallel-compression))
 
 (define* (pg-restore file)
   (let ((command
@@ -33,6 +37,46 @@
     (or
      (zero? (apply system* command))
      (error "pg_dump failed"))))
+
+(define (pg-dump-parallel-compression database-name output-path)
+  (let ((command
+         `("pg_dump"
+           ,database-name
+           ,(string-append "--file=" output-path)
+           "--verbose"
+           "--jobs=8"
+           "--compress=0"
+           "--format=directory")))
+    (simple-format #t "running:\n  ~A\n"
+                   (string-join command " "))
+    (force-output)
+    (or
+     (zero? (apply system* command))
+     (error "pg_dump failed")))
+
+  (for-each
+   (lambda (file)
+     (or (zero? (system* "pigz" "-9" "--verbose"
+                         (string-append output-path "/" file)))
+         (error "pigz failed")))
+   (scandir output-path
+            (lambda (name)
+              (and (not (string-prefix? "toc" name))
+                   (not (string-prefix? "." name)))))))
+
+(define (run-with-psql-port database-name user operations)
+  (let ((p (open-pipe*
+            OPEN_WRITE "psql"
+            (string-append "--user=" user)
+            "-a"
+            "--no-psqlrc"
+            database-name)))
+    (for-each
+     (lambda (o) (o p))
+     (if (list? operations)
+         operations
+         (list operations)))
+    (close-pipe p)))
 
 (define* (decompress-file-and-pipe-to-psql file database)
   (define decompressor
