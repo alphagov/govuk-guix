@@ -19,6 +19,7 @@
             postgresql-create-database-gexp
             postgresql-list-databases-gexp
             postgresql-import-gexp
+            postgresql-pg-restore-gexp
             postgresql-create-user-for-database-connection
             postgresql-create-user-and-database-for-database-connection))
 
@@ -144,6 +145,30 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                                    command))
                   '((simple-format #t "Running command: ~A\n" command)
                     (zero? (system command)))))))))
+
+(define* (postgresql-pg-restore-gexp database-connection file
+                                     #:key dry-run?)
+  (match database-connection
+    (($ <postgresql-connection-config> host user port database)
+     #~(lambda _
+         (use-modules (srfi srfi-1))
+         (let*
+             ((pg_restore (string-append #$postgresql "/bin/pg_restore"))
+              (command `(,pg_restore
+                         ,(string-append "--host=" #$host)
+                         ,(string-append "--port=" #$(number->string port))
+                         ,(string-append "--username=" #$user)
+                         ,(string-append "--dbname=" #$database)
+                         "--jobs=8"
+                         "--schema=public"
+                         "--exit-on-error"
+                         ,#$file)))
+           #$@(if dry-run?
+                  '((simple-format #t "Would run command: ~A\n"
+                                   (string-join command " ")))
+                  '((simple-format #t "Running command: ~A\n"
+                                   (string-join command " "))
+                    (zero? (apply system* command)))))))))
 
 (define (postgresql-create-user-for-database-connection
          database-connection)

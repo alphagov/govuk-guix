@@ -183,22 +183,29 @@ higher priority extracts appear later in the list"
 
   (let* ((load-gexp
           (match extract
-            (($ <data-extract> file datetime "postgresql" services)
-             (postgresql-import-gexp
-              database-connection-config
-              (transform-file file)
-              #:dry-run? dry-run?))
-            (($ <data-extract> file datetime "mongo" services)
+            (($ <data-extract> name file datetime "postgresql" services
+                               data-source variant-name variant-label
+                               variant-properties directory?)
+             (if directory?
+                 (postgresql-pg-restore-gexp
+                  database-connection-config
+                  (transform-file file)
+                  #:dry-run? dry-run?)
+                 (postgresql-import-gexp
+                  database-connection-config
+                  (transform-file file)
+                  #:dry-run? dry-run?)))
+            (($ <data-extract> name file datetime "mongo" services)
              (mongodb-restore-gexp
               database-connection-config
               (transform-file file)
               #:dry-run? dry-run?))
-            (($ <data-extract> file datetime "mysql" services)
+            (($ <data-extract> name file datetime "mysql" services)
              (mysql-run-file-gexp
               database-connection-config
               (transform-file file)
               #:dry-run? dry-run?))
-            (($ <data-extract> file datetime "elasticsearch" services)
+            (($ <data-extract> name file datetime "elasticsearch" services)
              (elasticsearch-restore-gexp
               database-connection-config
               (simple-format
