@@ -180,7 +180,9 @@ def group_extracts(field, extracts)
 end
 
 def sort_extracts(extracts)
-  extracts.sort_by { |extract| extract[:date] }
+  extracts.sort_by do |extract|
+    [extract[:date], extract.dig(:variant, :properties, :priority)]
+  end
 end
 
 FILTER_OPTIONS = %i(services database before_date after_date).freeze
