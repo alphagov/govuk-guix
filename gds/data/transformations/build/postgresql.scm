@@ -52,5 +52,6 @@
     (simple-format #t "ungzip-file-and-pipe-to-psql running:\n  ~A\n"
                    command)
     (force-output)
+    (setenv "XZ_OPT" "-T0")
     (or (zero? (system command))
         (error "ungzip-file-and-pipe-to-psql failed"))))
