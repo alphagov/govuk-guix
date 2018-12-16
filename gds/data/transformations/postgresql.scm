@@ -33,6 +33,16 @@
                          (service-extension-target service-extension)))
                   (service-type-extensions (service-kind postgresql-service))))
            (service-parameters postgresql-service))))
+        (postgresql-config
+         (postgresql-config-file
+          (extra-config
+           '(("wal_level" "minimal")
+             ("fsync" "off")
+             ("full_page_writes" "off")
+             ("autovacuum" "off")
+             ("max_wal_senders" "0")
+             ("shared_buffers" "2GB")
+             ("maintenance_work_mem" "2GB")))))
         (postgresql
          ((@@ (gnu services databases)
               postgresql-configuration-postgresql)
@@ -78,13 +88,13 @@
             (invoke "initdb"
                     "--locale=en_GB.UTF-8"
                     "-U" "postgres"
-                    "-D"
-                    data-directory))
+                    "-D" data-directory))
 
           (define (pg_ctl . args)
             (let ((command
                    `(,(string-append #$postgresql "/bin/pg_ctl")
                      "-D" ,data-directory
+                     "-o" ,(string-append "--config-file=" #$postgresql-config)
                      ,@args)))
               (simple-format #t "running: ~A\n" (string-join command " "))
               (apply invoke command)))
