@@ -14,10 +14,13 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu services databases)
   #:use-module (gds data data-extract)
+  #:use-module (gds data transformations)
   #:use-module (gds services utils databases postgresql)
   #:export (with-postgresql
 
-            postgresql-load-extracts))
+            postgresql-load-extracts
+
+            postgresql-multi-output-data-transformation))
 
 (define* (with-postgresql
           postgresql-service
@@ -70,6 +73,7 @@
                      "/bin")
                     (string-append #$pv "/bin")
                     (string-append #$gzip "/bin")
+                    (string-append #$pigz "/bin")
                     (string-append #$glibc "/bin")
                     (string-append #$xz "/bin")
                     (search-path-as-string->list (getenv "PATH")))
@@ -132,3 +136,52 @@
       #$(with-postgresql
          (service postgresql-service-type)
          operation)))
+
+(define (postgresql-multi-output-data-transformation
+         base-extract
+         database-connection-config
+         variant-details)
+  (define operation
+    (with-imported-modules '((gds data transformations build postgresql))
+      #~(lambda _
+          (define database-name
+            #$(postgresql-connection-config-database database-connection-config))
+
+          (define user
+            #$(postgresql-connection-config-user database-connection-config))
+
+          (invoke "createuser" user)
+          (invoke "createdb" database-name "-O" user)
+          (decompress-file-and-pipe-to-psql #$(data-extract-file base-extract)
+                                            database-name)
+
+          #$@(map
+              (match-lambda
+                ((variant-name variant-description variant-sql)
+                 #~(let ((variant-name #$variant-name)
+                         (variant-sql (list #$@variant-sql)))
+                     ;; Run the SQL for this variant
+                     (run-with-psql-port
+                      database-name user
+                      (lambda (port)
+                        (for-each (lambda (statement)
+                                    (display (string-append statement ";")
+                                             port))
+                                  variant-sql)))
+
+                     ;; Then dump out the state at this point during the
+                     ;; transformation
+                     (pg-dump-parallel-compression
+                      database-name (ungexp output variant-name)))))
+              variant-details))))
+
+  (multi-output-data-transformation
+   (name "postgresql-incremental-transformation")
+   (outputs (map (match-lambda
+                   ((variant-name variant-description variant-sql)
+                    (list variant-name variant-description)))
+                 variant-details))
+   (operation #~(begin
+                  #$(with-postgresql
+                     (service postgresql-service-type)
+                     operation)))))
