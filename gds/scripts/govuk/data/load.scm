@@ -30,7 +30,8 @@
       (for-each
        (lambda (database-connection-config)
          (match data-extract
-           (($ <data-extract> file datetime database services data-source)
+           (($ <data-extract> name file datetime database
+                              services data-source)
             (simple-format
              #t " - ~A extract from ~A (~A) into the ~A database for"
              database
@@ -64,7 +65,7 @@
       (for-each
        (lambda (database-connection-config)
          (match data-extract
-           (($ <data-extract> file datetime database services)
+           (($ <data-extract> name file datetime database services)
             (simple-format
              #t "Importing extract from ~A in to ~A\n"
              (date->string datetime "~d/~m/~Y")
