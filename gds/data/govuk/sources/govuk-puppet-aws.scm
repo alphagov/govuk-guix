@@ -179,8 +179,8 @@
       (cons '(1 . ("directory"
                    "Directory format dump."
                    ()))
-            (or (assoc-ref (data-extract-name extract)
-                           (postgresql-extract-variants))
+            (or (assoc-ref (postgresql-extract-variants)
+                           (data-extract-name extract))
                 '()))))
    base-extracts))
 
