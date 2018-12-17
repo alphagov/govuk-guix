@@ -194,16 +194,33 @@
                                     (string-join command)
                                     " failed"))))
 
-        (invoke "mongodump"
-                "-d" #$database-name
-                "--out" #$output)))
+        (let* ((tmp-output
+                (string-append #$output "/tmp"))
+               (expected-dump-directory
+                (string-append tmp-output "/" #$database-name)))
+          (invoke "mongodump"
+                  "-d" #$database-name
+                  "--out" tmp-output)
+
+          (for-each (lambda (name)
+                      (rename-file
+                       (string-append expected-dump-directory "/" name)
+                       (string-append #$output "/" name)))
+                    (scandir expected-dump-directory
+                             (negate
+                              (lambda (f)
+                                (member f '("." ".."))))))
+
+          (rmdir expected-dump-directory)
+          (rmdir tmp-output))))
 
   (data-transformation
    (output-name (string-append database-name))
    (operation
     (with-imported-modules '((guix build utils))
       #~(begin
-          (use-modules (guix build utils))
+          (use-modules (ice-9 ftw)
+                       (guix build utils))
 
           #$(with-mongodb
              (service mongodb-service-type)
