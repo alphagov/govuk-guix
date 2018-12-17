@@ -311,7 +311,6 @@ def load_postgresql_extract(extract, service, options)
   commands = [
     "#{psql_command} -c \"DROP DATABASE IF EXISTS \\\"#{target_database}\\\"\"",
     "#{psql_command} -c \"CREATE DATABASE \\\"#{target_database}\\\"\"",
-    "pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
   ]
 
   format = extract[:variant][:properties][:format]
@@ -321,7 +320,7 @@ def load_postgresql_extract(extract, service, options)
     )
   elsif format == 'directory'
     commands.push(
-      "pg_restore #{host_and_port_arguments} --username=#{user} #{target_database} --jobs=8 --exit-on-error #{local_file}"
+      "pg_restore #{host_and_port_arguments} --username=#{user} --schema=public --dbname=#{target_database} --jobs=8 --exit-on-error #{local_file}"
     )
   else
     STDERR.puts "error: unknown pg_dump format #{format}"
