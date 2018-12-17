@@ -200,6 +200,13 @@ def filter_extracts(extracts,
         extract.dig(:variant, :name) == 'archive'
       )
 
+    next if (
+        extract[:database] == 'postgresql' &&
+        # the directory format doesn't quite work yet, so ignore it
+        # for now
+        extract.dig(:variant, :properties, :format) == 'directory'
+      )
+
     next if services and
       services.all? { |service| !extract[:services].keys.include? service.to_sym }
 
