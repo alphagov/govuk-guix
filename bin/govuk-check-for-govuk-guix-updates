@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -e
+
+case "$0" in
+  \/*) SCRIPT_PATH="$0";;
+  *)   SCRIPT_PATH=$(readlink -f "$0");;
+esac
+
+GOVUK_GUIX_REPO="$(dirname "$(dirname "$SCRIPT_PATH")")"
+
+cd "$GOVUK_GUIX_REPO"
+
+CURTIME=$(date +%s)
+FILETIME=$(stat .git/FETCH_HEAD -c %Y)
+TIMEDIFF=$(expr $CURTIME - $FILETIME)
+
+CHECKPERIOD=86400 # 1 day
+
+if [ $TIMEDIFF -lt $CHECKPERIOD ]; then
+    exit 0
+fi
+
+git fetch
+
+REMOTE_REF="$(git for-each-ref --format='%(upstream:short)' refs/heads/master)"
+COUNT="$(git rev-list --count master..$REMOTE_REF)"
+
+if [[ $COUNT -lt 2 ]]; then
+    exit 0
+fi
+
+YELLOW="\e[0;33m"
+BOLDYELLOW="\e[1;33m"
+RESET="\e[0m"
+
+echo -e "\n${YELLOW}There are $COUNT new commits available for govuk-guix, consider running:"
+echo
+echo -e "  ${BOLDYELLOW}govuk update-repos govuk-guix${RESET}"
+echo
+
+sleep 1
