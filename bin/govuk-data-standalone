@@ -557,6 +557,8 @@ def main
     STDERR.puts "error: command #{command} is not recognised"
     exit 1
   end
+rescue Interrupt => e
+  exit 1
 end
 
 main
