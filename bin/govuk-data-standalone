@@ -164,6 +164,17 @@ def retrieve_extracts
   end
 end
 
+FILTER_OPTIONS = %i(services database before_date after_date).freeze
+
+def filtered_extracts(options)
+  sort_extracts(
+    filter_extracts(
+      retrieve_extracts,
+      **options.keep_if { |k| FILTER_OPTIONS.include? k }
+    )
+  )
+end
+
 def group_extracts(field, extracts)
   extracts.each_with_object(Hash.new { |h,k| h[k] = [] }) do |extract, result|
     key = extract[field]
@@ -185,8 +196,6 @@ def sort_extracts(extracts)
   end
 end
 
-FILTER_OPTIONS = %i(services database before_date after_date).freeze
-
 def filter_extracts(extracts,
                     services: false,
                     database: false,
@@ -198,13 +207,6 @@ def filter_extracts(extracts,
         # mongorestore in the govuk-puppet devleopment VM doesn't support the
         # archive format yet
         extract.dig(:variant, :name) == 'archive'
-      )
-
-    next if (
-        extract[:database] == 'postgresql' &&
-        # the directory format doesn't quite work yet, so ignore it
-        # for now
-        extract.dig(:variant, :properties, :format) == 'directory'
       )
 
     next if services and
@@ -223,10 +225,7 @@ def all_services(extracts)
 end
 
 def list(options)
-  extracts = filter_extracts(
-    sort_extracts(retrieve_extracts),
-    **options.keep_if { |k| FILTER_OPTIONS.include? k }
-  )
+  extracts = filtered_extracts(options)
 
   group_extracts(:services, extracts).each do |service, extracts_for_service|
     puts "service: #{service}"
@@ -469,14 +468,9 @@ def load_extracts(extracts_by_service_and_database, options)
 end
 
 def load(options)
-  all_extracts = filter_extracts(
-    retrieve_extracts,
-    **options.select { |k, _v| FILTER_OPTIONS.include? k }
+  extracts = extracts_to_load_by_service_and_database(
+    filtered_extracts(options)
   )
-
-  services = options[:services] or all_services(all_extracts)
-
-  extracts = extracts_to_load_by_service_and_database(all_extracts)
 
   show_extracts_to_load(extracts)
   puts
@@ -485,12 +479,9 @@ def load(options)
 end
 
 def fetch(options)
-  all_extracts = filter_extracts(
-    retrieve_extracts,
-    **options.select { |k, _v| FILTER_OPTIONS.include? k }
+  extracts = extracts_to_load_by_service_and_database(
+    filtered_extracts(options)
   )
-
-  extracts = extracts_to_load_by_service_and_database(all_extracts)
 
   show_extracts_to_load(extracts)
   puts
