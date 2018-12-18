@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+GOVUK_ROOT="$(dirname "$GOVUK_GUIX_ROOT")"
+
+for repo in "$@"
+do
+    cd "$GOVUK_ROOT/$repo"
+
+    BRANCH="$(git symbolic-ref --short HEAD)"
+
+    if [[ "$BRANCH" != "master" ]]; then
+        echo "$repo: skipped: on non-master branch"
+    elif ! git diff --quiet --ignore-submodules --no-ext-diff; then
+        echo "$repo: skipped: uncommitted local changes"
+    else
+        git fetch origin
+        if ! git merge --ff-only origin/master >/dev/null 2>&1; then
+            echo "$repo: skipped: unpushed local commits"
+        else
+            echo "$repo: now up to date"
+        fi
+    fi
+done
