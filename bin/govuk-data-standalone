@@ -526,6 +526,8 @@ def parse_options
 end
 
 def main
+  system('govuk check-for-govuk-guix-updates')
+
   options = parse_options
 
   command = ARGV.shift
