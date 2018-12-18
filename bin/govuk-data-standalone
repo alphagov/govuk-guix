@@ -26,14 +26,16 @@ def aws_s3(*args)
   end
 end
 
-def aws_s3_download_and_unpack_tar(target, directory)
-  FileUtils.mkdir_p directory
+def aws_s3_download_and_unpack_tar(target, directory, size)
+  temp_directory = "#{directory}.temp"
+  FileUtils.rm_r temp_directory if Dir.exist? temp_directory
+  FileUtils.mkdir_p temp_directory
 
   command = (
     "govuk aws --profile govuk-integration -- "\
     "s3 cp #{target} - | "\
     "xz -d -T0 | "\
-    "tar --extract --directory #{directory}"
+    "tar --extract --directory #{temp_directory}"
   )
 
   status = system(command)
@@ -42,6 +44,8 @@ def aws_s3_download_and_unpack_tar(target, directory)
     STDERR.puts "error: aws s3 command failed: #{command}"
     exit 1
   end
+
+  File.rename temp_directory, directory
 end
 
 def data_storage_directory
