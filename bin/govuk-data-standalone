@@ -164,7 +164,7 @@ def retrieve_extracts
   end
 end
 
-FILTER_OPTIONS = %i(services database before_date after_date).freeze
+FILTER_OPTIONS = %i(services_and_variants database before_date after_date).freeze
 
 def filtered_extracts(options)
   sort_extracts(
@@ -197,7 +197,7 @@ def sort_extracts(extracts)
 end
 
 def filter_extracts(extracts,
-                    services: false,
+                    services_and_variants: false,
                     database: false,
                     before_date: false,
                     after_date: false)
@@ -209,12 +209,22 @@ def filter_extracts(extracts,
         extract.dig(:variant, :name) == 'archive'
       )
 
-    next if services and
-      services.all? { |service| !extract[:services].keys.include? service.to_sym }
-
     next if database and !database.include? extract[:database]
     next if before_date and extract[:before_date] > before_date
     next if after_date and extract[:after_date] < after_date
+
+    if services_and_variants
+      services_and_variants_split = services_and_variants
+                                      .map do |service_and_variant|
+        service_and_variant.split(':')
+      end
+
+      # Skip if it doesn't match any of the service variant pairs
+      next if services_and_variants_split.none? do |(service, variant)|
+        extract[:services].keys.include?(service.to_sym) &&
+          (variant.nil? || extract[:variant][:name] == variant)
+      end
+    end
 
     true
   end
@@ -522,7 +532,7 @@ def main
   options = parse_options
 
   command = ARGV.shift
-  options[:services] = ARGV if !ARGV.empty?
+  options[:services_and_variants] = ARGV if !ARGV.empty?
   unless command
     STDERR.puts "error: no command specified"
     exit 1
