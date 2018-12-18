@@ -34,6 +34,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
   command = (
     "govuk aws --profile govuk-integration -- "\
     "s3 cp #{target} - | "\
+    "pv --size=#{size} |"\
     "xz -d -T0 | "\
     "tar --extract --directory #{temp_directory}"
   )
@@ -129,7 +130,8 @@ def get_local_path_to_extract_data(extract, dry_run)
         if extract[:directory?]
           aws_s3_download_and_unpack_tar(
             extract_data_uri.to_s,
-            resulting_filename
+            resulting_filename,
+            extract[:size]
           )
         else
           aws_s3('cp', extract_data_uri.to_s, "#{storage_directory}/")
