@@ -71,7 +71,7 @@ def filename_for_local_extract(extract)
   when "file"
     extract_data_uri.path
   when "s3"
-    suffix_to_remove = extract[:directory?] ? '-directory.tar.xz' : ''
+    suffix_to_remove = extract[:directory?] ? '.tar.xz' : ''
     File.join(
       data_storage_directory,
       extract[:date],
