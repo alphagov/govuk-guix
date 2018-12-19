@@ -17,6 +17,17 @@ def cache_directory
   "#{base}/govuk-guix/development-data"
 end
 
+def format_seconds(seconds)
+  if seconds >= 120
+    minutes = seconds.to_i / 60
+    "%i minutes, %i seconds" % [minutes, seconds.modulo(60).round]
+  elsif seconds >= 1
+    "%i seconds" % seconds.round
+  else
+    "less than a second"
+  end
+end
+
 def aws_s3(*args)
   status = system(*(%w[govuk aws --profile govuk-integration -- s3] + args))
 
@@ -342,6 +353,8 @@ def load_postgresql_extract(extract, service, options)
     exit 1
   end
 
+  start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
   commands.each do |command|
     if dry_run
       puts "Would run command: #{command}"
@@ -386,7 +399,9 @@ def load_postgresql_extract(extract, service, options)
     end
   end
 
-  puts "\nSuccessfully created #{target_database}" unless dry_run
+  time_taken = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
+
+  puts "\nSuccessfully created #{target_database} (took #{format_seconds(time_taken)})" unless dry_run
 end
 
 def load_mysql_extract(extract, service, options)
@@ -406,6 +421,8 @@ def load_mysql_extract(extract, service, options)
     "pv #{local_file} | #{decompressor} -d | mysql #{mysql_args} #{target_database}"
   ]
 
+  start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
   commands.each do |command|
     if dry_run
       puts "Would run command: #{command}"
@@ -416,7 +433,9 @@ def load_mysql_extract(extract, service, options)
         exit 1
       end
 
-      puts "\nSuccessfully created #{target_database}"
+      time_taken = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
+
+      puts "\nSuccessfully created #{target_database} (took #{format_seconds(time_taken)})"
     end
   end
 end
@@ -448,6 +467,8 @@ def load_mongo_extract(extract, service, options)
     exit 1
   end
 
+  start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
   if dry_run
     puts "Would run command: #{command}"
   else
@@ -457,7 +478,9 @@ def load_mongo_extract(extract, service, options)
       exit 1
     end
 
-    puts "\nSuccessfully created #{target_database}"
+    time_taken = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
+
+    puts "\nSuccessfully created #{target_database} (took #{format_seconds(time_taken)})"
   end
 end
 
