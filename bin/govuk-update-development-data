@@ -15,4 +15,9 @@ TWO_WEEKS_AGO="$(date --date="2 weeks ago" '+%d/%m/%Y')"
 
 DATA_DIRECTORY_WITH_INDEX="$(govuk data build-data-directory-with-index --after=$TWO_WEEKS_AGO | tail -n1)"
 
+GCROOT_DIRECTORY="/var/guix/gcroots/govuk-development-data"
+if [ -d "$GCROOT_DIRECTORY" ]; then
+    ln -s -f "$DATA_DIRECTORY_WITH_INDEX" "$GCROOT_DIRECTORY/current"
+fi
+
 govuk aws --profile govuk-test -- s3 sync --delete "$DATA_DIRECTORY_WITH_INDEX" s3://govuk-development-data-test/
