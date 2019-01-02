@@ -304,8 +304,8 @@
           (redis-connection-config)
           (memcached-connection-config)
           (mysql-connection-config
-           (user "collections-pub")
-           (password (random-base16-string 30))
+           (user "collections_pub")
+           (password "collections_pub")
            (database "collections_publisher_production")))))
 
 ;;;
