@@ -466,15 +466,15 @@ proxies requests to some upstream")
 (define-public email-alert-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1xswj4qjqqabhp2xzzh50mcs69dxip7b7knag8w54bjjxh69y3l3")))
+    (hash (base32 "1anrrwnx8xdggd903093116jm8a9ngrg0rr2j1c64gcpk4bnzifb")))
    (package
      (name "email-alert-frontend")
-     (version "release_297")
+     (version "release_298")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "18rm37b4sj74k07sgclrllqmavd8mw32djl04kgywwjcgv567509")))
+       #:hash (base32 "01k33k4l3l5wf1jkca85b7n9k3yv8rg8mxzllp0y3p1w79dfzynz")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
