@@ -21,7 +21,7 @@ if [ $TIMEDIFF -lt $CHECKPERIOD ]; then
     exit 0
 fi
 
-git fetch
+git fetch --quiet
 
 REMOTE_REF="$(git for-each-ref --format='%(upstream:short)' refs/heads/master)"
 COUNT="$(git rev-list --count master..$REMOTE_REF)"
