@@ -312,7 +312,16 @@
                         (hash-map->list (lambda (key value)
                                           key)
                                         (hash-ref data-extract-data "services"))))
-             (data-source data-directory-with-index-data-source)))
+             (data-source data-directory-with-index-data-source)
+             (variant-name (hash-ref (hash-ref data-extract-data "variant")
+                                     "name"))
+             (variant-label (hash-ref (hash-ref data-extract-data "variant")
+                                      "label"))
+             (variant-properties (hash-map->list
+                                  (lambda (key value)
+                                    (cons (string->symbol key) value))
+                                  (hash-ref (hash-ref data-extract-data "variant")
+                                            "properties")))))
           (hash-ref (json->scm data-extracts-index) "extracts")))))
 
     (if (string=? base-url "")
