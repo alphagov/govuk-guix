@@ -101,9 +101,12 @@
                  (#$gexp-to-run)))
 
             (simple-format #t "Stopping MySQL\n")
+            (force-output)
             ((make-kill-destructor) mysql-pid)
             ;; TODO: Fix this
             (sleep 10)
+            (simple-format #t "Finished sleeping after stopping MySQL\n")
+            (force-output)
 
             result)))))
 
