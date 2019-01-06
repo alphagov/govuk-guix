@@ -126,9 +126,40 @@
                              (user #$user))
                          (invoke "createuser" user)
                          (invoke "createdb" database "-O" user)
-                         (decompress-file-and-pipe-to-psql
-                          #$(data-extract-file data-extract)
-                          database))))
+                         #$(let ((format
+                                  (assoc-ref
+                                   (data-extract-variant-properties data-extract)
+                                   'format)))
+                             (cond
+                              ((string=? format "plain")
+                               #~(decompress-file-and-pipe-to-psql
+                                  #$(data-extract-file data-extract)
+                                  database))
+                              ((string=? format "directory")
+                               #~(let ((tmp-dir
+                                        #$(string-append
+                                           "tmp-"
+                                           (data-extract-name data-extract))))
+                                   (mkdir tmp-dir)
+                                   (tar-extract #$(file-append tar "/bin/tar")
+                                                #$(data-extract-file data-extract)
+                                                tmp-dir)
+
+                                   (pg-restore tmp-dir database)
+
+                                   (use-modules (ice-9 ftw))
+                                   (make-file-writable tmp-dir)
+                                   (for-each (lambda (file)
+                                               (make-file-writable
+                                                (string-append tmp-dir "/" file)))
+                                             (scandir tmp-dir
+                                                      (lambda (file)
+                                                        (not (member
+                                                              file
+                                                              '("." ".."))))))
+                                   (delete-file-recursively tmp-dir)))
+                              (else
+                               (error "Unknown format")))))))
                   database-connection-configs)))
               extracts-and-database-connection-configs))))
 

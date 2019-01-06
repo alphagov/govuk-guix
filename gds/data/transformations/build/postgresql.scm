@@ -1,16 +1,50 @@
 (define-module (gds data transformations build postgresql)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 popen)
+  #:use-module (ice-9 match)
   #:use-module (ice-9 ftw)
-  #:export (pg-restore
+  #:export (tar-extract
+
+            pg-restore
             pg-dump
             decompress-file-and-pipe-to-psql
             run-with-psql-port
             pg-dump-parallel-compression))
 
-(define* (pg-restore file)
+(define (parallel-job-count)
+  (match (getenv "NIX_BUILD_CORES")
+    (#f  1)
+    ("0" (current-processor-count))
+    (x   (or (string->number x) 1))))
+
+(define* (tar-extract tar file target)
+  (define decompressor
+    (assoc-ref '(("gz" . "gzip")
+                 ("xz" . "xz"))
+               (last (string-split file #\.))))
+
   (let ((command
-         `("pg_restore" ,file)))
+         (string-join
+          `("set -eo pipefail;"
+            "pv" "--force" ,file "|"
+            ,@(if decompressor
+                  `(,decompressor "-d" "|")
+                  '())
+            ,tar "--extract" "--directory" ,target)
+          " ")))
+    (simple-format #t "tar-extract running:\n  ~A\n"
+                   command)
+    (force-output)
+    (or (zero? (system command))
+        (error "tar-extract failed"))))
+
+(define (pg-restore file database)
+  (let ((command
+         `("pg_restore"
+           ,(string-append "--dbname=" database)
+           ,(simple-format #f "--jobs=~A" (parallel-job-count))
+           "--exit-on-error"
+           ,file)))
     (simple-format #t "pg-restore running:\n  ~A\n"
                    (string-join command " "))
     (force-output)
