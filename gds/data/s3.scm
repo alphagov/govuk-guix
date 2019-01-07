@@ -87,7 +87,7 @@
                         #:local-build? #t
                         #:hash-algo hash-algo
                         #:hash hash
-                        #:recursive? #t
+                        #:recursive? #f
                         #:guile-for-build guile))))
 
 (define (s3-fetch-with-access-key-or-profile profile)
