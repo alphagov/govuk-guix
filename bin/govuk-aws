@@ -89,6 +89,9 @@ get_aws_credentials() {
     fi
 }
 
+if [ "$GOVUK_AWS_DONT_ASSUME_ROLE" == "true" ]; then
+    exec aws "${@:3}"
+fi
 
 if [ "$1" == "--profile" ]; then
     profile="$2"
