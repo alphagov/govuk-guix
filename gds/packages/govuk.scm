@@ -893,15 +893,15 @@ service setup.")
 (define-public local-links-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "09mwncz30bb32i3m1rg4g25bv91fxfgpfg0fzc6yadq2z7xdby56")))
+    (hash (base32 "0zwzhk8gaxbmk61sdfhalcfr62wccf65rj13xlpjaw2xazygjy4j")))
    (package
      (name "local-links-manager")
-     (version "release_310")
+     (version "release_311")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "08palqv4wimrk8f67plh208wbwh5skhsqpx9ihzwhd9i9mr5wkx6")))
+       #:hash (base32 "0x1qvqs3p66w37nwwgvpvjr6i3i05icy090d91adxaf7n3zcnxi9")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
