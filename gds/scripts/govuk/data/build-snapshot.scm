@@ -157,7 +157,9 @@
 
   (define (build-snapshot-union)
     (with-store store
-      (set-build-options store #:max-build-jobs 1)
+      (set-build-options store
+                         #:max-build-jobs 1
+                         #:max-silent-time 14400) ;; Wait up to 4 hours
 
       (run-with-store store
         (mlet %store-monad
