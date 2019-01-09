@@ -57,6 +57,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
     exit 1
   end
 
+  system('chmod', 'u+w', temp_directory)
   File.rename temp_directory, directory
 end
 
