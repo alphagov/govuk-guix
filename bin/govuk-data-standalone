@@ -327,11 +327,13 @@ def load_postgresql_extract(extract, service, options)
     user = extract[:services][service][:user]
     host_and_port_arguments = "--host=127.0.0.1 --port=#{extract[:services][service][:port]}"
     psql_command = "psql -U postgres #{host_and_port_arguments}"
+    pg_restore_command = 'pg_restore'
     owner = extract[:services][service][:user]
   else
     user = 'postgres'
     host_and_port_arguments = ''
     psql_command = 'sudo -E -u postgres psql'
+    pg_restore_command = 'sudo -E -u postgres pg_restore'
     owner = 'vagrant'
   end
 
@@ -347,7 +349,7 @@ def load_postgresql_extract(extract, service, options)
     )
   elsif format == 'directory'
     commands.push(
-      "sudo -E -u postgres pg_restore #{host_and_port_arguments} --username=#{user} --no-owner --schema=public --dbname=#{target_database} --jobs=8 --exit-on-error #{local_file}"
+      "#{pg_restore_command} #{host_and_port_arguments} --username=#{user} --no-owner --schema=public --dbname=#{target_database} --jobs=8 --exit-on-error #{local_file}"
     )
   else
     STDERR.puts "error: unknown pg_dump format #{format}"
