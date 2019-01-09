@@ -12,7 +12,11 @@ GOVUK_GUIX_REPO="$(dirname "$(dirname "$SCRIPT_PATH")")"
 cd "$GOVUK_GUIX_REPO"
 
 CURTIME=$(date +%s)
-FILETIME=$(stat .git/FETCH_HEAD -c %Y)
+if [ -f .git/FETCH_HEAD ]; then
+    FILETIME=$(stat .git/FETCH_HEAD -c %Y)
+else
+    FILETIME=0
+fi
 TIMEDIFF=$(expr $CURTIME - $FILETIME)
 
 CHECKPERIOD=86400 # 1 day
