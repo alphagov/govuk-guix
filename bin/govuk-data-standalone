@@ -370,6 +370,18 @@ def load_postgresql_extract(extract, service, options)
     end
   end
 
+  change_database_owner_command = "#{psql_command} -qXAt -c \"ALTER DATABASE \\\"#{target_database}\\\" OWNER TO #{owner}\" #{target_database}"
+
+  if dry_run
+    puts "Would run command: #{change_database_owner_command}"
+  else
+    puts "Running #{change_database_owner_command}"
+    unless system(change_database_owner_command)
+      STDERR.puts "error: command failed: #{change_owner_command}"
+      exit 1
+    end
+  end
+
   alter_owner_queries = {
     table: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';",
     view: "SELECT table_name FROM information_schema.views WHERE table_schema = 'public';",
