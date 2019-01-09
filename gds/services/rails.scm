@@ -315,7 +315,6 @@
           (mkdir bundle-install-cache-directory)
           (system* #$(file-append tar "/bin/tar")
                    "--extract"
-                   "--strip-components=3"
                    "--file" #$(tar-archive
                                (name (string-append (package-name package)
                                                     "-bundle-install.tar"))
