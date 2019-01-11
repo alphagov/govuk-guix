@@ -1396,6 +1396,19 @@
           (signon-application
            (name "Publishing API")
            (supported-permissions '("signin" "view_all")))
+          (signon-api-user
+           (name "Publishing API")
+           (email "publishing-api@dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Draft Content Store"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Content Store"))
+              '("signin")))))
           (sidekiq-config
            (file "config/sidekiq.yml"))
           (memcached-connection-config)
@@ -1413,7 +1426,7 @@
 (define-public content-store-service-type
   (service-type (name 'content-store)
                 (extensions
-                 (modify-service-extensions-for-plek
+                 (modify-service-extensions-for-signon-and-plek
                   name
                   (standard-rails-service-type-extensions name)))))
 
@@ -1423,12 +1436,15 @@
    (list (shepherd-service
            (inherit default-shepherd-service)
            (provision '(content-store))
-           (requirement '(router-api nginx mongodb)))
+           (requirement '(router-api signon nginx mongodb)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((register-backends
              . ,#~(lambda ()
                     (run-command "rake" "register_backends")))))
+         (signon-application
+          (name "Content Store")
+          (supported-permissions '("signin")))
           (plek-config)
           (rails-app-config
            (assets? #f))
@@ -1439,7 +1455,7 @@
 (define-public draft-content-store-service-type
   (service-type (name 'draft-content-store)
                 (extensions
-                 (modify-service-extensions-for-plek
+                 (modify-service-extensions-for-signon-and-plek
                   name
                   (standard-rails-service-type-extensions name)))))
 
@@ -1449,12 +1465,15 @@
    (list (shepherd-service
           (inherit default-shepherd-service)
           (provision '(draft-content-store))
-          (requirement '(draft-router-api nginx mongodb)))
+          (requirement '(draft-router-api signon nginx mongodb)))
          (service-startup-config-add-pre-startup-scripts
           (service-startup-config)
           `((register-backends
              . ,#~(lambda ()
                     (run-command "rake" "register_backends")))))
+         (signon-application
+          (name "Draft Content Store")
+          (supported-permissions '("signin")))
          (plek-config)
          (rails-app-config
           (assets? #f))
