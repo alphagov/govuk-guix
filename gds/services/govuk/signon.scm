@@ -609,11 +609,24 @@ the Signon Dev user passphrase in\n")
           (string-append "/var/log/" sidekiq-service-name ".log"))
          '()))))
 
+(define (assert-shepherd-service-requirements-contain-signon parameters)
+  (and=> (find signon-application? parameters)
+         (lambda (signon-application)
+           (and=> (find shepherd-service? parameters)
+                  (lambda (shepherd-service)
+                    (unless (memq 'signon
+                                  (shepherd-service-requirement shepherd-service))
+                      (error (string-append
+                              "Missing signon requirement for "
+                              (signon-application-name signon-application)))))))))
+
 (define (modify-service-extensions-for-signon name service-extensions)
   (service-extensions-modify-parameters
    (cons*
     (service-extension signon-service-type
                        (lambda (parameters)
+                         (assert-shepherd-service-requirements-contain-signon parameters)
+
                          (filter
                           (lambda (parameter)
                             (or (signon-application? parameter)
