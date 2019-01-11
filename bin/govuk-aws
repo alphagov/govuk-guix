@@ -27,6 +27,17 @@ read_aws_config_file() {
         exit 1
     fi
 
+    if ! grep --quiet --fixed-strings "[profile $profile]" ~/.aws/config; then
+        echo "govuk: aws: couldn't find the '$profile' profile in ~/.aws/config"
+        if grep --quiet "^\[profile " ~/.aws/config; then
+            echo "govuk: aws: the following profiles are available in ~/.aws/config"
+            sed -n -e 's/\[profile \(.*\)\]/  \1/p' /home/gds/.aws/config
+        else
+            echo "govuk: aws: it doesn't look like ~/.aws/config contains any profiles"
+        fi
+        exit 1
+    fi
+
     ROLE_ARN=$(awk '/profile '"$profile"'/ {profile=1} /role_arn/ && profile==1 {print $3; exit}' ~/.aws/config)
     MFA_SERIAL=$(awk '/profile '"$profile"'/ {profile=1} /mfa_serial/ && profile==1 {print $3; exit}' ~/.aws/config)
     SOURCE_PROFILE=$(awk '/profile '"$profile"'/ {profile=1} /source_profile/ && profile==1 {print $3; exit}' ~/.aws/config)
@@ -110,10 +121,22 @@ if [ "$1" == "--profile" ]; then
 
         exec aws "${@:3}"
     else
+        echo "govuk: aws: unknown argument '$3'"
+        echo "govuk: aws: valid arguments are:"
+        echo
+        echo "  --export         to output the shell commands for the AWS credentials"
+        echo "  --export-json    to output JSON describing the AWS credentials"
+        echo "  --               to run a command with the AWS credentials set in the environment,"
+        echo "                   e.g. 'govuk aws --profile=govuk-integration -- s3 ls'"
         exit 1
     fi
 elif [ "$1" == "--" ]; then
     exec aws "${@:2}"
 else
+    echo "govuk: aws: unknown argument '$1'"
+    echo "govuk: aws: valid arguments are:"
+    echo
+    echo "  --profile    followed by a profile, e.g. 'govuk aws --profile govuk-integration -- s3 ls'"
+    echo "  --           on it's own to not assume a role, e.g. 'govuk aws -- s3 ls'"
     exit 1
 fi
