@@ -1445,6 +1445,15 @@
          (signon-application
           (name "Content Store")
           (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Content Store")
+          (email "content-store@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Router API"))
+             '("signin")))))
           (plek-config)
           (rails-app-config
            (assets? #f))
@@ -1474,6 +1483,16 @@
          (signon-application
           (name "Draft Content Store")
           (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Draft Content Store")
+          (email "draft-content-store@dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Draft Router API")
+              (environment-variable "ROUTER_API_BEARER_TOKEN"))
+             '("signin")))))
          (plek-config)
          (rails-app-config
           (assets? #f))
@@ -1737,8 +1756,11 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(router-api))
-           (requirement '(router)))
+           (requirement '(router signon)))
           (service-startup-config)
+          (signon-application
+           (name "Router API")
+           (supported-permissions '("signin")))
           (plek-config)
           (rails-app-config
            (assets? #f))
@@ -1759,8 +1781,11 @@
    (cons* (shepherd-service
            (inherit default-shepherd-service)
            (provision '(draft-router-api))
-           (requirement '(draft-router)))
+           (requirement '(draft-router signon)))
           (service-startup-config)
+          (signon-application
+           (name "Draft Router API")
+           (supported-permissions '("signin")))
           (plek-config)
           (rails-app-config
            (assets? #f))
