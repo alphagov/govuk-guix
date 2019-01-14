@@ -696,6 +696,7 @@ service setup.")
        ("guile-gcrypt" ,guile-gcrypt)
        ("awscli" ,awscli)
        ("gawk" ,gawk)
+       ("grep" ,grep)
        ("ruby" ,ruby)
        ("pv" ,pv)
        ("pigz" ,pigz)
@@ -755,7 +756,7 @@ service setup.")
                  `("PATH" =
                    ,(map (lambda (input)
                            (string-append (assoc-ref inputs input) "/bin"))
-                         (list "coreutils" "awscli" "ruby" "gawk"))))
+                         (list "coreutils" "awscli" "ruby" "gawk" "grep"))))
 
                (wrap-program
                    (string-append out
