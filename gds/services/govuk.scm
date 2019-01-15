@@ -92,7 +92,7 @@
           (mysql-connection-config
            (user "signon")
            (database "signon_production")
-           (password ""))
+           (password "signon"))
           (redis-connection-config))))
 
 ;;;
