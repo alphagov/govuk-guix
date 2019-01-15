@@ -17,7 +17,7 @@ DATA_DIRECTORY_WITH_INDEX="$(govuk data build-data-directory-with-index --after=
 
 GCROOT_DIRECTORY="/var/guix/gcroots/govuk-development-data"
 if [ -d "$GCROOT_DIRECTORY" ]; then
-    rm "$GCROOT_DIRECTORY/current"
+    rm -f "$GCROOT_DIRECTORY/current"
     ln -s "$DATA_DIRECTORY_WITH_INDEX" "$GCROOT_DIRECTORY/current"
 fi
 
