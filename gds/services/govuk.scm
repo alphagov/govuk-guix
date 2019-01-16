@@ -297,6 +297,10 @@
              (cons
               (signon-authorisation
                (application-name "Publishing API"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Link Checker API"))
               '("signin")))))
           (service-startup-config)
           (sidekiq-config
@@ -796,6 +800,9 @@
          (sidekiq-config
           (file "config/sidekiq.yml"))
          link-checker-api
+         (signon-application
+          (name "Link Checker API")
+          (supported-permissions '("signin")))
          (signon-api-user
           (name "Link Checker API")
           (email "link-checker-api@guix-dev.gov.uk")
@@ -833,6 +840,10 @@
              (cons
               (signon-authorisation
                (application-name "Publishing API"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Link Checker API"))
               '("signin")))))
           (signon-application
            (name "Local Links Manager")
@@ -946,6 +957,10 @@
              (cons
               (signon-authorisation
                (application-name "Publishing API"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Link Checker API"))
               '("signin")))))
           (service-startup-config)
           (sidekiq-config
@@ -1392,6 +1407,10 @@
              (cons
               (signon-authorisation
                (application-name "Asset Manager"))
+              '("signin"))
+             (cons
+              (signon-authorisation
+               (application-name "Link Checker API"))
               '("signin")))))
           (service-startup-config)
           (redis-connection-config)
@@ -1734,6 +1753,10 @@
              (signon-authorisation
               (application-name "Asset Manager")
               (environment-variable "PUBLISHER_ASSET_MANAGER_CLIENT_BEARER_TOKEN"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Link Checker API"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
@@ -2097,6 +2120,10 @@
             (cons
              (signon-authorisation
               (application-name "Rummager"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Link Checker API"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
