@@ -255,6 +255,11 @@ end
 def list(options)
   extracts = filtered_extracts(options)
 
+  if extracts.empty?
+    puts 'govuk: data: No extracts found'
+    exit 0
+  end
+
   group_extracts(:services, extracts).each do |service, extracts_for_service|
     puts "service: #{service}"
     group_extracts(
@@ -526,6 +531,11 @@ def load(options)
     filtered_extracts(options)
   )
 
+  if extracts.empty?
+    puts 'govuk: data: No extracts found'
+    exit 0
+  end
+
   show_extracts_to_load(extracts)
   puts
 
@@ -536,6 +546,11 @@ def fetch(options)
   extracts = extracts_to_load_by_service_and_database(
     filtered_extracts(options)
   )
+
+  if extracts.empty?
+    puts 'govuk: data: No extracts found'
+    exit 0
+  end
 
   show_extracts_to_load(extracts)
   puts
