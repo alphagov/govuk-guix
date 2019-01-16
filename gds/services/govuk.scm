@@ -370,6 +370,15 @@
           (signon-application
            (name "Content Performance Manager")
            (supported-permissions '("signin" "inventory_management")))
+          (signon-api-user
+           (name "Content Performance Manager")
+           (email "content-performance-manager@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Support API"))
+              '("signin")))))
           (service-startup-config)
           (redis-connection-config)
           (postgresql-connection-config
@@ -642,8 +651,17 @@
            (inherit default-shepherd-service)
            (provision '(feedback))
            (requirement '(publishing-api support-api signon)))
-          (plek-config) (rails-app-config) feedback
-          (service-startup-config))))
+         (plek-config) (rails-app-config) feedback
+         (signon-api-user
+          (name "Feedback")
+          (email "feedback@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Support API"))
+             '("signin")))))
+         (service-startup-config))))
 
 ;;;
 ;;; Finder Frontend
@@ -1284,6 +1302,15 @@
          (signon-application
           (name "Support")
           (supported-permissions '("signin")))
+         (signon-api-user
+          (name "Support")
+          (email "support@guix-dev.gov.uk")
+          (authorisation-permissions
+           (list
+            (cons
+             (signon-authorisation
+              (application-name "Support API"))
+             '("signin")))))
          (plek-config) (rails-app-config) support
          (redis-connection-config)
          (service-startup-config))))
@@ -1308,6 +1335,9 @@
           (requirement '(publishing-api signon)))
          (plek-config) (rails-app-config) support-api
          (service-startup-config)
+         (signon-application
+          (name "Support API")
+          (supported-permissions '("signin")))
          (sidekiq-config
           (file "config/sidekiq.yml"))
          (redis-connection-config)
