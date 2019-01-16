@@ -1004,6 +1004,15 @@
           (signon-application
            (name "Search Admin")
            (supported-permissions '("signin")))
+          (signon-api-user
+           (name "Search Admin")
+           (email "search-admin@guix-dev.gov.uk")
+           (authorisation-permissions
+            (list
+             (cons
+              (signon-authorisation
+               (application-name "Rummager"))
+              '("signin")))))
           (service-startup-config)
           (mysql-connection-config
            (user "search_admin")
@@ -1914,6 +1923,9 @@
                              "bundle" "exec"
                              "rake" "message_queue:create_queues")))))
                  (redis-connection-config)
+                 (signon-application
+                  (name "Rummager")
+                  (supported-permissions '("signin")))
                  (signon-api-user
                   (name "Rummager")
                   (email "rummager@guix-dev.gov.uk")
@@ -2081,6 +2093,10 @@
             (cons
              (signon-authorisation
               (application-name "Asset Manager"))
+             '("signin"))
+            (cons
+             (signon-authorisation
+              (application-name "Rummager"))
              '("signin")))))
          (sidekiq-config
           (file "config/sidekiq.yml"))
