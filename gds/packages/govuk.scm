@@ -356,15 +356,15 @@ proxies requests to some upstream")
 (define-public content-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0pff6192hnxvq955wa68mbyyiklp99x1p6iq487k930xh6yznslg")))
+    (hash (base32 "093ijadawgsqfcppvsmmzz5z4nbidmaih9w2p98m6cahgydf558q")))
    (package
      (name "content-publisher")
-     (version "release_584")
+     (version "release_588")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1apa0bx0q8rc85am1bxc6iwzs0dq0vy582fb75rllxwazj98rq4b")))
+       #:hash (base32 "0svah9g2lb5mqab7v787a9gr3012hf4an58v45g2nv3a7x4hc3rl")))
      (build-system rails-build-system)
      (arguments
       `(;; TODO: Asset precompilation is now failing, due to npm not
