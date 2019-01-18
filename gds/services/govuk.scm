@@ -92,7 +92,7 @@
           (mysql-connection-config
            (user "signon")
            (database "signon_production")
-           (password "signon"))
+           (password (random-base16-string 30)))
           (redis-connection-config))))
 
 ;;;
@@ -309,7 +309,7 @@
           (memcached-connection-config)
           (mysql-connection-config
            (user "collections_pub")
-           (password "collections_pub")
+           (password (random-base16-string 30))
            (database "collections_publisher_production")))))
 
 ;;;
@@ -994,7 +994,7 @@
           (service-startup-config)
           (mysql-connection-config
            (user "release")
-           (password "release")
+           (password (random-base16-string 30))
            (database "release_production")))))
 
 ;;;
@@ -1032,7 +1032,7 @@
           (mysql-connection-config
            (user "search_admin")
            (database "search_admin_production")
-           (password "")))))
+           (password (random-base16-string 30))))))
 
 ;;;
 ;;; Service Manual Publisher
@@ -2132,7 +2132,7 @@
          (mysql-connection-config
           (user "whitehall")
           (database "whitehall_production")
-          (password "whitehall")))))
+          (password (random-base16-string 30))))))
 
 ;;;
 ;;; Service Groups

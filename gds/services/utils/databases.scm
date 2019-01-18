@@ -221,6 +221,11 @@
    ((mysql-connection-config? config)
     (mysql-connection-config
      (inherit config)
+     (password (if (string=? environment "development")
+                   ;; The apparent convention for development users is
+                   ;; to use the user as the password
+                   (mysql-connection-config-user config)
+                   (mysql-connection-config-password config)))
      (database (replace-environment
                 (mysql-connection-config-database config)))))
    ((mongodb-connection-config? config)
