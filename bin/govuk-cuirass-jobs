@@ -20,15 +20,13 @@
                 (error "Unable to locate the govuk-guix root")))
            (command-full-path
             (string-append govuk-guix-root "/bin/govuk-cuirass-jobs")))
-      (exit
-       (status:exit-val
-        (apply
-         system*
-         "bash"
-         (string-append govuk-guix-root "/guix-pre-inst-env")
-         "guile"
-         command-full-path
-         (cdr (command-line))))))))
+      (apply execlp
+             "bash"
+             "--"
+             (string-append govuk-guix-root "/guix-pre-inst-env")
+             "guile"
+             command-full-path
+             (cdr (command-line))))))
 
 (use-modules (ice-9 pretty-print)
              (guix store)

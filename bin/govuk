@@ -87,18 +87,18 @@ log # empty line in log output
 if [[ "$COMMAND" == "data" ]]; then
     GUIX=$(type -pf guile || echo "")
     if [ -z "$GUIX" ]; then
-        $RUBY "$(type -p govuk-data-standalone)" "${@:2}"
+        exec $RUBY "$(type -p govuk-data-standalone)" "${@:2}"
     else
-        $GUILE "$COMMAND_FULL_PATH" "${@:2}"
+        exec $GUILE "$COMMAND_FULL_PATH" "${@:2}"
     fi
 elif [ "$COMMAND" = "data-standalone" ]; then
-    $RUBY "$COMMAND_FULL_PATH" "${@:2}"
+    exec $RUBY "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "system" ]; then
-    $GUILE "$COMMAND_FULL_PATH" "${@:2}"
+    exec $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "refresh" ]; then
-    $GUILE "$COMMAND_FULL_PATH" "${@:2}"
+    exec $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 elif [ "$COMMAND" = "cuirass-jobs" ]; then
-    $GUILE "$COMMAND_FULL_PATH" "${@:2}"
+    exec $GUILE "$COMMAND_FULL_PATH" "${@:2}"
 else
-    "$COMMAND_FULL_PATH" "${@:2}"
+    exec "$COMMAND_FULL_PATH" "${@:2}"
 fi

@@ -39,5 +39,5 @@ fi
 
 # If this is being run as a script
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    "$@"
+    exec "$@"
 fi
