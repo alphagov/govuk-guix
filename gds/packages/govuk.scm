@@ -1433,16 +1433,16 @@ content, as well as broadcasting changes to a message queue.")
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1hlr1y8mvl0xiw0hbd4zdrqlr5nph3j1p3hzir9gfs2gl04x0vmx"))
+    (hash (base32 "04ayvdhi4mippk7nldbfi7friaaxsfh021gd1mi1rshak029gsf9"))
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
-     (version "release_1090")
+     (version "release_1091")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0zv2frprhpg1xnhglnb4yn8zapyxs0bnapmrmv91jpsx51vgnnp3")))
+       #:hash (base32 "16xryhcpdard1yhhr8qbl79bmzd1p7ippv15183i34gpfsv5hn8y")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
