@@ -2065,6 +2065,7 @@
                          email-alert-api
                          signon
                          asset-manager
+                         link-checker-api
                          static
                          memcached)))
          (service-startup-config-add-pre-startup-scripts
