@@ -287,7 +287,12 @@ users.each do |name, email, authorisation_permissions|
   u.save!
 
   authorisation_permissions.each do |application_name, token, permissions|
-    app = Doorkeeper::Application.find_by_name!(application_name)
+    app = Doorkeeper::Application.find_by_name(application_name)
+
+    unless app
+      puts \"signon-setup-api-users: warning: #{application_name} not found, skipping\"
+      next
+    end
 
     u.grant_application_permissions(app, permissions)
 
