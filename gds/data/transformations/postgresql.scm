@@ -45,6 +45,7 @@
              ("autovacuum" "off")
              ("max_wal_senders" "0")
              ("shared_buffers" "2GB")
+             ("work_mem" "1GB")
              ("maintenance_work_mem" "2GB")))))
         (postgresql
          ((@@ (gnu services databases)
