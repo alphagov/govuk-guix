@@ -18,7 +18,11 @@
         (system*
          certtool
          "--generate-privkey"
-         "--outfile" #$output)))))
+         "--provable"
+         "--seed=00000000"
+         "--outfile" #$output)))
+   #:options '(#:local-build? #t
+               #:substitutable? #f)))
 
 (define (development-os-tls-certificate-template dns-names)
   (plain-file
@@ -62,7 +66,9 @@ cert_signing_key")))
          "--load-privkey" #$development-os-tls-private-key
          "--template"
          #$(development-os-tls-certificate-template dns-names)
-         "--outfile" #$output)))))
+         "--outfile" #$output)))
+   #:options '(#:local-build? #t
+               #:substitutable? #f)))
 
 (define (development-os-certificates-package-for-domains dns-names)
   (package
