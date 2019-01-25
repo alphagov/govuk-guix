@@ -2081,7 +2081,8 @@
                                  (mount-source
                                   (string-append "/var/lib/whitehall/" name)))
                              (mkdir-p mount-source)
-                             (mkdir-p mount-target)
+                             (unless (file-exists? mount-target)
+                               (mkdir-p mount-target))
                              (chown mount-source
                                     (passwd:uid user)
                                     (passwd:gid user))
