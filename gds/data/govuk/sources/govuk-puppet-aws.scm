@@ -331,7 +331,10 @@
 
 (define list-extracts
   (lambda ()
-    (find-data-extracts (backups-directory))))
+    (let ((directory (backups-directory)))
+      (if directory
+          (find-data-extracts directory)
+          '()))))
 
 (define govuk-puppet-aws-data-source
   (data-source

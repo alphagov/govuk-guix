@@ -100,11 +100,7 @@
 
         (if (file-exists? directory)
             directory
-            (error
-             (string-append
-              "The backups directory does not exist" directory
-              "\nTo use a different directory, set the "
-              "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY environment variable"))))))
+            #f))))
 
 (define-record-type <govuk-puppet-source-file>
   (govuk-puppet-source-file date database hostname file)
@@ -405,15 +401,21 @@
 
 (define list-extracts
   (lambda ()
-    (append-map
-     source-file->extracts
-     (find-source-files (backups-directory)))))
+    (let ((directory (backups-directory)))
+      (if directory
+          (append-map
+           source-file->extracts
+           (find-source-files directory))
+          '()))))
 
 (define* (data-directory-with-index . filters)
-  (source-files->data-directory-with-index
-   (apply filter-source-files
-          (find-source-files (backups-directory))
-          filters)))
+  (let ((directory (backups-directory)))
+    (source-files->data-directory-with-index
+     (apply filter-source-files
+            (if directory
+                (find-source-files directory)
+                '())
+            filters))))
 
 (define (list-extracts-from-data-directory-index index-file base-url)
   (append-map
