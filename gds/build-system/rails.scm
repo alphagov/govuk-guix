@@ -20,6 +20,7 @@
   ;; Build side modules imported by default
   `((guix build syscalls)
     ,@%gnu-build-system-modules
+    (guix build ruby-build-system)
     (gds build rails-build-system)))
 
 (define (default-ruby)
@@ -74,6 +75,7 @@
                       (imported-modules %rails-build-system-modules)
                       (system (%current-system))
                       (modules '((gds build rails-build-system)
+                                 ((guix build ruby-build-system) #:prefix ruby:)
                                  (guix build utils)))
                       (search-paths '())
                       (outputs '("out"))

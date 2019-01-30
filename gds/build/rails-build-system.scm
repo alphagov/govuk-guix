@@ -17,6 +17,9 @@
 ;;
 ;; Code:
 
+(define wrap-ruby-program
+  (@@ (guix build ruby-build-system) wrap-ruby-program))
+
 (define* (replace-relative-spring-path #:key outputs
                                        #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out"))
