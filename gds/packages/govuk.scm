@@ -25,6 +25,9 @@
   #:use-module (gnu packages gawk)
   #:use-module (gnu packages gnupg)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages python)
+  #:use-module (gnu packages rails)
+  #:use-module (gnu packages terraform)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages compression)
@@ -34,6 +37,8 @@
   #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages pv)
   #:use-module (gnu packages python-web)
+  #:use-module (gnu packages ssh)
+  #:use-module (gnu packages sqlite)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages web)
   #:use-module (gnu packages pkg-config)
@@ -44,6 +49,7 @@
   #:use-module (gds packages guix)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler)
+  #:use-module (gds packages govuk ruby)
   #:use-module (gds packages third-party chromium))
 
 (define govuk-admin-template-initialiser
@@ -1023,6 +1029,121 @@ service setup.")
    #:extra-inputs (list libffi postgresql
                         ;; TODO Remove sqlite if it's unused, it's still in the Gemfile
                         sqlite)))
+
+(define-public mini-environment-admin
+  (package
+    (name "govuk-mini-environment-admin")
+    (version "release_10")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://git.cbaines.net/gds/govuk-mini-environment-admin")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0axgw29j545v2w6dpf9jrh6n9v5bs61rf24lxvc59hk0abscw26v"))))
+    (build-system rails-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (delete 'replace-git-ls-files)
+         (add-after 'install 'use-relative-config-file
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out")))
+               (substitute* (string-append out "/bin/rails")
+                 (("\\.\\.\\/config")
+                  (string-append out "/config"))))))
+         (delete 'wrap-bin-files-for-rails)
+         (delete 'wrap-with-relative-path)
+         (add-after 'install 'wrap-bin/rails
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             ((@@ (guix build ruby-build-system) wrap-ruby-program)
+              (string-append (assoc-ref outputs "out") "/bin/rails")
+              ;; Terraform doesn't support a search path for plugins,
+              ;; and expects a single directory, so just lump together
+              ;; everything which is used via the PATH in to one
+              ;; input.
+              `("PATH" prefix (,(string-append (assoc-ref
+                                                inputs "PATH-dependencies")
+                                               "/bin")))
+              `("GEM_PATH" prefix (,(getenv "GEM_PATH"))))
+             (substitute* (string-append (assoc-ref outputs "out")
+                                         "/bin/.real/rails")
+               (("../config") "../../config"))
+             (substitute* (string-append (assoc-ref outputs "out")
+                                         "/bin/rails")
+               (((assoc-ref outputs "out")) ".")))))))
+    (inputs
+     `(("ruby-rails" ,ruby-rails)
+       ("ruby-sass-rails" ,ruby-sass-rails)
+       ("ruby-listen" ,ruby-listen)
+       ("ruby-web-console" ,ruby-web-console)
+       ("ruby-pg" ,ruby-pg)
+       ("ruby-gds-sso" ,ruby-gds-sso)
+       ("ruby-govuk-admin-template" ,ruby-govuk-admin-template)
+       ("ruby-plek" ,ruby-plek)
+       ("ruby-terraform"
+        ,(package
+           (inherit ruby-terraform)
+           (arguments
+            (substitute-keyword-arguments
+                (package-arguments ruby-terraform)
+              ((#:phases phases '%standard-phases)
+               `(modify-phases ,phases
+                  (replace 'replace-git-ls-files
+                    (lambda _
+                      (substitute* "ruby_terraform.gemspec"
+                        (("`git ls-files -z`") "`find . -type f -print0`"))))))))
+           (source
+            (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/cbaines/ruby_terraform.git")
+                    ;; hash for the support-passing-target-to-destroy branch
+                    (commit "b858f9d7b1a5c193b94bd4bf38eea5fc3afd0295")))
+              (sha256
+               (base32
+                "0714zhc0rak2wrb2yivy7a1naqlcccwgd90lp2vpjs7aj3j23i2k"))))))
+       ("ruby-que" ,ruby-que)
+       ("ruby-with-advisory-lock" ,ruby-with-advisory-lock)
+       ("ruby-git" ,ruby-git)
+       ("PATH-dependencies"
+        ,(directory-union
+          "govuk-mini-environment-admin-path-dependencies"
+          (list postgresql
+                openssh
+                terraform
+                (package
+                  (inherit terraform-provider-libvirt)
+                  (source
+                   (origin
+                     (method git-fetch)
+                     (uri (git-reference
+                           (url "http://git.cbaines.net/terraform-provider-libvirt")
+                           ;; hash for the for-govuk-mini-environment-admin branch
+                           (commit "682f8a9865fe0bec16423f63018725f5b364659b")))
+                     (sha256
+                      (base32
+                       "1wxiyfkmvflf6c669h6i9ym21r5w4mw55jiy6gma3cddlbhpjhhb")))))
+                terraform-provider-template
+                terraform-provider-aws
+                terraform-provider-local)))))
+    (native-inputs
+     `(("ruby-rubocop" ,ruby-rubocop)
+       ("python" ,python)
+       ("ruby-mocha" ,ruby-mocha)
+       ;; ("coala" ,coala)
+       ;; ("coala-bears" ,coala-bears)
+       ))
+    (synopsis "Manage mini GOV.UK environments")
+    (description
+     "The GOV.UK Mini Environment Admin is a web application for
+managing small isolated GOV.UK deployments.  The services to run, and
+data to use can be selected, and multiple backends are supported.")
+    (home-page "https://git.cbaines.net/gds/govuk-mini-environment-admin/about/")
+    (license license:agpl3+)))
 
 (define-public publisher
   (package-with-bundler
