@@ -970,6 +970,36 @@
            (database "govuk_content_production")))))
 
 ;;;
+;;; Mini Environment Admin
+;;;
+
+(define-public mini-environment-admin-service-type
+  (service-type
+   (name 'mini-environment-admin)
+   (extensions
+    (modify-service-extensions-for-signon-and-plek
+     name
+     (standard-rails-service-type-extensions name)))
+   (default-value
+     (list (shepherd-service
+            (inherit default-shepherd-service)
+            (provision '(mini-environment-admin))
+            (requirement '(signon postgres)))
+           (plek-config)
+           (rails-app-config
+            (run-with 'rails))
+           mini-environment-admin
+           (signon-application
+            (name "Mini Environment Admin")
+            (supported-permissions '("signin")))
+           (service-startup-config)
+           (postgresql-connection-config
+            (user "govuk_mini_environment_admin")
+            (database "govuk_mini_environment_admin")
+            ;; TODO: Due to the plpgsql extension
+            (superuser? #t))))))
+
+;;;
 ;;; Release
 ;;;
 
@@ -2224,7 +2254,8 @@
   (service-group
    "Development Services"
    "Services to support the development of GOV.UK"
-   (list (service publishing-e2e-tests-service-type))))
+   (list (service mini-environment-admin-service-type)
+         (service publishing-e2e-tests-service-type))))
 
 (define-public frontend-services
   (service-group
