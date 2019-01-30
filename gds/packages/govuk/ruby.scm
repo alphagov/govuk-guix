@@ -3,7 +3,71 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix build-system ruby)
-  #:use-module (gnu packages ruby))
+  #:use-module (gnu packages ruby)
+  #:use-module (gnu packages rails))
+
+(define-public ruby-gds-sso
+  (package
+    (name "ruby-gds-sso")
+    (version "14.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (rubygems-uri "gds-sso" version))
+       (sha256
+        (base32
+         "1vyq7s4x110zr5dvw3xlh5h2m03823h9mmg3l05qjjiy98i93wa2"))))
+    (build-system ruby-build-system)
+    (arguments
+     '(#:tests? #f))
+    (propagated-inputs
+     `(("ruby-multi-json" ,ruby-multi-json)
+       ("ruby-oauth2" ,ruby-oauth2)
+       ("ruby-omniauth" ,ruby-omniauth)
+       ("ruby-omniauth-gds" ,ruby-omniauth-gds)
+       ("ruby-rails" ,ruby-rails)
+       ("ruby-warden" ,ruby-warden)
+       ("ruby-warden-oauth2" ,ruby-warden-oauth2)))
+    (synopsis "Client for GDS' OAuth 2-based SSO")
+    (description "Client for GDS' OAuth 2-based SSO")
+    (home-page "https://github.com/alphagov/gds-sso")
+    (license license:expat)))
+
+(define-public ruby-govuk-admin-template
+  (package
+    (name "ruby-govuk-admin-template")
+    (version "6.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (rubygems-uri "govuk_admin_template" version))
+       (sha256
+        (base32
+         "0z14lf1xf7ynarn0kf72rgdjfnhwd56yqzbwzwvp9xgk8mwcmlsf"))))
+    (build-system ruby-build-system)
+    (arguments
+     '(#:tests? #f))
+    (propagated-inputs
+     `(("ruby-bootstrap-sass"
+        ,(package
+           (inherit ruby-bootstrap-sass)
+           (version "3.3.5.1")
+           (source
+            (origin
+              (method url-fetch)
+              (uri (rubygems-uri "bootstrap-sass" version))
+              (sha256
+               (base32
+                "0bx2bbsd2dandxax9b0by351wa1ab9hysc1f8p5i7ssqz4ayr8jv"))))))
+       ("ruby-jquery-rails" ,ruby-jquery-rails)
+       ("ruby-rails" ,ruby-rails)))
+    (synopsis
+     "Styles, scripts and templates for GOV.UK admin applications")
+    (description
+     "Styles, scripts and templates for GOV.UK admin applications")
+    (home-page
+     "https://github.com/alphagov/govuk_admin_template")
+    (license #f)))
 
 (define-public ruby-govuk-document-types
   (package
@@ -53,17 +117,43 @@
      "https://github.com/alphagov/govuk_taxonomy_helpers")
     (license license:expat)))
 
+(define-public ruby-omniauth-gds
+  (package
+    (name "ruby-omniauth-gds")
+    (version "3.2.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (rubygems-uri "omniauth-gds" version))
+       (sha256
+        (base32
+         "1nkqxkn0fqnllgn34v54y33vy812pxwkzavgzi2a4a6rnpfbj4pv"))))
+    (build-system ruby-build-system)
+    (arguments
+     '(#:tests? #f))
+    (native-inputs
+     `(("bundler" ,bundler)))
+    (propagated-inputs
+     `(("ruby-multi-json" ,ruby-multi-json)
+       ("ruby-omniauth-oauth2" ,ruby-omniauth-oauth2)))
+    (synopsis
+     " Omniauth strategy for GDS oauth2 provider ")
+    (description
+     " Omniauth strategy for GDS oauth2 provider ")
+    (home-page "")
+    (license #f)))
+
 (define-public ruby-plek
   (package
     (name "ruby-plek")
-    (version "2.0.0")
+    (version "2.1.1")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "plek" version))
        (sha256
         (base32
-         "189aryw1rcvnfxpdnvpz9qn8c0vf658mlhgyvyi1yrxrdy2z14i7"))))
+         "1l34xdi7n43wpbfqai656zsiwlilrnfb4kwayyscnf7gi7mfydj5"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f)) ;; No tests included
