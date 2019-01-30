@@ -78,7 +78,7 @@
     (build-hook? . #t)
     (fallback? . #t)
     (print-build-trace? . #t)
-    (verbosity . 0)))
+    (debug . 0)))
 
 (define %default-options
   (let ((data-dir (or (getenv "XDG_DATA_HOME")
