@@ -73,7 +73,9 @@
           #:key inputs precompile-rails-assets?
           #:allow-other-keys)
   (or (not precompile-rails-assets?)
-      (invoke "bundle" "exec" "rake" "assets:precompile")))
+      (if (file-exists? "bin/bundle")
+          (invoke "bundle" "exec" "rake" "assets:precompile")
+          (invoke "rails" "assets:precompile"))))
 
 (define* (install #:key inputs outputs exclude-files #:allow-other-keys)
   (let* ((out (assoc-ref outputs "out"))
