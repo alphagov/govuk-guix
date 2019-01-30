@@ -62,8 +62,9 @@
   (list
    (syslog-service)
    (nscd-service)
-   (guix-service (guix-configuration
-                  (guix guix)))
+   (service guix-service-type
+            (guix-configuration
+             (guix guix)))
    (service  set-file-ownership-service-type
              '(("/var/lib/mysql" "mysql" "mysql" #:recursive)
                ("/var/lib/postgresql" "postgres" "postgres" #:recursive)
