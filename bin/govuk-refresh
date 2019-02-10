@@ -103,7 +103,7 @@
 
   (simple-format #t "\nChecking latest release of ~A\n"
                  (package-name package))
-  (let-values (((version tarball)
+  (let-values (((version tarball changes)
                 (package-update store package updaters)))
     (if (and (let ((source-tarball-changed
                     (if version
