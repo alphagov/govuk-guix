@@ -687,12 +687,12 @@ service setup.")
 (define-public govuk-guix
   (package
     (name "govuk-guix")
-    (version "release_2")
+    (version "release_3")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "0632b4ycs7biifv3nnlpr9f6kwgvg6vh6clzwf3xlrvsbacbmidv")))
+      #:hash (base32 "1g714x476g1b73rjfkxk8av8jcb4r7ql39c1d5pa7zjn45ndc14a")))
     (build-system guile-build-system)
     (inputs
      `(("coreutils" ,coreutils)
