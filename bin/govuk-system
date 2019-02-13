@@ -635,7 +635,7 @@
                                               (requirement '())
                                               (provision '(loopback)))))
 
-            (dhcp-client-service)
+            (service dhcp-client-service-type)
 
             (filter
              (lambda (s)
