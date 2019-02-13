@@ -9,9 +9,12 @@
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system shadow)
+  #:use-module (gds packages govuk)
   #:use-module (gds services)
   #:use-module (gds services utils)
   #:use-module (gds services utils databases)
+  #:use-module (gds services utils databases elasticsearch)
+  #:use-module (gds services utils databases rabbitmq)
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk signon)
@@ -237,14 +240,42 @@
                        (shell #~(string-append #$shadow "/sbin/nologin"))))))
 
 (define rummager-service-type
-  (service-type (name 'rummager)
-                (extensions
-                 (modify-service-extensions-for-signon
-                  name
-                  (list
-                   (service-extension shepherd-root-service-type
-                                      rummager-shepherd-services)
-                   (service-extension activation-service-type
-                                      rummager-activation)
-                   (service-extension account-service-type
-                                      rummager-accounts))))))
+  (service-type
+   (name 'rummager)
+   (extensions
+    (modify-service-extensions-for-signon
+     name
+     (list
+      (service-extension shepherd-root-service-type
+                         rummager-shepherd-services)
+      (service-extension activation-service-type
+                         rummager-activation)
+      (service-extension account-service-type
+                         rummager-accounts))))
+   (default-value
+     (list (service-startup-config-add-pre-startup-scripts
+            (service-startup-config)
+            `((publish-special-routes
+               . ,#~(lambda ()
+                      (run-command
+                       "bundle" "exec"
+                       "rake" "message_queue:create_queues")))))
+           (redis-connection-config)
+           (signon-application
+            (name "Rummager")
+            (supported-permissions '("signin")))
+           (signon-api-user
+            (name "Rummager")
+            (email "rummager@guix-dev.gov.uk")
+            (authorisation-permissions
+             (list
+              (cons
+               (signon-authorisation
+                (application-name "Publishing API"))
+               '("signin")))))
+           (plek-config)
+           (sidekiq-config (file "config/sidekiq.yml"))
+           (elasticsearch-connection-config)
+           (rabbitmq-connection-config (user "rummager")
+                                       (password "rummager"))
+           rummager))))

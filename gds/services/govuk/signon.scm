@@ -10,6 +10,8 @@
   #:use-module (gnu services shepherd)
   #:use-module (gds services)
   #:use-module (gds services utils)
+  #:use-module (gds services utils databases)
+  #:use-module (gds services utils databases mysql)
   #:use-module (gds services rails)
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk tailon)
@@ -459,7 +461,22 @@ end")
                                  (filter signon-api-user?
                                          extension-parameters))))
                     parameter))
-              parameters)))))
+              parameters)))
+   (default-value
+     (list (shepherd-service
+            (inherit default-shepherd-service)
+            (provision '(signon))
+            (requirement '(mysql loopback redis)))
+           (service-startup-config)
+           (plek-config) (rails-app-config) (@ (gds packages govuk) signon)
+           (signon-config)
+           (sidekiq-config
+            (file "config/sidekiq.yml"))
+           (mysql-connection-config
+            (user "signon")
+            (database "signon_production")
+            (password (random-base16-string 30)))
+           (redis-connection-config)))))
 
 (define (signon-dev-user-passphrase)
   (define (new-passphrase)

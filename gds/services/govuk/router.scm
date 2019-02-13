@@ -82,9 +82,12 @@
                    #:log-file (string-append "/var/log/" #$string-service-name)))
          (stop #~(make-kill-destructor))))))))
 
-(define (make-router-service-type name)
+(define (make-router-service-type name
+                                  default-value)
   (service-type
    (name name)
    (extensions
     (list (service-extension shepherd-root-service-type
-                             (make-router-shepherd-service name))))))
+                             (make-router-shepherd-service name))))
+   (default-value
+     default-value)))
