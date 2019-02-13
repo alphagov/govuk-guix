@@ -949,15 +949,15 @@ service setup.")
 (define-public manuals-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ssbc0y46z716z9nk9yc32qmvkwgbq4fzy8b8vxmdy9naniy8r9m")))
+    (hash (base32 "002724rblpia53xjhpq7dpscw74imjf0bf8l1rxsaffxcis9nrw3")))
    (package
      (name "manuals-publisher")
-     (version "release_1166")
+     (version "release_1167")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "10yr5jyr44bx6g9yxxrawzahk9fqsz5bdgzl3k4q7xhka5j522zc")))
+       #:hash (base32 "1hjrr0i8f6mm9s5zibmm9pckxbwvv87naqpgh8z0z4sxzz0aqv60")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
