@@ -152,12 +152,12 @@ proxies requests to some upstream")
     (hash (base32 "0zypc0w4a7idzgv6ic4dxkn98f70wyirlykhb31jyzpylaa51h9d")))
    (package
      (name "bouncer")
-     (version "release_244")
+     (version "release_245")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02xm19f35w4mjv2qvh5fj7q6zkpkijsly35bniqvkgsd1d79l9dp")))
+       #:hash (base32 "035z8i4h7x7y5s90dknm6357hx2rh35cv81nd9g9qmw1q9r0r1lq")))
      (build-system rails-build-system)
      (arguments
       '(#:precompile-rails-assets? #f))
