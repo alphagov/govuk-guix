@@ -317,15 +317,15 @@ proxies requests to some upstream")
 (define-public content-data-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0nh9wmb4yksdzzw47gl4xxwmfyy1i3jm808q0kbwp6ha267z3wfi")))
+    (hash (base32 "1bar3f5ac6qfm7xha5vpbd215b7vz9g7lxy0a78gglwzzy509qjh")))
    (package
      (name "content-data-admin")
-     (version "release_338")
+     (version "release_339")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1hlsc84cfn2y92fhwa887xwyq1pxgp1cb9pvsss9j8crsv2gzvah")))
+       #:hash (base32 "1x6mjfzj90z3rm01wqmj36wb9jgyhz81fz7skg9v5xarhwr5gqxf")))
      (build-system rails-build-system)
      (synopsis "A front end for the data warehouse")
      (description "")
