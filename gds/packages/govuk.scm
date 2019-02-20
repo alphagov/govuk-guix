@@ -1277,12 +1277,12 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router
   (package
     (name "router")
-    (version "release_186")
+    (version "release_188")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "0wjgkwbqpa0wvl4bh0d9mzbn7aa58jslmcl34k8xz2vbfrwcs010")))
+      #:hash (base32 "1lj50pgprpprvf52djq1i59j64fkmxh50m710wgv186f8bjm3cgb")))
     (build-system gnu-build-system)
     (native-inputs
      `(("go" ,go)))
