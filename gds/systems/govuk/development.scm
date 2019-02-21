@@ -1,12 +1,26 @@
 (define-module (gds systems govuk development)
   #:use-module (srfi srfi-26)
   #:use-module (gnu system)
+  #:use-module (gnu services)
+  #:use-module (gnu services databases)
   #:use-module (gds services rails)
   #:use-module (gds services utils databases)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk routing-configuration)
   #:use-module (gds systems govuk production)
   #:export (govuk-development-os))
+
+(define (setup-other-services services)
+  (modify-services services
+    (postgresql-service-type
+     config => (postgresql-configuration
+                (inherit config)
+                (config-file
+                 (postgresql-config-file
+                  (inherit (postgresql-configuration-file config))
+                  (extra-config
+                   '(("session_preload_libraries" "'auto_explain'")
+                     ("auto_explain.log_min_duration" "'500ms'")))))))))
 
 (define setup-services-for-development-os
   (let
@@ -15,6 +29,7 @@
         ;; and add comments to indicate any interdependencies in the
         ;; configuration
         (list
+         setup-other-services
          (cut map
            (cut update-rails-app-config-environment-for-service "development" <>)
            <>)
