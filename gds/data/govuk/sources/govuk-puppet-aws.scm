@@ -123,8 +123,45 @@
                    delete-all-but-one-month-of-events
                    set-details-to-NULL-for-old-superseded-editions)))))
 
+(define (content-performance-manager-variants)
+  (define (select-top-n-for-each-document-type-from-facts-metrics n)
+    (string-append
+     "SELECT * FROM facts_metrics WHERE dimensions_edition_id IN ("
+     "SELECT selected.dimensions_edition_id FROM "
+     "(SELECT DISTINCT document_type FROM dimensions_editions) AS document_types, "
+     "LATERAL ("
+     "SELECT aggregations_search_last_thirty_days.dimensions_edition_id "
+     "FROM aggregations_search_last_thirty_days "
+     "WHERE document_type = document_types.document_type "
+     "ORDER BY upviews DESC LIMIT " (number->string n)
+     ") AS selected"
+     ")"))
+
+  (define trim-facts-metrics
+    `(,(string-append
+        "CREATE TEMP TABLE tmp_facts_metrics AS "
+        (select-top-n-for-each-document-type-from-facts-metrics 10000))
+      "TRUNCATE facts_metrics"
+      "INSERT INTO facts_metrics SELECT * FROM tmp_facts_metrics"))
+
+  (define refresh-materialized-views
+    (map (lambda (view)
+           (string-append
+            "REFRESH MATERIALIZED VIEW " view))
+         '("aggregations_search_last_months"
+           "aggregations_search_last_six_months"
+           "aggregations_search_last_thirty_days"
+           "aggregations_search_last_three_months"
+           "aggregations_search_last_twelve_months")))
+
+  `((2 . ("small"
+          "Only the 10000 items for each document_type with the most unique page views"
+          ,(append trim-facts-metrics
+                   refresh-materialized-views)))))
+
 (define (postgresql-extract-variants)
   `(("publishing_api_production" . ,(publishing-api-variants))
+    ("content_performance_manager_production" . ,(content-performance-manager-variants))
     ;; This is mostly for testing, as content-tagger has a small database
     ("content_tagger_production" .
      ((2 . ("no-taxonomy-health-warnings"
