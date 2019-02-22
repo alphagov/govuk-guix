@@ -385,7 +385,7 @@ def load_postgresql_extract(extract, service, options)
   else
     puts "Running #{change_database_owner_command}"
     unless system(change_database_owner_command)
-      STDERR.puts "error: command failed: #{change_owner_command}"
+      STDERR.puts "error: command failed: #{change_database_owner_command}"
       exit 1
     end
   end
