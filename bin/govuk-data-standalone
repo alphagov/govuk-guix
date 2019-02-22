@@ -378,7 +378,7 @@ def load_postgresql_extract(extract, service, options)
     end
   end
 
-  change_database_owner_command = "#{psql_command} -qXAt -c \"ALTER DATABASE \\\"#{target_database}\\\" OWNER TO #{owner}\" #{target_database}"
+  change_database_owner_command = "#{psql_command} -qXAt -c \"ALTER DATABASE \\\"#{target_database}\\\" OWNER TO \\\"#{owner}\\\"\" #{target_database}"
 
   if dry_run
     puts "Would run command: #{change_database_owner_command}"
@@ -413,7 +413,7 @@ def load_postgresql_extract(extract, service, options)
     end
 
     object_names.each_line do |name|
-      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.gsub('_', ' ').upcase} \\\"#{name.strip}\\\" OWNER TO #{owner}\" #{target_database}"
+      change_owner_command = "#{psql_command} -qXAt -c \"ALTER #{type.to_s.gsub('_', ' ').upcase} \\\"#{name.strip}\\\" OWNER TO \\\"#{owner}\\\"\" #{target_database}"
 
       unless system(change_owner_command)
         STDERR.puts "error: command failed: #{change_owner_command}"
