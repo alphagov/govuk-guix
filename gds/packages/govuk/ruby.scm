@@ -4,7 +4,8 @@
   #:use-module (guix packages)
   #:use-module (guix build-system ruby)
   #:use-module (gnu packages ruby)
-  #:use-module (gnu packages rails))
+  #:use-module (gnu packages rails)
+  #:use-module (gds packages third-party ruby))
 
 (define-public ruby-gds-sso
   (package
@@ -130,16 +131,23 @@
          "1nkqxkn0fqnllgn34v54y33vy812pxwkzavgzi2a4a6rnpfbj4pv"))))
     (build-system ruby-build-system)
     (arguments
-     '(#:tests? #f))
+     '(#:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'extract-gemspec 'loosen-gemspec-dependencies
+           (lambda _
+             (substitute* "omniauth-gds.gemspec"
+               (("%q<omniauth-oauth2>.freeze, \\[.*")
+                "%q<omniauth-oauth2>.freeze, ['~> 1'])\n"))
+             #t)))))
     (native-inputs
      `(("bundler" ,bundler)))
     (propagated-inputs
      `(("ruby-multi-json" ,ruby-multi-json)
        ("ruby-omniauth-oauth2" ,ruby-omniauth-oauth2)))
-    (synopsis
-     " Omniauth strategy for GDS oauth2 provider ")
+    (synopsis "Omniauth strategy for GDS oauth2 provider")
     (description
-     " Omniauth strategy for GDS oauth2 provider ")
+     "Omniauth strategy for GDS oauth2 provider.")
     (home-page "")
     (license #f)))
 

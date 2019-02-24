@@ -18,6 +18,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages curl)
+  #:use-module (gnu packages chromium)
   #:use-module (gnu packages ruby)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages commencement)
@@ -49,8 +50,7 @@
   #:use-module (gds packages guix)
   #:use-module (gds packages utils)
   #:use-module (gds packages utils bundler)
-  #:use-module (gds packages govuk ruby)
-  #:use-module (gds packages third-party chromium))
+  #:use-module (gds packages govuk ruby))
 
 (define govuk-admin-template-initialiser
   '(lambda _
@@ -1220,7 +1220,7 @@ content, as well as broadcasting changes to a message queue.")
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
-        ("chromium" ,chromium)))
+        ("chromium" ,ungoogled-chromium)))
      (arguments
       `(#:phases
         (modify-phases %standard-phases
@@ -1599,7 +1599,7 @@ content, as well as broadcasting changes to a message queue.")
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)
-        ("chromium" ,chromium)))
+        ("chromium" ,ungoogled-chromium)))
      (arguments
       `(#:phases
         (modify-phases %standard-phases
