@@ -3,6 +3,8 @@
   #:use-module (ice-9 match)
   #:use-module (json)
   #:use-module (guix packages)
+  #:use-module (guix download)
+  #:use-module (guix git-download)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system)
@@ -45,7 +47,15 @@
 
 (define (display-available-services-in-json)
   (define (origin-sexp origin)
-    `((uri . ,(origin-uri origin))))
+    (cond
+     ((eq? (origin-method origin) url-fetch)
+      `((uri . ,(origin-uri origin))))
+     ((eq? (origin-method origin) git-fetch)
+      `((uri . ,(let ((git-reference (origin-uri origin)))
+                  `((url .    ,(git-reference-url git-reference))
+                    (commit . ,(git-reference-commit git-reference)))))))
+     (else
+      (error "Unhandled origin method"))))
 
   (define (package-sexp package)
     `((name . ,(package-name package))
