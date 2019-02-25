@@ -10,7 +10,7 @@ do
 
     BRANCH="$(git symbolic-ref --short HEAD)"
 
-    if [[ "$BRANCH" != "master" ]]; then
+    if [ "$BRANCH" != "master" ]; then
         echo "$repo: skipped: on non-master branch"
     elif ! git diff --quiet --ignore-submodules --no-ext-diff; then
         echo "$repo: skipped: uncommitted local changes"
