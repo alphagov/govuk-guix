@@ -49,17 +49,7 @@
     (arguments
      '(#:tests? #f))
     (propagated-inputs
-     `(("ruby-bootstrap-sass"
-        ,(package
-           (inherit ruby-bootstrap-sass)
-           (version "3.3.5.1")
-           (source
-            (origin
-              (method url-fetch)
-              (uri (rubygems-uri "bootstrap-sass" version))
-              (sha256
-               (base32
-                "0bx2bbsd2dandxax9b0by351wa1ab9hysc1f8p5i7ssqz4ayr8jv"))))))
+     `(("ruby-bootstrap-sass" ,ruby-bootstrap-sass)
        ("ruby-jquery-rails" ,ruby-jquery-rails)
        ("ruby-rails" ,ruby-rails)))
     (synopsis

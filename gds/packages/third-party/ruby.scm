@@ -10,14 +10,14 @@
 (define-public ruby-bootstrap-sass
   (package
     (name "ruby-bootstrap-sass")
-    (version "3.3.7")
+    (version "3.3.5.1") ; ruby-govuk-admin-template requires this version
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "bootstrap-sass" version))
        (sha256
         (base32
-         "1bc9bf6caddqn1rv15b5x56yczmbjzaxzl9lk5zbwrg1bfph4bx9"))))
+         "0bx2bbsd2dandxax9b0by351wa1ab9hysc1f8p5i7ssqz4ayr8jv"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f))
