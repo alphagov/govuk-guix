@@ -140,7 +140,7 @@
   (define trim-facts-metrics
     `(,(string-append
         "CREATE TEMP TABLE tmp_facts_metrics AS "
-        (select-top-n-for-each-document-type-from-facts-metrics 10000))
+        (select-top-n-for-each-document-type-from-facts-metrics 2000))
       "TRUNCATE facts_metrics"
       "INSERT INTO facts_metrics SELECT * FROM tmp_facts_metrics"))
 
