@@ -43,7 +43,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
     system('chmod', '-R', 'u+w', temp_directory)
     FileUtils.rm_r temp_directory
   end
-  FileUtils.mkdir temp_directory
+  FileUtils.mkdir_p temp_directory
 
   command = (
     "govuk aws --profile govuk-integration -- "\
