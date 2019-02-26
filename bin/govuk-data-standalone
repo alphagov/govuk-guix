@@ -231,8 +231,8 @@ def filter_extracts(extracts,
       )
 
     next if database and !database.include? extract[:database]
-    next if before_date and extract[:before_date] > before_date
-    next if after_date and extract[:after_date] < after_date
+    next if before_date and extract[:date] > before_date
+    next if after_date and extract[:date] < after_date
 
     if services_and_variants
       services_and_variants_split = services_and_variants
