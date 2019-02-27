@@ -140,9 +140,15 @@
   (define trim-facts-metrics
     `(,(string-append
         "CREATE TEMP TABLE tmp_facts_metrics AS "
-        (select-top-n-for-each-document-type-from-facts-metrics 2000))
+        (select-top-n-for-each-document-type-from-facts-metrics 1000))
       "TRUNCATE facts_metrics"
       "INSERT INTO facts_metrics SELECT * FROM tmp_facts_metrics"))
+
+  (define slim-publishing-api-events
+    `(,(string-append
+        "UPDATE publishing_api_events SET payload = '{}'::jsonb WHERE id NOT IN ("
+        "SELECT id FROM publishing_api_events ORDER BY id DESC LIMIT 100"
+        ")")))
 
   (define refresh-materialized-views
     (map (lambda (view)
@@ -157,6 +163,7 @@
   `((2 . ("small"
           "Only the 10000 items for each document_type with the most unique page views"
           ,(append trim-facts-metrics
+                   slim-publishing-api-events
                    refresh-materialized-views)))))
 
 (define (postgresql-extract-variants)
