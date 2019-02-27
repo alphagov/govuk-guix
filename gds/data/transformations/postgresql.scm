@@ -170,10 +170,11 @@
          (service postgresql-service-type)
          operation)))
 
-(define (postgresql-multi-output-data-transformation
-         base-extract
-         database-connection-config
-         variant-details)
+(define* (postgresql-multi-output-data-transformation
+          base-extract
+          database-connection-config
+          variant-details
+          #:key (initial-superuser-sql '()))
   (define operation
     (with-imported-modules '((gds data transformations build postgresql))
       #~(lambda _
@@ -183,10 +184,22 @@
           (define user
             #$(postgresql-connection-config-user database-connection-config))
 
+          (define initial-superuser-sql (list #$@initial-superuser-sql))
+
           (invoke "createuser" user)
           (invoke "createdb" database-name "-O" user)
           (decompress-file-and-pipe-to-psql #$(data-extract-file base-extract)
                                             database-name)
+
+          (unless (null? initial-superuser-sql)
+            (run-with-psql-port
+             database-name "postgres"
+             (lambda (port)
+               (for-each (lambda (statement)
+                           (simple-format #t "initial-sql: ~A;\n" statement)
+                           (display (string-append statement ";")
+                                    port))
+                         initial-superuser-sql))))
 
           #$@(map
               (match-lambda
