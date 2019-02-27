@@ -160,7 +160,6 @@ CREATE DATABASE \"~A\" WITH OWNER \"~A\";" #$database #$owner)))
                          ,(string-append "--username=" #$user)
                          ,(string-append "--dbname=" #$database)
                          "--jobs=8"
-                         "--schema=public"
                          "--exit-on-error"
                          ,#$file)))
            #$@(if dry-run?
