@@ -174,7 +174,12 @@
     (postgresql-multi-output-data-transformation
      base-extract
      database-connection-config
-     (map cdr variant-details)))
+     (map cdr variant-details)
+     #:initial-superuser-sql '(;; This avoids errors when restoring the dump
+                               ;; with a user that doesn't have permission to
+                               ;; comment on the default plpgsql
+                               ;; schema.
+                               "COMMENT ON EXTENSION plpgsql IS null")))
 
   (cons base-extract
         (map (match-lambda
