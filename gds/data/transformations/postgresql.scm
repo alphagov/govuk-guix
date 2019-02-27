@@ -40,6 +40,7 @@
          (postgresql-config-file
           (extra-config
            '(("wal_level" "minimal")
+             ("archive_mode" "off")
              ("fsync" "off")
              ("full_page_writes" "off")
              ("autovacuum" "off")
