@@ -1636,12 +1636,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "1d80gpiymjg7l28sqgrmapwrrqjrgwv0mb8wdxfib6mgzfnm533q")))
    (package
      (name "static")
-     (version "release_3059")
+     (version "release_3060")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "12ygfym3lihn4wlgf6ljr21vxrp94xaim7fsl3yd92v4bxk5p5gq")))
+       #:hash (base32 "0ym90agsjgc674yic55xxif2za3h6p18479k3h27xbci7chr7yph")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
