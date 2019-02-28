@@ -103,6 +103,9 @@ def filename_for_local_extract(extract)
 end
 
 def extract_exists_locally?(extract)
+  # TODO: Record the expected hash of the extract, and check if the recorded
+  # hash matches that in the index. If it doesn't, it means that the file has
+  # changed, and should be downloaded again.
   File.exist? filename_for_local_extract(extract)
 end
 
