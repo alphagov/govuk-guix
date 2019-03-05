@@ -114,6 +114,21 @@ if [ "$1" == "--profile" ]; then
         echo "export AWS_SESSION_TOKEN=\"$SESSION_TOKEN\""
     elif [ "$3" == "--export-json" ]; then
         echo "{ \"access_key_id\": \"$ACCESS_KEY_ID\", \"secret_access_key\": \"$SECRET_ACCESS_KEY\", \"session_token\": \"$SESSION_TOKEN\" }"
+    elif [ "$3" == "--export-pretty" ] || [ "$3" == "" ]; then
+        bold="\e[1m"
+        reset="\e[0m"
+
+        echo
+        echo -e "  Profile\t\t $profile"
+        echo
+        echo -e "  Session expires\t $EXPIRATION"
+        echo
+        echo -e "  Access key id\t\t $bold$ACCESS_KEY_ID$reset"
+        echo
+        echo -e "  Secret access key\t $bold$SECRET_ACCESS_KEY$reset"
+        echo
+        echo -e "  Session token\t\t $bold$SESSION_TOKEN$reset"
+        echo
     elif [ "$3" == "--" ]; then
         export AWS_ACCESS_KEY_ID="$ACCESS_KEY_ID"
         export AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY"
@@ -125,6 +140,7 @@ if [ "$1" == "--profile" ]; then
         echo "govuk: aws: valid arguments are:"
         echo
         echo "  --export         to output the shell commands for the AWS credentials"
+        echo "  --export-pretty  to output the values for the AWS credentials"
         echo "  --export-json    to output JSON describing the AWS credentials"
         echo "  --               to run a command with the AWS credentials set in the environment,"
         echo "                   e.g. 'govuk aws --profile=govuk-integration -- aws s3 ls'"
