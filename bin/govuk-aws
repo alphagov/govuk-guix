@@ -119,7 +119,7 @@ if [ "$1" == "--profile" ]; then
         export AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY"
         export AWS_SESSION_TOKEN="$SESSION_TOKEN"
 
-        exec aws "${@:3}"
+        exec "${@:3}"
     else
         echo "govuk: aws: unknown argument '$3'"
         echo "govuk: aws: valid arguments are:"
@@ -127,16 +127,16 @@ if [ "$1" == "--profile" ]; then
         echo "  --export         to output the shell commands for the AWS credentials"
         echo "  --export-json    to output JSON describing the AWS credentials"
         echo "  --               to run a command with the AWS credentials set in the environment,"
-        echo "                   e.g. 'govuk aws --profile=govuk-integration -- s3 ls'"
+        echo "                   e.g. 'govuk aws --profile=govuk-integration -- aws s3 ls'"
         exit 1
     fi
 elif [ "$1" == "--" ]; then
-    exec aws "${@:2}"
+    exec "${@:2}"
 else
     echo "govuk: aws: unknown argument '$1'"
     echo "govuk: aws: valid arguments are:"
     echo
-    echo "  --profile    followed by a profile, e.g. 'govuk aws --profile govuk-integration -- s3 ls'"
-    echo "  --           on it's own to not assume a role, e.g. 'govuk aws -- s3 ls'"
+    echo "  --profile    followed by a profile, e.g. 'govuk aws --profile govuk-integration -- aws s3 ls'"
+    echo "  --           on it's own to not assume a role, e.g. 'govuk aws -- aws s3 ls'"
     exit 1
 fi
