@@ -34,7 +34,7 @@ do
     MONGODB_FILES+=("$FILE_NAME")
 done
 
-export XZ_OPT="-e -9 -T0"
+export XZ_OPT="-9 -T0"
 
 for index in "${!MONGODB_HOSTNAMES[@]}"
 do
@@ -75,6 +75,6 @@ for file in $(find "$BACKUPS/$DATE" -name "*.dump.gz"); do
         echo "$newfile already exists"
     else
         echo "creating ${newfile}..."
-        pv "$file" | gzip -d | xz -e -9 -z -T0 -c > "$newfile"
+        pv "$file" | gzip -d | xz -9 -z -T0 -c > "$newfile"
     fi
 done
