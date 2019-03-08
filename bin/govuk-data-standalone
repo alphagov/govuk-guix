@@ -600,6 +600,10 @@ def main
   options[:services_and_variants] = ARGV if !ARGV.empty?
   unless command
     STDERR.puts "error: no command specified"
+    STDERR.puts "\nvalid commands are:"
+    STDERR.puts " - list"
+    STDERR.puts " - load"
+    STDERR.puts " - fetch"
     exit 1
   end
 
