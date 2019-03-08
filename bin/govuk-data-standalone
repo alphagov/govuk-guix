@@ -29,7 +29,7 @@ def format_seconds(seconds)
 end
 
 def aws_s3(*args)
-  status = system(*(%w[govuk aws --profile govuk-integration -- s3] + args))
+  status = system(*(%w[govuk aws --profile govuk-integration -- aws s3] + args))
 
   unless status
     STDERR.puts "error: aws s3 command failed: #{args.join(' ')}"
@@ -47,7 +47,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
 
   command = (
     "govuk aws --profile govuk-integration -- "\
-    "s3 cp #{target} - | "\
+    "aws s3 cp #{target} - | "\
     "pv --size=#{size} |"\
     "xz -d -T0 | "\
     "tar --extract --directory #{temp_directory}"
