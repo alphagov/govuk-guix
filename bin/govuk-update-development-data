@@ -21,4 +21,4 @@ if [ -d "$GCROOT_DIRECTORY" ]; then
     ln -s "$DATA_DIRECTORY_WITH_INDEX" "$GCROOT_DIRECTORY/current"
 fi
 
-govuk aws --profile govuk-test -- s3 sync --delete "$DATA_DIRECTORY_WITH_INDEX" s3://govuk-development-data-test/
+govuk aws --profile govuk-test -- aws s3 sync --delete "$DATA_DIRECTORY_WITH_INDEX" s3://govuk-development-data-test/
