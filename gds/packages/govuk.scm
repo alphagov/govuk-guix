@@ -1703,15 +1703,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01bqmfwbq62cqkx9h2dmfhcqs3ni030hybm53ry5lxh009ab0da1")))
+    (hash (base32 "00n0bav4y7fhkbp91zd49qm66nsii4ymbsl3rp0spa31ksgnylmn")))
    (package
      (name "support-api")
-     (version "release_265")
+     (version "release_266")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "18pxsmj8h5w9dpgwffxnvi85nfypvi3a4ayg1kap73pv4shxmp1r")))
+       #:hash (base32 "1hzjaiks1kci3hf1bzcbpwarnqw93xypwr2lmismf27mbhxg3c4b")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
