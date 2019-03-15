@@ -46,6 +46,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
   FileUtils.mkdir_p temp_directory
 
   command = (
+    "set -o pipefail; "\
     "govuk aws --profile govuk-integration -- "\
     "aws s3 cp #{target} - | "\
     "pv --size=#{size} |"\
@@ -356,7 +357,7 @@ def load_postgresql_extract(extract, service, options)
   format = extract[:variant][:properties][:format]
   if format == 'plain'
     commands.push(
-      "pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
+      "set -o pipefail; pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
     )
   elsif format == 'directory'
     commands.push(
@@ -444,7 +445,7 @@ def load_mysql_extract(extract, service, options)
   commands = [
     "mysql #{mysql_args} -e \"DROP DATABASE IF EXISTS #{target_database}\"",
     "mysql #{mysql_args} -e \"CREATE DATABASE #{target_database}\"",
-    "pv #{local_file} | #{decompressor} -d | mysql #{mysql_args} #{target_database}"
+    "set -o pipefail; pv #{local_file} | #{decompressor} -d | mysql #{mysql_args} #{target_database}"
   ]
 
   start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -479,7 +480,7 @@ def load_mongo_extract(extract, service, options)
       mongorestore_args += " --host=127.0.0.1:37017"
     end
 
-    command = "pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
+    command = "set -o pipefail; pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
   elsif extract[:variant][:name] == 'directory'
     target_database = extract[:services][service.to_sym][:database]
     mongorestore_args = "--drop -d #{target_database} #{local_file}"
