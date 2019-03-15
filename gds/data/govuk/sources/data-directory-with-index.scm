@@ -226,7 +226,7 @@
                            '()
                            '("--profile" "govuk-integration"))
                      "--"
-                     "s3" "cp"
+                     "aws" "s3" "cp"
                      ,url
                      ,target)))
               (apply system* download-command)))
