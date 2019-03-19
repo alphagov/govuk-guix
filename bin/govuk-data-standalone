@@ -28,6 +28,21 @@ def format_seconds(seconds)
   end
 end
 
+def pipe_command(*commands)
+  command = 'set -o pipefail; ' + commands.join(' ')
+
+  # Sometimes, /bin/sh isn't bash, including in the Ubuntu govuk-puppet
+  # Development VM, so use /bin/bash explicitly if it exists as bash supports
+  # pipefail.
+  if File.exist? '/bin/bash'
+    system('/bin/bash', '-c', command)
+  else
+    # If /bin/bash doesn't exist, fallback to hoping that /bin/sh supports
+    # pipefail.
+    system(command)
+  end
+end
+
 def aws_s3(*args)
   status = system(*(%w[govuk aws --profile govuk-integration -- aws s3] + args))
 
@@ -45,16 +60,15 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
   end
   FileUtils.mkdir_p temp_directory
 
-  command = (
-    "set -o pipefail; "\
-    "govuk aws --profile govuk-integration -- "\
-    "aws s3 cp #{target} - | "\
-    "pv --size=#{size} |"\
-    "xz -d -T0 | "\
-    "tar --extract --directory #{temp_directory}"
+  status = system(
+    pipe_command(
+      'govuk aws --profile govuk-integration --',
+      "aws s3 cp #{target} -",
+      "pv --size=#{size}",
+      'xz -d -T0',
+      "tar --extract --directory #{temp_directory}"
+    )
   )
-
-  status = system(command)
 
   unless status
     STDERR.puts "error: aws s3 command failed: #{command}"
@@ -357,7 +371,12 @@ def load_postgresql_extract(extract, service, options)
   format = extract[:variant][:properties][:format]
   if format == 'plain'
     commands.push(
-      "set -o pipefail; pv #{local_file} | #{decompressor} -d | #{psql_command} --no-psqlrc --quiet --user=#{user} #{target_database}"
+      pipe_command(
+        "pv #{local_file}",
+        "#{decompressor} -d",
+        "#{psql_command} --no-psqlrc --quiet"\
+        " --user=#{user} #{target_database}"
+      )
     )
   elsif format == 'directory'
     commands.push(
@@ -445,7 +464,11 @@ def load_mysql_extract(extract, service, options)
   commands = [
     "mysql #{mysql_args} -e \"DROP DATABASE IF EXISTS #{target_database}\"",
     "mysql #{mysql_args} -e \"CREATE DATABASE #{target_database}\"",
-    "set -o pipefail; pv #{local_file} | #{decompressor} -d | mysql #{mysql_args} #{target_database}"
+    pipe_command(
+      "pv #{local_file}",
+      "#{decompressor} -d",
+      "mysql #{mysql_args} #{target_database}"
+    )
   ]
 
   start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -480,7 +503,11 @@ def load_mongo_extract(extract, service, options)
       mongorestore_args += " --host=127.0.0.1:37017"
     end
 
-    command = "set -o pipefail; pv #{local_file} | #{decompressor} -d | mongorestore #{mongorestore_args}"
+    command = pipe_command(
+      "pv #{local_file}",
+      "#{decompressor} -d",
+      "mongorestore #{mongorestore_args}"
+    )
   elsif extract[:variant][:name] == 'directory'
     target_database = extract[:services][service.to_sym][:database]
     mongorestore_args = "--drop -d #{target_database} #{local_file}"
