@@ -5,6 +5,7 @@ require 'uri'
 require 'json'
 require 'open3'
 require 'optparse'
+require 'shellwords'
 require 'fileutils'
 
 def data_directory_base_url
@@ -35,11 +36,11 @@ def pipe_command(*commands)
   # Development VM, so use /bin/bash explicitly if it exists as bash supports
   # pipefail.
   if File.exist? '/bin/bash'
-    system('/bin/bash', '-c', command)
+    "/bin/bash -c \"#{Shellwords.escape(command)}\""
   else
     # If /bin/bash doesn't exist, fallback to hoping that /bin/sh supports
     # pipefail.
-    system(command)
+    command
   end
 end
 
