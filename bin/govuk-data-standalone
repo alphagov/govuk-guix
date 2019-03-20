@@ -30,7 +30,7 @@ def format_seconds(seconds)
 end
 
 def pipe_command(*commands)
-  command = 'set -o pipefail; ' + commands.join(' ')
+  command = 'set -o pipefail; ' + commands.join(' | ')
 
   # Sometimes, /bin/sh isn't bash, including in the Ubuntu govuk-puppet
   # Development VM, so use /bin/bash explicitly if it exists as bash supports
