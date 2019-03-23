@@ -106,7 +106,8 @@
               (apply invoke command)))
 
           (activate)
-          (pg_ctl "start")
+          (pg_ctl "start"
+                  "-w") ; wait for PostgreSQL to start
           (let ((result
                  (#$gexp-to-run '())))
 
