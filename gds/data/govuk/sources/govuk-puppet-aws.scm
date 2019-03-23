@@ -14,6 +14,8 @@
   #:use-module (guix packages)
   #:use-module (gnu packages guile)
   #:use-module (gnu services)
+  #:use-module (gnu services databases)
+  #:use-module (gds systems govuk base)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
   #:use-module (gds services govuk rummager)
@@ -177,8 +179,15 @@
 
 (define (postgresql-extract-plus-variants
          base-extract database-connection-config variant-details)
+  (define postgresql-service
+    (find (lambda (service)
+            (eq? (service-kind service)
+                 postgresql-service-type))
+          optional-services))
+
   (define transformation
     (postgresql-multi-output-data-transformation
+     postgresql-service
      base-extract
      database-connection-config
      (map cdr variant-details)

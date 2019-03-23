@@ -13,6 +13,7 @@
   #:use-module (gnu packages compression)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
+  #:use-module (gds systems govuk base)
   #:use-module (gds services govuk)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds services utils databases mysql)
@@ -24,6 +25,16 @@
   #:use-module (gds data transformations mysql)
   #:use-module (gds data transformations mongodb)
   #:export (build-snapshot))
+
+(define (postgresql-load-extracts* extracts-and-database-connection-configs)
+  (define postgresql-service
+    (find (lambda (service)
+            (eq? (service-kind service)
+                 postgresql-service-type))
+          optional-services))
+
+  (postgresql-load-extracts postgresql-service
+                            extracts-and-database-connection-configs))
 
 (define* (snapshot-data-transformations all-data-extracts
                                         #:key dry-run?)
@@ -49,7 +60,7 @@
   (filter-map
    (match-lambda
      ((database . data-extracts)
-      (and=> (assoc-ref `(("postgresql" . ,postgresql-load-extracts)
+      (and=> (assoc-ref `(("postgresql" . ,postgresql-load-extracts*)
                           ("mysql" . ,mysql-load-extracts)
                           ("mongo" . ,mongodb-load-extracts))
                         database)

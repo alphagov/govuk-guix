@@ -115,7 +115,8 @@
 
             result)))))
 
-(define (postgresql-load-extracts extracts-and-database-connection-configs)
+(define (postgresql-load-extracts postgresql-service
+                                  extracts-and-database-connection-configs)
   (define operation
     (with-imported-modules '((gds data transformations build postgresql))
       #~(lambda _
@@ -168,10 +169,11 @@
 
   #~(begin
       #$(with-postgresql
-         (service postgresql-service-type)
+         postgresql-service
          operation)))
 
 (define* (postgresql-multi-output-data-transformation
+          postgresql-service
           base-extract
           database-connection-config
           variant-details
@@ -230,5 +232,5 @@
                  variant-details))
    (operation #~(begin
                   #$(with-postgresql
-                     (service postgresql-service-type)
+                     postgresql-service
                      operation)))))
