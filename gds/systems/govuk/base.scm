@@ -94,7 +94,9 @@
    (list
     (service redis-service-type (redis-configuration))
     (service memcached-service-type)
-    (postgresql-service)
+    (service postgresql-service-type
+             (postgresql-configuration
+              (postgresql postgresql-9.6)))
     (service mongodb-service-type)
     (service elasticsearch-service-type)
     (service mysql-service-type (mysql-configuration))
@@ -134,7 +136,7 @@
    (specification->package+output "bind" "utils")
    glibc
    git
-   postgresql
+   postgresql-9.6
    mariadb
    mongodb
    rabbitmq
