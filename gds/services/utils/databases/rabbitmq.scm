@@ -49,7 +49,7 @@
       (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
 
       (let* ((command `(,(string-append #$rabbitmq "/sbin/rabbitmqctl")
-                        "list_users" "-q"))
+                        "list_users" "-s"))
              (p (apply open-pipe* OPEN_READ command))
              (lines (let loop ((lines '())
                                (line (read-line p)))
