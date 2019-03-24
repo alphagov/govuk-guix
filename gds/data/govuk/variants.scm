@@ -11,6 +11,7 @@
   #:use-module (gds data data-extract)
   #:use-module (gds data transformations)
   #:use-module (gds data transformations postgresql)
+  #:use-module (gds data transformations mongodb)
   #:export (mongodb-extract-plus-variants
             postgresql-extract-plus-variants))
 
