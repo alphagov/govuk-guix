@@ -554,12 +554,12 @@ proxies requests to some upstream")
     (hash (base32 "10by71jbil2m6hcfbivvnhqrg03p18hm6ckbc1d382r71rk5vkg3")))
    (package
      (name "finder-frontend")
-     (version "release_871")
+     (version "release_872")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "13nq2g55j36dbjmjaj6i053pfa43n3r2djl3rhzw1x2mxzvqdfs7")))
+       #:hash (base32 "13lf1r44192sibl3cwn81n45af2kwzasdaqwwkfjsxj6p3w44bwz")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
