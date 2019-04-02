@@ -1393,12 +1393,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "05k7fh9cwi706pqq6vmw1xwjjy9s6dsxcbldcicf5j7qzicxinm8")))
    (package
      (name "service-manual-frontend")
-     (version "release_310")
+     (version "release_311")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "16d147nfq20bd8i7ng6zdqs7wi30jnlx7b58ivpry7ma7ijjqrpw")))
+       #:hash (base32 "1d6ibhqkq5b39g0q6njfphzmfscg30ivzkca79xj9m5c874jbr1h")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
