@@ -65,15 +65,15 @@ GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONME
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "19vi6bspax5b0yn2lq9jigf57gdv6bhk5jghkd5hfnhaprgryx9z")))
+    (hash (base32 "0zi4pzgr59ys1fgy75x0xl3mjxmv9x147mz2vs6ma006wivbbz6q")))
    (package
      (name "asset-manager")
-     (version "release_361")
+     (version "release_362")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1k55mc465myax4hbyqdammkp5506lcd97xwx28722jww4wr61w2k")))
+       #:hash (base32 "0fwr8mm1sbr471s4fqqfz9h2g7p57h0dfs3a8d9vwgd7p6q7l3r5")))
      (build-system rails-build-system)
      (inputs
       `(("govuk_clamscan"
