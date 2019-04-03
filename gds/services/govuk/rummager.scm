@@ -257,11 +257,21 @@
    (default-value
      (list (service-startup-config-add-pre-startup-scripts
             (service-startup-config)
-            `((publish-special-routes
+            `((create-queues
                . ,#~(lambda ()
                       (run-command
                        "bundle" "exec"
-                       "rake" "message_queue:create_queues")))))
+                       "rake" "message_queue:create_queues")))
+              (publish-special-routes
+               . ,#~(lambda ()
+                      (run-command
+                       "bundle" "exec"
+                       "rake" "publishing_api:publish_special_routes")))
+              (publish-supergroup-finders
+               . ,#~(lambda ()
+                      (run-command
+                       "bundle" "exec"
+                       "rake" "publishing_api:publish_supergroup_finders")))))
            (redis-connection-config)
            (signon-application
             (name "Rummager")
