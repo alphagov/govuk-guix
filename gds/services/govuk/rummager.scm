@@ -77,7 +77,9 @@
            plek-config
            #:service-name-whitelist rummager-govuk-dependencies)
 
-          `(("PATH" . ,(file-append package "/bin")))
+          `(("PATH" . ,(file-append package "/bin"))
+            ;; To satisfy pry-byebug
+            ("HOME" . "/var/apps/rummager"))
 
           (append-map database-connection-config->environment-variables
                       database-connection-configs)))
