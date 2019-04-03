@@ -1148,15 +1148,15 @@ data to use can be selected, and multiple backends are supported.")
 (define-public publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0x0nqfdsbzbgi58y4as6y8dsdhxb2qzdnvyhpha5gq7vlc58bijr")))
+    (hash (base32 "0nn5kcc57lzhk8xrcrpx3i8mxn26knzaw6f27jc5k80jvazb0r0h")))
    (package
      (name "publisher")
-     (version "release_2116")
+     (version "release_2117")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0hvidyyrzfk0bha1999yirwxxnxisi2c4mfqi4kxzll2yhh4psi0")))
+       #:hash (base32 "0w51a6y428bqap36sc2n9ssaw87xgakbijf0hcmyxs7bscsndvwn")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
