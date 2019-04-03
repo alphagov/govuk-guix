@@ -649,10 +649,14 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(finder-frontend))
-            (requirement '(content-store rummager static)))
+            (requirement '(content-store
+                           rummager
+                           static
+                           memcached)))
            (plek-config)
            (rails-app-config)
            finder-frontend
+           (memcached-connection-config)
            (service-startup-config
             (environment-variables
              '(("GOVUK_APP_NAME" . "finder-frontend"))))))))
@@ -668,10 +672,14 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(draft-finder-frontend))
-            (requirement '(draft-content-store rummager draft-static)))
+            (requirement '(draft-content-store
+                           rummager
+                           draft-static
+                           memcached)))
            (plek-config)
            (rails-app-config)
            finder-frontend
+           (memcached-connection-config)
            (service-startup-config
             (environment-variables
              '(("GOVUK_APP_NAME" . "draft-finder-frontend"))))))))
