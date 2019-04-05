@@ -339,12 +339,12 @@ proxies requests to some upstream")
     (hash (base32 "1ri502fcbpw5qbmcbq3drkjy0h4mdgi2aj1m3rnabzahm8dd28y4")))
    (package
      (name "content-performance-manager")
-     (version "release_1015")
+     (version "release_1016")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1f1wpnnymr820laszkrangs1kwhfw78lcf28kqr14zy5n9rbf8z6")))
+       #:hash (base32 "0y2zyaz4rl54sbiphbmx5ndx5qs1dr3n4w0wl5crq0v49rgigwb1")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
