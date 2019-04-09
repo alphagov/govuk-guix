@@ -98,7 +98,11 @@
              (postgresql-configuration
               (postgresql postgresql-9.6)))
     (service mongodb-service-type)
-    (service elasticsearch-service-type)
+    (service elasticsearch-service-type
+             (elasticsearch-configuration
+              (extra-config
+               '(("action.destructive_requires_name" "true")
+                 ("script.engine.groovy.inline.search" "true")))))
     (service mysql-service-type (mysql-configuration))
     (service rabbitmq-service-type)
     tailon-service
