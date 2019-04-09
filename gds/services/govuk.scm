@@ -651,6 +651,7 @@
             (provision '(finder-frontend))
             (requirement '(content-store
                            rummager
+                           whitehall ;; For the Worldwide API
                            static
                            memcached)))
            (plek-config)
@@ -674,6 +675,7 @@
             (provision '(draft-finder-frontend))
             (requirement '(draft-content-store
                            rummager
+                           whitehall ;; For the Worldwide API
                            draft-static
                            memcached)))
            (plek-config)
