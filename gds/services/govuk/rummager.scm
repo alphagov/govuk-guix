@@ -80,7 +80,9 @@
 
           `(("PATH" . ,(file-append package "/bin"))
             ;; To satisfy pry-byebug
-            ("HOME" . "/var/apps/rummager"))
+            ("HOME" . "/var/apps/rummager")
+            ("SSL_CERT_FILE" .
+             "/run/current-system/profile/etc/ssl/certs/ca-certificates.crt"))
 
           (append-map database-connection-config->environment-variables
                       database-connection-configs)))
