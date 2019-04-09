@@ -57,7 +57,8 @@
       "Rummager bulk-reindex queue listener"))))
 
 (define rummager-govuk-dependencies
-  '(publishing-api))
+  '(publishing-api
+    signon))
 
 (define (environment-variable-pairs->strings environment-variables)
   (map
@@ -166,7 +167,8 @@
     (cons*
      (shepherd-service (documentation "Rummager web service")
                        (provision '(rummager))
-                       (requirement '(elasticsearch))
+                       (requirement '(elasticsearch
+                                      signon))
                        (respawn? #f)
                        (start (rummager-web-start-gexp
                                environment-variables
