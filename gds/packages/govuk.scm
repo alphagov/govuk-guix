@@ -279,7 +279,9 @@ proxies requests to some upstream")
         #:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
-                      ,govuk-admin-template-initialiser))))
+            ,govuk-admin-template-initialiser)
+          (add-after 'install 'replace-database.yml
+            ,(use-blank-database.yml)))))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
      (license license:expat)
@@ -1386,6 +1388,26 @@ content, as well as broadcasting changes to a message queue.")
    #:extra-inputs (list libffi
                         mariadb
                         openssl)))
+
+(define-public search-api
+  (package-with-bundler
+   (bundle-package
+    (hash (base32 "0g81v01ncaqpp6gsn8j1niyf3zq5zvfgrbgs4zdzain0f2jnbngr")))
+   (package
+     (name "search-api")
+     (version "release_46")
+     (source
+      (github-archive
+       #:repository name
+       #:commit-ish version
+       #:hash (base32 "0n438sdmdpacnd3hrmzrlhbw6hn2zrapc3r4prw82f2qxqs5vwc5")))
+     (build-system rails-build-system)
+     (arguments '(#:precompile-rails-assets? #f))
+     (synopsis "Search API for GOV.UK")
+     (description "")
+     (license license:expat)
+     (home-page "https://github.com/alphagov/search-api"))
+   #:extra-inputs (list libffi)))
 
 (define-public service-manual-frontend
   (package-with-bundler

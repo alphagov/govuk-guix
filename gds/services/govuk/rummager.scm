@@ -294,4 +294,4 @@
            (elasticsearch-connection-config)
            (rabbitmq-connection-config (user "rummager")
                                        (password "rummager"))
-           rummager))))
+           search-api))))
