@@ -85,9 +85,9 @@
           (package-name package) (package-version package) new-version))))
 
 (define (refresh-package store package commit? force?)
-  (define (refresh-package-source package version tarball)
+  (define (refresh-package-source package source tarball)
     (update-package-source package
-                           version
+                           source
                            (call-with-input-file
                                tarball
                              port-sha256)))
@@ -103,11 +103,11 @@
 
   (simple-format #t "\nChecking latest release of ~A\n"
                  (package-name package))
-  (let-values (((version tarball changes)
+  (let-values (((version tarball source)
                 (package-update store package updaters)))
     (if (and (let ((source-tarball-changed
                     (if version
-                        (refresh-package-source package version tarball)
+                        (refresh-package-source package source tarball)
                         #f))
                    (bundle-package-changed
                     (if (or version force?)
