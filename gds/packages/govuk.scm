@@ -338,15 +338,15 @@ proxies requests to some upstream")
 (define-public content-performance-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "180l4dzvmm9rbp3la91fxbbv28qm0mvs9lb9qapfafqza6diwg4d")))
+    (hash (base32 "0b3fq397ra8rb35kaz0d519xpcgp9bni44ssl1j47hs80rlky89a")))
    (package
      (name "content-performance-manager")
-     (version "release_1032")
+     (version "release_1033")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1vxfqa6n3a26wha8vx302vwinxb894azk76allkylg9qzlz12nnz")))
+       #:hash (base32 "11da7zjbxazp97dyvlf0sdkdpj2kj672w8ya01cghdwkp6npg3wc")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
