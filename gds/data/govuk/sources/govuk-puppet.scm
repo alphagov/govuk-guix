@@ -73,9 +73,9 @@
 
 (define elasticsearch-indexes
   `(("api-elasticsearch-1.api.integration"
-     ("govuk" . (,rummager-service-type)))
+     ("govuk" . (,search-api-service-type)))
     ("rummager-elasticsearch-1.api.integration"
-     ("govuk" . (,rummager-service-type)))))
+     ("govuk" . (,search-api-service-type)))))
 
 (define (backups-directory)
   (or (and=> (getenv "GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY")
