@@ -1485,16 +1485,16 @@ content, as well as broadcasting changes to a message queue.")
 (define-public signon
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qi1i6sy05rq8igw12n9nyw9ic2ay316rzz7p5va3ssz6b05dldv"))
+    (hash (base32 "1zwm4njscd03kdc0765gwm3040r8a7qjmdfb571m2ir82qb9c4mr"))
     (without '("development" "test")))
    (package
      (name "signon")
-     (version "release_1247")
+     (version "release_1248")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "16vfdc4wxj436n9lfc8p37r924jsah6mgnvzghpqzcvkixa9kj8g")))
+       #:hash (base32 "0mklvw0ar0zw7q2kkcasvpzypdw02jhj5bwr9f6gbz8qv6wszhd5")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
