@@ -1,4 +1,4 @@
-(define-module (gds services govuk rummager)
+(define-module (gds services govuk search-api)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (guix gexp)
@@ -18,7 +18,7 @@
   #:use-module (gds services sidekiq)
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk signon)
-  #:export (rummager-service-type))
+  #:export (search-api-service-type))
 
 (define (queue-listener-shepherd-services package environment-variables)
   (map
@@ -29,12 +29,12 @@
                         (requirement '(redis rabbitmq))
                         (respawn? #f)
                         (start #~(make-forkexec-constructor
-                                  '("/var/apps/rummager/bin/bundle"
+                                  '("/var/apps/search-api/bin/bundle"
                                     "exec"
                                     "rake"
                                     #$(string-append "message_queue:" task))
-                                  #:user (passwd:uid (getpwnam "rummager"))
-                                  #:directory "/var/apps/rummager"
+                                  #:user (passwd:uid (getpwnam "search-api"))
+                                  #:directory "/var/apps/search-api"
                                   #:log-file #$(string-append
                                                 "/var/log/"
                                                 (symbol->string service)
@@ -44,19 +44,19 @@
 
                         (stop #~(make-kill-destructor)))))
 
-   '((rummager-publishing-queue-listener
+   '((search-api-publishing-queue-listener
       "listen_to_publishing_queue"
-      "Rummager publishing queue listener")
+      "Search API publishing queue listener")
 
-     (rummager-publishing-api-queue-listener
+     (search-api-publishing-api-queue-listener
       "insert_data_into_govuk"
-      "Rummager Publishing API queue listener")
+      "Search API Publishing API queue listener")
 
-     (rummager-bulk-reindex-queue-listener
+     (search-api-bulk-reindex-queue-listener
       "bulk_insert_data_into_govuk"
-      "Rummager bulk-reindex queue listener"))))
+      "Search API bulk-reindex queue listener"))))
 
-(define rummager-govuk-dependencies
+(define search-api-govuk-dependencies
   '(publishing-api
     signon))
 
@@ -67,7 +67,7 @@
       #~(string-append #$key "=" #$value)))
    environment-variables))
 
-(define (rummager-environment service-startup-config
+(define (search-api-environment service-startup-config
                               plek-config
                               package
                               database-connection-configs)
@@ -76,29 +76,29 @@
 
           (plek-config->environment-variables
            plek-config
-           #:service-name-whitelist rummager-govuk-dependencies)
+           #:service-name-whitelist search-api-govuk-dependencies)
 
           `(("PATH" . ,(file-append package "/bin"))
             ;; To satisfy pry-byebug
-            ("HOME" . "/var/apps/rummager")
+            ("HOME" . "/var/apps/search-api")
             ("SSL_CERT_FILE" .
              "/run/current-system/profile/etc/ssl/certs/ca-certificates.crt"))
 
           (append-map database-connection-config->environment-variables
                       database-connection-configs)))
 
-(define (rummager-web-start-gexp environment-variables
+(define (search-api-web-start-gexp environment-variables
                                  plek-config
                                  package
                                  run-pre-startup-scripts-program
                                  run-root-pre-startup-scripts)
-  (let* ((pid-file "/tmp/rummager.pid")
+  (let* ((pid-file "/tmp/search-api.pid")
          (start-command
-          `("/var/apps/rummager/bin/bundle"
+          `("/var/apps/search-api/bin/bundle"
             "exec"
             "unicorn"
             "-p" ,(number->string
-                   (service-port-from-plek-config plek-config 'rummager))
+                   (service-port-from-plek-config plek-config 'search-api))
             "-P" ,pid-file)))
 
     #~(lambda args
@@ -115,51 +115,51 @@
                     ((pid
                       (fork+exec-command
                        (list #$run-pre-startup-scripts-program)
-                       #:user (passwd:uid (getpwnam "rummager"))
-                       #:directory "/var/apps/rummager"
+                       #:user (passwd:uid (getpwnam "search-api"))
+                       #:directory "/var/apps/search-api"
                        #:environment-variables environment-variables)))
                   (if (zero? (cdr (waitpid pid)))
                       #t
                       (begin
-                        (display "rummager: pre-startup-scripts failed\n")
+                        (display "search-api: pre-startup-scripts failed\n")
                         #f))))
-               (begin (simple-format #t "starting rummager: ~A\n"
+               (begin (simple-format #t "starting search-api: ~A\n"
                                      start-command)
                       #t)
 
                ((make-forkexec-constructor
                  start-command
-                 #:user (passwd:uid (getpwnam "rummager"))
-                 #:directory "/var/apps/rummager"
+                 #:user (passwd:uid (getpwnam "search-api"))
+                 #:directory "/var/apps/search-api"
                  #:pid-file #$pid-file
                  #:pid-file-timeout 10
-                 #:log-file "/var/log/rummager.log"
+                 #:log-file "/var/log/search-api.log"
                  #:environment-variables environment-variables)))))))
 
-(define (rummager-shepherd-services parameters)
+(define (search-api-shepherd-services parameters)
   (let* ((service-startup-config
           (or (find service-startup-config? parameters)
-              (error "Missing service-startup-config for rummager")))
+              (error "Missing service-startup-config for search-api")))
          (run-pre-startup-scripts-program
           (if (null?
                (service-startup-config-pre-startup-scripts
                 service-startup-config))
               #f
               (program-file
-               (string-append "start-rummager-pre-startup-scripts")
+               (string-append "start-search-api-pre-startup-scripts")
                #~(exit #$(run-pre-startup-scripts-gexp
-                          'rummager
+                          'search-api
                           (service-startup-config-pre-startup-scripts
                            service-startup-config))))))
          (run-root-pre-startup-scripts
           (run-pre-startup-scripts-gexp
-           'rummager
+           'search-api
            (service-startup-config-root-pre-startup-scripts
             service-startup-config)))
          (plek-config (find plek-config? parameters))
          (package (find package? parameters))
          (environment-variables (environment-variable-pairs->strings
-                                 (rummager-environment
+                                 (search-api-environment
                                   service-startup-config
                                   plek-config
                                   package
@@ -167,12 +167,12 @@
                                           parameters)))))
 
     (cons*
-     (shepherd-service (documentation "Rummager web service")
-                       (provision '(rummager))
+     (shepherd-service (documentation "Search API web service")
+                       (provision '(search-api))
                        (requirement '(elasticsearch
                                       signon))
                        (respawn? #f)
-                       (start (rummager-web-start-gexp
+                       (start (search-api-web-start-gexp
                                environment-variables
                                plek-config
                                package
@@ -180,27 +180,27 @@
                                run-root-pre-startup-scripts))
                        (stop #~(make-kill-destructor)))
 
-     (shepherd-service (documentation "Rummager Sidekiq workers")
-                       (provision '(rummager-sidekiq))
+     (shepherd-service (documentation "Search API Sidekiq workers")
+                       (provision '(search-api-sidekiq))
                        (requirement (cons* 'redis 'elasticsearch
-                                           rummager-govuk-dependencies))
+                                           search-api-govuk-dependencies))
                        (respawn? #f)
                        (start (let* ((sidekiq-config (find sidekiq-config?
                                                            parameters))
                                      (config-file (sidekiq-config-file
                                                    sidekiq-config))
-                                     (pid-file "/tmp/rummager-sidekiq.pid"))
+                                     (pid-file "/tmp/search-api-sidekiq.pid"))
                                 #~(make-forkexec-constructor
-                                   '("/var/apps/rummager/bin/bundle"
+                                   '("/var/apps/search-api/bin/bundle"
                                      "exec"
                                      "sidekiq"
                                      #$@(if config-file `("-C" ,config-file) '())
                                      "--pidfile" #$pid-file)
-                                   #:user (passwd:uid (getpwnam "rummager"))
-                                   #:directory "/var/apps/rummager"
+                                   #:user (passwd:uid (getpwnam "search-api"))
+                                   #:directory "/var/apps/search-api"
                                    #:pid-file #$pid-file
                                    #:pid-file-timeout 5
-                                   #:log-file "/var/log/rummager-sidekiq.log"
+                                   #:log-file "/var/log/search-api-sidekiq.log"
                                    #:environment-variables
                                    (list #$@environment-variables))))
                        (stop #~(make-kill-destructor)))
@@ -208,11 +208,11 @@
      (queue-listener-shepherd-services package
                                        environment-variables))))
 
-(define (rummager-activation parameters)
+(define (search-api-activation parameters)
   (define package (find package? parameters))
 
   (define environment-variables
-    (rummager-environment (find service-startup-config?
+    (search-api-environment (find service-startup-config?
                                 parameters)
                           (find plek-config? parameters)
                           package
@@ -220,9 +220,9 @@
                                   parameters)))
 
   #~(let* ((dir (string-append "/tmp/env.d/"))
-           (file (string-append dir "rummager")))
+           (file (string-append dir "search-api")))
 
-      #$(setup-app-directory "rummager" package)
+      #$(setup-app-directory "search-api" package)
 
       (mkdir-p dir)
       (call-with-output-file file
@@ -237,27 +237,27 @@
                                             "\"\n"))
                          environment-variables)))))))
 
-(define rummager-accounts
+(define search-api-accounts
   (const
-   (list (user-account (name "rummager")
+   (list (user-account (name "search-api")
                        (group "nogroup")
                        (system? #t)
                        (home-directory "/var/empty")
                        (shell #~(string-append #$shadow "/sbin/nologin"))))))
 
-(define rummager-service-type
+(define search-api-service-type
   (service-type
-   (name 'rummager)
+   (name 'search-api)
    (extensions
     (modify-service-extensions-for-signon
      name
      (list
       (service-extension shepherd-root-service-type
-                         rummager-shepherd-services)
+                         search-api-shepherd-services)
       (service-extension activation-service-type
-                         rummager-activation)
+                         search-api-activation)
       (service-extension account-service-type
-                         rummager-accounts))))
+                         search-api-accounts))))
    (default-value
      (list (service-startup-config-add-pre-startup-scripts
             (service-startup-config)
@@ -278,11 +278,11 @@
                        "rake" "publishing_api:publish_supergroup_finders")))))
            (redis-connection-config)
            (signon-application
-            (name "Rummager")
+            (name "Search API")
             (supported-permissions '("signin")))
            (signon-api-user
-            (name "Rummager")
-            (email "rummager@guix-dev.gov.uk")
+            (name "Search API")
+            (email "search-api@guix-dev.gov.uk")
             (authorisation-permissions
              (list
               (cons
@@ -292,6 +292,6 @@
            (plek-config)
            (sidekiq-config (file "config/sidekiq.yml"))
            (elasticsearch-connection-config)
-           (rabbitmq-connection-config (user "rummager")
-                                       (password "rummager"))
+           (rabbitmq-connection-config (user "search-api")
+                                       (password "search-api"))
            search-api))))

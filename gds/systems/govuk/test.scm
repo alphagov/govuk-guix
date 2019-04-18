@@ -18,7 +18,7 @@
   #:use-module (gds services utils databases mongodb)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
-  #:use-module (gds services govuk rummager)
+  #:use-module (gds services govuk search-api)
   #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk plek)
@@ -60,7 +60,7 @@
              '(("DISABLE_EMAIL" . "true")))
             parameter))
       parameters))
-    (rummager-service-type
+    (search-api-service-type
      parameters =>
      (map
       (lambda (parameter)

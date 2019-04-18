@@ -15,7 +15,7 @@
   #:use-module (gnu packages guile)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
-  #:use-module (gds services govuk rummager)
+  #:use-module (gds services govuk search-api)
   #:use-module (gds data data-source)
   #:use-module (gds data data-extract)
   #:use-module (gds data tar-extract)

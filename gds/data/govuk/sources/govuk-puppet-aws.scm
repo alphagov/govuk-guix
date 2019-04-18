@@ -18,7 +18,7 @@
   #:use-module (gds systems govuk base)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk signon)
-  #:use-module (gds services govuk rummager)
+  #:use-module (gds services govuk search-api)
   #:use-module (gds services utils databases)
   #:use-module (gds services utils databases postgresql)
   #:use-module (gds data data-source)

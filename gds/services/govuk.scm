@@ -29,7 +29,7 @@
   #:use-module (gds services sidekiq)
   #:use-module (gds services delayed-job)
   #:use-module (gds services govuk signon)
-  #:use-module (gds services govuk rummager)
+  #:use-module (gds services govuk search-api)
   #:use-module (gds services govuk router)
   #:use-module (gds services govuk publishing-e2e-tests)
   #:use-module (gds services rails)
@@ -215,7 +215,7 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(collections))
-            (requirement '(content-store static rummager)))
+            (requirement '(content-store static search-api)))
            (plek-config)
            (rails-app-config)
            collections
@@ -234,7 +234,7 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(draft-collections))
-            (requirement '(draft-content-store draft-static rummager)))
+            (requirement '(draft-content-store draft-static search-api)))
            (plek-config)
            (rails-app-config)
            collections
@@ -650,7 +650,7 @@
             (inherit default-shepherd-service)
             (provision '(finder-frontend))
             (requirement '(content-store
-                           rummager
+                           search-api
                            whitehall ;; For the Worldwide API
                            static
                            memcached)))
@@ -674,7 +674,7 @@
             (inherit default-shepherd-service)
             (provision '(draft-finder-frontend))
             (requirement '(draft-content-store
-                           rummager
+                           search-api
                            whitehall ;; For the Worldwide API
                            draft-static
                            memcached)))
@@ -1022,7 +1022,7 @@
              (list
               (cons
                (signon-authorisation
-                (application-name "Rummager"))
+                (application-name "Search API"))
                '("signin")))))
            (service-startup-config)
            (mysql-connection-config
@@ -1645,7 +1645,7 @@
             (inherit default-shepherd-service)
             (provision '(frontend))
             (requirement '(static
-                           rummager
+                           search-api
                            content-store
                            ;; For publishing special routes
                            publishing-api)))
@@ -1680,7 +1680,7 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(draft-frontend))
-            (requirement '(draft-static rummager draft-content-store)))
+            (requirement '(draft-static search-api draft-content-store)))
            (service-startup-config
             (environment-variables
              '(("GOVUK_APP_NAME" . "draft-frontend"))))
@@ -1844,7 +1844,7 @@
             (provision '(content-tagger))
             (requirement '(publishing-api
                            signon
-                           rummager
+                           search-api
                            email-alert-api)))
            (service-startup-config)
            (signon-application
@@ -1992,7 +1992,7 @@
                            ;; The frontend component of Whitehall uses
                            ;; the content store directly
                            content-store
-                           rummager
+                           search-api
                            email-alert-api
                            signon
                            asset-manager
@@ -2053,7 +2053,7 @@
                '("signin"))
               (cons
                (signon-authorisation
-                (application-name "Rummager"))
+                (application-name "Search API"))
                '("signin"))
               (cons
                (signon-authorisation
@@ -2104,7 +2104,7 @@
    (list (service email-alert-api-service-type)
          (service email-alert-service-type)
          (service imminence-service-type)
-         (service rummager-service-type)
+         (service search-api-service-type)
          (service asset-manager-service-type)
          (service support-api-service-type)
          (service hmrc-manuals-api-service-type)

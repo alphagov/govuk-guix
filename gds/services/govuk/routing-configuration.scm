@@ -99,7 +99,7 @@
    #:aliases aliases))
 
 (define %default-aliases
-  '((rummager . (search))
+  '((search-api . (search))
     (whitehall . (whitehall-admin whitehall-frontend))))
 
 (define* (set-routing-configuration-for-services
