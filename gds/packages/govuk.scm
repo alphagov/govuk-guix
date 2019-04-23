@@ -149,15 +149,15 @@ proxies requests to some upstream")
 (define-public bouncer
   (package-with-bundler
    (bundle-package
-    (hash (base32 "152nv3aac1a7x39yh20q5c1dh42lfkm89j6cqmj5jq42i3ps8p66")))
+    (hash (base32 "0xxfxdglqzd0bnsy4ylxv3hmgcg6rsbl7vpbhx56c3184binrwyn")))
    (package
      (name "bouncer")
-     (version "release_253")
+     (version "release_254")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1nsj895ni8ag7sl2rl2yq5hk9sx8v1sig87f3makl1klaq0bn2bs")))
+       #:hash (base32 "15ay6wk5k2sanc5ricqgvhap7a2jr7z5l87jrlpmxd3panrv3vx5")))
      (build-system rails-build-system)
      (arguments
       '(#:precompile-rails-assets? #f))
