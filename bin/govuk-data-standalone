@@ -36,7 +36,7 @@ def pipe_command(*commands)
   # Development VM, so use /bin/bash explicitly if it exists as bash supports
   # pipefail.
   if File.exist? '/bin/bash'
-    "/bin/bash -c \"#{Shellwords.escape(command)}\""
+    "/bin/bash -c #{Shellwords.escape(command)}"
   else
     # If /bin/bash doesn't exist, fallback to hoping that /bin/sh supports
     # pipefail.
