@@ -11,8 +11,16 @@ eval "$(govuk aws --profile govuk-integration --export)"
 BACKUPS="$GDS_GUIX_GOVUK_PUPPET_BACKUPS_DIRECTORY"
 DATE="$(date '+%Y-%m-%d')"
 
+#
+# Download PostgreSQL and MySQL backups
+#
+
 aws s3 sync s3://govuk-integration-database-backups/postgres/$DATE/ "$BACKUPS/$DATE/postgresql/"
 aws s3 sync s3://govuk-integration-database-backups/mysql/$DATE/ "$BACKUPS/$DATE/mysql/mysql-master/"
+
+#
+# Download MongoDB backups
+#
 
 MONGODB_HOSTNAMES=(router_backend mongo)
 MONGODB_FILES=()
@@ -34,6 +42,10 @@ do
     MONGODB_FILES+=("$FILE_NAME")
 done
 
+#
+# Download PostgreSQL backups from govuk_env_sync
+#
+
 CONTENT_DATA_API_POSTGRESQL_DATABASES=(content_performance_manager_production)
 
 for index in "${!CONTENT_DATA_API_POSTGRESQL_DATABASES[@]}"
@@ -51,6 +63,10 @@ do
 
     aws s3 cp "$SOURCE" "$DEST"
 done
+
+#
+# Re-compress the backups
+#
 
 export XZ_OPT="-9 -T0"
 
