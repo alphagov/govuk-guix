@@ -34,6 +34,24 @@ do
     MONGODB_FILES+=("$FILE_NAME")
 done
 
+CONTENT_DATA_API_POSTGRESQL_DATABASES=(content_performance_manager_production)
+
+for index in "${!CONTENT_DATA_API_POSTGRESQL_DATABASES[@]}"
+do
+    DATABASE="${CONTENT_DATA_API_POSTGRESQL_DATABASES[$index]}"
+
+    LATEST_TIMESTAMP="$(aws s3 ls "s3://govuk-integration-database-backups/content-data-api-postgresql/" \
+      | grep "\\-${DATABASE}" \
+      | tail -1 \
+      | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}')"
+
+    SOURCE="s3://govuk-integration-database-backups/content-data-api-postgresql/${LATEST_TIMESTAMP}-${DATABASE}.gz"
+    DEST="$BACKUPS/postgres/$DATE/$DATABASE.dump.gz"
+    echo "download: $SOURCE to $DEST"
+
+    aws s3 cp "$SOURCE" "$DEST"
+done
+
 export XZ_OPT="-9 -T0"
 
 for index in "${!MONGODB_HOSTNAMES[@]}"
