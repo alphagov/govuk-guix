@@ -37,14 +37,14 @@
 (define-public ruby-govuk-admin-template
   (package
     (name "ruby-govuk-admin-template")
-    (version "6.2.0")
+    (version "6.7.0")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "govuk_admin_template" version))
        (sha256
         (base32
-         "0z14lf1xf7ynarn0kf72rgdjfnhwd56yqzbwzwvp9xgk8mwcmlsf"))))
+         "19wwh1mn1kla8wp3baxq0s58agiik0fbxqli4sn8ymqlrzi86xnd"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f))
