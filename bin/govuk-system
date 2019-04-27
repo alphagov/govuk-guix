@@ -545,7 +545,7 @@
                                    ("development" . ,govuk-development-os))
                                  arg)
                                 (error "Unknown type argument" arg)))
-                           (alist-delete 'type result))
+                           (alist-delete 'base-os result))
                           rest)))
          (option '("signon-user") #t #f
                  (lambda (opt name arg result)
