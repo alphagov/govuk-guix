@@ -43,15 +43,20 @@
  (gds packages utils bundler))
 
 (define updaters
-  (list (@ (guix import github) %github-updater)))
+  (list (@ (guix import github) %github-updater)
+        (@ (guix import gem) %gem-updater)))
 
 (define (all-packages)
   (filter
    package?
-   (module-map
-    (lambda (name var)
-      (variable-ref var))
-    (resolve-interface '(gds packages govuk)))))
+   (append-map
+    (lambda (module)
+      (module-map
+       (lambda (name var)
+         (variable-ref var))
+       (resolve-interface module)))
+    '((gds packages govuk)
+      (gds packages govuk ruby)))))
 
 (define (get-matching-packages args)
   (map (lambda (name)
