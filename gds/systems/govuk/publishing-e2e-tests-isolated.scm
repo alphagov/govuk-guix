@@ -3,7 +3,8 @@
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services networking)
-  #:use-module (gds systems govuk publishing-e2e-tests))
+  #:use-module (gds systems govuk publishing-e2e-tests)
+  #:export (publishing-e2e-tests-isolated-os))
 
 (define publishing-e2e-tests-isolated-os
   (operating-system

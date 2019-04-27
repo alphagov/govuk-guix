@@ -68,6 +68,7 @@
  (gds services utils databases)
  (gds systems utils)
  (gds systems govuk base)
+ (gds systems govuk production)
  (gds systems govuk development)
  (gds scripts govuk system available-services))
 
@@ -98,6 +99,7 @@
                                      (writable? #t)))))
             '())
       (rails-environment . "development")
+      (base-os . ,govuk-development-os)
       (host-name . "dev.gov.uk")
       (use-high-ports? . #t)
       (use-https? . #f)
@@ -146,6 +148,7 @@
                     draft-frontend-services))))
 
 (define* (operating-system-for-services
+          base-os
           host-name
           services
           rails-environment
@@ -192,15 +195,15 @@
              '())
        ,@(map service-kind base-services))))
 
-  (define base-system
+  (define minimal-base-os
     (update-system-services-package-source
      (filter pair? parsed-services)
      (system-without-unnecessary-services
       (filter
        (lambda (service)
          (member (service-kind service) required-service-types))
-       (operating-system-user-services govuk-development-os))
-      govuk-development-os)))
+       (operating-system-user-services base-os))
+      base-os)))
 
   (define routing-configuration-arguments
     `(#:use-high-ports? ,use-high-ports
@@ -213,7 +216,7 @@
 
   (define plek-config
     (apply plek-config-from-routing-configuration-arguments
-           (operating-system-user-services base-system)
+           (operating-system-user-services minimal-base-os)
            routing-configuration-arguments))
 
   (define database-service-ports
@@ -356,12 +359,12 @@
       (apply compose (reverse service-setup-functions))))
 
   (operating-system
-   (inherit base-system)
+   (inherit minimal-base-os)
    (host-name host-name)
    (hosts-file (plek-config->hosts-file plek-config))
    (packages (useful-packages))
    (services (set-services-configuration
-              (operating-system-user-services base-system)))))
+              (operating-system-user-services minimal-base-os)))))
 
 (define (default-signon-user-permissions services)
   (map
@@ -521,6 +524,28 @@
                                           (error "Unknown type argument" arg))
                                       (alist-delete 'type result))
                           rest)))
+         (option '("base-os") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons
+                           'base-os
+                           (force
+                            (or (assoc-ref
+                                 `(("production" . ,govuk-production-os)
+                                   ("test" .
+                                    ,(delay (@ (gds systems govuk test) govuk-test-os)))
+                                   ("publishing-e2e-tests" .
+                                    ,(delay (@ (gds systems govuk publishing-e2e-tests)
+                                               publishing-e2e-tests-os)))
+                                   ("publishing-e2e-tests-isolated" .
+                                    ,(delay
+                                       (@ (gds systems govuk publishing-e2e-tests-isolated)
+                                          publishing-e2e-tests-isolated-os)))
+                                   ("development" . ,govuk-development-os))
+                                 arg)
+                                (error "Unknown type argument" arg)))
+                           (alist-delete 'type result))
+                          rest)))
          (option '("signon-user") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'signon-users
@@ -568,6 +593,7 @@
           #:key
           default-read-bundle-install-input-as-tar-archive?)
   (operating-system-for-services
+   (assq-ref opts 'base-os)
    (assq-ref opts 'host-name)
    (option-values opts 'argument)
    (assq-ref opts 'rails-environment)
