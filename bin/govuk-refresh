@@ -77,7 +77,10 @@
   (let ((name "Package Updater")
         (email "govuk-guix-package-updater@digital.cabinet-office.gov.uk")
         (repo-location (dirname (dirname (current-filename)))))
-    (run "git" "-C" repo-location "add" "gds/packages/govuk.scm")
+    (run "git" "-C" repo-location
+         "add"
+         "gds/packages/govuk.scm"
+         "gds/packages/govuk/ruby.scm")
     (setenv "GIT_COMMITTER_NAME" name)
     (setenv "GIT_COMMITTER_EMAIL" email)
     (run "git"
