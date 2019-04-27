@@ -543,6 +543,8 @@
                                     ,(delay
                                        (@ (gds systems govuk publishing-e2e-tests-isolated)
                                           publishing-e2e-tests-isolated-os)))
+                                   ("aws" .
+                                    ,(delay (@ (gds systems govuk aws) govuk-aws-os)))
                                    ("development" . ,govuk-development-os))
                                  arg)
                                 (error "Unknown type argument" arg)))
