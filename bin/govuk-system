@@ -519,6 +519,7 @@
                                            arg
                                            '("vm-image-and-system"
                                              "vm-start-script"
+                                             "disk-image"
                                              "container-start-script"))
                                           (string->symbol arg)
                                           (error "Unknown type argument" arg))
@@ -720,6 +721,23 @@
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
+(define (disk-image os opts)
+  (with-store store
+    (set-build-options-from-command-line store opts)
+
+    (run-with-store store
+      (mbegin %store-monad
+        (set-grafting #f)
+        (mlet* %store-monad
+            ((item (system-disk-image
+                    (alter-services-for-vm os)
+                    #:name "disk-image"
+                    #:disk-image-size 'guess)))
+
+          (mbegin %store-monad
+            (built-derivations (list item))
+            (return (derivation->output-path item))))))))
+
 (define (vm-start-script os opts)
   (with-store store
     (set-build-options-from-command-line store opts)
@@ -805,12 +823,14 @@
                 (assq-ref
                  '((vm-image-and-system . #t)
                    (vm-start-script . #t)
-                   (container-start-script . #f))
+                   (container-start-script . #f)
+                   (disk-image . #f))
                  type)))
          (build-function
           (assq-ref
            `((vm-image-and-system . ,vm-image-and-system)
              (vm-start-script . ,vm-start-script)
+             (disk-image . ,disk-image)
              (container-start-script . ,container-start-script))
            type))
          (output (build-function os opts)))
