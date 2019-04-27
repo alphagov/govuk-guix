@@ -10,20 +10,20 @@
 (define-public ruby-bootstrap-sass
   (package
     (name "ruby-bootstrap-sass")
-    (version "3.3.5.1") ; ruby-govuk-admin-template requires this version
+    (version "3.4.1") ; ruby-govuk-admin-template requires this version
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "bootstrap-sass" version))
        (sha256
         (base32
-         "0bx2bbsd2dandxax9b0by351wa1ab9hysc1f8p5i7ssqz4ayr8jv"))))
+         "1py78mv97c1m2w59s1h7fvs34j4hh66yln5275537a5hbr9p6ims"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f))
     (propagated-inputs
      `(("ruby-autoprefixer-rails" ,ruby-autoprefixer-rails)
-       ("ruby-sass" ,ruby-sass)))
+       ("ruby-sassc" ,ruby-sassc)))
     (synopsis "Sass-powered version of Bootstrap 3")
     (description
      "bootstrap-sass is a Sass-powered version of Bootstrap 3, ready to drop right into your Sass powered applications.")
