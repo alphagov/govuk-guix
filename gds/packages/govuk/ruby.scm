@@ -87,14 +87,14 @@
 (define-public ruby-govuk-taxonomy-helpers
   (package
     (name "ruby-govuk-taxonomy-helpers")
-    (version "0.1.1")
+    (version "1.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "govuk_taxonomy_helpers" version))
        (sha256
         (base32
-         "0bgydkscj03121pg47msyhwyim67lhzxlj7kkjjr6m263j8r03gp"))))
+         "0sshqz1viwm6drql9rcfk7056ajxw5vnfpv5m3zs90ab0miphin7"))))
     (build-system ruby-build-system)
     (arguments
      '(#:test-target "spec"))
