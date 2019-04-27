@@ -99,6 +99,7 @@
                                      (writable? #t)))))
             '())
       (rails-environment . "development")
+      (type . container-start-script)
       (base-os . ,govuk-development-os)
       (host-name . "dev.gov.uk")
       (use-high-ports? . #t)
@@ -815,8 +816,7 @@
 
 (define (build . args)
   (let* ((opts (parse-command-line args options (list %default-options)))
-         (type (or (assq-ref opts 'type)
-                   'container-start-script))
+         (type (assq-ref opts 'type))
          (os   (opts->operating-system
                 opts
                 #:default-read-bundle-install-input-as-tar-archive?
@@ -860,8 +860,7 @@
        (apply system* command))))
 
   (let* ((opts (parse-command-line args options (list %default-options)))
-         (type (or (assq-ref opts 'type)
-                     'container-start-script))
+         (type (assq-ref opts 'type))
          (start-script-builder
           (or (assq-ref `((vm-start-script . ,vm-start-script)
                           (container-start-script . ,container-start-script))
