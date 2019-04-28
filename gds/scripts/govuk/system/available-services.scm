@@ -10,6 +10,7 @@
   #:use-module (gnu system)
   #:use-module (gds services govuk)
   #:use-module (gds systems govuk development)
+  #:use-module (gds scripts utils)
   #:export (available-services))
 
 (define (shepherd-services service)
@@ -135,8 +136,8 @@
               (newline))
             govuk-services))
 
-(define (available-services . args)
-  (if (and (eq? (length args) 1)
-           (string=? (car args) "--json"))
+(define (available-services opts)
+  (if (option-value opts #:json-output?
+                    #:default #f)
       (display-available-services-in-json)
       (display-available-services)))
