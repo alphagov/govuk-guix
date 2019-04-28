@@ -712,6 +712,10 @@ service setup.")
     (arguments
      '(#:phases
        (modify-phases %standard-phases
+         (add-before 'build 'set-GUILE_WARN_DEPRECATED
+           (lambda _
+             (setenv "GUILE_WARN_DEPRECATED" "detailed")
+             #t))
          (add-after 'build 'install-bin
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((out (assoc-ref outputs "out")))
