@@ -1680,12 +1680,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "07s1f385hyyfhpnbsij6r12i2b6d3w2gfcb1gs07aza8gqvl0vy0")))
    (package
      (name "support")
-     (version "release_826")
+     (version "release_827")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dd3cad026qpws0hk0xmm3mpbnim5f8qbdrx624l2xp3fchb60mp")))
+       #:hash (base32 "0w22hdrhm3lx8bc2m2j0a8sgg19saak21gfp68m72akcix2r3l57")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
