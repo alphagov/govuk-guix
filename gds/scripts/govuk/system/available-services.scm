@@ -137,7 +137,6 @@
             govuk-services))
 
 (define (available-services opts)
-  (if (option-value opts #:json-output?
-                    #:default #f)
+  (if (option-value opts 'json-output? #:default #f)
       (display-available-services-in-json)
       (display-available-services)))
