@@ -760,7 +760,6 @@ service setup.")
                                           module-dir)))
                  `("GOVUK_EXEC_PATH" suffix
                    (,(string-append out "/share/govuk-guix/bin")))
-                 `("GUIX_PACKAGE_PATH" = (,module-dir))
                  `("GUIX_UNINSTALLED" = ("true")))
 
                (wrap-program (string-append
