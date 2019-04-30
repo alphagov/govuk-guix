@@ -553,15 +553,15 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "15yhx5jj6s1s3zp09j7n5lbagzni42j7w0h7k5zik7y91b09vmpx")))
+    (hash (base32 "185d8ih32565lz810razjmpjnxws26k0qhwv730syfn6syz0n2mj")))
    (package
      (name "finder-frontend")
-     (version "release_936")
+     (version "release_937")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0mx6xxypgbj1lplzwa1b35n2v1khm9ix34g7074y6a1wpg650dvi")))
+       #:hash (base32 "1xymsnr27jbqxkhbjckz8f22b0crrmqwr77b374pvgm7cbxshgqq")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
