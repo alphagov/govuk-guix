@@ -62,8 +62,7 @@ def aws_s3_download_and_unpack_tar(target, directory, size)
   FileUtils.mkdir_p temp_directory
 
   command = pipe_command(
-    'govuk aws --profile govuk-integration --',
-    "aws s3 cp #{target} -",
+    "govuk aws --profile govuk-integration -- aws s3 cp #{target} -",
     "pv --size=#{size}",
     'xz -d -T0',
     "tar --extract --directory #{temp_directory}"
