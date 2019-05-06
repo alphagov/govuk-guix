@@ -69,9 +69,9 @@
              parameter
              `((create-all-indices
                 . ,#~(lambda ()
-                       (setenv "RUMMAGER_INDEX" "all")
+                       (setenv "SEARCH_INDEX" "all")
                        (run-command "bundle" "exec" "rake"
-                                    "rummager:create_all_indices")))))
+                                    "search:create_all_indices")))))
             parameter))
       parameters))
     (router-service-type
