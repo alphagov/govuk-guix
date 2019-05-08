@@ -233,6 +233,7 @@
                                            '("vm-image-and-system"
                                              "vm-start-script"
                                              "aws-packer-template"
+                                             "aws-packer-ami"
                                              "disk-image"
                                              "container-start-script"))
                                           (string->symbol arg)

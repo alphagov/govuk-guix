@@ -6,9 +6,12 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages disk)
+  #:use-module (gnu packages golang)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages linux)
-  #:export (packer-template-for-disk-image))
+  #:export (packer-template-for-disk-image
+
+            packer-build-template-script))
 
 (define-record-type* <packer-template>
   packer-template make-packer-template
@@ -186,6 +189,14 @@
                  port)
                 (display "\n" port)))))
       #:local-build? #t))))
+
+(define (packer-build-template-script template)
+  (gexp->script
+   "build-packer-template"
+   #~(execl
+      #$(file-append packer "/bin/packer")
+      "build"
+      #$template)))
 
 (define (builder-for-disk-image disk-image)
   (packer-amazon-chroot-builder

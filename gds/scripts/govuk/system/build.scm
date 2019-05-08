@@ -1,4 +1,5 @@
 (define-module (gds scripts govuk system build)
+  #:use-module (srfi srfi-1)
   #:use-module (guix derivations)
   #:use-module (guix grafts)
   #:use-module (guix monads)
@@ -92,6 +93,46 @@
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
+(define (aws-packer-ami os opts)
+  (define (sudo-path)
+    (find
+     file-exists?
+     '("/run/setuid-programs/sudo"
+       "/usr/bin/sudo")))
+
+  (define (run . args)
+    (let ((command
+           (if (eq? (getuid) 1)
+               args
+               (cons (sudo-path) args))))
+      (format #t "Running command:~%  ~a~2%" (string-join command " "))
+      (apply execl
+             (first command)
+             (first command)
+             command)))
+
+  (define build-packer-template-script
+    (with-store store
+      (set-build-options-from-command-line store opts)
+
+      (run-with-store store
+        (mbegin %store-monad
+          (set-grafting #f)
+          (mlet* %store-monad
+              ((item (packer-build-template-script
+                      (packer-template-for-disk-image
+                       ((system-disk-image
+                         (alter-services-for-vm os)
+                         #:name "disk-image"
+                         #:disk-image-size 'guess)
+                        store)))))
+
+            (mbegin %store-monad
+              (built-derivations (list item))
+              (return (derivation->output-path item))))))))
+
+  (run build-packer-template-script))
+
 (define (build opts)
   (let* ((type (assq-ref opts 'type))
          (os   (opts->operating-system
@@ -101,6 +142,7 @@
                  '((vm-image-and-system . #t)
                    (vm-start-script . #t)
                    (aws-packer-template . #f)
+                   (aws-packer-ami . #f)
                    (container-start-script . #f)
                    (disk-image . #f))
                  type)))
@@ -109,6 +151,7 @@
            `((vm-image-and-system . ,vm-image-and-system)
              (vm-start-script . ,vm-start-script)
              (aws-packer-template . ,aws-packer-template)
+             (aws-packer-ami . ,aws-packer-ami)
              (disk-image . ,disk-image)
              (container-start-script . ,container-start-script))
            type))
