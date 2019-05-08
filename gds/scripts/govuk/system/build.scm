@@ -104,10 +104,9 @@
     (let ((command
            (if (eq? (getuid) 1)
                args
-               (cons (sudo-path) args))))
+               (cons* (sudo-path) "-E" args))))
       (format #t "Running command:~%  ~a~2%" (string-join command " "))
       (apply execl
-             (first command)
              (first command)
              command)))
 
