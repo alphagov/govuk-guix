@@ -8,6 +8,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system vm)
   #:use-module (gnu system file-systems)
+  #:use-module (gds systems utils packer)
   #:use-module (gds scripts govuk system)
   #:export (build))
 
@@ -71,6 +72,26 @@
             (built-derivations (list item))
             (return (derivation->output-path item))))))))
 
+(define (aws-packer-template os opts)
+  (with-store store
+    (set-build-options-from-command-line store opts)
+
+    (run-with-store store
+      (mbegin %store-monad
+        (set-grafting #f)
+        (mlet* %store-monad
+            ((item (lower-object
+                    (packer-template-for-disk-image
+                     ((system-disk-image
+                       (alter-services-for-vm os)
+                       #:name "disk-image"
+                       #:disk-image-size 'guess)
+                      store)))))
+
+          (mbegin %store-monad
+            (built-derivations (list item))
+            (return (derivation->output-path item))))))))
+
 (define (build opts)
   (let* ((type (assq-ref opts 'type))
          (os   (opts->operating-system
@@ -79,6 +100,7 @@
                 (assq-ref
                  '((vm-image-and-system . #t)
                    (vm-start-script . #t)
+                   (aws-packer-template . #f)
                    (container-start-script . #f)
                    (disk-image . #f))
                  type)))
@@ -86,6 +108,7 @@
           (assq-ref
            `((vm-image-and-system . ,vm-image-and-system)
              (vm-start-script . ,vm-start-script)
+             (aws-packer-template . ,aws-packer-template)
              (disk-image . ,disk-image)
              (container-start-script . ,container-start-script))
            type))

@@ -232,6 +232,7 @@
                                            arg
                                            '("vm-image-and-system"
                                              "vm-start-script"
+                                             "aws-packer-template"
                                              "disk-image"
                                              "container-start-script"))
                                           (string->symbol arg)
