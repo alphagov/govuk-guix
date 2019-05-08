@@ -195,6 +195,7 @@
    "build-packer-template"
    #~(execl
       #$(file-append packer "/bin/packer")
+      "packer" ;; This argument is used at the name of the script
       "build"
       #$template)))
 
