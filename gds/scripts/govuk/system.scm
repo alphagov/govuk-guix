@@ -11,6 +11,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services web)
+  #:use-module (gnu services ssh)
   #:use-module (gnu services networking)
   #:use-module (gnu system)
   #:use-module (gnu system vm)
@@ -28,6 +29,7 @@
   #:use-module (gds services utils databases)
   #:use-module (gds systems utils)
   #:use-module (gds systems govuk base)
+  #:use-module (gds systems govuk aws)
   #:use-module (gds scripts utils)
   #:export (vm-start-script
             container-start-script
@@ -125,12 +127,16 @@
            (type type))
          parsed-services))
 
-  (define required-service-types
+  (define service-types-to-keep
     (append
      (if (null? service-types)
          (map service-kind %default-services)
          service-types)
-     `(,govuk-nginx-service-type
+     `(;; These service types are used by the aws system
+       ,aws-pubkey-service-type
+       ,openssh-service-type
+       ;; Nothing requires NGinx, but it's needed
+       ,govuk-nginx-service-type
        ;; Only include the authenticating proxy if needed
        ,@(if (any (lambda (draft-frontend-service-type)
                     (memq draft-frontend-service-type service-types))
@@ -153,7 +159,7 @@
      (system-without-unnecessary-services
       (filter
        (lambda (service)
-         (member (service-kind service) required-service-types))
+         (member (service-kind service) service-types-to-keep))
        (operating-system-user-services base-os))
       base-os)))
 
