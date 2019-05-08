@@ -5,6 +5,7 @@
   #:use-module (gnu)
   #:use-module (gnu packages guile)
   #:use-module (gnu services shepherd)
+  #:use-module (gnu services ssh)
   #:use-module (gds systems govuk production)
   #:export (aws-pubkey-service-type
             govuk-aws-os))
@@ -81,6 +82,12 @@ AWS EC2.")
                  (bootloader grub-bootloader)
                  (target "/dev/xvdf")))
 
+    (kernel-arguments
+     '("quiet"
+       ;; The following argument makes the "System Log" work on the AWS
+       ;; website
+       "console=ttyS0"))
+
     (file-systems (cons (file-system
                           (device (file-system-label "my-root"))
                           (mount-point "/")
@@ -98,5 +105,14 @@ AWS EC2.")
                   (home-directory "/home/govuk"))
                  %base-user-accounts))
 
+    (sudoers-file (plain-file
+                   "sudoers"
+                   (string-append
+                    "root ALL=(ALL) ALL\n"
+                    "%wheel ALL=(ALL) NOPASSWD:ALL\n")))
+
     (services (cons* (service aws-pubkey-service-type)
+                     (service openssh-service-type
+                              (openssh-configuration
+                               (password-authentication? #f)))
                      (operating-system-user-services govuk-production-os)))))
