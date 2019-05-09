@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+USAGE = <<~FOO
+  usage:
+
+  govuk config key [value]
+FOO
+
+def config_file
+  @config_file ||= begin
+    directory = ENV.fetch('XDG_CONFIG_HOME', "#{Dir.home}/.config")
+
+    File.join(directory, 'config.yaml')
+  end
+end
+
+def set(key, value)
+  if File.exist? config_file
+    config = YAML::load_file(config_file)
+  else
+    config = {}
+  end
+
+  config[key] = value
+
+  File.write(config_file, config.to_yaml)
+end
+
+def get(key)
+  YAML::load_file(config_file)[key]
+end
+
+def main
+  key, value, *_rest = ARGV
+
+  unless key
+    STDERR.puts USAGE
+    exit 1
+  end
+
+  if value
+    set key, value
+
+    STDERR.puts "#{key} set to #{value}"
+  else
+    puts get(key)
+  end
+
+  exit 0
+end
+
+main
