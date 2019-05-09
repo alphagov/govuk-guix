@@ -1,0 +1,743 @@
+#!/usr/bin/env ruby
+
+require 'uri'
+require 'yaml'
+require 'open3'
+require 'socket'
+require 'timeout'
+require 'optparse'
+
+USAGE_BANNER = 'Usage: govuk connect TYPE TARGET [options]'
+
+EXAMPLES = <<~EXAMPLES
+  For example:
+
+    govuk connect app-console --environment staging publishing-api
+
+EXAMPLES
+
+RABBITMQ_PORT = 15672
+SIDEKIQ_MONITORING_PORT = 3211
+
+JUMPBOXES = {
+  ci: {
+    carrenza: 'ci-jumpbox.integration.publishing.service.gov.uk',
+  },
+  integration: {
+    aws: 'jumpbox.integration.publishing.service.gov.uk',
+  },
+  staging: {
+    carrenza: 'jumpbox.staging.publishing.service.gov.uk',
+    aws: 'jumpbox.staging.govuk.digital',
+  },
+  production: {
+    carrenza: 'jumpbox.publishing.service.gov.uk',
+    aws: 'jumpbox.production.govuk.digital',
+  }
+}
+
+def log(message)
+  STDERR.puts message if $verbose
+end
+
+def bold(string)
+  "\e[1m#{string}\e[0m"
+end
+
+def newline
+  STDERR.puts
+end
+
+def info(message)
+  STDERR.puts message
+end
+
+def error(message)
+  STDERR.puts "\e[1m\e[31m#{message}\e[0m"
+end
+
+# From Rosetta Code: https://rosettacode.org/wiki/Levenshtein_distance#Ruby
+def levenshtein_distance(a, b)
+  a, b = a.downcase, b.downcase
+  costs = Array(0..b.length) # i == 0
+  (1..a.length).each do |i|
+    costs[0], nw = i, i - 1  # j == 0; nw is lev(i-1, j)
+    (1..b.length).each do |j|
+      costs[j], nw = [
+        costs[j] + 1, costs[j-1] + 1,
+        a[i-1] == b[j-1] ? nw : nw + 1
+      ].min, costs[j]
+    end
+  end
+  costs[b.length]
+end
+
+def strings_similar_to(target, strings)
+  strings.select do |s|
+    levenshtein_distance(s, target) <= 3 # No specific reasoning for this value
+  end
+end
+
+def port_free?(port)
+  # No idea how well this works, but it's hopefully better than nothing
+
+  log "debug: checking if port #{port} is free"
+  Socket.tcp('127.0.0.1', port, connect_timeout: 0.1) {}
+  false
+rescue Errno::ETIMEDOUT
+  log "debug: port #{port} doesn't seem to be free"
+  false
+rescue Errno::ECONNREFUSED
+  log "debug: port #{port} is free"
+  true
+end
+
+def random_free_port
+  tries = 0
+
+  while tries <= 10
+    port = rand(32768...61000)
+
+    return port if port_free? port
+
+    tries += 1
+  end
+
+  raise "couldn't find open port"
+end
+
+def hosting_providers
+  JUMPBOXES
+    .map { |env, jumpboxes| jumpboxes.keys }
+    .flatten
+    .uniq
+end
+
+def jumpbox_for_environment_and_hosting(environment, hosting)
+  raise 'missing environment' unless environment
+  raise 'missing hosting' unless hosting
+
+  jumpbox = JUMPBOXES[environment][hosting]
+
+  unless jumpbox
+    error "error: couldn't determine jumpbox for #{hosting}/#{environment}"
+    exit 1
+  end
+
+  jumpbox
+end
+
+def single_hosting_provider_for_environment(environment)
+  jumpboxes = JUMPBOXES[environment]
+
+  if jumpboxes.size == 1
+    jumpboxes.keys[0]
+  else
+    false
+  end
+end
+
+def config_file
+  @config_file ||= begin
+    directory = ENV.fetch('XDG_CONFIG_HOME', "#{Dir.home}/.config")
+
+    File.join(directory, 'config.yaml')
+  end
+end
+
+def ssh_username
+  @ssh_username ||= begin
+    if File.exist? config_file
+      config_ssh_username = YAML::load_file(config_file)['ssh_username']
+    end
+
+    config_ssh_username or ENV['USER']
+  end
+end
+
+def user_at_host(user, host)
+  "#{user}@#{host}"
+end
+
+def govuk_node_list_classes(environment, hosting)
+  log "debug: looking up classes in #{hosting}/#{environment}"
+  command = [
+    'ssh',
+    '-o', 'ConnectTimeout=2', # Show a failure quickly
+    user_at_host(
+      ssh_username,
+      jumpbox_for_environment_and_hosting(environment, hosting)
+    ),
+    "govuk_node_list --classes",
+  ].join(' ')
+
+  log "debug: running command: #{command}"
+  output, status = Open3.capture2(command)
+
+  unless status.success?
+    error "\nerror: command failed: #{command}"
+    exit 1
+  end
+
+  classes = output.split("\n").sort
+
+  log "debug: classes:"
+  classes.each { |c| log " - #{c}" }
+
+  classes
+end
+
+def get_domains_for_node_class(target, environment, hosting, ssh_username)
+  command = [
+    'ssh',
+    '-o', 'ConnectTimeout=2', # Show a failure quickly
+    user_at_host(
+      ssh_username,
+      jumpbox_for_environment_and_hosting(environment, hosting)
+    ),
+    "govuk_node_list -c #{target}",
+  ].join(' ')
+
+  output, status = Open3.capture2(command)
+
+  unless status.success?
+    error "error: command failed: #{command}"
+    exit 1
+  end
+
+  output.split("\n").sort
+end
+
+def govuk_directory
+  File.dirname(File.dirname(File.dirname(__FILE__)))
+end
+
+def govuk_developer_docs_applications_data
+  log 'debug: fetching the govuk-developer-docs application data'
+
+  applications_yml_file = File.join(
+    govuk_directory,
+    'govuk-developer-docs',
+    'data',
+    'applications.yml'
+  )
+
+  YAML::load_file(applications_yml_file)
+end
+
+def govuk_puppet_node_class_data(environment, hosting)
+  log "debug: fetching govuk-puppet node class data for #{hosting} #{environment}"
+
+  local_hieradata_root = File.join(
+    govuk_directory,
+    'govuk-puppet',
+    {
+      carrenza: 'hieradata',
+      aws: 'hieradata_aws'
+    }[hosting]
+  )
+
+  hieradata_file = File.join(local_hieradata_root, "#{environment}.yaml")
+  log "debug: reading #{hieradata_file}"
+
+  environment_specific_hieradata = YAML::load_file(hieradata_file)
+
+  if environment_specific_hieradata['node_class']
+    environment_specific_hieradata['node_class']
+  else
+    common_hieradata = YAML::load_file(
+      File.join(local_hieradata_root, 'common.yaml')
+    )
+
+    common_hieradata['node_class']
+  end
+end
+
+def node_classes_for_environment_and_hosting(environment, hosting)
+  govuk_puppet_node_class_data(
+    environment,
+    hosting
+  ).map do |node_class, _data|
+    node_class
+  end
+end
+
+def node_class_for_app(app_name, environment, hosting)
+  log "debug: finding node class for #{app_name} in #{hosting} #{environment}"
+
+  node_class_data = govuk_puppet_node_class_data(
+    environment,
+    hosting
+  )
+
+  app_lookup_hash = {}
+  node_class_data.each do |node_class, data|
+    data['apps'].each do |app|
+      app_lookup_hash[app] = node_class
+    end
+  end
+
+  node_class = app_lookup_hash[app_name]
+
+  log "debug: node class: #{node_class}"
+
+  node_class
+end
+
+def hosting_for_target_and_environment(target, environment)
+  hosting = single_hosting_provider_for_environment(
+    environment
+  )
+
+  unless hosting
+    hosting, name, _number = parse_hosting_name_and_number(target)
+
+    unless hosting
+      hosting = hosting_for_node_type(name, environment)
+    end
+  end
+
+  hosting
+end
+
+def hosting_for_node_type(node_type, environment)
+  log "debug: Looking up hosting for node_type: #{node_type}"
+  hosting = single_hosting_provider_for_environment(environment)
+
+  return hosting if hosting
+
+  aws_node_types = govuk_node_list_classes(environment, :aws)
+  carrenza_node_types = govuk_node_list_classes(environment, :carrenza)
+
+  if (
+    aws_node_types.include?(node_type) &&
+    carrenza_node_types.include?(node_type)
+  )
+    error "error: ambiguous hosting for #{node_type} in #{environment}"
+    newline
+    info "specify the hosting provider and node type, for example: "
+    info "\n  govuk connect ssh aws/#{node_type}\n\n"
+
+    exit 1
+  elsif aws_node_types.include?(node_type)
+    :aws
+  elsif carrenza_node_types.include?(node_type)
+    :carrenza
+  else
+    error "error: couldn't find #{node_type} in #{environment}"
+
+    all_node_types = (aws_node_types + carrenza_node_types).uniq.sort
+    similar_node_types = strings_similar_to(node_type, all_node_types)
+
+    if similar_node_types.any?
+      info "\ndid you mean:"
+      similar_node_types.each { |s| info " - #{s}" }
+    else
+      info "\nall node types:"
+      all_node_types.each { |s| info " - #{s}" }
+    end
+
+    exit 1
+  end
+end
+
+def hosting_for_app(app_name, environment)
+  log "debug: finding hosting for #{app_name} in #{environment}"
+
+  hosting = single_hosting_provider_for_environment(environment)
+
+  if hosting
+    log "debug: this environment has a single hosting provider: #{hosting}"
+    return hosting
+  end
+
+  app_data = govuk_developer_docs_applications_data.find do |data|
+    key = (data.key? 'puppet_name') ? 'puppet_name' : 'github_repo_name'
+
+    data[key] == app_name
+  end
+
+  unless app_data
+    error "error: unknown hosting for #{app_name} in #{environment}"
+    exit 1
+  end
+
+  hosting = app_data['production_hosted_on']
+
+  if hosting == 'aws'
+    log "debug: #{app_name} is hosted in AWS"
+
+    :aws
+  elsif hosting == 'carrenza'
+    log "debug: #{app_name} is hosted in Carrenza"
+
+    :carrenza
+  else
+    error "error: unknown hosting value '#{hosting}' for #{app_name}"
+    exit 1
+  end
+end
+
+def app_console(target, environment)
+  hosting, name, number = parse_hosting_name_and_number(target)
+
+  info "Connecting to the app console for #{bold(name)},\
+ in the #{bold(environment)} environment"
+
+  if hosting
+    info "The selected hosting provider is #{bold(hosting)}"
+  else
+    hosting = hosting_for_app(name, environment)
+
+    info "The relevant hosting provider is #{bold(hosting)}"
+  end
+
+  node_class = node_class_for_app(
+    name,
+    environment,
+    hosting
+  )
+
+  info "The relevant node class is #{bold(node_class)}"
+
+  ssh(
+    {
+      hosting: hosting,
+      name: node_class,
+      number: number
+    },
+    environment,
+    command: "govuk_app_console #{name}"
+  )
+end
+
+def app_dbconsole(target, environment)
+  hosting, name, number = parse_hosting_name_and_number(target)
+
+  unless hosting
+    hosting = hosting_for_app(name, environment)
+  end
+
+  ssh(
+    {
+      hosting: hosting,
+      name: node_class_for_app(
+        name,
+        environment,
+        hosting
+      ),
+      number: number,
+    },
+    environment,
+    command: "govuk_app_dbconsole #{name}"
+  )
+end
+
+def ssh(
+      target,
+      environment,
+      command: false,
+      port_forward: false
+    )
+  log "debug: ssh to #{target} in #{environment}"
+
+  # Split something like aws/backend:2 in to :aws, 'backend', 2
+  hosting, name, number = parse_hosting_name_and_number(target)
+
+  # The hosting might not have been provided, so check if necessary
+  hosting ||= hosting_for_target_and_environment(target, environment)
+
+  if name.end_with?('.internal', '.gov.uk')
+    ssh_target = name
+  else
+    domains = get_domains_for_node_class(
+      name,
+      environment,
+      hosting,
+      ssh_username
+    )
+
+    if domains.length == 1
+      ssh_target = domains.first
+
+      info "There is #{bold('one machine')} to connect to"
+    else
+      n_machines = bold("#{domains.length} machines")
+      info "There are #{n_machines} of this class"
+
+      if number
+        ssh_target = domains[number - 1]
+        info "Connecting to number #{number}"
+      else
+        ssh_target = domains.sample
+        info "Connecting to a random machine (number #{domains.find_index(ssh_target) + 1})"
+      end
+    end
+  end
+
+  ssh_command = [
+    'ssh',
+    '-J', user_at_host(
+      ssh_username,
+      jumpbox_for_environment_and_hosting(environment, hosting)
+    ),
+    user_at_host(
+      ssh_username,
+      ssh_target
+    )
+  ]
+
+  if command
+    ssh_command += [
+      '-t', # Force tty allocation so that interactive commands work
+      command
+    ]
+  elsif port_forward
+    localhost_port = random_free_port
+
+    ssh_command += [
+      '-N',
+      '-L', "#{localhost_port}:127.0.0.1:#{port_forward}"
+    ]
+
+    info "Port forwarding setup, access:\n\n  http://127.0.0.1:#{localhost_port}/\n\n"
+  end
+
+  info "\n#{bold('Running command:')} #{ssh_command.join(' ')}\n\n"
+
+  exec(*ssh_command)
+end
+
+def rabbitmq_root_password_command(hosting, environment)
+  hieradata_directory = {
+    aws: 'puppet_aws',
+    carrenza: 'puppet'
+  }[hosting]
+
+  directory = File.join(
+    govuk_directory,
+    'govuk-secrets',
+    hieradata_directory
+  )
+
+  "cd #{directory} && rake eyaml:decrypt_value[#{environment},govuk_rabbitmq::root_password]"
+end
+
+def hosting_and_environment_from_url(url)
+  uri = URI(url)
+
+  host_to_hosting_and_environment = {
+   'ci-alert.integration.publishing.service.gov.uk' => %i[carrenza ci],
+   'alert.integration.publishing.service.gov.uk' => %i[aws integration],
+   'alert.staging.govuk.digital' => %i[aws staging],
+   'alert.staging.publishing.service.gov.uk' => %i[carrenza staging],
+   'alert.production.govuk.digital' => %i[aws production],
+   'alert.publishing.service.gov.uk' => %i[carrenza production],
+  }
+
+  unless host_to_hosting_and_environment.key? uri.host
+    error "error: unknown hosting and environment for: #{uri.host}"
+    exit 1
+  end
+
+  host_to_hosting_and_environment[uri.host]
+end
+
+def parse_options
+  options = {}
+
+  @option_parser = OptionParser.new do |opts|
+    opts.banner = USAGE_BANNER
+
+    opts.on(
+      '-e',
+      '--environment ENVIRONMENT',
+      'Select which environment to connect to'
+    ) do |o|
+      options[:environment] = o.to_sym
+    end
+    opts.on(
+      '--hosting-and-environment-from-alert-url URL',
+      'Select which environment to connect to based on the alert. URL'
+    ) do |o|
+      hosting, environment = hosting_and_environment_from_url(o)
+      options[:hosting] = hosting
+      options[:environment] = environment
+    end
+    opts.on('-p', '--port-forward SERVICE', 'Connect to a remote port') do |o|
+      options[:port_forward] = o
+    end
+    opts.on('-v', '--verbose', 'Enable more detailed logging') do
+      $verbose = true
+    end
+
+    opts.on('-h', '--help', 'Prints this help') do
+      info opts
+      exit
+    end
+  end
+
+  @option_parser.parse!
+
+  options
+end
+
+def parse_hosting_name_and_number(target)
+  log "debug: parsing target: #{target}"
+  if target.is_a? Hash
+    return %i[hosting name number].map do |key|
+      target[key]
+    end
+  end
+
+  if target.include? '/'
+    hosting, name_and_number = target.split '/'
+
+    hosting = hosting.to_sym
+
+    unless %i[carrenza aws].include? hosting
+      error "error: unknown hosting provider: #{hosting}"
+      newline
+      info "available hosting providers are:"
+      hosting_providers.each { |x| info " - #{x}" }
+
+      exit 1
+    end
+  else
+    name_and_number = target
+  end
+
+  if name_and_number.include? ':'
+    name, number = name_and_number.split ':'
+
+    number = number.to_i
+  else
+    name = name_and_number
+  end
+
+  log "debug: hosting: #{hosting.inspect}, name: #{name.inspect}, number: #{number.inspect}"
+
+  return hosting, name, number
+end
+
+def check_for_target(target)
+  unless target
+    error "error: you must specify the target\n"
+    STDERR.puts USAGE_BANNER
+    STDERR.puts
+    STDERR.puts EXAMPLES
+    exit 1
+  end
+end
+
+TYPES = {
+  'app-console' => Proc.new do |target, environment, _options|
+    check_for_target(target)
+    app_console(target, environment)
+  end,
+
+  'app-dbconsole' => Proc.new do |target, environment, _options|
+    check_for_target(target)
+    app_dbconsole(target, environment)
+  end,
+
+  'rabbitmq' => Proc.new do |target, environment, options|
+    target ||= 'rabbitmq'
+
+    root_password_command = rabbitmq_root_password_command(
+      hosting_for_target_and_environment(target, environment),
+      environment
+    )
+
+    info "You'll need to login as the RabbitMQ #{bold('root')} user."
+    info "Get the password from govuk-secrets, or example:\n\n"
+    info "  #{bold(root_password_command)}"
+    newline
+
+    ssh(
+      target,
+      environment,
+      port_forward: RABBITMQ_PORT,
+    )
+  end,
+
+  'sidekiq-monitoring' => Proc.new do |target, environment, options|
+    ssh(
+      target || 'backend',
+      environment,
+      port_forward: SIDEKIQ_MONITORING_PORT,
+    )
+  end,
+
+  'ssh' => Proc.new do |target, environment, options|
+    check_for_target(target)
+
+    if options.key? :hosting
+      hosting, name, number = parse_hosting_name_and_number(target)
+      if hosting
+        error "error: hosting specified twice"
+        exit 1
+      end
+
+      target = {
+        hosting: options[:hosting],
+        name: name,
+        number: number
+      }
+    end
+
+    ssh(
+      target,
+      environment,
+      port_forward: options[:port_forward]
+    )
+  end
+}
+
+def main
+  system('govuk check-for-govuk-guix-updates')
+
+  options = parse_options
+
+  type, target = ARGV
+
+  unless type
+    error "error: you must specify the connection type\n"
+
+    STDERR.puts @option_parser.help
+
+    STDERR.puts "\nValid connection types are:\n"
+    TYPES.keys.each do |x|
+      STDERR.puts " - #{x}"
+    end
+
+    exit 1
+  end
+
+  handler = TYPES[type]
+
+  unless handler
+    error "error: unknown connection type: #{type}\n"
+
+    STDERR.puts "Valid connection types are:\n"
+    TYPES.keys.each do |x|
+      STDERR.puts " - #{x}"
+    end
+    exit 1
+  end
+
+  environment = options[:environment]&.to_sym
+
+  unless environment
+    error "error: you must specify the environment\n"
+    STDERR.puts @option_parser.help
+    exit 1
+  end
+
+  handler.call(target, environment, options)
+rescue Interrupt
+  # Handle SIGTERM without printing a stacktrace
+  exit 1
+end
+
+main
