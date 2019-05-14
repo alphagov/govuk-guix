@@ -1676,15 +1676,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "14dzzxbqjlnyx1pxbw20ny7i5128kwqz0g437a8r0bih78iqh35l")))
+    (hash (base32 "1ky70g21sb260m0l7qva38vx3l87b7jmv6y65mbm3krslhzg42ps")))
    (package
      (name "support")
-     (version "release_834")
+     (version "release_835")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0nlbyfc7727d9p307ynqcgwhxnz554d1irjgmg2v87a278x3lfn9")))
+       #:hash (base32 "1jgjjyc5fjqwiglq7m21a59k7lby2ka3q5iaq5i75ba0a65cvvn2")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
