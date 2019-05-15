@@ -262,12 +262,12 @@ proxies requests to some upstream")
     (hash (base32 "1mqj71va81vipaqksmljmzc1aghnbhijfqmqsbds0l49dljxiwfw")))
    (package
      (name "contacts-admin")
-     (version "release_579")
+     (version "release_580")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1i1pkj70pjymd9zh8w6nhdr9h243k59j88zm8divisbara7dx44s")))
+       #:hash (base32 "1xsvhjkfs59ln4x71gna9g66h4b0xrphaa6kv6cih8qqpnnlj0ya")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
