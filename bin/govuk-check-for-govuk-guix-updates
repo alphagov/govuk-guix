@@ -17,12 +17,12 @@ cd "$GOVUK_GUIX_REPO"
 
 CURTIME=$(date +%s)
 if [ -f .git/FETCH_HEAD ]; then
-    case "Darwin" in
+    case "$(uname -s)" in
         "Darwin")
             # stat isn't GNU stat, so different options apply
-	    FILETIME=$(stat -f %m .git/FETCH_HEAD);;
+            FILETIME=$(stat -f %m .git/FETCH_HEAD);;
         *)
-	    FILETIME=$(stat .git/FETCH_HEAD -c %Y);;
+            FILETIME=$(stat .git/FETCH_HEAD -c %Y);;
     esac
 else
     FILETIME=0
