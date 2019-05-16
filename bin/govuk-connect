@@ -56,6 +56,14 @@ def error(message)
   STDERR.puts "\e[1m\e[31m#{message}\e[0m"
 end
 
+def print_ssh_username_configuration_help
+  info "The SSH username used was: #{bold(ssh_username)}"
+  info "Check this is correct, and it it isn't run the following command to set the correct username"
+  newline
+  info "  #{bold('govuk config ssh_username USERNAME')}"
+  newline
+end
+
 # From Rosetta Code: https://rosettacode.org/wiki/Levenshtein_distance#Ruby
 def levenshtein_distance(a, b)
   a, b = a.downcase, b.downcase
@@ -176,6 +184,8 @@ def govuk_node_list_classes(environment, hosting)
 
   unless status.success?
     error "\nerror: command failed: #{command}"
+    newline
+    print_ssh_username_configuration_help
     exit 1
   end
 
@@ -202,6 +212,8 @@ def get_domains_for_node_class(target, environment, hosting, ssh_username)
 
   unless status.success?
     error "error: command failed: #{command}"
+    newline
+    print_ssh_username_configuration_help
     exit 1
   end
 
