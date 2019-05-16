@@ -32,11 +32,21 @@ def get(key)
   YAML::load_file(config_file)[key]
 end
 
+def print_current_configuration
+  YAML::load_file(config_file).each do |key, value|
+    STDERR.puts " - #{key}: #{value}"
+  end
+end
+
 def main
   key, value, *_rest = ARGV
 
   unless key
     STDERR.puts USAGE
+
+    STDERR.puts "\nCurrent configuration:"
+    print_current_configuration
+
     exit 1
   end
 
