@@ -274,6 +274,19 @@ def node_classes_for_environment_and_hosting(environment, hosting)
   end
 end
 
+def application_names_from_node_class_data(environment, hosting)
+  node_class_data = govuk_puppet_node_class_data(
+    environment,
+    hosting
+  )
+
+  all_names = node_class_data.flat_map do |node_class, data|
+    data['apps']
+  end
+
+  all_names.sort.uniq
+end
+
 def node_class_for_app(app_name, environment, hosting)
   log "debug: finding node class for #{app_name} in #{hosting} #{environment}"
 
@@ -390,10 +403,10 @@ def hosting_for_app(app_name, environment)
   end
 end
 
-def app_console(target, environment)
+def govuk_app_command(target, environment, command)
   hosting, name, number = parse_hosting_name_and_number(target)
 
-  info "Connecting to the app console for #{bold(name)},\
+  info "Connecting to the app #{command} for #{bold(name)},\
  in the #{bold(environment)} environment"
 
   if hosting
@@ -410,6 +423,29 @@ def app_console(target, environment)
     hosting
   )
 
+  unless node_class
+    error "error: application '#{name}' not found."
+    newline
+
+    application_names = application_names_from_node_class_data(
+      environment,
+      hosting
+    )
+
+    similar_application_names = strings_similar_to(name, application_names)
+    if similar_application_names.any?
+      info "did you mean:"
+      similar_application_names.each { |s| info " - #{s}" }
+    else
+      info "all applications:"
+      newline
+      info "  #{application_names.join(', ')}"
+      newline
+    end
+
+    exit 1
+  end
+
   info "The relevant node class is #{bold(node_class)}"
 
   ssh(
@@ -419,29 +455,7 @@ def app_console(target, environment)
       number: number
     },
     environment,
-    command: "govuk_app_console #{name}"
-  )
-end
-
-def app_dbconsole(target, environment)
-  hosting, name, number = parse_hosting_name_and_number(target)
-
-  unless hosting
-    hosting = hosting_for_app(name, environment)
-  end
-
-  ssh(
-    {
-      hosting: hosting,
-      name: node_class_for_app(
-        name,
-        environment,
-        hosting
-      ),
-      number: number,
-    },
-    environment,
-    command: "govuk_app_dbconsole #{name}"
+    command: "govuk_app_#{command} #{name}"
   )
 end
 
@@ -645,12 +659,12 @@ end
 TYPES = {
   'app-console' => Proc.new do |target, environment, _options|
     check_for_target(target)
-    app_console(target, environment)
+    govuk_app_command(target, environment, 'console')
   end,
 
   'app-dbconsole' => Proc.new do |target, environment, _options|
     check_for_target(target)
-    app_dbconsole(target, environment)
+    govuk_app_command(target, environment, 'dbconsole')
   end,
 
   'rabbitmq' => Proc.new do |target, environment, options|
