@@ -114,6 +114,18 @@ if [ "$1" == "--profile" ]; then
         echo "export AWS_SESSION_TOKEN=\"$SESSION_TOKEN\""
     elif [ "$3" == "--export-json" ]; then
         echo "{ \"access_key_id\": \"$ACCESS_KEY_ID\", \"secret_access_key\": \"$SECRET_ACCESS_KEY\", \"session_token\": \"$SESSION_TOKEN\" }"
+    elif [ "$3" == "--export-plain" ]; then
+        echo
+        echo -e "  Profile\t\t $profile"
+        echo
+        echo -e "  Session expires\t $EXPIRATION"
+        echo
+        echo -e "  Access key id\t\t $ACCESS_KEY_ID"
+        echo
+        echo -e "  Secret access key\t $SECRET_ACCESS_KEY"
+        echo
+        echo -e "  Session token\t\t $SESSION_TOKEN"
+        echo
     elif [ "$3" == "--export-pretty" ] || [ "$3" == "" ]; then
         bold="\e[1m"
         reset="\e[0m"
@@ -140,6 +152,7 @@ if [ "$1" == "--profile" ]; then
         echo "govuk: aws: valid arguments are:"
         echo
         echo "  --export         to output the shell commands for the AWS credentials"
+        echo "  --export-plain   to output the values for the AWS credentials without bold styling"
         echo "  --export-pretty  to output the values for the AWS credentials"
         echo "  --export-json    to output JSON describing the AWS credentials"
         echo "  --               to run a command with the AWS credentials set in the environment,"
