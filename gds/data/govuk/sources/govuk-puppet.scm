@@ -30,7 +30,7 @@
 (define postgresql-extracts
   `(("postgresql-primary-1.backend.integration"
      ("content_performance_manager_production" .
-      (,content-performance-manager-service-type))
+      (,content-data-api-service-type))
      ("content_tagger_production" . (,content-tagger-service-type))
      ("email-alert-api_production" . (,email-alert-api-service-type))
      ("local-links-manager_production" . (,local-links-manager-service-type))

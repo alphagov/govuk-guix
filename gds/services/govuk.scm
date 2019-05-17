@@ -329,9 +329,9 @@
 ;;; Content Performance Manager
 ;;;
 
-(define-public content-performance-manager-service-type
+(define-public content-data-api-service-type
   (service-type
-   (name 'content-performance-manager)
+   (name 'content-data-api)
    (extensions
     (modify-service-extensions-for-signon-and-plek
      name
@@ -339,19 +339,19 @@
    (default-value
      (list (shepherd-service
             (inherit default-shepherd-service)
-            (provision '(content-performance-manager))
+            (provision '(content-data-api))
             (requirement '(signon postgres)))
            (sidekiq-config
             (file "config/sidekiq.yml"))
            (plek-config)
            (rails-app-config)
-           content-performance-manager
+           content-data-api
            (signon-application
             (name "Content Performance Manager")
             (supported-permissions '("signin" "inventory_management")))
            (signon-api-user
             (name "Content Performance Manager")
-            (email "content-performance-manager@guix-dev.gov.uk")
+            (email "content-data-api@guix-dev.gov.uk")
             (authorisation-permissions
              (list
               (cons
@@ -416,7 +416,7 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(content-data-admin))
-            (requirement '(content-performance-manager
+            (requirement '(content-data-api
                            signon
                            postgres)))
            (plek-config)
@@ -2130,7 +2130,7 @@
    "Applications to support GOV.UK"
    (list (service content-audit-tool-service-type)
          (service content-data-admin-service-type)
-         (service content-performance-manager-service-type)
+         (service content-data-api-service-type)
          (service link-checker-api-service-type)
          (service search-admin-service-type)
          (service signon-service-type)

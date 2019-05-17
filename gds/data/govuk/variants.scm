@@ -44,7 +44,7 @@
 (define (postgresql-extract-plus-variants base-extract)
   (define custom-postgresql-extract-variants
     `(("publishing_api_production" . ,publishing-api-variants)
-      ("content_performance_manager_production" . ,content-performance-manager-variants)
+      ("content_performance_manager_production" . ,content-data-api-variants)
       ;; This is mostly for testing, as content-tagger has a small database
       ("content_tagger_production" . , content-tagger-variants)))
 
@@ -161,7 +161,7 @@
                      delete-all-but-one-month-of-events
                      set-details-to-NULL-for-old-superseded-editions))))))
 
-(define content-performance-manager-variants
+(define content-data-api-variants
   (let* ((select-top-n-for-each-document-type-from-facts-metrics
           (lambda (n)
             (string-append

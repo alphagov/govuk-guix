@@ -335,12 +335,12 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/content-data-admin"))
    #:extra-inputs (list postgresql libffi)))
 
-(define-public content-performance-manager
+(define-public content-data-api
   (package-with-bundler
    (bundle-package
     (hash (base32 "13ci7cd50p9jv07pjjc74wk3rwv2p0xr8rqjd4w8zbrji2a8vshq")))
    (package
-     (name "content-performance-manager")
+     (name "content-data-api")
      (version "release_1046")
      (source
       (github-archive
@@ -358,7 +358,7 @@ proxies requests to some upstream")
      (synopsis "")
      (description "")
      (license #f)
-     (home-page "https://github.com/alphagov/content-performance-manager"))
+     (home-page "https://github.com/alphagov/content-data-api"))
    #:extra-inputs (list postgresql libffi)))
 
 (define-public content-publisher
