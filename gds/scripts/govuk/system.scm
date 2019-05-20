@@ -360,7 +360,7 @@
             ((sys (container-script
                    os
                    #:mappings (option-values opts 'file-system-mapping)
-                   #:container-shared-network? #t)))
+                   #:shared-network? #t)))
           (mbegin %store-monad
             (built-derivations (list sys))
             (return (derivation->output-path sys))))))))
