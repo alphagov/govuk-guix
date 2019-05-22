@@ -760,6 +760,14 @@ def main
     exit 1
   end
 
+  unless JUMPBOXES.key? environment
+    error "error: unknown environment '#{environment}'"
+    newline
+    info "Valid environments are:"
+    JUMPBOXES.keys.each { |e| info " - #{e}" }
+    exit 1
+  end
+
   handler.call(target, environment, options)
 rescue Interrupt
   # Handle SIGTERM without printing a stacktrace
