@@ -492,6 +492,18 @@ def ssh(
       info "There are #{n_machines} of this class"
 
       if number
+        unless number > 0
+          newline
+          error "error: invalid machine number '#{number}', it must be > 0"
+          exit 1
+        end
+
+        unless number <= domains.length
+          newline
+          error "error: cannot connect to machine number: #{number}"
+          exit 1
+        end
+
         ssh_target = domains[number - 1]
         info "Connecting to number #{number}"
       else
