@@ -1,5 +1,28 @@
 #!/usr/bin/env ruby
 
+#
+# This script aims to make it easy to connect to various parts of the GOV.UK
+# infrastructure. It aims to provide a consistent way to do this, even across
+# different mosting providers.
+#
+#
+# Usage: govuk connect TYPE TARGET [options]
+#     -e, --environment ENVIRONMENT    Select which environment to connect to
+#         --hosting-and-environment-from-alert-url URL
+#                                      Select which environment to connect to
+#                                      based on the alert. URL
+#     -p, --port-forward SERVICE       Connect to a remote port
+#     -v, --verbose                    Enable more detailed logging
+#     -h, --help                       Prints this help
+#
+# Valid connection types are:
+#  - app-console
+#  - app-dbconsole
+#  - rabbitmq
+#  - sidekiq-monitoring
+#  - ssh
+
+
 require 'uri'
 require 'yaml'
 require 'open3'
