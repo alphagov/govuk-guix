@@ -506,7 +506,23 @@ def ssh(
       ssh_username
     )
 
-    if domains.length == 1
+    if domains.length.zero?
+      error "error: couldn't find #{name} in #{hosting}/#{environment}"
+
+      node_types = govuk_node_list_classes(environment, hosting)
+
+      similar_node_types = strings_similar_to(name, node_types)
+
+      if similar_node_types.any?
+        info "\ndid you mean:"
+        similar_node_types.each { |s| info " - #{s}" }
+      else
+        info "\nall node types:"
+        node_types.each { |s| info " - #{s}" }
+      end
+
+      exit 1
+    elsif domains.length == 1
       ssh_target = domains.first
 
       info "There is #{bold('one machine')} to connect to"
