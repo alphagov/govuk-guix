@@ -691,18 +691,29 @@ def check_for_target(target)
   end
 end
 
+def check_for_additional_arguments(command, args)
+  unless args.empty?
+    error "error: #{command} doesn't support arguments: #{args}"
+    exit 1
+  end
+end
+
 TYPES = {
-  'app-console' => Proc.new do |target, environment, _options|
+  'app-console' => Proc.new do |target, environment, args, _options|
     check_for_target(target)
+    check_for_additional_arguments('app-console', args)
     govuk_app_command(target, environment, 'console')
   end,
 
-  'app-dbconsole' => Proc.new do |target, environment, _options|
+  'app-dbconsole' => Proc.new do |target, environment, args, _options|
     check_for_target(target)
+    check_for_additional_arguments('app-dbconsole', args)
     govuk_app_command(target, environment, 'dbconsole')
   end,
 
-  'rabbitmq' => Proc.new do |target, environment, options|
+  'rabbitmq' => Proc.new do |target, environment, args, options|
+    check_for_additional_arguments('rabbitmq', args)
+
     target ||= 'rabbitmq'
 
     root_password_command = rabbitmq_root_password_command(
@@ -722,7 +733,8 @@ TYPES = {
     )
   end,
 
-  'sidekiq-monitoring' => Proc.new do |target, environment, options|
+  'sidekiq-monitoring' => Proc.new do |target, environment, args, options|
+    check_for_additional_arguments('sidekiq-monitoring', args)
     ssh(
       target || 'backend',
       environment,
@@ -730,7 +742,7 @@ TYPES = {
     )
   end,
 
-  'ssh' => Proc.new do |target, environment, options|
+  'ssh' => Proc.new do |target, environment, args, options|
     check_for_target(target)
 
     if options.key? :hosting
@@ -760,7 +772,7 @@ def main
 
   options = parse_options
 
-  type, target = ARGV
+  type, target, *rest = ARGV
 
   unless type
     error "error: you must specify the connection type\n"
@@ -803,7 +815,7 @@ def main
     exit 1
   end
 
-  handler.call(target, environment, options)
+  handler.call(target, environment, rest, options)
 rescue Interrupt
   # Handle SIGTERM without printing a stacktrace
   exit 1
