@@ -486,7 +486,8 @@ def ssh(
       target,
       environment,
       command: false,
-      port_forward: false
+      port_forward: false,
+      additional_arguments: []
     )
   log "debug: ssh to #{target} in #{environment}"
 
@@ -579,6 +580,8 @@ def ssh(
 
     info "Port forwarding setup, access:\n\n  http://127.0.0.1:#{localhost_port}/\n\n"
   end
+
+  ssh_command += additional_arguments
 
   info "\n#{bold('Running command:')} #{ssh_command.join(' ')}\n\n"
 
@@ -778,7 +781,8 @@ TYPES = {
     ssh(
       target,
       environment,
-      port_forward: options[:port_forward]
+      port_forward: options[:port_forward],
+      additional_arguments: args
     )
   end
 }
@@ -786,9 +790,22 @@ TYPES = {
 def main
   system('govuk check-for-govuk-guix-updates')
 
-  options = parse_options
+  double_dash_index = ARGV.index '--'
+  if double_dash_index
+    rest = ARGV[double_dash_index + 1, ARGV.length]
+    argv = ARGV[0, double_dash_index]
 
-  type, target, *rest = ARGV
+    ARGV.clear
+    ARGV.concat argv
+
+    options = parse_options
+
+    type, target = ARGV
+  else
+    options = parse_options
+
+    type, target, *rest = ARGV
+  end
 
   unless type
     error "error: you must specify the connection type\n"
