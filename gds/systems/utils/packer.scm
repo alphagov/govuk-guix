@@ -10,6 +10,7 @@
   #:use-module (gnu packages guile)
   #:use-module (gnu packages linux)
   #:export (packer-template-for-disk-image
+            packer-template-for-govuk-system-init
 
             packer-build-template-script))
 
@@ -243,3 +244,53 @@
       (aws_secret_access_key . "{{ env `AWS_SECRET_ACCESS_KEY` }}")))
    (builders
     (list (builder-for-disk-image disk-image)))))
+
+(define (builder-for-govuk-system-init args)
+  (packer-amazon-chroot-builder
+   (ami-name "placeholder-ami-name")
+   (access-key "{{user `aws_access_key_id`}}")
+   (secret-key "{{user `aws_secret_access_key`}}")
+   (region "eu-west-1")
+   (source-ami #f)
+   (from-scratch? #t)
+   (root-volume-size 200)
+   (root-device-name "xvda")
+   (ami-virtualization-type "hvm")
+   (ami-block-device-mappings
+    (list (block-device-mapping
+           (device-name "xvda")
+           (delete-on-termination? #t)
+           (volume-type "gp2"))))
+   (pre-mount-commands
+    (list #~(string-append
+             #$(file-append parted "/sbin/parted")
+             " "
+             #$(string-join
+                '("--align=optimal"
+                  "--script"
+                  "{{.Device}}"
+                  "mklabel msdos"
+                  "--"
+                  "mkpart primary ext4 1MiB 100%"
+                  "set 1 boot on")))
+          #~(string-append
+             #$(file-append e2fsprogs "/sbin/mkfs.ext4")
+             " {{.Device}}1")
+          #~(string-append
+             #$(file-append e2fsprogs "/sbin/e2label")
+             " {{.Device}}1 my-root")))
+   (post-mount-commands
+    (list (string-append
+           (getenv "GOVUK_GUIX_ROOT")
+           "/bin/govuk system init --target={{.MountPath}} "
+           (string-join args " "))))
+   (additional-options
+    '((ena_support . #t)))))
+
+(define (packer-template-for-govuk-system-init args)
+  (packer-template
+   (variables
+    '((aws_access_key_id . "{{ env `AWS_ACCESS_KEY_ID` }}")
+      (aws_secret_access_key . "{{ env `AWS_SECRET_ACCESS_KEY` }}")))
+   (builders
+    (list (builder-for-govuk-system-init args)))))

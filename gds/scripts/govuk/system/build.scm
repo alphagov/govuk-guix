@@ -82,12 +82,8 @@
         (set-grafting #f)
         (mlet* %store-monad
             ((item (lower-object
-                    (packer-template-for-disk-image
-                     ((system-disk-image
-                       (alter-services-for-vm os)
-                       #:name "disk-image"
-                       #:disk-image-size 'guess)
-                      store)))))
+                    (packer-template-for-govuk-system-init
+                     (cddr (command-line))))))
 
           (mbegin %store-monad
             (built-derivations (list item))
@@ -119,12 +115,8 @@
           (set-grafting #f)
           (mlet* %store-monad
               ((item (packer-build-template-script
-                      (packer-template-for-disk-image
-                       ((system-disk-image
-                         (alter-services-for-vm os)
-                         #:name "disk-image"
-                         #:disk-image-size 'guess)
-                        store)))))
+                      (packer-template-for-govuk-system-init
+                       (cddr (command-line))))))
 
             (mbegin %store-monad
               (built-derivations (list item))
