@@ -231,7 +231,11 @@
                      ,target)))
               (apply system* download-command)))
 
-        (call-with-input-file target function)))
+        (if (file-exists? target)
+            (call-with-input-file target function)
+            (begin
+              (display "warning: unable to fetch index.json\n")
+              #f))))
      (else (error "Unrecognised scheme" (uri-scheme uri))))))
 
 (define (list-extracts)
@@ -326,7 +330,8 @@
 
     (if (string=? base-url "")
         '()
-        (data-extracts))))
+        (or (data-extracts)
+            '()))))
 
 (define data-directory-with-index-data-source
   (data-source
