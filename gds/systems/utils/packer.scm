@@ -285,7 +285,10 @@
     `(,(string-append
         (getenv "GOVUK_GUIX_ROOT")
         "/bin/govuk system init --target={{.MountPath}} "
-        (string-join args " "))
+        (string-join (map (lambda (arg)
+                            (string-append "'" arg "'"))
+                          args)
+                     " "))
       ,@(if data-snapshot
             (let ((snapshot-var-lib
                    (string-append data-snapshot
