@@ -284,7 +284,9 @@
    (post-mount-commands
     `(,(string-append
         (getenv "GOVUK_GUIX_ROOT")
-        "/bin/govuk system init --target={{.MountPath}} "
+        "/bin/govuk system init "
+        "--target={{.MountPath}} "
+        "--bootloader-target={{.Device}} "
         (string-join (map (lambda (arg)
                             (string-append "'" arg "'"))
                           args)

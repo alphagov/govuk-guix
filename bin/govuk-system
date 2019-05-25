@@ -277,6 +277,13 @@
                                       arg
                                       (alist-delete 'target result))
                           rest)))
+         (option '("bootloader-target") #t #f
+                 (lambda (opt name arg result . rest)
+                   (apply values
+                          (alist-cons 'bootloader-target
+                                      arg
+                                      (alist-delete 'bootloader-target result))
+                          rest)))
          (option '("signon-user") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'signon-users

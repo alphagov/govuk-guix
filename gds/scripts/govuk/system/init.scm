@@ -11,6 +11,7 @@
   #:use-module (gnu system vm)
   #:use-module (gnu system file-systems)
   #:use-module (gds systems utils packer)
+  #:use-module (gds scripts utils)
   #:use-module (gds scripts govuk system)
   #:export (init))
 
@@ -22,8 +23,12 @@
          (os     (alter-services-for-vm
                   (opts->operating-system opts)))
          (bootloader-target
-          (bootloader-configuration-target
-           (operating-system-bootloader os))))
+          (option-value
+           opts
+           'bootloader-target
+           #:default
+           (bootloader-configuration-target
+            (operating-system-bootloader os)))))
 
     (display-system-information os)
 
@@ -44,6 +49,6 @@
            #:image-size 'guess
            #:full-boot? #t
            #:install-bootloader? #t
-           #:target (peek "TARGET" (assq-ref opts 'target))
-           #:bootloader-target (peek "BOOT TARGET" bootloader-target)))))
+           #:target (assq-ref opts 'target)
+           #:bootloader-target bootloader-target))))
     (exit 0)))
