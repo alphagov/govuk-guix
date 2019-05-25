@@ -170,7 +170,9 @@
   #~(begin
       #$(with-postgresql
          postgresql-service
-         operation)))
+         (if (null? extracts-and-database-connection-configs)
+             #~(lambda _ #f)
+             operation))))
 
 (define* (postgresql-multi-output-data-transformation
           postgresql-service

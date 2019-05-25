@@ -52,6 +52,7 @@
  (gds data data-source)
  (gds data data-extract)
  (gds data govuk)
+ (gds scripts utils)
  (gds scripts govuk data list)
  (gds scripts govuk data load)
  (gds scripts govuk data build-snapshot)
@@ -82,6 +83,9 @@
                   (alist-cons 'exclude-service
                               arg
                               result)))
+        (option '("no-services") #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'no-services? #t result)))
         (option '("dry-run") #f #f
                 (lambda (opt name arg result)
                   (alist-cons 'dry-run? #t result)))
@@ -132,11 +136,13 @@
 
     (remove-excluded-services
      (if (null? values)
-         ;; If no services are specified, just filter on all services, with no
-         ;; restrictions on the variant names.
-         (map (lambda (service)
-                (cons service '()))
-              govuk-services)
+         (if (option-value opts 'no-services?)
+             '()
+             ;; If no services are specified, just filter on all services, with no
+             ;; restrictions on the variant names.
+             (map (lambda (service)
+                    (cons service '()))
+                  govuk-services))
          (map (lambda (value)
                 (match (string-split value #\:)
                   ((service-name variant-name)

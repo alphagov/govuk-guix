@@ -87,7 +87,15 @@
                                "--create"
                                "--file" #$output
                                #$database)))))))))
-   (group-extracts data-extract-database all-data-extracts)))
+   (let ((data-extracts-by-database
+          (group-extracts data-extract-database all-data-extracts)))
+     (fold (lambda (database result)
+             (if (assoc database result)
+                 result
+                 (cons (cons database '())
+                       result)))
+           data-extracts-by-database
+           '("postgresql" "mysql" "mongo")))))
 
 (define (snapshot-manifest all-data-extracts)
 
