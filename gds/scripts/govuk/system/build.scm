@@ -10,6 +10,7 @@
   #:use-module (gnu system vm)
   #:use-module (gnu system file-systems)
   #:use-module (gds systems utils packer)
+  #:use-module (gds scripts utils)
   #:use-module (gds scripts govuk system)
   #:export (build))
 
@@ -83,7 +84,8 @@
         (mlet* %store-monad
             ((item (lower-object
                     (packer-template-for-govuk-system-init
-                     (cddr (command-line))))))
+                     (cddr (command-line))
+                     #:data-snapshot (option-value opts 'data-snapshot)))))
 
           (mbegin %store-monad
             (built-derivations (list item))
@@ -116,7 +118,8 @@
           (mlet* %store-monad
               ((item (packer-build-template-script
                       (packer-template-for-govuk-system-init
-                       (cddr (command-line))))))
+                       (cddr (command-line))
+                       #:data-snapshot (option-value opts 'data-snapshot)))))
 
             (mbegin %store-monad
               (built-derivations (list item))
@@ -127,7 +130,12 @@
 (define (build opts)
   (let* ((type (assq-ref opts 'type))
          (os   (opts->operating-system
-                opts
+                (if (memq type '(aws-packer-template aws-packer-ami))
+                    ;; If this system is for an AMI, don't pass the
+                    ;; data-snapshot through, as this is handled in
+                    ;; the packer template
+                    (alist-delete 'data-snapshot opts)
+                    opts)
                 #:default-read-bundle-install-input-as-tar-archive?
                 (assq-ref
                  '((vm-image-and-system . #t)

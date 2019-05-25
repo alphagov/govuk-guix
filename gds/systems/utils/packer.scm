@@ -290,24 +290,26 @@
             (let ((snapshot-var-lib
                    (string-append data-snapshot
                                   "/var/lib")))
-              (filter-map
-               (lambda (archive-name)
-                 #~(string-join
-                    (list
-                     #$(file-append tar "/bin/tar")
-                     "--directory={{.MountPath}}/var/lib"
-                     (string-append "--use-compress-program="
-                                    #$(file-append pigz "/bin/pigz"))
-                     "--checkpoint=1000"
-                     "--checkpoint-action=echo='%ds: %{read,wrote}T'"
-                     "--extract"
-                     "--file" #$(string-append snapshot-var-lib
-                                               "/" archive-name))
-                    " "))
-               (scandir snapshot-var-lib
-                        (negate
-                         (lambda (f)
-                           (member f '("." "..")))))))
+              (cons
+               "mkdir -p {{.MountPath}}/var/lib"
+               (filter-map
+                (lambda (archive-name)
+                  #~(string-join
+                     (list
+                      #$(file-append tar "/bin/tar")
+                      "--directory={{.MountPath}}/var/lib"
+                      (string-append "--use-compress-program="
+                                     #$(file-append pigz "/bin/pigz"))
+                      "--checkpoint=1000"
+                      "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+                      "--extract"
+                      "--file" #$(string-append snapshot-var-lib
+                                                "/" archive-name))
+                     " "))
+                (scandir snapshot-var-lib
+                         (negate
+                          (lambda (f)
+                            (member f '("." ".."))))))))
             '())))
    (additional-options
     '((ena_support . #t)))))
