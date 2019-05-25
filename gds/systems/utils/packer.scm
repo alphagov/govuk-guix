@@ -247,9 +247,9 @@
    (builders
     (list (builder-for-disk-image disk-image)))))
 
-(define (builder-for-govuk-system-init args data-snapshot)
+(define (builder-for-govuk-system-init ami-name args data-snapshot)
   (packer-amazon-chroot-builder
-   (ami-name "placeholder-ami-name")
+   (ami-name ami-name)
    (access-key "{{user `aws_access_key_id`}}")
    (secret-key "{{user `aws_secret_access_key`}}")
    (region "eu-west-1")
@@ -314,10 +314,10 @@
    (additional-options
     '((ena_support . #t)))))
 
-(define* (packer-template-for-govuk-system-init args #:key data-snapshot)
+(define* (packer-template-for-govuk-system-init ami-name args #:key data-snapshot)
   (packer-template
    (variables
     '((aws_access_key_id . "{{ env `AWS_ACCESS_KEY_ID` }}")
       (aws_secret_access_key . "{{ env `AWS_SECRET_ACCESS_KEY` }}")))
    (builders
-    (list (builder-for-govuk-system-init args data-snapshot)))))
+    (list (builder-for-govuk-system-init ami-name args data-snapshot)))))

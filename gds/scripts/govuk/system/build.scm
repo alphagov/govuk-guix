@@ -84,6 +84,7 @@
         (mlet* %store-monad
             ((item (lower-object
                     (packer-template-for-govuk-system-init
+                     (option-value opts 'ami-name)
                      (cddr (command-line))
                      #:data-snapshot (option-value opts 'data-snapshot)))))
 
@@ -118,6 +119,7 @@
           (mlet* %store-monad
               ((item (packer-build-template-script
                       (packer-template-for-govuk-system-init
+                       (option-value opts 'ami-name)
                        (cddr (command-line))
                        #:data-snapshot (option-value opts 'data-snapshot)))))
 

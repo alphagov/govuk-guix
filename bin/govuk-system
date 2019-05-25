@@ -152,6 +152,11 @@
                    (alist-cons 'data-snapshot
                                arg
                                (alist-delete 'data-snapshot result))))
+         (option '("ami-name") #f #t
+                 (lambda (opt namg arg result)
+                   (alist-cons 'ami-name
+                               arg
+                               (alist-delete 'ami-name result))))
          (option '("rails-environment") #t #f
                  (lambda (opt name arg result . rest)
                    (apply values
