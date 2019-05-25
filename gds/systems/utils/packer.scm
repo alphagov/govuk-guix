@@ -1,10 +1,12 @@
 (define-module (gds systems utils packer)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 ftw)
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages compression)
   #:use-module (gnu packages disk)
   #:use-module (gnu packages golang)
   #:use-module (gnu packages guile)
@@ -245,7 +247,7 @@
    (builders
     (list (builder-for-disk-image disk-image)))))
 
-(define (builder-for-govuk-system-init args)
+(define (builder-for-govuk-system-init args data-snapshot)
   (packer-amazon-chroot-builder
    (ami-name "placeholder-ami-name")
    (access-key "{{user `aws_access_key_id`}}")
@@ -280,17 +282,40 @@
              #$(file-append e2fsprogs "/sbin/e2label")
              " {{.Device}}1 my-root")))
    (post-mount-commands
-    (list (string-append
-           (getenv "GOVUK_GUIX_ROOT")
-           "/bin/govuk system init --target={{.MountPath}} "
-           (string-join args " "))))
+    `(,(string-append
+        (getenv "GOVUK_GUIX_ROOT")
+        "/bin/govuk system init --target={{.MountPath}} "
+        (string-join args " "))
+      ,@(if data-snapshot
+            (let ((snapshot-var-lib
+                   (string-append data-snapshot
+                                  "/var/lib")))
+              (filter-map
+               (lambda (archive-name)
+                 #~(string-join
+                    (list
+                     #$(file-append tar "/bin/tar")
+                     "--directory={{.MountPath}}/var/lib"
+                     (string-append "--use-compress-program="
+                                    #$(file-append pigz "/bin/pigz"))
+                     "--checkpoint=1000"
+                     "--checkpoint-action=echo='%ds: %{read,wrote}T'"
+                     "--extract"
+                     "--file" #$(string-append snapshot-var-lib
+                                               "/" archive-name))
+                    " "))
+               (scandir snapshot-var-lib
+                        (negate
+                         (lambda (f)
+                           (member f '("." "..")))))))
+            '())))
    (additional-options
     '((ena_support . #t)))))
 
-(define (packer-template-for-govuk-system-init args)
+(define* (packer-template-for-govuk-system-init args #:key data-snapshot)
   (packer-template
    (variables
     '((aws_access_key_id . "{{ env `AWS_ACCESS_KEY_ID` }}")
       (aws_secret_access_key . "{{ env `AWS_SECRET_ACCESS_KEY` }}")))
    (builders
-    (list (builder-for-govuk-system-init args)))))
+    (list (builder-for-govuk-system-init args data-snapshot)))))
