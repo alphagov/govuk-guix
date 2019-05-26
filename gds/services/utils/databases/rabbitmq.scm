@@ -57,15 +57,14 @@
                           (reverse lines)
                           (loop (cons line lines)
                                 (read-line p))))))
-        (and (let ((status (close-pipe p)))
+        (and (let ((status (status:exit-val (close-pipe p))))
                (if (zero? status)
                    #t
                    (begin
                      (simple-format #t
                                     "command: ~A\n"
                                     (string-join command))
-                     (error "listing users failed, status ~A\n"
-                            status))))
+                     (error "listing users failed, status ~A" status))))
              (map (lambda (line)
                     (let ((m (string-match "^(\\S+)\\s+\\[(.*?)\\]$" line)))
                       (cons (match:substring m 1)
