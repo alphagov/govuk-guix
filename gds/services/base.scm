@@ -22,7 +22,7 @@
     (const
      (shepherd-service
       (documentation "Pretend loopback service, just provides 'loopback")
-      (provision '(loopback))
+      (provision '(loopback networking))
       (start #~(const #t))
       (stop #~(const #t)))))
    '()))

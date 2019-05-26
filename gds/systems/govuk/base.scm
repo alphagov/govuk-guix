@@ -77,6 +77,7 @@
                                          "/bin/bash"))))
    pretend-loopback-service
    (service govuk-nginx-service-type)
+   (service govuk-certificates-service-type)
    (service govuk-skeletons-service-type)))
 
 (define tailon-service

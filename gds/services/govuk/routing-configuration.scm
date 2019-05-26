@@ -6,6 +6,7 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu services)
   #:use-module (gnu services databases)
+  #:use-module (gnu services shepherd)
   #:use-module (gds services)
   #:use-module (gds services utils)
   #:use-module (gds services utils databases)
@@ -13,7 +14,9 @@
   #:use-module (gds services govuk plek)
   #:use-module (gds services govuk nginx)
   #:use-module (gds services govuk router)
-  #:export (standard-ports-for-services
+  #:export (govuk-certificates-service-type
+
+            standard-ports-for-services
             high-ports-for-services
             plek-config-from-routing-configuration-arguments
 
@@ -22,6 +25,50 @@
             high-database-service-ports
             default-database-service-ports
             update-database-service-ports-for-services))
+
+(define (certbot-activation http-port
+                            web-domain
+                            domains)
+  #~(lambda ()
+      (zero?
+       (system* #$(file-append certbot "/bin/certbot")
+                "certonly"
+                "--cert-name" #$web-domain
+                "-d" #$(string-join domains ",")
+                "-n" ;; Run non-interactively
+                ;; TODO: This is useful for ;; testing, but not
+                ;; sensible in the long run.
+                "--email" "mail@cbaines.net"
+                "--agree-tos"
+                "--standalone"
+                "--http-01-port" #$(number->string http-port)))))
+
+(define govuk-certificates-service-type
+  (service-type
+   (name 'govuk-certificates)
+   (extensions
+    (list (service-extension
+           shepherd-root-service-type
+           (match-lambda
+             ((port web-domain domains)
+              (list
+               (shepherd-service
+                (requirement '(networking))
+                (provision '(certificates))
+                (one-shot? #t)
+                (start (certbot-activation port
+                                           web-domain
+                                           domains))
+                (documentation "Run certbot."))))
+             (#f
+              (list
+               (shepherd-service
+                (requirement '(networking))
+                (provision '(certificates))
+                (one-shot? #t)
+                (start #~(const #t))
+                (documentation "Run certbot."))))))))
+   (default-value #f)))
 
 (define (generate-port-range start-port services)
   (define (get-next-port ports)
@@ -165,22 +212,20 @@
         high-database-service-ports
         default-database-service-ports))
 
-  (define (add-the-certbot-activation-service services)
-    (cons (simple-service 'govuk-certbot
-                          activation-service-type
-                          (certbot-activation
-                           8080
+  (define (set-govuk-certificates-config services)
+    (if (eq? use-https? 'certbot)
+        (modify-services services
+          (govuk-certificates-service-type
+           config => (list (assq-ref http-ports 'http)
                            web-domain
-                           (plek-config->domains plek-config)))
-          services))
+                           (plek-config->domains plek-config))))
+        services))
 
   (define service-setup-functions
     `(,update-services-plek-config
       ,(cut update-database-service-ports-for-services
          database-service-ports <>)
-      ,@(if (eq? use-https? 'certbot)
-            (list add-the-certbot-activation-service)
-            '())))
+      ,set-govuk-certificates-config))
 
   (define service-names
     (map service-type-name
@@ -354,19 +399,3 @@ net:
                         (mysql-configuration
                          (inherit parameter)
                          (port (assq-ref ports 'mysql))))))
-
-(define (certbot-activation http-port
-                            web-domain
-                            domains)
-  #~(begin
-      (system* #$(file-append certbot "/bin/certbot")
-               "certonly"
-               "--cert-name" #$web-domain
-               "-d" #$(string-join domains ",")
-               "-n" ;; Run non-interactively
-               ;; TODO: This is useful for ;; testing, but not
-               ;; sensible in the long run.
-               "--email" "mail@cbaines.net"
-               "--agree-tos"
-               "--standalone"
-               "--http-01-port" #$(number->string http-port))))

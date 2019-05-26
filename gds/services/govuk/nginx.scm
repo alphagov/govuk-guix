@@ -527,8 +527,18 @@ proxy_set_header Host whitehall-admin.~A~A;"
               (cond ((eq? target shepherd-root-service-type)
                      (service-extension
                       target
-                      (compose (@@ (gnu services web) nginx-shepherd-service)
-                               maybe-convert-to-nginx-configuration)))
+                      (lambda config
+                        (match (apply
+                                (compose (@@ (gnu services web) nginx-shepherd-service)
+                                         maybe-convert-to-nginx-configuration)
+                                config)
+                          (((? shepherd-service? service))
+                           (list
+                            (shepherd-service
+                             (inherit service)
+                             (requirement
+                              (cons 'certificates
+                                    (shepherd-service-requirement service))))))))))
                     ((eq? target activation-service-type)
                      (service-extension
                       target
