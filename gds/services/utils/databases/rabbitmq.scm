@@ -48,6 +48,8 @@
       ;; Set the correct value for the .erlang-cookie
       (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
 
+      (system* #$(file-append rabbitmq "/sbin/rabbitmqctl")
+               "wait" "/var/run/rabbitmq/pid")
       (let* ((command `(,(string-append #$rabbitmq "/sbin/rabbitmqctl")
                         "list_users" "-s"))
              (p (apply open-pipe* OPEN_READ command))
