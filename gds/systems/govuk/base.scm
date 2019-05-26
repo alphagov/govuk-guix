@@ -36,6 +36,7 @@
   #:use-module (gnu packages vim)
   #:use-module (gnu packages web)
   #:use-module (gnu packages wget)
+  #:use-module (gds services)
   #:use-module (gds services base)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk content-access-limits)
@@ -126,6 +127,7 @@
          ;; database connection configuration is used.
          (cut map ensure-database-user-exists-on-service-startup <>)
          (cut map run-db:setup-if-postgresql-or-mysql-is-used <>)
+         (cut set-aws-xray-context-missing <> "IGNORE_ERROR")
          (cut use-gds-sso-strategy <> "real")
          update-services-with-random-signon-secrets)))
 

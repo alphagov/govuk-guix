@@ -14,7 +14,9 @@
             service-startup-config-add-pre-startup-scripts
             service-extensions-modify-parameters
             service-type-extensions-modify-parameters
-            run-pre-startup-scripts-gexp))
+            run-pre-startup-scripts-gexp
+
+            set-aws-xray-context-missing))
 
 (define-record-type* <service-startup-config>
   service-startup-config make-service-startup-config
@@ -146,3 +148,22 @@
                     (if (eq? result #t)
                         (run (cdr scripts))
                         #f)))))))))
+
+(define (set-aws-xray-context-missing services value)
+  (map
+   (lambda (s)
+     (service
+      (service-kind s)
+      (if
+       (list? (service-parameters s))
+       (map
+        (lambda (parameter)
+          (if
+           (service-startup-config? parameter)
+           (service-startup-config-with-additional-environment-variables
+            parameter
+            `(("AWS_XRAY_CONTEXT_MISSING" . ,value)))
+           parameter))
+        (service-parameters s))
+       (service-parameters s))))
+   services))
