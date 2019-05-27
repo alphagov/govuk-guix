@@ -211,7 +211,8 @@
          (if service-startup-config
              (service-startup-config-root-pre-startup-scripts
               service-startup-config)
-             '())))
+             '())
+         #:home "root"))
        (database-connection-configs
         (filter database-connection-config? rest))
        (environment-variables

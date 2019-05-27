@@ -95,7 +95,8 @@
            (f parameters)))))
      (service-type-extensions type)))))
 
-(define (run-pre-startup-scripts-gexp name pre-startup-scripts)
+(define* (run-pre-startup-scripts-gexp name pre-startup-scripts
+                                       #:key home)
   (let
       ((script-gexps
         (map
@@ -129,25 +130,30 @@
     (if (null? script-gexps)
         #~#t
         (with-imported-modules '((gds build utils))
-        #~(begin
-            (use-modules (gds build utils)
-                         (ice-9 format))
-            (simple-format
-             #t
-             "Running ~A startup scripts for ~A\n"
-             #$(length script-gexps)
-             '#$name)
-            (for-each
-             (lambda (key) (simple-format #t "  - ~A\n" key))
-             '#$(map car pre-startup-scripts))
-            (let run ((scripts (list #$@script-gexps)))
-              (if (null? scripts)
-                  #t
-                  (let
-                      ((result ((car scripts))))
-                    (if (eq? result #t)
-                        (run (cdr scripts))
-                        #f)))))))))
+          #~(let ((old-HOME (getenv "HOME")))
+              (use-modules (gds build utils)
+                           (ice-9 format))
+              (when #$home
+                (setenv "HOME" #$home))
+              (simple-format
+               #t
+               "Running ~A startup scripts for ~A\n"
+               #$(length script-gexps)
+               '#$name)
+              (for-each
+               (lambda (key) (simple-format #t "  - ~A\n" key))
+               '#$(map car pre-startup-scripts))
+              (let ((overall-result
+                     (let run ((scripts (list #$@script-gexps)))
+                       (if (null? scripts)
+                           #t
+                           (let ((result ((car scripts))))
+                             (if (eq? result #t)
+                                 (run (cdr scripts))
+                                 #f))))))
+                (when #$home
+                  (setenv "HOME" old-HOME))
+                overall-result))))))
 
 (define (set-aws-xray-context-missing services value)
   (map
