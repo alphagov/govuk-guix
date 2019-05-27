@@ -155,7 +155,8 @@
           (run-pre-startup-scripts-gexp
            'search-api
            (service-startup-config-root-pre-startup-scripts
-            service-startup-config)))
+            service-startup-config)
+           #:home "/root"))
          (plek-config (find plek-config? parameters))
          (package (find package? parameters))
          (environment-variables (environment-variable-pairs->strings
