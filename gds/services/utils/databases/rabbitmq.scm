@@ -48,6 +48,9 @@
       ;; Set the correct value for the .erlang-cookie
       (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
 
+      ;; Set LC_ALL, as Elixir needs a UTF-8 locale
+      (setenv "LC_ALL" "en_US.UTF-8")   ; Use en_US, as this is in the
+                                        ; glibc-utf8-locales package
       (system* #$(file-append rabbitmq "/sbin/rabbitmqctl")
                "wait" "/var/run/rabbitmq/pid")
       (let* ((command `(,(string-append #$rabbitmq "/sbin/rabbitmqctl")
