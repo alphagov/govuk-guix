@@ -231,15 +231,15 @@ proxies requests to some upstream")
 (define-public collections-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0385szwypvn82hs5j3c2wzvlqzg9skbdbikslla4b8h9fsi345cn")))
+    (hash (base32 "0ylkdfmbp2szjj2xjn5bylli9p97qv26q88ii3svhhl2lx64nd5g")))
    (package
      (name "collections-publisher")
-     (version "release_577")
+     (version "release_579")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1kl1ar5cbi5ynn1sn0k2myld09gn2xd1rwlflkjpgl2ywsjcf7gb")))
+       #:hash (base32 "0wqsfasn9arf0lv0lipngd99jpx02q1insj2bvivwgnl5j8afl9n")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
