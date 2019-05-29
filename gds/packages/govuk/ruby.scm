@@ -144,14 +144,14 @@
 (define-public ruby-plek
   (package
     (name "ruby-plek")
-    (version "2.1.1")
+    (version "3.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "plek" version))
        (sha256
         (base32
-         "1l34xdi7n43wpbfqai656zsiwlilrnfb4kwayyscnf7gi7mfydj5"))))
+         "03zpghlkxxwb61ywnyly23ci10qws64jvih3hgqrcax3m0d24j5a"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f)) ;; No tests included
