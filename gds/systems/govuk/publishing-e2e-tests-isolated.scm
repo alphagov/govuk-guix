@@ -14,7 +14,7 @@
       (service static-networking-service-type
                (list (static-networking (interface "lo")
                                         (ip "127.0.0.1")
-                                        (provision '(loopback)))))
+                                        (provision '(loopback networking)))))
       (filter
        (lambda (s)
          (not (eq?
