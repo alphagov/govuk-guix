@@ -26,7 +26,7 @@
      ((service task documentation)
       (shepherd-service (documentation documentation)
                         (provision (list service))
-                        (requirement '(redis rabbitmq))
+                        (requirement '(search-api redis rabbitmq))
                         (respawn? #f)
                         (start #~(make-forkexec-constructor
                                   '("/var/apps/search-api/bin/bundle"
