@@ -341,12 +341,12 @@ proxies requests to some upstream")
     (hash (base32 "0053gpndjg86p89n0yfgk3wfp8lhbcycbj907pv2gkb7wf4d3a6j")))
    (package
      (name "content-data-api")
-     (version "release_1061")
+     (version "release_1062")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1nb7r9j57hq19nz0bgi1hv8gcvzmx6b0zdna5q5bw9pwc3hpc91a")))
+       #:hash (base32 "0hla08iy9ks1rbd2f49n1z2ygs27j4gbv9m1n10zcjlbb08abi5s")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
