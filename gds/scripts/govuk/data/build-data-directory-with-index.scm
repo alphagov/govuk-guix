@@ -8,14 +8,16 @@
   #:export (build-data-directory-with-index))
 
 (define* (build-data-directory-with-index services data-extracts
-                                          #:key dry-run? verbose?)
+                                          #:key dry-run? verbose? max-jobs)
   (with-store store
-    (set-build-options store
-                       #:max-build-jobs 1)
+    (set-build-options store #:max-build-jobs max-jobs)
 
     (let ((derivation
            ((lower-object (data-directory-with-index services data-extracts))
             store)))
-      (simple-format #t "Building derivations ~A" derivation)
-      (build-derivations store (list derivation))
+      (if dry-run?
+          (simple-format #t "Would build derivation ~A" derivation)
+          (begin
+            (simple-format #t "Building derivations ~A" derivation)
+            (build-derivations store (list derivation))))
       (simple-format #t "\n~A\n" (derivation->output-path derivation)))))

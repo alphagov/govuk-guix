@@ -23,7 +23,7 @@
   #:export (list-available-extracts))
 
 (define* (list-available-extracts services data-extracts
-                                  #:key dry-run? verbose?)
+                                  #:key dry-run? verbose? max-jobs)
   (for-each
    (match-lambda
      ((service-type . data-extracts)

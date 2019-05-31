@@ -91,7 +91,14 @@
                   (alist-cons 'dry-run? #t result)))
         (option '("verbose") #f #f
                 (lambda (opt name arg result)
-                  (alist-cons 'verbose? #t result)))))
+                  (alist-cons 'verbose? #t result)))
+        (option '(#\M "max-jobs") #t #f
+                (lambda (opt name arg result . rest)
+                  (let ((c (false-if-exception (string->number arg))))
+                    (if c
+                        (apply values (alist-cons 'max-jobs c result) rest)
+                        (leave (G_ "not a number: '~a' option argument: ~a~%")
+                               name arg)))))))
 
 (define (configure-services services)
   (set-routing-configuration-for-services
@@ -177,7 +184,8 @@
            #:after-date (assq-ref opts 'after))))
     (list services data-extracts
           #:dry-run? (assq-ref opts 'dry-run?)
-          #:verbose? (assq-ref opts 'verbose?))))
+          #:verbose? (assq-ref opts 'verbose?)
+          #:max-jobs (option-value opts 'max-jobs #:default 1))))
 
 (define (get-services service-names)
   (map

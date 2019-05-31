@@ -143,7 +143,7 @@
    #:pretty #t))
 
 (define* (build-snapshot services data-extracts
-                         #:key dry-run? verbose?)
+                         #:key dry-run? verbose? max-jobs)
   (define data-transformations
     (snapshot-data-transformations data-extracts
                                    #:dry-run? dry-run?))
@@ -177,7 +177,7 @@
   (define (build-snapshot-union)
     (with-store store
       (set-build-options store
-                         #:max-build-jobs 1
+                         #:max-build-jobs max-jobs
                          #:max-silent-time 14400) ;; Wait up to 4 hours
 
       (run-with-store store
