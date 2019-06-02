@@ -326,7 +326,7 @@
             (database "contacts_production"))))))
 
 ;;;
-;;; Content Performance Manager
+;;; Content Data API
 ;;;
 
 (define-public content-data-api-service-type
@@ -347,10 +347,10 @@
            (rails-app-config)
            content-data-api
            (signon-application
-            (name "Content Performance Manager")
+            (name "Content Data API")
             (supported-permissions '("signin" "inventory_management")))
            (signon-api-user
-            (name "Content Performance Manager")
+            (name "Content Data API")
             (email "content-data-api@guix-dev.gov.uk")
             (authorisation-permissions
              (list
@@ -432,7 +432,7 @@
              (list
               (cons
                (signon-authorisation
-                (application-name "Content Performance Manager"))
+                (application-name "Content Data API"))
                '("signin")))))
            (service-startup-config)
            (postgresql-connection-config
