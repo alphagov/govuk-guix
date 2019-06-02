@@ -32,6 +32,8 @@
            #~(let* ((tar-command
                      (list
                       (string-append #$tar "/bin/tar")
+                      "--checkpoint=20000"
+                      "--checkpoint-action=echo='%ds: %{read,wrote}T'"
                       "--create"
                       "--verbose"
                       "--auto-compress"
