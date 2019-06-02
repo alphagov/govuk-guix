@@ -110,6 +110,25 @@
     tailon-service
     govuk-content-schemas-service)))
 
+(define (set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER services)
+  (map
+   (lambda (s)
+     (service
+      (service-kind s)
+      (if
+       (list? (service-parameters s))
+       (map
+        (lambda (parameter)
+          (if
+           (service-startup-config? parameter)
+           (service-startup-config-with-additional-environment-variables
+            parameter
+            `(("GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" . "true")))
+           parameter))
+        (service-parameters s))
+       (service-parameters s))))
+   services))
+
 (define setup-services
   (let
       ((service-setup-functions
@@ -128,6 +147,7 @@
          (cut map ensure-database-user-exists-on-service-startup <>)
          (cut map run-db:setup-if-postgresql-or-mysql-is-used <>)
          (cut set-aws-xray-context-missing <> "LOG_ERROR")
+         set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
          (cut use-gds-sso-strategy <> "real")
          update-services-with-random-signon-secrets)))
 
