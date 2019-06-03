@@ -423,7 +423,7 @@
            (rails-app-config)
            content-data-admin
            (signon-application
-            (name "Content Data Admin")
+            (name "Content Data")
             (supported-permissions '("signin")))
            (signon-api-user
             (name "Content Data Admin")
