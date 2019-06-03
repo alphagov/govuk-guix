@@ -166,7 +166,7 @@
                  (string-join
                   `("set -eo pipefail;"
                     "pv" "--force" ,#$tmp-archive-filename "|"
-                    "xz" "-e" "-9" "-z" "-T0" "-c" ">"
+                    "xz" "-9" "--compress" "--threads=0" "--to-stdout" ">"
                     ,#$output)
                   " ")))
             (or (zero? (system command))
