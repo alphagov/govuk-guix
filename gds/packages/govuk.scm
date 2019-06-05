@@ -1449,12 +1449,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "1b3kz2x90dlgmh7yiniwvh3qywz3l5mdds5zyhadcmy67cwn3jd6")))
    (package
      (name "short-url-manager")
-     (version "release_320")
+     (version "release_321")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1lczyc0dlpp2qsqglycnvn08182qk11dhcd146ja8nn6n9ib94hq")))
+       #:hash (base32 "1ad1bdv3wxavc3pw8c3sjjghcgs3gnnmcmsswxpjrlnx61wh57sq")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
