@@ -3,7 +3,7 @@
 #
 # This script aims to make it easy to connect to various parts of the GOV.UK
 # infrastructure. It aims to provide a consistent way to do this, even across
-# different mosting providers.
+# different hosting providers.
 #
 #
 # Usage: govuk connect TYPE TARGET [options]
