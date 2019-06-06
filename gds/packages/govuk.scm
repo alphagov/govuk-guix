@@ -296,12 +296,12 @@ proxies requests to some upstream")
     (hash (base32 "1ibahbz3bxwmw32k8c16wz9la0jkbaw7qbzam0ml1ayvb9s8lcdh")))
    (package
      (name "content-audit-tool")
-     (version "release_606")
+     (version "release_607")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0jjjp36srk887yb4s8bch1b4c81fbacd4v4raf6i77xpihk2wyi7")))
+       #:hash (base32 "1ka434pn3dr76s408y4ni75v9fpjij1kxqg52fcp2i0zj88z4cyx")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
