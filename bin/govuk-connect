@@ -321,11 +321,23 @@ def node_class_for_app(app_name, environment, hosting)
   app_lookup_hash = {}
   node_class_data.each do |node_class, data|
     data['apps'].each do |app|
-      app_lookup_hash[app] = node_class
+      if app_lookup_hash.key? app
+        app_lookup_hash[app] += [node_class]
+      else
+        app_lookup_hash[app] = [node_class]
+      end
     end
   end
 
-  node_class = app_lookup_hash[app_name]
+  node_classes = app_lookup_hash[app_name]
+
+  if node_classes.length > 1
+    error "error: ambiguous node class for #{app_name} in #{environment}"
+
+    exit 1
+  else
+    node_class = node_classes.first
+  end
 
   log "debug: node class: #{node_class}"
 
@@ -427,27 +439,25 @@ def hosting_for_app(app_name, environment)
 end
 
 def govuk_app_command(target, environment, command)
-  hosting, name, number = parse_hosting_name_and_number(target)
+  node_class, app_name, number = parse_node_class_app_name_and_number(target)
 
-  info "Connecting to the app #{command} for #{bold(name)},\
+  info "Connecting to the app #{command} for #{bold(app_name)},\
  in the #{bold(environment)} environment"
 
-  if hosting
-    info "The selected hosting provider is #{bold(hosting)}"
-  else
-    hosting = hosting_for_app(name, environment)
+  hosting = hosting_for_app(app_name, environment)
 
-    info "The relevant hosting provider is #{bold(hosting)}"
-  end
-
-  node_class = node_class_for_app(
-    name,
-    environment,
-    hosting
-  )
+  info "The relevant hosting provider is #{bold(hosting)}"
 
   unless node_class
-    error "error: application '#{name}' not found."
+    node_class = node_class_for_app(
+      app_name,
+      environment,
+      hosting
+    )
+  end
+
+  unless node_class
+    error "error: application '#{app_name}' not found."
     newline
 
     application_names = application_names_from_node_class_data(
@@ -455,7 +465,7 @@ def govuk_app_command(target, environment, command)
       hosting
     )
 
-    similar_application_names = strings_similar_to(name, application_names)
+    similar_application_names = strings_similar_to(app_name, application_names)
     if similar_application_names.any?
       info "did you mean:"
       similar_application_names.each { |s| info " - #{s}" }
@@ -478,7 +488,7 @@ def govuk_app_command(target, environment, command)
       number: number
     },
     environment,
-    command: "govuk_app_#{command} #{name}"
+    command: "govuk_app_#{command} #{app_name}"
   )
 end
 
@@ -698,6 +708,33 @@ def parse_hosting_name_and_number(target)
   log "debug: hosting: #{hosting.inspect}, name: #{name.inspect}, number: #{number.inspect}"
 
   return hosting, name, number
+end
+
+def parse_node_class_app_name_and_number(target)
+  log "debug: parsing target: #{target}"
+  if target.is_a? Hash
+    return %i[node_class app_name number].map do |key|
+      target[key]
+    end
+  end
+
+  if target.include? '/'
+    node_class, app_name_and_number = target.split '/'
+  else
+    app_name_and_number = target
+  end
+
+  if app_name_and_number.include? ':'
+    app_name, number = name_and_number.split ':'
+
+    number = number.to_i
+  else
+    app_name = app_name_and_number
+  end
+
+  log "debug: node_class: #{node_class.inspect}, app_name: #{app_name.inspect}, number: #{number.inspect}"
+
+  return node_class, app_name, number
 end
 
 def check_for_target(target)
