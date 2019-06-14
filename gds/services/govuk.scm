@@ -340,9 +340,9 @@
      (list (shepherd-service
             (inherit default-shepherd-service)
             (provision '(content-data-api))
-            (requirement '(signon postgres)))
+            (requirement '(signon postgres redis rabbitmq)))
            (sidekiq-config
-            (file "config/sidekiq.yml"))
+            (file "config/sidekiq/default.yml"))
            (plek-config)
            (rails-app-config)
            content-data-api
