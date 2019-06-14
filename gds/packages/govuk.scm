@@ -351,8 +351,6 @@ proxies requests to some upstream")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
-          (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
      (synopsis "")
