@@ -329,6 +329,15 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "1jj3s42a9jwrb4335jfak4h0mcfrwcdz6c97ahihc8k0wy8kskc7")))
      (build-system rails-build-system)
+     (native-inputs
+      `(("chromium" ,ungoogled-chromium)))
+     (arguments
+      '(#:phases
+        (modify-phases %standard-phases
+          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
+            (lambda _
+              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
+              #t)))))
      (synopsis "A front end for the data warehouse")
      (description "")
      (license license:expat)
