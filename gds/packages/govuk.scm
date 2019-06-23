@@ -247,7 +247,11 @@ proxies requests to some upstream")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml))
+          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
+            (lambda _
+              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
+              #t)))))
      (synopsis "Used to create browse and topic pages")
      (description "")
      (license license:expat)
@@ -309,7 +313,11 @@ proxies requests to some upstream")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml))
+          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
+            (lambda _
+              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
+              #t)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -551,6 +559,13 @@ proxies requests to some upstream")
        #:commit-ish version
        #:hash (base32 "0gvlazzsghyldwgp0ba2irv3vjc4xlkw4yld2y19klcfqyap3xma")))
      (build-system rails-build-system)
+     (arguments
+      '(#:phases
+        (modify-phases %standard-phases
+          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
+            (lambda _
+              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
+              #t)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -879,6 +894,13 @@ service setup.")
        #:commit-ish version
        #:hash (base32 "0rjb5ms9ymj52q6894f7kjmvyw7ynkxnsba9sk34w5229lqiarrl")))
      (build-system rails-build-system)
+     (arguments
+      '(#:phases
+        (modify-phases %standard-phases
+          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
+            (lambda _
+              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
+              #t)))))
      (synopsis "")
      (description "")
      (license #f)
