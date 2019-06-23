@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -ex
+
+EXTRA_PACKAGE_NAMES="mongodb mongo-tools postgresql rabbitmq redis ungoogled-chromium"
+
+PACKAGE_NAMES="$(./guix-pre-inst-env guile -c "(begin (use-modules (gnu packages) (guix packages) (guix discovery)) (display (string-join (map package-name (fold-packages cons '() (all-modules '((\".\" . \"gds/packages\"))))))))")"
+
+./guix-pre-inst-env guix build --no-grafts --fallback --keep-going $PACKAGE_NAMES $EXTRA_PACKAGE_NAMES
