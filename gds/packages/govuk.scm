@@ -416,15 +416,15 @@ proxies requests to some upstream")
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "09aw4bxmr8wm86z9hy41idl9rszapkingmmjyiff1d23c89x7kg0")))
+    (hash (base32 "0gk39r1bks4aq6j0k997haq4s9mmfhsd99iaz3a2lf0x6kj3sb51")))
    (package
      (name "content-store")
-     (version "release_882")
+     (version "release_883")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1zc6m6vn5ld0sz03h6n56gwwqvd1hb2imqd6xz1vqpiggi432kg4")))
+       #:hash (base32 "0mpfl12k58c2by5q66ks53c9c3fyzchms3hs167z2x5dpxx76bnl")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
