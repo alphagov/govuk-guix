@@ -721,6 +721,7 @@ service setup.")
     (inputs
      `(("coreutils" ,coreutils)
        ("bash" ,bash)
+       ("sed" ,sed)
        ("guix" ,guix)
        ("guile" ,guile-2.2)
        ("guile-gcrypt" ,guile-gcrypt)
@@ -789,7 +790,7 @@ service setup.")
                  `("PATH" =
                    ,(map (lambda (input)
                            (string-append (assoc-ref inputs input) "/bin"))
-                         (list "coreutils" "awscli" "ruby" "gawk" "grep"))))
+                         (list "coreutils" "awscli" "ruby" "gawk" "grep" "sed"))))
 
                (wrap-program
                    (string-append out
