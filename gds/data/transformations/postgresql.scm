@@ -193,8 +193,6 @@
 
           (invoke "createuser" user)
           (invoke "createdb" database-name "-O" user)
-          (decompress-file-and-pipe-to-psql #$(data-extract-file base-extract)
-                                            database-name)
 
           (unless (null? initial-superuser-sql)
             (run-with-psql-port
@@ -205,6 +203,19 @@
                            (display (string-append statement ";")
                                     port))
                          initial-superuser-sql))))
+
+          #$(let ((format
+                   (assq-ref (data-extract-variant-properties base-extract)
+                             'format))
+                  (file
+                   (data-extract-file base-extract)))
+              (cond
+               ((string=? format "plain")
+                #~(decompress-file-and-pipe-to-psql #$file database-name))
+               ((string=? format "custom")
+                #~(pg-restore #$file database-name))
+               (else
+                (error "Unknown format" format))))
 
           #$@(map
               (match-lambda

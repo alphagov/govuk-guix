@@ -77,11 +77,28 @@
      (database-connection-config-for-data-extract base-extract)
      (map cdr variant-details)
      #:initial-superuser-sql
-     '(;; This avoids errors when restoring the dump
+     `(;; This avoids errors when restoring the dump
        ;; with a user that doesn't have permission to
        ;; comment on the default plpgsql
        ;; schema.
-       "COMMENT ON EXTENSION plpgsql IS null")))
+       "COMMENT ON EXTENSION plpgsql IS null"
+       ,@(let ((format
+                (assq-ref
+                 (data-extract-variant-properties base-extract)
+                 'format)))
+           (if (string=? format "custom")
+               '(;; Otherwise restoring data with dumps from AWS fails
+                 ;; with:
+                 ;;
+                 ;;  could not execute query: ERROR:  role "rdsadmin" does not exist
+                 ;;  Command was: REVOKE ALL ON SCHEMA public FROM rdsadmin;
+                 ;;
+                 ;;  could not execute query: ERROR:  role "aws_db_admin" does not exist
+                 ;;  GRANT ALL ON SCHEMA public TO aws_db_admin
+                 ;;
+                 "CREATE ROLE rdsadmin"
+                 "CREATE ROLE aws_db_admin")
+               '())))))
 
   (cons
    ;; The base extract is plain compressed SQL, with a priority value of 0.
