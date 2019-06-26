@@ -233,6 +233,11 @@
                     (list variant-name variant-description)))
                  variant-details))
    (operation #~(begin
+                  ;; Use line buffering for output, as this makes
+                  ;; messages appear promptly
+                  (setvbuf (current-output-port) 'line)
+                  (setvbuf (current-error-port) 'line)
+
                   #$(with-postgresql
                      postgresql-service
                      operation)))))
