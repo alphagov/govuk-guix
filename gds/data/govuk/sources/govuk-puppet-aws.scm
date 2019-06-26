@@ -180,31 +180,49 @@
       (find (lambda (filename)
               (member filename filenames))
             (list (string-append extract-prefix ".dump.xz")
-                  (string-append extract-prefix ".dump.gz"))))
+                  (string-append extract-prefix ".dump.gz")
+                  (string-append extract-prefix ".dump"))))
+
+    (define (remove-extension filename)
+      (fold (lambda (extension filename)
+              (basename filename extension))
+            filename
+            '(".dump.gz" ".dump.xz" ".dump")))
 
     (define (create-data-extract filename services)
-      (data-extract
-       (name (basename
-              (basename filename ".dump.xz")
-              ".dump.gz"))
-       (file (local-file
-              (string-join
-               `(,backup-directory
-                 ,date
-                 ,database
-                 ,@(if (string=? "mysql" database)
-                       '("mysql-master")
-                       '())
-                 ,filename)
-               "/")))
-       (datetime (string->date date "~Y-~m-~d"))
-       (database database)
-       (services services)
-       (data-source govuk-puppet-aws-data-source)
-       (variant-name "plain")
-       (variant-label "Plain compressed SQL")
-       (variant-properties '((format . "plain")
-                             (priority . 0)))))
+      (let* ((dump-suffix? (string-suffix? ".dump" filename))
+             (variant-name
+              (cond
+               (dump-suffix? "custom")
+               (else         "plain")))
+             (variant-label
+              (cond
+               (dump-suffix? "custom")
+               (else         "plain")))
+             (variant-properties-format
+              (cond
+               (dump-suffix? "custom")
+               (else         "plain"))))
+        (data-extract
+         (name (remove-extension filename))
+         (file (local-file
+                (string-join
+                 `(,backup-directory
+                   ,date
+                   ,database
+                   ,@(if (string=? "mysql" database)
+                         '("mysql-master")
+                         '())
+                   ,filename)
+                 "/")))
+         (datetime (string->date date "~Y-~m-~d"))
+         (database database)
+         (services services)
+         (data-source govuk-puppet-aws-data-source)
+         (variant-name variant-name)
+         (variant-label variant-label)
+         (variant-properties `((format . ,variant-properties-format)
+                               (priority . 0))))))
 
     (filter-map (match-lambda
                   ((extract-prefix . services)
