@@ -76,13 +76,14 @@
      base-extract
      (database-connection-config-for-data-extract base-extract)
      (map cdr variant-details)
-     #:initial-superuser-sql
-     `(;; This avoids errors when restoring the dump
+     #:post-restore-superuser-sql
+     '(;; This avoids errors when restoring the dump
        ;; with a user that doesn't have permission to
        ;; comment on the default plpgsql
        ;; schema.
-       "COMMENT ON EXTENSION plpgsql IS null"
-       ,@(let ((format
+       "COMMENT ON EXTENSION plpgsql IS null")
+     #:pre-restore-superuser-sql
+     `(,@(let ((format
                 (assq-ref
                  (data-extract-variant-properties base-extract)
                  'format)))

@@ -179,7 +179,9 @@
           base-extract
           database-connection-config
           variant-details
-          #:key (initial-superuser-sql '()))
+          #:key
+          (pre-restore-superuser-sql '())
+          (post-restore-superuser-sql '()))
   (define operation
     (with-imported-modules '((gds data transformations build postgresql))
       #~(lambda _
@@ -189,20 +191,21 @@
           (define user
             #$(postgresql-connection-config-user database-connection-config))
 
-          (define initial-superuser-sql (list #$@initial-superuser-sql))
+          (define pre-restore-superuser-sql (list #$@pre-restore-superuser-sql))
+          (define post-restore-superuser-sql (list #$@post-restore-superuser-sql))
 
           (invoke "createuser" user)
           (invoke "createdb" database-name "-O" user)
 
-          (unless (null? initial-superuser-sql)
+          (unless (null? pre-restore-superuser-sql)
             (run-with-psql-port
              database-name "postgres"
              (lambda (port)
                (for-each (lambda (statement)
-                           (simple-format #t "initial-sql: ~A;\n" statement)
+                           (simple-format #t "pre-restore sql: ~A;\n" statement)
                            (display (string-append statement ";")
                                     port))
-                         initial-superuser-sql))))
+                         pre-restore-superuser-sql))))
 
           #$(let ((format
                    (assq-ref (data-extract-variant-properties base-extract)
@@ -216,6 +219,16 @@
                 #~(pg-restore #$file database-name))
                (else
                 (error "Unknown format" format))))
+
+          (unless (null? post-restore-superuser-sql)
+            (run-with-psql-port
+             database-name "postgres"
+             (lambda (port)
+               (for-each (lambda (statement)
+                           (simple-format #t "post-restore sql: ~A;\n" statement)
+                           (display (string-append statement ";")
+                                    port))
+                         post-restore-superuser-sql))))
 
           #$@(map
               (match-lambda
