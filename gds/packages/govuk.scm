@@ -1476,15 +1476,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public short-url-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "08823lijzy23x40bqijjdrc52f6yik0jap2kmb2z97h06jki054v")))
+    (hash (base32 "0f7sdkp2pg23vsyz094k1x5w67p4cygaw2j4h2dhlawjry41iaqm")))
    (package
      (name "short-url-manager")
-     (version "release_327")
+     (version "release_328")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "17nhs4sagf0dpw5vp0hwg53f5n1q39c7jdhksc3psj995b0l3pag")))
+       #:hash (base32 "1hcgb6kqravdn0ig6wmh4q12vlab7h0hkv7wk15w1iygfkxxjm4x")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
