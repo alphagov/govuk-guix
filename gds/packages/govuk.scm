@@ -1790,15 +1790,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public travel-advice-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1i0vadjdq3x33x7125r6b2krs0571r0fs18lz9yajbj62cs1wqjq")))
+    (hash (base32 "0bmkhdwlfvlwnwbbf2b29d2s0cjsfx7qyp2wdwcqgilwvvk5fdbf")))
    (package
      (name "travel-advice-publisher")
-     (version "release_603")
+     (version "release_604")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0cbhwaabvc58am4l24pxi7ddhc86lii7x3wlpfqglhj3whnds54y")))
+       #:hash (base32 "170yad85km9llwibmrys8wig8cfkv1f6rk982avqb6cwa3mykfbs")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
