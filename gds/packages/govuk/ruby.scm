@@ -63,14 +63,14 @@
 (define-public ruby-govuk-document-types
   (package
     (name "ruby-govuk-document-types")
-    (version "0.9.1")
+    (version "0.9.2")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "govuk_document_types" version))
        (sha256
         (base32
-         "0gxj8zgjpm9i96z246zxxy7a7vvsq6yiyzlgf3dz43501gy6x712"))))
+         "0kyymwvnm3sdmcf1ip7cnkpclvs4il2vklh64fi3hbl61iy9k9y6"))))
     (build-system ruby-build-system)
     (arguments
      '(#:test-target "spec"))
