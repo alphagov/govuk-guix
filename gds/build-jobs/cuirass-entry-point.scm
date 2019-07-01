@@ -12,7 +12,7 @@
                            (string-append working-directory "/bin/govuk")
                            "cuirass-jobs"))
          (jobs (match (read port)
-                 ;; If an error occured during evaluation report it,
+                 ;; If an error occurred during evaluation report it,
                  ;; otherwise, suppose that data read from port are
                  ;; correct and keep things going.
                  ((? eof-object?)

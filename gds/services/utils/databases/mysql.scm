@@ -105,7 +105,7 @@
                            "--protocol=tcp"
                            ,(string-append "--password=" #$password "")
                            "-P" ,(number->string #$port)
-                           "--batch"  ;; tab seperated output
+                           "--batch"  ;; tab separated output
                            "--skip-column-names"
                            "--execute=SHOW DATABASES;"))
                 (p (apply open-pipe* OPEN_READ command))

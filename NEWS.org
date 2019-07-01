@@ -183,7 +183,7 @@ out of date.
 *** Improve support for Whitehall attachments
 ** July
 *** Display NGinx logs through Tailon in the development system
-*** Create per-service NGinx acccess.log files
+*** Create per-service NGinx access.log files
 *** Improve Rails app database support
 *** Plek support improvements
 *** Elasticsearch connection support
@@ -288,7 +288,7 @@ out of date.
  - support-api
 *** Removed services
  - private-frontend
-** Febuary
+** February
 *** Add support for configuring signon users and applications
 *** Switch to using unicorn to serve rails applications
 *** New packages

@@ -15,7 +15,7 @@ __If you encounter any difficulties or problems with govuk-guix, please [open an
 
 To access locally running services, the local DNS configuration must
 resolve domains like `*.dev.gov.uk` to your local machine, if this is
-not setup, see the [DNS Setup](#dns-setup) section for guidence on how
+not setup, see the [DNS Setup](#dns-setup) section for guidance on how
 to do this.
 
 When using govuk-guix, you can either start all services, or a subset
@@ -34,7 +34,7 @@ govuk system start short-url-manager publisher
 
 The [Signon][signon] application is used for authentication by other
 applications, and also provides links to those applications to which
-you have access. A user is automaticaly created, with access to all
+you have access. A user is automatically created, with access to all
 applications with the email address `dev@dev.gov.uk`. The passphrase
 randomly generated and saved so that it is the same when `govuk
 system` is run again. You can find out what the passphrase is by
@@ -42,7 +42,7 @@ running the `govuk system passphrase` command.
 
 [signon]: https://docs.publishing.service.gov.uk/apps/signon.html
 
-If local DNS is configigured, and the system started succesfully,
+If local DNS is configigured, and the system started successfully,
 Signon should now be reachable at:
 
 ```
@@ -56,7 +56,7 @@ workaround until more complex networking support is available.
 
 At this point, you have a GOV.UK system running locally with many of
 the services that you might expect. The software behind these services
-sits within the `/gnu/store` and cannot be modified. For guidence in
+sits within the `/gnu/store` and cannot be modified. For guidance in
 starting systems for developing services, see the section on
 [sharing files for local development](#sharing-files-for-local-development).
 
@@ -94,7 +94,7 @@ To do this, the share option would be:
 GOV.UK services are usually deployed to separate domains, e.g. the
 Signon service is accessible at
 `signon.publishing.service.gov.uk`. Doing similarly for local
-devleopment can be convinient, but does require setting up the DNS
+devleopment can be convenient, but does require setting up the DNS
 configuration for your machine.
 
 ### govuk-puppet Development VM
