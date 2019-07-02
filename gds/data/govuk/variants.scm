@@ -80,18 +80,6 @@
      base-extract
      (database-connection-config-for-data-extract base-extract)
      (map cdr variant-details)
-     #:post-restore-superuser-sql
-     `(;; This avoids errors when restoring the dump
-       ;; with a user that doesn't have permission to
-       ;; comment on the default plpgsql
-       ;; schema.
-       "COMMENT ON EXTENSION plpgsql IS null"
-       ,@(if (string=? format "custom")
-             '(;; Remove the use of the aws_db_admin role, so that
-               ;; it's not required when restoring
-               "REVOKE ALL ON SCHEMA public FROM aws_db_admin"
-               "DROP ROLE aws_db_admin")
-             '()))
      #:pre-restore-superuser-sql
      `(,@(if (string=? format "custom")
              '(;; Otherwise restoring data with dumps from AWS fails
@@ -105,6 +93,18 @@
                ;;
                "CREATE ROLE rdsadmin"
                "CREATE ROLE aws_db_admin")
+             '()))
+     #:post-restore-superuser-sql
+     `(;; This avoids errors when restoring the dump
+       ;; with a user that doesn't have permission to
+       ;; comment on the default plpgsql
+       ;; schema.
+       "COMMENT ON EXTENSION plpgsql IS null"
+       ,@(if (string=? format "custom")
+             '(;; Remove the use of the aws_db_admin role, so that
+               ;; it's not required when restoring
+               "REVOKE ALL ON SCHEMA public FROM aws_db_admin"
+               "DROP ROLE aws_db_admin")
              '()))))
 
   (cons
