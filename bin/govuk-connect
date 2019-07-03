@@ -347,6 +347,8 @@ def node_class_for_app(app_name, environment, hosting)
 
   node_classes = app_lookup_hash[app_name]
 
+  return if node_classes.nil?
+
   if node_classes.length > 1
     error "error: ambiguous node class for #{app_name} in #{environment}"
 
