@@ -392,7 +392,10 @@ def hosting_for_node_type(node_type, environment)
     error "error: ambiguous hosting for #{node_type} in #{environment}"
     newline
     info "specify the hosting provider and node type, for example: "
-    info "\n  govuk connect ssh aws/#{node_type}\n\n"
+    hosting_providers.each do |hosting_provider|
+      info "\n  govuk connect ssh #{bold(hosting_provider)}/#{node_type}"
+    end
+    info "\n"
 
     exit 1
   elsif aws_node_types.include?(node_type)
