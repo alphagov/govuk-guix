@@ -9,18 +9,69 @@
 # Usage: govuk connect TYPE TARGET [options]
 #     -e, --environment ENVIRONMENT    Select which environment to connect to
 #         --hosting-and-environment-from-alert-url URL
-#                                      Select which environment to connect to
-#                                      based on the alert. URL
+#                                      Select which environment to connect to based on the URL provided.
 #     -p, --port-forward SERVICE       Connect to a remote port
 #     -v, --verbose                    Enable more detailed logging
-#     -h, --help                       Prints this help
+#     -h, --help                       Prints usage information and examples
 #
-# Valid connection types are:
-#  - app-console
-#  - app-dbconsole
-#  - rabbitmq
-#  - sidekiq-monitoring
-#  - ssh
+# CONNECTION TYPES
+#   app-console
+#     Launch a console for an application.  For example, a rails console when connecting to a Rails application.
+#   app-dbconsole
+#     Launch a console for the database for an application.
+#   rabbitmq
+#     Setup port forwarding to the RabbitMQ admin interface.
+#   sidekiq-monitoring
+#     Setup port forwarding to the Sidekiq Monitoring application.
+#   ssh
+#     Connect to a machine through SSH.
+#
+# MACHINE TARGET
+#   The ssh, rabbitmq and sidekiq-monitoring connection types target
+#   machines.
+#
+#   The machine can be specified by name, for example:
+#
+#     gouvk connect ssh -e integration backend
+#
+#   If the hosting provider is ambiguous, you'll need to specify it prior
+#   to the name, for example:
+#
+#     govuk connect ssh -e staging aws/backend
+#
+#   If you want to connect to a specific machine, you can specify a number
+#   after the name, for example:
+#
+#     govuk connect ssh -e integration backend:2
+#
+# APPLICATION TARGET
+#   The app-console and app-dbconsole connection types target
+#   applications.
+#
+#   The application is specified by name, for example:
+#
+#     govuk connect app-console -e integration publishing-api
+#
+#   If the node class is ambiguous, you'll need to specify it prior to
+#   the name, for example:
+#
+#     govuk connect app-console -e integration whitehall_backend/whitehall
+#
+#   If you want to connect to a specific machine, you can specify a
+#   number after the name, for example:
+#
+#     govuk connect app-console -e integration publishing-api:2
+#
+# EXAMPLES
+#   govuk connect ssh --environment integration backend
+#
+#   govuk connect app-console --environment staging publishing-api
+#
+#   govuk connect app-dbconsole -e integration whitehall_backend/whitehall
+#
+#   gouvk connect rabbitmq -e staging aws/rabbitmq
+#
+#   govuk connect sidekiq-monitoring -e integration
 
 
 require 'uri'
@@ -30,22 +81,69 @@ require 'socket'
 require 'timeout'
 require 'optparse'
 
+def bold(string)
+  "\e[1m#{string}\e[0m"
+end
+
 USAGE_BANNER = 'Usage: govuk connect TYPE TARGET [options]'
 
-EXAMPLES = <<~EXAMPLES
-  For example:
+EXAMPLES = <<EXAMPLES
+  govuk connect ssh --environment integration backend
 
-    govuk connect ssh --environment integration backend
+  govuk connect app-console --environment staging publishing-api
 
-    govuk connect app-console --environment staging publishing-api
+  govuk connect app-dbconsole -e integration whitehall_backend/whitehall
 
-    govuk connect app-dbconsole -e integration whitehall_backend/whitehall
+  gouvk connect rabbitmq -e staging aws/rabbitmq
 
-    gouvk connect rabbitmq -e staging aws/rabbitmq
-
-    govuk connect sidekiq-monitoring -e integration
-
+  govuk connect sidekiq-monitoring -e integration
 EXAMPLES
+
+MACHINE_TARGET_DESCRIPTION  = <<DOCS
+  The ssh, rabbitmq and sidekiq-monitoring connection types target
+  machines.
+
+  The machine can be specified by name, for example:
+
+    gouvk connect ssh -e integration #{bold('backend')}
+
+  If the hosting provider is ambiguous, you'll need to specify it prior
+  to the name, for example:
+
+    govuk connect ssh -e staging #{bold('aws/')}backend
+
+  If you want to connect to a specific machine, you can specify a number
+  after the name, for example:
+
+    govuk connect ssh -e integration backend#{bold(':2')}
+DOCS
+
+APP_TARGET_DESCRIPTION = <<DOCS
+  The app-console and app-dbconsole connection types target
+  applications.
+
+  The application is specified by name, for example:
+
+    govuk connect app-console -e integration #{bold('publishing-api')}
+
+  If the node class is ambiguous, you'll need to specify it prior to
+  the name, for example:
+
+    govuk connect app-console -e integration #{bold('whitehall_backend/')}whitehall
+
+  If you want to connect to a specific machine, you can specify a
+  number after the name, for example:
+
+    govuk connect app-console -e integration publishing-api#{bold(':2')}
+DOCS
+
+CONNECTION_TYPE_DESCRIPTIONS = {
+  'ssh' => 'Connect to a machine through SSH.',
+  'app-console' => 'Launch a console for an application.  For example, a rails console when connecting to a Rails application.',
+  'app-dbconsole' => 'Launch a console for the database for an application.',
+  'rabbitmq' => 'Setup port forwarding to the RabbitMQ admin interface.',
+  'sidekiq-monitoring' => 'Setup port forwarding to the Sidekiq Monitoring application.'
+}
 
 RABBITMQ_PORT = 15672
 SIDEKIQ_MONITORING_PORT = 3211
@@ -69,10 +167,6 @@ JUMPBOXES = {
 
 def log(message)
   STDERR.puts message if $verbose
-end
-
-def bold(string)
-  "\e[1m#{string}\e[0m"
 end
 
 def newline
@@ -686,7 +780,7 @@ def parse_options
     end
     opts.on(
       '--hosting-and-environment-from-alert-url URL',
-      'Select which environment to connect to based on the alert. URL'
+      'Select which environment to connect to based on the URL provided.'
     ) do |o|
       hosting, environment = hosting_and_environment_from_url(o)
       options[:hosting] = hosting
@@ -699,8 +793,24 @@ def parse_options
       $verbose = true
     end
 
-    opts.on('-h', '--help', 'Prints this help') do
+    opts.on('-h', '--help', 'Prints usage information and examples') do
       info opts
+      newline
+      info bold('CONNECTION TYPES')
+      TYPES.keys.each do |x|
+        info "  #{x}"
+        description = CONNECTION_TYPE_DESCRIPTIONS[x]
+        info "    #{description}" if description
+      end
+      newline
+      info bold('MACHINE TARGET')
+      info MACHINE_TARGET_DESCRIPTION
+      newline
+      info bold('APPLICATION TARGET')
+      info APP_TARGET_DESCRIPTION
+      newline
+      info bold('EXAMPLES')
+      info EXAMPLES
       exit
     end
   end
