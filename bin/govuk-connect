@@ -186,6 +186,20 @@ def ssh_username
   end
 end
 
+def ssh_identity_file
+  @ssh_identity_file ||= begin
+    YAML::load_file(config_file)['ssh_identity_file'] if File.exist? config_file
+  end
+end
+
+def ssh_identity_arguments
+  if ssh_identity_file
+    ['-i', ssh_identity_file]
+  else
+    []
+  end
+end
+
 def user_at_host(user, host)
   "#{user}@#{host}"
 end
@@ -195,6 +209,7 @@ def govuk_node_list_classes(environment, hosting)
   command = [
     'ssh',
     '-o', 'ConnectTimeout=2', # Show a failure quickly
+    *ssh_identity_arguments,
     user_at_host(
       ssh_username,
       jumpbox_for_environment_and_hosting(environment, hosting)
@@ -224,6 +239,7 @@ def get_domains_for_node_class(target, environment, hosting, ssh_username)
   command = [
     'ssh',
     '-o', 'ConnectTimeout=2', # Show a failure quickly
+    *ssh_identity_arguments,
     user_at_host(
       ssh_username,
       jumpbox_for_environment_and_hosting(environment, hosting)
@@ -565,6 +581,7 @@ def ssh(
 
   ssh_command = [
     'ssh',
+    *ssh_identity_arguments,
     '-J', user_at_host(
       ssh_username,
       jumpbox_for_environment_and_hosting(environment, hosting)
