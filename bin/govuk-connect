@@ -359,6 +359,12 @@ def node_class_for_app(app_name, environment, hosting)
 
   if node_classes.length > 1
     error "error: ambiguous node class for #{app_name} in #{environment}"
+    newline
+    info "specify the node class and application mame, for example: "
+    node_classes.each do |node_class|
+      info "\n  govuk connect app-console -e #{environment} #{node_class}/#{app_name}"
+    end
+    newline
 
     exit 1
   else
