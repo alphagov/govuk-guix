@@ -35,7 +35,15 @@ USAGE_BANNER = 'Usage: govuk connect TYPE TARGET [options]'
 EXAMPLES = <<~EXAMPLES
   For example:
 
+    govuk connect ssh --environment integration backend
+
     govuk connect app-console --environment staging publishing-api
+
+    govuk connect app-dbconsole -e integration whitehall_backend/whitehall
+
+    gouvk connect rabbitmq -e staging aws/rabbitmq
+
+    govuk connect sidekiq-monitoring -e integration
 
 EXAMPLES
 
