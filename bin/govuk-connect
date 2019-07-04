@@ -32,7 +32,7 @@
 #
 #   The machine can be specified by name, for example:
 #
-#     gouvk connect ssh -e integration backend
+#     govuk connect ssh -e integration backend
 #
 #   If the hosting provider is ambiguous, you'll need to specify it prior
 #   to the name, for example:
@@ -69,7 +69,7 @@
 #
 #   govuk connect app-dbconsole -e integration whitehall_backend/whitehall
 #
-#   gouvk connect rabbitmq -e staging aws/rabbitmq
+#   govuk connect rabbitmq -e staging aws/rabbitmq
 #
 #   govuk connect sidekiq-monitoring -e integration
 
@@ -94,7 +94,7 @@ EXAMPLES = <<EXAMPLES
 
   govuk connect app-dbconsole -e integration whitehall_backend/whitehall
 
-  gouvk connect rabbitmq -e staging aws/rabbitmq
+  govuk connect rabbitmq -e staging aws/rabbitmq
 
   govuk connect sidekiq-monitoring -e integration
 EXAMPLES
@@ -105,7 +105,7 @@ MACHINE_TARGET_DESCRIPTION  = <<DOCS
 
   The machine can be specified by name, for example:
 
-    gouvk connect ssh -e integration #{bold('backend')}
+    govuk connect ssh -e integration #{bold('backend')}
 
   If the hosting provider is ambiguous, you'll need to specify it prior
   to the name, for example:
