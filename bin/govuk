@@ -32,9 +32,15 @@ esac
 
 log "SCRIPT_PATH is $SCRIPT_PATH"
 
+export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
+log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
+
+export GOVUK_ROOT_DIR="$(dirname $GOVUK_GUIX_ROOT)"
+log "Using $GOVUK_ROOT_DIR as GOVUK_ROOT_DIR"
+
 if [ "$GOVUK_EXEC_PATH" = "" ]; then
-    log "GOVUK_EXEC_PATH is empty, so using \$(dirname \"\$SCRIPT_PATH\")"
-    GOVUK_EXEC_PATH=$(dirname "$SCRIPT_PATH")
+    GOVUK_EXEC_PATH="$(dirname "$SCRIPT_PATH"):$GOVUK_ROOT_DIR/govuk-docker/bin"
+    log "GOVUK_EXEC_PATH is empty, so setting a default value"
 fi
 
 log "GOVUK_EXEC_PATH is $GOVUK_EXEC_PATH"
@@ -60,9 +66,6 @@ if [ "$COMMAND_FULL_PATH" = "" ]; then
 fi
 
 log "COMMAND_FULL_PATH is $COMMAND_FULL_PATH"
-
-export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
-log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
 
 # Determine if guile is available
 GUILE=""
