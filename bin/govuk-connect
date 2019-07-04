@@ -1002,6 +1002,7 @@ def main
       STDERR.puts " - #{x}"
     end
     STDERR.puts
+    STDERR.puts "Example commands:"
     STDERR.puts EXAMPLES
 
     exit 1
@@ -1017,6 +1018,7 @@ def main
       STDERR.puts " - #{x}"
     end
     STDERR.puts
+    STDERR.puts "Example commands:"
     STDERR.puts EXAMPLES
 
     exit 1
