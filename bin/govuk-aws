@@ -31,7 +31,7 @@ read_aws_config_file() {
         echo "govuk: aws: couldn't find the '$profile' profile in ~/.aws/config"
         if grep --quiet "^\[profile " ~/.aws/config; then
             echo "govuk: aws: the following profiles are available in ~/.aws/config"
-            sed -n -e 's/\[profile \(.*\)\]/  \1/p' /home/gds/.aws/config
+            sed -n -e 's/\[profile \(.*\)\]/  \1/p' ~/.aws/config
         else
             echo "govuk: aws: it doesn't look like ~/.aws/config contains any profiles"
         fi
