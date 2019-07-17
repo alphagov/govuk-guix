@@ -885,15 +885,15 @@ service setup.")
 (define-public licence-finder
   (package-with-bundler
    (bundle-package
-    (hash (base32 "00ws0mpvby04avpip7lwk5r7dszmx4zr6is4r9rr66qi0cpgv3wi")))
+    (hash (base32 "1nis5aycxj43pc6hysw9lma3mk1a5arix4clw4gkswil2br8384p")))
    (package
      (name "licence-finder")
-     (version "release_615")
+     (version "release_616")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "00sfh15dzmjns7hl62nb67q6yi9phrv6d72za3wll87qm5n6xcc3")))
+       #:hash (base32 "1qmrc8ji2203aw4lc5w8r8xkrwkav89y4yb2nyya1r4qf5kgniwa")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
