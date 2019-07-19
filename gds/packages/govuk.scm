@@ -965,15 +965,15 @@ service setup.")
 (define-public manuals-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "174lxx67kfa4pyakwzsnmsmbi8wnrkdc789spa424w273pqp75fd")))
+    (hash (base32 "01mb5f1h688lsy78klzm77nrzpsd74y2vr665kqbr5an9rg5ybww")))
    (package
      (name "manuals-frontend")
-     (version "release_543")
+     (version "release_545")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ibydmlhi5cybygrdjs795kp2ww2mywfxn9w2lpq7zn7wjznfaay")))
+       #:hash (base32 "1zya6w4jm9vg3kjh7x9vqqjbfvjp3gnwr8zrsn5q2835rvlv9rn9")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
