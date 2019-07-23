@@ -53,7 +53,7 @@ COMMAND="$1"
 log "COMMAND is $COMMAND"
 
 if [ "$COMMAND" = "" ]; then
-    echo "Please specify a command, e.g. data or system"
+    echo "Please specify a command, e.g. connect, data or system"
     exit 1
 fi
 
