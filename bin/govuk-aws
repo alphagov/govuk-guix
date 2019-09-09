@@ -100,12 +100,19 @@ get_aws_credentials() {
     fi
 }
 
+test_aws_cli_installed() {
+  if ! command -v aws 2>/dev/null; then
+    echo "You need to have the aws cli tool installed to run govuk aws.\r\nIt looks like you don't.\r\nPlease visit https://aws.amazon.com/cli/ for installation instructions."
+    exit 1
+  fi
+}
 
 if [ "$1" == "--profile" ]; then
     profile="$2"
     cache_directory="${XDG_CACHE_HOME-$HOME/.cache}/govuk-guix"
     cached_aws_credentials="$cache_directory/${profile}-aws-credentials"
 
+    test_aws_cli_installed
     get_aws_credentials
 
     if [ "$3" == "--export" ]; then
