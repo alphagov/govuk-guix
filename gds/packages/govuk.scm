@@ -822,15 +822,15 @@ service setup.")
 (define-public hmrc-manuals-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "07vvsp6bj494c7kasp429iw7qaip1kp9kipz7rfyvqcrgmb8mdgd")))
+    (hash (base32 "0amjsga9sfh6acpra52wvag7ws8s02s84rsdwhr7xlidk5bms51q")))
    (package
      (name "hmrc-manuals-api")
-     (version "release_373")
+     (version "release_375")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "05j67dym08m1shai6pk4v3mhlnmfws49cvq4sq3knrslny3jzfhp")))
+       #:hash (base32 "0vfc0kj6z23myjfrdlxwdqi68kcd127cimgbgkxq7fpabcjgynhz")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
