@@ -1362,12 +1362,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0y7lmf37prhx2h8lrdmba0lgf2gsc3dv00zazgww974ld4bd8sxv")))
    (package
      (name "router-api")
-     (version "release_242")
+     (version "release_243")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0kp5vrswmdzxh55fs9r3i1cl6dmhb9ac504hryhsxsryhg404fpj")))
+       #:hash (base32 "0naw3m08ayhikc9lc6l7p5scg5dcr4k3hdp4lmlmibqhv37g6sdv")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
