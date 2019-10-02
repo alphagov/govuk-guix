@@ -1741,12 +1741,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0x5556cirixdnbmx5p17rqr01xg025hhzjpyc192dh49pmba3bwi")))
    (package
      (name "support-api")
-     (version "release_329")
+     (version "release_330")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1fq4s1k4bgabjj80v0jpgjcs116x60wy9mbh4qcwqahrgfxalj48")))
+       #:hash (base32 "0d4abnfnazbglkkx1icais5jx9s0grspblbixlbwdv7kypfwcygx")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
