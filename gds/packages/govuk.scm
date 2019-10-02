@@ -552,12 +552,12 @@ proxies requests to some upstream")
     (hash (base32 "12r734lbbcz9dzlh9q4kd74mmcjwxrxd3c20bfchcvx2hgd26vhv")))
    (package
      (name "feedback")
-     (version "release_740")
+     (version "release_741")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1jqf4psjajkfxha567r91gz8lhbkbg26y0asaw3llq4qxlsadkqv")))
+       #:hash (base32 "0rmdw7sa3c3sr1p4wzg5bmxf9r2819n3gha58ay3mcjba9kcd2k9")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
