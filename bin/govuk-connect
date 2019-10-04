@@ -211,6 +211,24 @@ def strings_similar_to(target, strings)
   end
 end
 
+def check_ruby_version_greater_than(required_major:, required_minor:)
+  major, minor = RUBY_VERSION.split '.'
+
+  insufficient_version = (
+    major.to_i < required_major || (
+      major.to_i == required_major &&
+      minor.to_i < required_minor
+    )
+  )
+
+  if insufficient_version
+    error "insufficient Ruby version: #{RUBY_VERSION}"
+    error "must be at least #{required_major}.#{required_minor}"
+
+    exit 1
+  end
+end
+
 def port_free?(port)
   # No idea how well this works, but it's hopefully better than nothing
 
@@ -974,6 +992,7 @@ TYPES = {
 
 def main
   system('govuk check-for-govuk-guix-updates')
+  check_ruby_version_greater_than(required_major: 2, required_minor: 0)
 
   double_dash_index = ARGV.index '--'
   if double_dash_index
