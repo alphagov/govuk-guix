@@ -21,7 +21,7 @@ log "\$0 is $0"
 case "$0" in
     \/*) SCRIPT_PATH="$0";;
     *)   log "\$0 does not start with / so using readlink -f";
-         case "Darwin" in
+         case $(uname) in
              "Darwin")
                  # readlink -f doesn't work on MacOS
                  SCRIPT_PATH="$PWD/${0#./}";;
