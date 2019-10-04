@@ -35,7 +35,20 @@ log "SCRIPT_PATH is $SCRIPT_PATH"
 export GOVUK_GUIX_ROOT="$(dirname $(dirname $SCRIPT_PATH))"
 log "Using $GOVUK_GUIX_ROOT as GOVUK_GUIX_ROOT"
 
-export GOVUK_ROOT_DIR="$(dirname $GOVUK_GUIX_ROOT)"
+if [ -d "$GOVUK_GUIX_ROOT/.git" ]; then
+    # Probably running from a Git repository, so assume the above
+    # directory is the GOVUK_ROOT_DIR
+    export GOVUK_ROOT_DIR="$(dirname $GOVUK_GUIX_ROOT)"
+else
+    # Probably installed, maybe through Homebrew. Try to figure out
+    # where other GOV.UK repositories are located by looking at $HOME
+    case $(uname) in
+        "Darwin")
+            export GOVUK_ROOT_DIR="$HOME/govuk";;
+        *)
+            export GOVUK_ROOT_DIR="$(readlink -f "$HOME/govuk")";;
+    esac
+fi
 log "Using $GOVUK_ROOT_DIR as GOVUK_ROOT_DIR"
 
 if [ "$GOVUK_EXEC_PATH" = "" ]; then
