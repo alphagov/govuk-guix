@@ -977,6 +977,9 @@ def main
 
   double_dash_index = ARGV.index '--'
   if double_dash_index
+    # This is used in the case of passing extra options to ssh, the --
+    # acts as a separator, so to avoid optparse interpreting those
+    # options, split ARGV around -- before parsing the options
     rest = ARGV[double_dash_index + 1, ARGV.length]
     argv = ARGV[0, double_dash_index]
 
