@@ -1287,12 +1287,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "03bx4hdqd650zjjvxc2r14vn8y4376psx4ljspnv7cy4mymqk18x")))
    (package
      (name "release")
-     (version "release_504")
+     (version "release_505")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "079189s9fvlnl9l4zklhmvvsl9xvxkvic03zv3b46p3ibglqq9fp")))
+       #:hash (base32 "17qq8vsr3ahmdlpwd5gy17xg0zjgkjxhjpkwz2l0bkw8f7bk797j")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
