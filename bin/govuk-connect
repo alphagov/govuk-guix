@@ -651,12 +651,13 @@ def ssh(
   # Split something like aws/backend:2 in to :aws, 'backend', 2
   hosting, name, number = parse_hosting_name_and_number(target)
 
-  # The hosting might not have been provided, so check if necessary
-  hosting ||= hosting_for_target_and_environment(target, environment)
-
   if name.end_with?('.internal', '.gov.uk')
     ssh_target = name
+    hosting = :aws
   else
+    # The hosting might not have been provided, so check if necessary
+    hosting ||= hosting_for_target_and_environment(target, environment)
+
     domains = get_domains_for_node_class(
       name,
       environment,
