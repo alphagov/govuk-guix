@@ -651,9 +651,12 @@ def ssh(
   # Split something like aws/backend:2 in to :aws, 'backend', 2
   hosting, name, number = parse_hosting_name_and_number(target)
 
-  if name.end_with?('.internal', '.gov.uk')
+  if name.end_with? '.internal'
     ssh_target = name
     hosting = :aws
+  elsif name.end_with? '.gov.uk'
+    ssh_target = name
+    hosting = :carrenza
   else
     # The hosting might not have been provided, so check if necessary
     hosting ||= hosting_for_target_and_environment(target, environment)
