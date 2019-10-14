@@ -1762,15 +1762,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1jgpxgixzpnk03gxlxa0nrrvw0whlhrhw8zxrcj3hzwl801gb1sb")))
+    (hash (base32 "0gvas88rcxyp5nnirqcvh7c9cq24lmfhvsf5zvhmvgd0kqk0730h")))
    (package
      (name "transition")
-     (version "release_993")
+     (version "release_994")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1gwdspikbqhm0fyg2142r820gbk2slk32yc3j261vvpfnhjpj3m4")))
+       #:hash (base32 "0hfz5dsa9zr3b6nlyz36hn5yvvmkps1h1yxli4g0ap28wx4bwlh9")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
