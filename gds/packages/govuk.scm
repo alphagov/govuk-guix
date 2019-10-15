@@ -1405,15 +1405,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "12937w2q4h8lqfmxy9cpwpa7101vckdc1sirxp2wsak1xr4r9i0h")))
+    (hash (base32 "15w5i17rcd1157xhq1gb106xa6yrdf1xvlp7a94fgqr2m39ybvsb")))
    (package
      (name "search-api")
-     (version "release_2219")
+     (version "release_2220")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dl0s2hyyi6nvk2bnximkk2917hdbyh82n7bqw8z9lihivxni3c2")))
+       #:hash (base32 "1r9f4b2hr0pbjjs53s9wp0xvc1hfiabr46h8qndcbgn3c10bsa6p")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Search API for GOV.UK")
