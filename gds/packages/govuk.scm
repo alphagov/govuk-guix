@@ -1706,15 +1706,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1gn9m8pbqrxynxhjwcv9m9hvsv35kn9glgra36rnd6g101q046hj")))
+    (hash (base32 "135m6lyfg1rglh8f3pgdzx75jhmanh4h5pbpg4n29qrs9rw79sj8")))
    (package
      (name "support")
-     (version "release_897")
+     (version "release_898")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1arcahsf5zifskifyd930qmbz51f8shj75jbparzf50yx93kdmnv")))
+       #:hash (base32 "0lrkymx2f54wwllbzncnvyr13ri0w1a5n7ycvwx9q0zhv6knbagd")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
