@@ -1334,6 +1334,7 @@ content, as well as broadcasting changes to a message queue.")
                       (copy-recursively cwd "../router-copy")
                       (mkdir-p "__build/src/github.com/alphagov")
                       (mkdir-p "__build/bin")
+                      (setenv "HOME" "/tmp")
                       (setenv "GOPATH" (string-append cwd "/__build"))
                       (setenv "BINARY" (string-append cwd "/router"))
                       (rename-file "../router-copy"
