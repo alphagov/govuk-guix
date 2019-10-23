@@ -76,7 +76,6 @@
                                        "/bin/sh"))
               ("/bin/bash" ,(file-append (canonical-package bash)
                                          "/bin/bash"))))
-   pretend-loopback-service
    (service govuk-nginx-service-type)
    (service govuk-certificates-service-type)
    (service govuk-skeletons-service-type)))
@@ -180,6 +179,6 @@
    wget
    lsof
    curl
-   openssl
+   openssl-1.0
    nss-certs
    %base-packages))
