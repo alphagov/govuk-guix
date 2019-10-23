@@ -116,7 +116,7 @@
                           (ca-certificate-bundle
                            (packages->manifest (list nss-certs)))))
        (define inputs
-         (list ruby tar gzip (bundler ruby) git))
+         (list coreutils sed ruby tar gzip (bundler ruby) git))
 
        (define search-paths
          (map
