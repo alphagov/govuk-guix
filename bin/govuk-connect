@@ -558,31 +558,30 @@ def hosting_for_app(app_name, environment)
     return hosting
   end
 
-  app_data = govuk_developer_docs_applications_data.find do |data|
-    key = (data.key? 'puppet_name') ? 'puppet_name' : 'github_repo_name'
+  aws_app_names = application_names_from_node_class_data(
+    environment,
+    :aws,
+  )
 
-    data[key] == app_name
-  end
-
-  unless app_data
-    error "error: unknown hosting for #{app_name} in #{environment}"
-    exit 1
-  end
-
-  hosting = app_data['production_hosted_on']
-
-  if hosting == 'aws'
+  if aws_app_names.include? app_name
     log "debug: #{app_name} is hosted in AWS"
 
-    :aws
-  elsif hosting == 'carrenza'
+    return :aws
+  end
+
+  carrenza_app_names = application_names_from_node_class_data(
+    environment,
+    :carrenza,
+  )
+
+  if carrenza_app_names.include? app_name
     log "debug: #{app_name} is hosted in Carrenza"
 
-    :carrenza
-  else
-    error "error: unknown hosting value '#{hosting}' for #{app_name}"
-    exit 1
+    return :carrenza
   end
+
+  error "error: unknown hosting value '#{hosting}' for #{app_name}"
+  exit 1
 end
 
 def govuk_app_command(target, environment, command)
