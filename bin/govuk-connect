@@ -383,19 +383,6 @@ def govuk_directory
   File.dirname(File.dirname(File.dirname(__FILE__)))
 end
 
-def govuk_developer_docs_applications_data
-  log 'debug: fetching the govuk-developer-docs application data'
-
-  applications_yml_file = File.join(
-    govuk_directory,
-    'govuk-developer-docs',
-    'data',
-    'applications.yml'
-  )
-
-  YAML::load_file(applications_yml_file)
-end
-
 def govuk_puppet_node_class_data(environment, hosting)
   log "debug: fetching govuk-puppet node class data for #{hosting} #{environment}"
 
