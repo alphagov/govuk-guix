@@ -97,7 +97,15 @@
     (service memcached-service-type)
     (service postgresql-service-type
              (postgresql-configuration
-              (postgresql postgresql-9.6)))
+              (postgresql postgresql-9.6)
+              (config-file
+               (postgresql-config-file
+                (hba-file
+                 (plain-file "pg_hba.conf"
+                             "
+local	all	all			trust
+host	all	all	127.0.0.1/32 	trust
+host	all	all	::1/128 	trust"))))))
     (service mongodb-service-type)
     (service elasticsearch-service-type
              (elasticsearch-configuration
