@@ -825,12 +825,12 @@ service setup.")
     (hash (base32 "06anrmw8n7138jg0ghd73n0b7i6i1hasm0ys12y777h133sa1051")))
    (package
      (name "hmrc-manuals-api")
-     (version "release_396")
+     (version "release_397")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dcjk2vxp3xpkrgiiryv5n1qbsh2d05ga9khd3ji3wxaqnmaq6wx")))
+       #:hash (base32 "1sw1994x0g4ywza92k2g39lw2nlr35pprfg4ykfb2x6hdzlz25hx")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
