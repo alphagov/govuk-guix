@@ -330,12 +330,12 @@ proxies requests to some upstream")
     (hash (base32 "1xwfyx5gy976a1y77yv3fff4g03acszz5f4gfvjgzqxmnlvpm9n4")))
    (package
      (name "content-data-admin")
-     (version "release_600")
+     (version "release_601")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ks0nr8k8djqz8yfz0ww99y97w5x2lp9zafvszgqgxm0pl51q358")))
+       #:hash (base32 "0cl05mwkq2hjl4wf4107crq2w7n7s821zklayrl8fva8lq3yq9ai")))
      (build-system rails-build-system)
      (native-inputs
       `(("chromium" ,ungoogled-chromium)))
