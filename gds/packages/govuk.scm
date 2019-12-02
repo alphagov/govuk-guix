@@ -170,15 +170,15 @@ proxies requests to some upstream")
 (define-public calculators
   (package-with-bundler
    (bundle-package
-    (hash (base32 "090yzpzz4jnx9njb918qyhjj2ydndd9i97rjlp6z40znlbs6ig9p")))
+    (hash (base32 "1vnz5r0421s81sjz04fky4kcrx81mdrm6mxdsfljv3hpymavnfvc")))
    (package
      (name "calculators")
-     (version "release_590")
+     (version "release_591")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1vg84bdrg99mdlm6d1xpblh5f5mc4zimjpvfffpyk65ga18h95vs")))
+       #:hash (base32 "1blh5h2qzmlzjhim3j4hdisj0s4sw5lrryk7d4v6lcpv13yfpzg3")))
      (build-system rails-build-system)
      (synopsis "Calculators provides the Child benefit tax calculator")
      (description "")
