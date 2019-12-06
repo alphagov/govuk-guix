@@ -436,15 +436,15 @@ proxies requests to some upstream")
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0k6w3754w6lnp6fwrxrv00ldk6h87ngbh4b4fs3qy21s7xx0b455")))
+    (hash (base32 "0bbd7m9nnn775zlfypanx0r409mpvsxfl8nnfd5zks12r4yjw5dh")))
    (package
      (name "content-tagger")
-     (version "release_1033")
+     (version "release_1035")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1dl3mnyvqv25a1c6m58i7x4jd39qk6g9zv4rp8nba2649lkwmi3r")))
+       #:hash (base32 "1lixfa8pakg6mdxyj0v361cyghzxcc6d2pxvs09d9yq15w4i5ii7")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
