@@ -1523,12 +1523,12 @@ content, as well as broadcasting changes to a message queue.")
     (without '("development" "test")))
    (package
      (name "signon")
-     (version "release_1391")
+     (version "release_1392")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1sbpd15yc8cdqi3a66pz83rq1i665a1kf3zcl06d3x4kkhrpzd9v")))
+       #:hash (base32 "06sayfpxw09scpj6nblkm8h4phjxdff017wn9jnbqrc3h4921cg5")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
