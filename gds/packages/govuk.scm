@@ -1409,12 +1409,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0ch3g82n47mbj1q6cbmvjzq1spf7x6x0c81an0n4afnj1d33z2kd")))
    (package
      (name "search-api")
-     (version "release_2311")
+     (version "release_2312")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1c7hw1a2dbrsxnrakijkfh9arb7ds0fcqc8yw3y500hv5wym5y50")))
+       #:hash (base32 "0jrm4lxml7m5wmgfmv5fs0wz26zmmnlm0m9hpp6v88rgfhi521q9")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Search API for GOV.UK")
