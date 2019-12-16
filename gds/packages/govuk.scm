@@ -1742,12 +1742,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "1lz6qabn1pkxhc4dhna5891gikq7yb39ixfq1kckh3d1wymqs1s4")))
    (package
      (name "support-api")
-     (version "release_347")
+     (version "release_348")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "196yslzz467hhdqgnkzmkxqv5gi3m6g3yl0879s2kh605bb5793f")))
+       #:hash (base32 "1sj5kyjr8j7dgan1yrghfk1mh90q743d1ndikqvs4vkvj577j7m8")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
