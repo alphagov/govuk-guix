@@ -366,7 +366,8 @@ proxies requests to some upstream")
        #:hash (base32 "05p37ldrxvirz5ycq6bhzqad02pxsy2nsbk7v6m017kadk90bnzr")))
      (build-system rails-build-system)
      (arguments
-      `(#:phases
+      `(#:precompile-rails-assets? #f
+        #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
                      ,(use-blank-database.yml)))))
