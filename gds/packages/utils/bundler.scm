@@ -107,6 +107,15 @@
                             source-properties->location))
             (innate)))
 
+(define (bundle-package-inputs ruby)
+  (list coreutils
+        sed
+        ruby
+        tar
+        gzip
+        (bundler ruby)
+        git))
+
 (define-gexp-compiler (bundle-package-for-source-compiler
                        (bundle-package <bundle-package>) system target)
   ;; "Compile" FILE by adding it to the store.
@@ -116,7 +125,7 @@
                           (ca-certificate-bundle
                            (packages->manifest (list nss-certs)))))
        (define inputs
-         (list coreutils sed ruby tar gzip (bundler ruby) git))
+         (bundle-package-inputs ruby))
 
        (define search-paths
          (map
@@ -183,7 +192,7 @@
     (($ <bundle-package> source name hash ruby without)
      (parameterize ((%graft? #f))
        (with-store store
-        (let* ((inputs (list ruby (bundler ruby) gzip tar git))
+        (let* ((inputs (bundle-package-inputs ruby))
                (input-derivations (map (cut package-derivation store <>)
                                        inputs))
                (input-store-outputs (map derivation->output-path
