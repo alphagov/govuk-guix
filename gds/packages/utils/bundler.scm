@@ -221,15 +221,26 @@
                                      ,ca-certificates-derivation
                                      ,@input-derivations))
 
-          (run-bundle-package source-store-path
-                              output
-                              working-directory
-                              input-store-outputs
-                              ca-certificates-store-output
-                              nss-certs-store-output
-                              search-paths
-                              without
-                              (package-version ruby))
+          (with-throw-handler #t
+            (lambda ()
+              (run-bundle-package source-store-path
+                                  output
+                                  working-directory
+                                  input-store-outputs
+                                  ca-certificates-store-output
+                                  nss-certs-store-output
+                                  search-paths
+                                  without
+                                  (package-version ruby)))
+            (lambda (key args)
+              (display "exception thrown: deleting the working directory\n"
+                       (current-error-port))
+              (ftw working-directory
+                   (lambda (filename statinfo flag)
+                     (if (eq? flag 'directory)
+                         (chmod filename #o755))
+                     #t))
+              (delete-file-recursively working-directory)))
 
           (let ((path
                  (add-to-store store name #t "sha256" output)))
