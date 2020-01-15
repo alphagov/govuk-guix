@@ -52,7 +52,7 @@ fi
 log "Using $GOVUK_ROOT_DIR as GOVUK_ROOT_DIR"
 
 if [ "$GOVUK_EXEC_PATH" = "" ]; then
-    GOVUK_EXEC_PATH="$(dirname "$SCRIPT_PATH"):$GOVUK_ROOT_DIR/govuk-docker/bin"
+    GOVUK_EXEC_PATH="$GOVUK_ROOT_DIR/govuk-connect:$GOVUK_ROOT_DIR/govuk-docker/bin:$(dirname "$SCRIPT_PATH")"
     log "GOVUK_EXEC_PATH is empty, so setting a default value"
 fi
 
