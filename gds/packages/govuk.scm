@@ -1595,12 +1595,12 @@ content, as well as broadcasting changes to a message queue.")
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
-     (version "release_1260")
+     (version "release_1261")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0r6kx5sfnkp8ksbbc76nslmpampcbslxcgckiycycmyz36v2akyw")))
+       #:hash (base32 "1bdrkaxv9widsg3wr3035rb5pifmivmgwy844hbv89xs7llrlhap")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
