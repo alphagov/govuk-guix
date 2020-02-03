@@ -870,12 +870,12 @@ service setup.")
     (hash (base32 "1v49xrj19vinzkq44k7bzyj9siq41ln07w6a3mps9p1zvr7ds8vd")))
    (package
      (name "info-frontend")
-     (version "release_466")
+     (version "release_467")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0fhz1hf12yy3q6jsl7ian3dv2agvjhw6hfhd975i5il4wvnsz568")))
+       #:hash (base32 "19bcmzsqy9fh5h0128zdiarmh21f8hdls6nzwhmssgycwbx9mnx0")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
