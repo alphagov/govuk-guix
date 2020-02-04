@@ -65,15 +65,15 @@ GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONME
 (define-public asset-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1v7mm4vns4miwcpz7jmlgidbprmd5mibhzzvf3h07s32w51sy6br")))
+    (hash (base32 "08g4fnwy8fyq8dpsr5p6wmphm44vq62fjmdly03lsx9c2l8ymgzr")))
    (package
      (name "asset-manager")
-     (version "release_426")
+     (version "release_432")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "038x7sljwya6y38h1i7sjlrdgj3v0y4bm8jsbjghs0wdybk4q83j")))
+       #:hash (base32 "071ywsbzi8r6y620xbk86cjylyls88d2m41ngma3f6qjsz5yvv5s")))
      (build-system rails-build-system)
      (inputs
       `(("govuk_clamscan"
@@ -123,15 +123,15 @@ GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONME
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
-    (hash (base32 "02a8lxpw11mrh80il9q4bpxlc97jvd544n58bzjvsg9yhgjbaivr")))
+    (hash (base32 "0r05mdrlc2j8xw1wmnrirm2f9ngg4jbc4ra0qpj8b6rgm40qxmj9")))
    (package
      (name "authenticating-proxy")
-     (version "release_163")
+     (version "release_169")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0n1dc3yn9a97vpqhba0bcc773sgvk0n28gzh5j7n2bf8704kk0xj")))
+       #:hash (base32 "0jij1if3jl92l1q0yi5cbc6zqxv5cwvvp325hzbsr8bricr27cpm")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
@@ -149,15 +149,15 @@ proxies requests to some upstream")
 (define-public bouncer
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ja1id9bwp4ycg7w98s5j4i74ks7kcin4klfcr0jchw392iq6q93")))
+    (hash (base32 "0dksbpzikkda7pa5c2pgbn4i23c34ldn5jkb8a62v1638gp2r5hx")))
    (package
      (name "bouncer")
-     (version "release_282")
+     (version "release_285")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "00grdm4yqbjyanw9klw6csibiprgfm1451krkqff8rrhk6k5ih7q")))
+       #:hash (base32 "0g6p21p58yplrbycb7x6l2pgljyiaaj55hm9dbq3xwq3h87lsl0g")))
      (build-system rails-build-system)
      (arguments
       '(#:precompile-rails-assets? #f))
@@ -170,15 +170,15 @@ proxies requests to some upstream")
 (define-public calculators
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0dd19xgh73lhc1k6ghy1g5jkya0dcq30m68gxslw7n3q9p0cgdpr")))
+    (hash (base32 "1dgiibsh8jjm73xp4qaf6cmc0qqnj8ny1pwjcl0g1iabfzaqn3gf")))
    (package
      (name "calculators")
-     (version "release_616")
+     (version "release_628")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "06klsn149p6mhxfqpzknjyy0szmadnnnq57d08w1q1n0w4if4ic7")))
+       #:hash (base32 "0pcmps0n4wla1a3n7378qz0g83n28hzjifmz44lk99jqs152sg14")))
      (build-system rails-build-system)
      (synopsis "Calculators provides the Child benefit tax calculator")
      (description "")
@@ -189,15 +189,15 @@ proxies requests to some upstream")
 (define-public calendars
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0dp5mkwyrhfsqvjhdksgdhy3w3w2s23xfrwh4r6gv8vykxcvw0zd")))
+    (hash (base32 "1p9b1w0hq6fssjjpi7aiznxxm59vf010na0nniy27cvs7cl064c2")))
    (package
      (name "calendars")
-     (version "release_852")
+     (version "release_858")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "154yzpj3ajq217aakqfjvk77gycmn1gskx94d6c3rx10li92k11y")))
+       #:hash (base32 "1vkbnkkwn1w4mz59hfcra7c4c5d14jfgpfnbf3l8sgzw7k11g38n")))
      (build-system rails-build-system)
      (synopsis "Serves calendars on GOV.UK")
      (description "")
@@ -208,15 +208,15 @@ proxies requests to some upstream")
 (define-public collections
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0s55l489b8w29z0vi5gszwiw01zkgli9agfyhx94m3mni3j2w2bc")))
+    (hash (base32 "1kyvgsnh8635sqapiy4lj798df14406rf5k7ca5acbdmf94jqm50")))
    (package
      (name "collections")
-     (version "release_1176")
+     (version "release_1214")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1bnfxlpnfibn2vzrbf9g4sbzpqgyx573h43z6j53izz0szvcmg2c")))
+       #:hash (base32 "02i0p9ps0j6xvrl6d39k9crpyksq0s87pd8gr6c2dhx76dxp5k4d")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
@@ -231,15 +231,15 @@ proxies requests to some upstream")
 (define-public collections-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0q8xyf4hcihchnxivk9mb75z9nsv5nivz2989xlc95fa9sgw1wka")))
+    (hash (base32 "18v5mlyrpniajm8jm4jv4s2gi1xn9l0vmivq8khjfgf8d052qys5")))
    (package
      (name "collections-publisher")
-     (version "release_815")
+     (version "release_825")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "01py9ssh7xs2clk9dqss6rnaq7pam977hvdr5w779j42xyjrj9jc")))
+       #:hash (base32 "0pbr0gnshcyn6agl556q9flbz1xbl5pzw9wgfk2y5awd9sl6qmmc")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -263,15 +263,15 @@ proxies requests to some upstream")
 (define-public contacts-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1pddscls984qn2j6nfb6w40zz0pm3gyxab5biwdaknpj9xsm6cj6")))
+    (hash (base32 "0pdrc7hf8c8mg62vl9a1cmijs596w513y9kry5lvka7l9zmdcr76")))
    (package
      (name "contacts-admin")
-     (version "release_670")
+     (version "release_675")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0admgx1yfggbhb0b60fc625mhspm0r8lybs7jw94pwzqxiiihc42")))
+       #:hash (base32 "1vqq2nyvqqk4f54aky8bbdv474r6cbqd9w82qbjq5l2r3f94v9nz")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
@@ -297,15 +297,15 @@ proxies requests to some upstream")
 (define-public content-data-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "118fqxvm058w6r0zldy97lzicldxf8anigg3kmgy93ixk0zhpfkb")))
+    (hash (base32 "1j6gz7jn8ay3vagcyahdpj4qhylgjil4y3xclfi0xl493qr0lx5g")))
    (package
      (name "content-data-admin")
-     (version "release_618")
+     (version "release_624")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1mpsb4yplvjdmfd7rh6sbw943v06qmflng9knd4jzz78p4vhpfvs")))
+       #:hash (base32 "191jxfbzy45z03p1aaiyg5x8nfrrp65i2mzk7dkrfaz42xj84f6z")))
      (build-system rails-build-system)
      (native-inputs
       `(("chromium" ,ungoogled-chromium)))
@@ -325,15 +325,15 @@ proxies requests to some upstream")
 (define-public content-data-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0j6f7ll2iylzn8pbrclam0pak2862i6jbyfnbw87jmi47m6r7zww")))
+    (hash (base32 "0ncq4020rlasisaj49v802z1379xwxfxwfms6pa81s3c4wy7vi3m")))
    (package
      (name "content-data-api")
-     (version "release_1180")
+     (version "release_1191")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1ds12a7bjcnmngsbaj72hvrqx5n4q4vdb023r2iq0iv518j9yvx7")))
+       #:hash (base32 "19447plan0101gmmcnlxkdi5nda4n8rnkdfjg7jmiji8l4ql6r6g")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
@@ -350,15 +350,15 @@ proxies requests to some upstream")
 (define-public content-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mrjl3j5z3cl8ap65h2gqyhfxykks5rsrwyqzwjxxhwj2rywfsfb")))
+    (hash (base32 "161i7bb9r3aahkka0lyn58ar6vwf1p1xv5dc9azarailggdvcpxs")))
    (package
      (name "content-publisher")
-     (version "release_1453")
+     (version "release_1523")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0q9i403w2wsjmh6i1b9h4rsdfzami8wwhzd8hv4bv208zcf0vv67")))
+       #:hash (base32 "0xjvd62y3y3f1n1xjn0h4hxafhi6j6kwrqvq94433mgnlvsg2db7")))
      (build-system rails-build-system)
      (arguments
       `(;; TODO: Asset precompilation is now failing, due to npm not
@@ -387,15 +387,15 @@ proxies requests to some upstream")
 (define-public content-store
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0d1pj6jzdlcskzar80nx25s23igayl3q2j74hsbqvxm0aiw0ggr6")))
+    (hash (base32 "1404gg96bxvinhb3dp1h0rcj555r3bfvc3j0v24n1na7bklzn72y")))
    (package
      (name "content-store")
-     (version "release_952")
+     (version "release_962")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1bgvbnxx9ndc0mnydlc2gm5i561fhfjc3fx5ladrl6lmj998rrrf")))
+       #:hash (base32 "1wcp5342hfjlvihxzkvldva2fxq2magbdh19z9glq1lc0pkg32di")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
@@ -407,15 +407,15 @@ proxies requests to some upstream")
 (define-public content-tagger
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0wzakb2c68sx6xp5x7ij89ywgm2mcchf0qj7h1rfmp3rsnzgximc")))
+    (hash (base32 "195p6lnll0dgcr5cm0z8bvcmfz1yzw1si3vxzq9m8ixz4akalhvr")))
    (package
      (name "content-tagger")
-     (version "release_1048")
+     (version "release_1054")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0d9qm506kvzpc5g3bkg020j7mjbd29maagxjw0din8qd5nbkvagc")))
+       #:hash (base32 "0fhaagf4r7568vzlnagziv86azvp3abka5rbgs3m00hbnbl1sgh0")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -435,15 +435,15 @@ proxies requests to some upstream")
 (define-public email-alert-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0np30rly9b558mdax4vn0zw87is4nfgj6gl5sws6c8dxlc6jl8di")))
+    (hash (base32 "1rr6g3xvc1wshlhmp745na3wq6r55hafqhfm30lsqxppi00d90d6")))
    (package
      (name "email-alert-api")
-     (version "release_1026")
+     (version "release_1039")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "03wviisjb0qp2i5w6dhjbvn52jjj6l9dpvq5kv31qig2z5rs4b3x")))
+       #:hash (base32 "0qzqhkqdb691nj93hdqf9kwjp49pxi3h4h6h561z0p49b7f6hiwq")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
@@ -460,15 +460,15 @@ proxies requests to some upstream")
 (define-public email-alert-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "05qj3pjdcj511cxxi30p0n8x5xgkpdx6ysdf2qrmkypp51nlnykc")))
+    (hash (base32 "01vvxf2479kk3m9wcrxjiabsqffnrfkph05ah5nsag189q7y56v5")))
    (package
      (name "email-alert-frontend")
-     (version "release_497")
+     (version "release_506")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "16y8j6cccpgjdfin8g98sas6hs03zy8fk2d6g6mrrv805wwi52bk")))
+       #:hash (base32 "1hl6n8nisdqm9rd3dh160q29lws4z7512w3xcfd2nn06i0syak52")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
@@ -479,15 +479,15 @@ proxies requests to some upstream")
 (define-public email-alert-service
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1w56j7lpspfi0yniyia7am9vwwwyqaj007brswmc5sr10z2jbs8l")))
+    (hash (base32 "1ys9cy50k1k87fw5an4gaqvhy5sv4hms4mz8gina54p6gfbbs9qc")))
    (package
      (name "email-alert-service")
-     (version "release_308")
+     (version "release_312")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02fim1nplakf514cm3hwhg3vjsy1aiqjaalkk097ijgvr1jpfskz")))
+       #:hash (base32 "13ajql24sziw3fwpqcxgl898mrb84wzbf6cahfagnqj8lwm9x7z5")))
      (build-system gnu-build-system)
      (inputs
       `(("ruby" ,ruby)))
@@ -520,15 +520,15 @@ proxies requests to some upstream")
 (define-public feedback
   (package-with-bundler
    (bundle-package
-    (hash (base32 "140v04sh8h4jr513np0pq7i2day5sz5y7yqhq0y4rqysq4hkna3j")))
+    (hash (base32 "0428rqn2f0zk15wzvimmvhn56w111jdjw710r9xlr6hfdh25hfnn")))
    (package
      (name "feedback")
-     (version "release_794")
+     (version "release_800")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "12g15gc7mbzmjjcqlm393n3bj72v9rig4w69xga000p6dk256wga")))
+       #:hash (base32 "0192can91qydn7vxfqqlwgix0phhs88azb4ayi8bzcx583bw9mii")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
@@ -546,15 +546,15 @@ proxies requests to some upstream")
 (define-public finder-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0n5x7wqpzyl0lzn2axkzcj2pxcsgrpjr6fhqygw1jv12zgqpqs6w")))
+    (hash (base32 "01y21z836gw2qm7jk6l625yfajbwgifv562qbw8c40lrbr2vraqa")))
    (package
      (name "finder-frontend")
-     (version "release_1623")
+     (version "release_1664")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0bsizjnvdd2f8afcaxjbmk2z5zwgs0rysy40jk4vh7w23z9ll698")))
+       #:hash (base32 "16k7k6sz4i79vm09vwwvzvybnbf4kwxvn8wi8hd5isrly2kj8hy5")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
@@ -569,15 +569,15 @@ proxies requests to some upstream")
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "14f2n2ay47xb0yf9210zn76l815v05ampr46d6dmannnrqsmmf6v")))
+    (hash (base32 "1rk8bl3b6s4c98n9m52n27kfhla8ypmrdl34fkz7w1bnaj14yzb9")))
    (package
      (name "frontend")
-     (version "release_3400")
+     (version "release_3424")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0vkxxwmispyrd04cqd647r3rjx4dr09jjqzi9yr09dnx7k51ggbh")))
+       #:hash (base32 "0v1mgzbsay715c8wbrgz0347wajb96zfgikc88v8kpc1pglr2qhj")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
@@ -588,15 +588,15 @@ proxies requests to some upstream")
 (define-public government-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01rf6ycbwavad357pshh0ka53d2s0gw90xnqd29zqaqpndzhm00y")))
+    (hash (base32 "1hxpnnvdzxzqc8gilfh78fksm6db1djdadfqj5ip7f0ac3yak1lx")))
    (package
      (name "government-frontend")
-     (version "release_1321")
+     (version "release_1340")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0h2f4anpgnrcc7c2qyqx1732s7zlfpn0kq5zqzvjy35549188j98")))
+       #:hash (base32 "1p5mmix1wpja3xryjhsjvzjcvnhm897if142s843kck7czg6gfdf")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
@@ -611,12 +611,12 @@ proxies requests to some upstream")
 (define-public govuk-content-schemas
   (package
     (name "govuk-content-schemas")
-    (version "release_924")
+    (version "release_929")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "1bvccb5g0iwirkghx1y49f6297fssmbjv5947h8a8gh4439jpgbm")))
+      #:hash (base32 "18pxzss8gam750rprjvdbqc3agkb8a2jfaq1m445sld29wiljr8j")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
@@ -793,15 +793,15 @@ service setup.")
 (define-public hmrc-manuals-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0d2mfq9cimax5ghfj8vyrs975gw2mxzh4p9cmghr74hiqrjhl4bg")))
+    (hash (base32 "0pvqpw2anr2xrdmrnbzz1icihcgwad56s8h2ivghypfvl0bsp98n")))
    (package
      (name "hmrc-manuals-api")
-     (version "release_408")
+     (version "release_412")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0srl41b36smy8f25yqpqbrpfyad58m566d6yxbi06yprw5mbmma6")))
+       #:hash (base32 "1qmi73xnya02gqbypv347mc72c30k7md4nas1rrib0jcmvfcga6f")))
      (build-system rails-build-system)
      (arguments `(#:precompile-rails-assets? #f))
      (synopsis "")
@@ -813,15 +813,15 @@ service setup.")
 (define-public imminence
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1zbcv1sfqy6nqbh85ams15zv4a0zd9mhi3hn5r1a9j4w7yq9g852")))
+    (hash (base32 "02r8i7zc8iqrwivld96kxh0mdcpcbsmgl74ha9kr8xz4g30c9cjw")))
    (package
      (name "imminence")
-     (version "release_594")
+     (version "release_597")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0c72daqxbm3nlini7hwrfzdkjv7rbf99chnj9dkk5ggpsvgiw4mb")))
+       #:hash (base32 "13bz7481125r0qjijkl03ny7f5042fj07v11ckkxa78j2q02z775")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -837,15 +837,15 @@ service setup.")
 (define-public info-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1kxbmnc9f7nz30wcfp47j2byjydgb709qxmdc51bjzfnpcmnbc09")))
+    (hash (base32 "1v49xrj19vinzkq44k7bzyj9siq41ln07w6a3mps9p1zvr7ds8vd")))
    (package
      (name "info-frontend")
-     (version "release_457")
+     (version "release_467")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1limhlhfscm5w0zj4k5x0rl7brg2lkx689g080a34v0x7jhiss2p")))
+       #:hash (base32 "19bcmzsqy9fh5h0128zdiarmh21f8hdls6nzwhmssgycwbx9mnx0")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
@@ -856,15 +856,15 @@ service setup.")
 (define-public licence-finder
   (package-with-bundler
    (bundle-package
-    (hash (base32 "121jcf8gak48s1wjrwm9sg39ky77rcvjsdcq6vvszg9iix71zkzs")))
+    (hash (base32 "1gglg3h9ypd0qvx0mirv5dg7l2dbkcji4fjfzv0km9zq2ya0c4j2")))
    (package
      (name "licence-finder")
-     (version "release_682")
+     (version "release_690")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0k7l89855p89nhs0hgvjdfa22a7g80d054rgdr2y78h1kc58mm43")))
+       #:hash (base32 "03ic2sx98w5xxir3sgdl62rxd9bjasipmpqnady35mc1rlgx2msf")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
@@ -882,15 +882,15 @@ service setup.")
 (define-public link-checker-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "18d4wdn0gxf1gf79cx4yzhrgpmd67g2j67dix6z2hx1klcw6dms7")))
+    (hash (base32 "18iwvknfmlcywaqmgj8hqylanzabs74y7hy829myh307rjqx83d0")))
    (package
      (name "link-checker-api")
-     (version "release_262")
+     (version "release_268")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "03vs92in6q0brxp33pin2jlmmsvy77bp41dsvmrq2jpyrypajxd6")))
+       #:hash (base32 "0nkgwacvwic50lcyydhr6ibw4bp5sak5yfp134abb97bb2w74rbr")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f))
@@ -906,15 +906,15 @@ service setup.")
 (define-public local-links-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1hpb432255bvmvdlk1cjbzyvwggcbrswsz9vjw8b0rhzf5d54sh3")))
+    (hash (base32 "06pr2z9y44lhnxi5yj5f2qwdy26016grhm7q25lf23fh64f4yh5p")))
    (package
      (name "local-links-manager")
-     (version "release_471")
+     (version "release_478")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1wp1cr25wf8h7fz5lh9ss4pcgafxx4l5slqn9bl47m1ahxzh8s1y")))
+       #:hash (base32 "1rn03a9am9c6bd5kkvwcf1kh82914x9z48ky57al83nfx64bq20m")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
@@ -936,15 +936,15 @@ service setup.")
 (define-public manuals-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1phzkyikdmma71047gmwv8glgz6glq8g0ibxhzsbqrnr4z7zxkh6")))
+    (hash (base32 "065w64h1lvxkp34z5pdy68z8krq38m42jrzlglpgz2cc3ccyi5wj")))
    (package
      (name "manuals-frontend")
-     (version "release_626")
+     (version "release_635")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0l7nmrvmiy01b4fcmc7bxnvlzppb0glnsydlp2pvki2y7glxjawy")))
+       #:hash (base32 "0aaid9bqi59bqbv6l02l44qm84l02pvbl2jckkx8bq57j5l1vlzr")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
@@ -955,15 +955,15 @@ service setup.")
 (define-public manuals-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0gzlpx00gshsjxp3ba283vr34j1yx0vpiz2c67hjah706nnxvfbd")))
+    (hash (base32 "0v541642cmyi3c8fixvhadqws5f7hrjvgb825vyz5kh3f47r436i")))
    (package
      (name "manuals-publisher")
-     (version "release_1263")
+     (version "release_1275")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1pg0i7xrkb9sfsk8xw3h659f87y70vwhbjk9bfhp1nmdd6s95kyq")))
+       #:hash (base32 "1jp1an5vp07y9077a66vyrhg5wnfbnj81zkz5405v22mmc372cq6")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -990,15 +990,15 @@ service setup.")
 (define-public maslow
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1vj5wpjxf5rfpzadq6av0wf3qlw2avmp5jfzxb0a7n8xrqfa6fp7")))
+    (hash (base32 "0m464rmlc8v55mkzmcghzcadfkcy7nzppmvv7v0y1myizzlshfj8")))
    (package
      (name "maslow")
-     (version "release_487")
+     (version "release_493")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0b6jd7939flg497xxbg63aq2jlprr7czij87ydbfs13qhqd2m2xg")))
+       #:hash (base32 "124s9c500yy5r35agibmajd11mvxgy9blh834s80ivlrrxc0xjfm")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1154,15 +1154,15 @@ data to use can be selected, and multiple backends are supported.")
 (define-public publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0lbmkvbhsgl8dh2kz8hd2vh3rxamymfd36sc7rc7m1990jvkn2z8")))
+    (hash (base32 "0aqpzjfyv0x23ygxx7niinxy28q66ra2wq6yfcqrya4d2nhj94x3")))
    (package
      (name "publisher")
-     (version "release_2225")
+     (version "release_2229")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "022sn764vq1qaj6n9ls2c27chwz7j1yap5mmcdxsd5p6bdw5rl5d")))
+       #:hash (base32 "1p55951a1nv3p2s8ad8g82zxjc3yx6m1jbdnindrjvxx9ibpp3qd")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1185,15 +1185,15 @@ data to use can be selected, and multiple backends are supported.")
 (define-public publishing-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qh08ykskmiaws010ilkv0437a9xm541n0gmyim9vfjfmzs6n7wf")))
+    (hash (base32 "03l35v05rmal4jmc10bi4m7fi6vbqnp7pdngq4hks5l704fjs0y6")))
    (package
      (name "publishing-api")
-     (version "release_1569")
+     (version "release_1585")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "1acfh9x3saj4zyydlz3kngcamhd4yh83fiafq8plvrmpdpmqcl6g")))
+       #:hash (base32 "1fdhqg5qjsz3452g6aym82gmyjd339zgwnzcqbvn3m3g0wvzpi2v")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
@@ -1255,15 +1255,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public release
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1jhrr1i2i8rhznm2vpy7v3fxh81ypfd66765110gfy1lprk0x5x6")))
+    (hash (base32 "01njcgxh9yqhgg3m9a9lmxgwbqsdqmhch5jih2ywm61929s4qq6z")))
    (package
      (name "release")
-     (version "release_552")
+     (version "release_555")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "06arf1d9lm89ixx2s7jgqj8swbg8w2c4z5vg1wvnadd3sganmy0l")))
+       #:hash (base32 "1pdsa8bpiyaf176skx9sgxygbznnnk0gb9dnbjkvx2bnxln857h0")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1331,15 +1331,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public router-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ap72kvb2pjnnzjdix8gl53id3603mlbqzsy5qigk6rc71skwc9d")))
+    (hash (base32 "0px0ymgxcirzpj8428av9cvw9i543f28lf0khffckg5gdcny95yj")))
    (package
      (name "router-api")
-     (version "release_256")
+     (version "release_261")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "107mhs6gkhgmw7rqwplf8cdff0g83yp9kpkd1vhay9k5wnr88rmm")))
+       #:hash (base32 "1b12x13j3pxary82xn39fc6ayrqx9kzs06dwqa7rgl5yw5m6myn7")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "")
@@ -1351,15 +1351,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0m0px9yd1h0bwmavjq1c5h5h3v4lndr0hj9282a5jhngxjc1xnag")))
+    (hash (base32 "0vgzmg5x37ppaxp4jcwh69vxgpv5r5k86ka00a9s0zks3pjah56x")))
    (package
      (name "search-admin")
-     (version "release_320")
+     (version "release_326")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "19hr6kd1gviq85knbxflhn5w51hwyf4x3qwl1n0q2x3b0y21i43g")))
+       #:hash (base32 "1q74wvwkwv9cb5wknsknax8c4mw1sk32fn89lmvgkb87kpxry3sf")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1377,15 +1377,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "059r1vybhgqplzqpw5qs4lgplqsycmf4h3wb1gamp32pg0il037y")))
+    (hash (base32 "1vgy5qsil78smifx51sngixn2bighyh2f5dsi7lwrjrpd2mgq537")))
    (package
      (name "search-api")
-     (version "release_2370")
+     (version "release_2415")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1x1xgcmmsj2w3rbnanwqdkb607zgazypifwizx2n60zxdhn4p096")))
+       #:hash (base32 "1ngy1aaaslgif52ahfgvqga3zns0zz97yx5i0857s9nn37s692iy")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Search API for GOV.UK")
@@ -1397,15 +1397,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0p9qqnad6d8cmbi9bxq6z5hnvbzl29dyvn78nxnsk6f26dv55mz4")))
+    (hash (base32 "1mkf6v1cimpm76i1awq5wlnbafm51daxj499ljkzc19r48jzhaxi")))
    (package
      (name "service-manual-frontend")
-     (version "release_445")
+     (version "release_458")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1g63khhxaw46c5z01px4jsr8b2m48jzs8l5f3xnz3dwdnavvrj2c")))
+       #:hash (base32 "1y0bqjvrcizr83m61bnha80advv6s2zbag18sv0hkwhx33mdjh2j")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
@@ -1420,15 +1420,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1a061vzj960njzp3m0nl6zsfp7jjhn761vkbiic2l8yqj298c08y")))
+    (hash (base32 "0vhbd56pwk1wifdlpvfg0dlcsdpf915j1shlfm1xvqjm77anhf8k")))
    (package
      (name "service-manual-publisher")
-     (version "release_569")
+     (version "release_577")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "172ql8vnsfrayb3xn79a27ygmp812kcg813ryrym5djcdqj40caq")))
+       #:hash (base32 "09gvcxpp129i1yxx1p3vrz22jhasxq6gckp9vcihqwp1dyb623n6")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1448,15 +1448,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public short-url-manager
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1dwbyk1kvxx7jvkbsz9wkf62yvwvznbjphdmg5iayi6qx6yg9rch")))
+    (hash (base32 "0mgbmq42hkc1nsfhpjbjghm7xls05bfzr4iqq7zzd4cg08q00713")))
    (package
      (name "short-url-manager")
-     (version "release_382")
+     (version "release_390")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0wglxd70clxzzd19kinr4z6g5fxgkihlpajvkib9jkdlb8m578az")))
+       #:hash (base32 "1sbxqixnnjqba4fz94f565fppjgbwk6npr3xnaw5bzlminf18f8s")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1490,16 +1490,16 @@ content, as well as broadcasting changes to a message queue.")
 (define-public signon
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0q2dj5ryk28b2p0982dzcd89gybynxfqzfbx78n7vzb39l1p76sj"))
+    (hash (base32 "0r1p0dh1zpvf79anagrbdznbqh8qllg6fbq8lmdnr6ryj7f1hsd0"))
     (without '("development" "test")))
    (package
      (name "signon")
-     (version "release_1411")
+     (version "release_1415")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ai90jny4izxdhyj5c8bh8p880q4ff48b9h6a792zyf8z6wcd9hy")))
+       #:hash (base32 "0fqs6qwp75qjrv3hq9h2j6955a7mwhmpaj5lk142shsfy7d54n0v")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1531,15 +1531,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public smart-answers
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1rm8jg9ijs6blwwdc1dsnn2gh38zpdymsv4aza82f8wmvdll2yy3")))
+    (hash (base32 "1xs0f7x5kp7j8p45c57wf0f0wqpc82nasdhss2jlra1akala6b19")))
    (package
      (name "smart-answers")
-     (version "release_4553")
+     (version "release_4569")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "16zysrj5l8i0d552k1a4pg729ah99irdak1j5bkg6bfxydrmqgz4")))
+       #:hash (base32 "1p5a21mx77sxpldgarlp9ylq9p6vr7j1sa8d0rllm8w2j25hsqdv")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
@@ -1561,16 +1561,16 @@ content, as well as broadcasting changes to a message queue.")
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1yc5n135kk5l0a99a4bnmczzw2njs6f165x433568224bvz5mlkf"))
+    (hash (base32 "0c3rxq964nviwd8w8i5s7cd28806krgsbzj8g3w74r9f8qhzjjbw"))
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
-     (version "release_1258")
+     (version "release_1265")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0gq1i0igv491ly718n3g5xyixds03z84q5pl9jwb556wzs2bpq3y")))
+       #:hash (base32 "15b9y4raqdafk7y2fh1304x3pvpfjxvaksmpn4ifz91wq8w56wml")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1640,15 +1640,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qb5hm571yk3fbc5q1g2pin0iq58shkxskbg3lrm1vd3cbn8z4a4")))
+    (hash (base32 "1cp1x2i4a4f7c23n9b4mcmd2avax0iqg9d3nliz0c6k1pa2s05xl")))
    (package
      (name "static")
-     (version "release_3353")
+     (version "release_3375")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0hygnsaml2g5c2v1ann7cf86bw0xjn9a50g7gm14ay5hhn3n68k6")))
+       #:hash (base32 "0kxcxwl6i0n2xwc11rnrqr0mymin6qrs1s9kp3zfhqxpjrj8hcac")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
@@ -1678,15 +1678,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0mih32wgmdaj1z1fsxpgj1gfp68ib35v2b61yaarrazr944vwz8s")))
+    (hash (base32 "129b1qzxixwfyssa0lq94chnhgjsw8xz8rvw1b0lkhp6iy2sjm59")))
    (package
      (name "support")
-     (version "release_929")
+     (version "release_936")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "138y0kfqjpfmpv0s5l4kh6c2yyny2qg7ggq6g3qi5nyly48vba7s")))
+       #:hash (base32 "1pr8mxp6j8an9lz9gsrj5849kv6a3dhgfcq21fv4csa6vfzq9ial")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1710,15 +1710,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ybd0mx35dblvqvkgp4z8346qhrgpslxl42jphfxis1hz8s13sdq")))
+    (hash (base32 "0w25wa3g9wy4c3k4r6vsd208dyg9h117cshgn4cq9agdgpr1ymws")))
    (package
      (name "support-api")
-     (version "release_360")
+     (version "release_365")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0f7jqx6jwhcgf25x6yjfa6xyly7mvijc4151ln0mbnng9h144xk1")))
+       #:hash (base32 "01q3h432fscb46hyznm4hmi7w5zq8ya54wxs9drc09xcy7rz1k1g")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
@@ -1734,15 +1734,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1qwd80n2vlgyvlx9300xbl4kqpcw4fdlyhyhk448pljfn3d65pr8")))
+    (hash (base32 "0cxapl7mpjg9q03b1g62cnqp26bby1fyl3zlazs6phf7169vmchl")))
    (package
      (name "transition")
-     (version "release_1039")
+     (version "release_1042")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ni873h3fhb4f4wss47xhsrjcv1xdsrinvxk056d8kl8bkw028f9")))
+       #:hash (base32 "11a4p8ynfaa7wz15m07bcfqljh78jqqk6p7gkz1gr81sw1z2769s")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1762,15 +1762,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public travel-advice-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0l1nk1jkf9yn2729zagw54cq275xbw5l17h3mlzld1mkafbcdr8l")))
+    (hash (base32 "0454in06mqikdwb1h4l8y1ndj5jj5xkpb74gnw7jsgz5x1fcyw2a")))
    (package
      (name "travel-advice-publisher")
-     (version "release_708")
+     (version "release_715")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0318k96l8xih45cmfzsmbw8nhgwc9agcqpiz4967h87rg3qlmxn0")))
+       #:hash (base32 "1j3pqgsri40mvmazqs1rxpic975spb4lv10kghj9fxa3xx3cxd0x")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
@@ -1788,15 +1788,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public whitehall
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0r87m118i15rhf70033lffbmj09xv6dy5rsrkwl3y02p76g9arj7")))
+    (hash (base32 "0gkn3fm311m0di4j67s2w34aqgs6r774ac2z0y5fzpzzwm4w4bl0")))
    (package
      (name "whitehall")
-     (version "release_14442")
+     (version "release_14505")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1ag0cqrsggs5pl1zs5xh9lc27ash74hkjzra3j5wsavhvsi057wl")))
+       #:hash (base32 "0mw2gbsd8nh1cccrsyzcz9ah9c74ngplvagm7ipm6c5054kw65bk")))
      (build-system rails-build-system)
      (inputs
       `(("node" ,node)
