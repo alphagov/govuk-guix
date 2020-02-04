@@ -294,36 +294,6 @@ proxies requests to some upstream")
                         mariadb
                         openssl)))
 
-(define-public content-audit-tool
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "07iaj54qpfrzzxfwy1cr9vsrcszpx1j3qjrlpw0wsyz2vrmapr99")))
-   (package
-     (name "content-audit-tool")
-     (version "release_703")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1gcyaqcaz6zqcq51kqx4rxs78sc99qs3n425drfq2ndf6m9vm103")))
-     (build-system rails-build-system)
-     (arguments
-      `(#:phases
-        (modify-phases %standard-phases
-          (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser)
-          (add-after 'install 'replace-database.yml
-            ,(use-blank-database.yml))
-          (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
-            (lambda _
-              (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
-              #t)))))
-     (synopsis "")
-     (description "")
-     (license #f)
-     (home-page "https://github.com/alphagov/content-audit-tool"))
-   #:extra-inputs (list postgresql libffi)))
-
 (define-public content-data-admin
   (package-with-bundler
    (bundle-package

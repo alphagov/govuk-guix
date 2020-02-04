@@ -365,43 +365,6 @@
             (database "content_performance_manager_production"))))))
 
 ;;;
-;;; Content Audit Tool
-;;;
-
-(define-public content-audit-tool-service-type
-  (service-type
-   (name 'content-audit-tool)
-   (extensions
-    (modify-service-extensions-for-signon-and-plek
-     name
-     (standard-rails-service-type-extensions name)))
-   (default-value
-     (list (shepherd-service
-            (inherit default-shepherd-service)
-            (provision '(content-audit-tool))
-            (requirement '(publishing-api whitehall signon)))
-           (sidekiq-config
-            (file "config/sidekiq.yml"))
-           (plek-config) (rails-app-config) content-audit-tool
-           (signon-application
-            (name "Content Audit Tool")
-            (supported-permissions '("signin")))
-           (signon-api-user
-            (name "Content Audit Tool")
-            (email "content-audit-tool@guix-dev.gov.uk")
-            (authorisation-permissions
-             (list
-              (cons
-               (signon-authorisation
-                (application-name "Publishing API"))
-               '("signin")))))
-           (service-startup-config)
-           (redis-connection-config)
-           (postgresql-connection-config
-            (user "content_audit_tool")
-            (database "content_audit_tool_production"))))))
-
-;;;
 ;;; Content Data Admin
 ;;;
 
@@ -2128,8 +2091,7 @@
   (service-group
    "Supporting Applications"
    "Applications to support GOV.UK"
-   (list (service content-audit-tool-service-type)
-         (service content-data-admin-service-type)
+   (list (service content-data-admin-service-type)
          (service content-data-api-service-type)
          (service link-checker-api-service-type)
          (service search-admin-service-type)
