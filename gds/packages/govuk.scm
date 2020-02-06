@@ -208,15 +208,15 @@ proxies requests to some upstream")
 (define-public collections
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1kyvgsnh8635sqapiy4lj798df14406rf5k7ca5acbdmf94jqm50")))
+    (hash (base32 "1n44jaiwqv8s836xr524gcqx9dkbvs28cvzkzx2dwbyfzcy7xvpk")))
    (package
      (name "collections")
-     (version "release_1214")
+     (version "release_1215")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02i0p9ps0j6xvrl6d39k9crpyksq0s87pd8gr6c2dhx76dxp5k4d")))
+       #:hash (base32 "1qgacsws99qvzdss4lwm32y60zm02a5lzvm8jnr3n7bf19pc8q22")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
