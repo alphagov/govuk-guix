@@ -569,15 +569,15 @@ proxies requests to some upstream")
 (define-public frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0d4w6mxhnklqfwy8nkg8jdid6q5p3fk1a393ffxr7rmh7fpvb3y7")))
+    (hash (base32 "02hbnmm3c0qw3cyfczjiw5121lwqbr6lzaqfxc6byqci2agchxm0")))
    (package
      (name "frontend")
-     (version "release_3445")
+     (version "release_3446")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0jr1yiinxsa8d5gfz3icgm2hhsrqcfc43a7ci1pl03w29ip0ppk8")))
+       #:hash (base32 "0df4rvg5pl7ass6d99p2wws0cmghsy99czlrxhqk1njg6q9n7k2l")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
