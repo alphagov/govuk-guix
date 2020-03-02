@@ -813,15 +813,15 @@ service setup.")
 (define-public imminence
   (package-with-bundler
    (bundle-package
-    (hash (base32 "09qc4yqxnvhi7sny4pq675d7yxxq32njkc96zsjc9c57s0wa2fln")))
+    (hash (base32 "1q44pqpvbnlqwnhib8g20sqhrl07z19a2wnf4yddva34xccbrank")))
    (package
      (name "imminence")
-     (version "release_612")
+     (version "release_613")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02xl70w9l5mfdl143grgk1yfpnhm1b35v0dgalma9w5yxqkmpb3k")))
+       #:hash (base32 "18cv7lynfrar530hk1gkrg88hilkwaw5gilacs90w68riim8jmmh")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
