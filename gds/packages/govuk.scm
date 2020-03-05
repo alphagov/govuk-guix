@@ -1188,12 +1188,12 @@ data to use can be selected, and multiple backends are supported.")
     (hash (base32 "18v2lgmpwkgj7sn4ypq2p1ygabchnlpbiw0yhqc62lzv2s1vk3lb")))
    (package
      (name "publishing-api")
-     (version "release_1614")
+     (version "release_1615")
      (source
       (github-archive
        #:repository "publishing-api"
        #:commit-ish version
-       #:hash (base32 "0nhfgb5rxkiy0f9hyc2yzwis9zp139vb73zzliqq0niw3h5mkyp4")))
+       #:hash (base32 "1b45dfhmr8ik705ny9r1cvwvs9n5pkfh5p8annyyr7fxmj5hnnq0")))
      (build-system rails-build-system)
      (arguments '(#:precompile-rails-assets? #f))
      (synopsis "Service for storing and providing workflow for GOV.UK content")
