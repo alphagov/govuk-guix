@@ -835,9 +835,7 @@
             (provision '(manuals-frontend))
             (requirement '(publishing-api signon)))
            (plek-config) (rails-app-config) manuals-frontend
-           (service-startup-config)
-           (mongodb-connection-config
-            (database "manuals_frontend"))))))
+           (service-startup-config)))))
 
 (define-public draft-manuals-frontend-service-type
   (service-type
@@ -852,9 +850,7 @@
             (provision '(draft-manuals-frontend))
             (requirement '(publishing-api signon)))
            (plek-config) (rails-app-config) manuals-frontend
-           (service-startup-config)
-           (mongodb-connection-config
-            (database "manuals_frontend"))))))
+           (service-startup-config)))))
 
 ;;;
 ;;; Manuals Publisher
