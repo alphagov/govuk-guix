@@ -1490,8 +1490,7 @@ content, as well as broadcasting changes to a message queue.")
 (define-public signon
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1y8s51fv1rd8b2xczndims9xwmfyl7ybd3a0v8jlj8za4ljq9xlg"))
-    (without '("development" "test")))
+    (hash (base32 "1p49wajhpp9z65cmwncjx12rgzkqxr8a6z5495xh5valfh8sfw0h")))
    (package
      (name "signon")
      (version "release_1441")
