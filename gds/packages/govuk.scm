@@ -297,15 +297,15 @@ proxies requests to some upstream")
 (define-public content-data-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "01qs730y8s28969i4s3dqyij2i906y4dmba05bnpy9fkc8hlzb7j")))
+    (hash (base32 "1x72qnwf525ci4i9pvcrh46f3633irwkrq6aji47ng1dlqvap1yw")))
    (package
      (name "content-data-admin")
-     (version "release_651")
+     (version "release_652")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "19ha3cx4wdkh0bv5f75lf9vy6vljs99lxhw05m2jhyasdjd1ddsx")))
+       #:hash (base32 "0x5nf3bfqzjdxkkdvdisbhxa02dba3pb2wcsyv8gng2d8b8r3mrl")))
      (build-system rails-build-system)
      (native-inputs
       `(("chromium" ,ungoogled-chromium)))
