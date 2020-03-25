@@ -611,12 +611,12 @@ proxies requests to some upstream")
 (define-public govuk-content-schemas
   (package
     (name "govuk-content-schemas")
-    (version "release_947")
+    (version "release_948")
     (source
      (github-archive
       #:repository name
       #:commit-ish version
-      #:hash (base32 "0qnyag81lp7fhmmvk6q3ra3spnqb4211kq8rl0xiqjgqi5kycayp")))
+      #:hash (base32 "0r0631v2s4459s6z7h8a7ic2nwnbr3iqxfsax2dqfy8jh1b1lcki")))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
