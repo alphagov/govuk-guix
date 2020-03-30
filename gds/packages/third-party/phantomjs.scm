@@ -52,7 +52,7 @@
              "*/bin/phantomjs"))
            (system* patchelf "--set-interpreter" ld-so (string-append out "/bin/phantomjs"))
            (let*
-               ((libs '("gcc:lib" "zlib" "fontconfig" "freetype" "libstdc++"))
+               ((libs '("gcc:lib" "zlib" "fontconfig" "freetype"))
                 (ld-library-path
                  (map
                   (lambda (lib)
@@ -77,7 +77,6 @@
      `(("zlib" ,zlib)
        ("fontconfig" ,fontconfig)
        ("freetype" ,freetype)
-       ("libstdc++" ,libstdc++-4.9)
        ("gcc:lib" ,gcc-4.9 "lib")
        ("bash" ,bash)))
     (home-page "http://phantomjs.org/")
