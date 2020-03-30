@@ -9,7 +9,7 @@ GOVUK_ROOT="$(dirname "$GOVUK_GUIX_ROOT")"
 
 for repo in "$@"
 do
-    cd "$GOVUK_ROOT/$repo"
+    cd "$GOVUK_ROOT/$repo" || true
 
     if [ ! -d ".git" ]; then
         echo "$repo: skipped as not a Git repository"
@@ -21,7 +21,9 @@ do
         elif ! git diff --quiet --ignore-submodules --no-ext-diff; then
             echo "$repo: ${bold}skipped: uncommitted local changes${reset}"
         else
-            git fetch origin
+            if ! git fetch origin; then
+                echo "$repo: ${bold}error fetching from origin${reset}"
+            fi
             if ! git merge --ff-only origin/master >/dev/null 2>&1; then
                 echo "$repo: ${bold}skipped: unpushed local commits${reset}"
             else
