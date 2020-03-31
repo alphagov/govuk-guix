@@ -27,7 +27,7 @@
   (let ((ruby-mod (resolve-interface '(gnu packages ruby))))
     (package
       (inherit (module-ref ruby-mod 'ruby))
-      (version "2.5.3")
+      (version "2.6.5")
       (source
        (origin
          (method url-fetch)
@@ -36,7 +36,7 @@
                              "/ruby-" version ".tar.xz"))
          (sha256
           (base32
-           "0vrhrw7kcz9mg0jkqnihkcxqy5k05v8k1j0y2735z8wfk8sx1j8w")))))))
+           "0qhsw2mr04f3lqinkh557msr35pb5rdaqy4vdxcj91flgxqxmmnm")))))))
 
 (define* (lower name
                 #:key source inputs native-inputs outputs system target
