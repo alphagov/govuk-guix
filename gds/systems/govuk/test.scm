@@ -114,6 +114,20 @@
                        (run-command "rake" "finders:publish")))))
             parameter))
       parameters))
+    (collections-publisher-service-type
+     parameters =>
+     (map
+      (lambda (parameter)
+        (if (service-startup-config? parameter)
+            (service-startup-config-add-pre-startup-scripts
+             parameter
+             `((publish-api-organisations-route
+                . ,#~(lambda ()
+                       (run-command
+                        "rake"
+                        "publishing_api:publish_organisations_api_route")))))
+            parameter))
+      parameters))
     (specialist-publisher-service-type
      parameters =>
      (map
