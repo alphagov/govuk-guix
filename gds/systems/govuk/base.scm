@@ -112,7 +112,11 @@ host	all	all	::1/128 	trust"))))))
               (extra-config
                '(("action.destructive_requires_name" "true")
                  ("script.engine.groovy.inline.search" "true")))))
-    (service mysql-service-type (mysql-configuration))
+    (service mysql-service-type
+             (mysql-configuration
+              (extra-content
+               "# govuk-guix
+max_allowed_packet=16M")))
     (service rabbitmq-service-type)
     tailon-service
     govuk-content-schemas-service)))
