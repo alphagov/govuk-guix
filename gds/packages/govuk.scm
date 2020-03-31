@@ -1639,15 +1639,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "02b05dzzb31l7jcb41l4h190yap38wl2xjndbxgha6f1ms5z6kgm")))
+    (hash (base32 "1zbs8qpkkxvy68z32ya86aghi25g77ywwimixg8fmwx4q1x8m9jg")))
    (package
      (name "static")
-     (version "release_3457")
+     (version "release_3458")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0vns84d5b4f2ml5vqwl18wl24v1q020d74llkpapca02a97bj8yw")))
+       #:hash (base32 "0qns8rxw3ff5hz3zmm9ikggbp5q8cicgzannsi8ygqayh9kf1d2m")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
