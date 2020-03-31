@@ -242,7 +242,8 @@ proxies requests to some upstream")
        #:hash (base32 "0nyrrpn9lgwjn0mxhjla2fqzldv0zkmd6fxyzp4swsh85gv4z6g9")))
      (build-system rails-build-system)
      (arguments
-      `(#:phases
+      `(#:precompile-rails-assets? #f   ; TODO yarn
+        #:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
