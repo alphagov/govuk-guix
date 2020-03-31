@@ -254,7 +254,7 @@ proxies requests to some upstream")
      (description "")
      (license license:expat)
      (home-page "https://github.com/alphagov/collections-publisher"))
-   #:extra-inputs (list mariadb
+   #:extra-inputs (list mysql
                         openssl
                         libffi)))
 
@@ -287,7 +287,7 @@ proxies requests to some upstream")
      (license license:expat)
      (home-page "https://github.com/alphagov/contacts-admin"))
    #:extra-inputs (list libffi
-                        mariadb
+                        mysql
                         openssl)))
 
 (define-public content-data-admin
@@ -1517,7 +1517,7 @@ content, as well as broadcasting changes to a message queue.")
      (license #f)
      (home-page "https://github.com/alphagov/signon"))
    #:extra-inputs (list libffi
-                        mariadb
+                        mysql
                         postgresql
                         openssl)))
 
@@ -1826,7 +1826,7 @@ content, as well as broadcasting changes to a message queue.")
      (description "")
      (license #f)
      (home-page "https://github.com/alphagov/whitehall"))
-   #:extra-inputs (list mariadb
+   #:extra-inputs (list mysql
                         libffi
                         openssl
                         curl
