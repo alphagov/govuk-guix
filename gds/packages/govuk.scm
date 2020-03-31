@@ -1310,6 +1310,9 @@ content, as well as broadcasting changes to a message queue.")
                       (and
                        (with-directory-excursion
                            "__build/src/github.com/alphagov/router"
+                         (substitute* "Makefile"
+                           (("go build")
+                            "go build -mod vendor"))
                          (and
                           (zero? (system*
                                   "make" "build"
