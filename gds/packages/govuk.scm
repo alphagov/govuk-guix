@@ -246,8 +246,6 @@ proxies requests to some upstream")
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
-          (add-after 'install 'replace-database.yml
-            ,(use-blank-database.yml))
           (add-before 'check 'set-GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER
             (lambda _
               (setenv "GOVUK_TEST_USE_SYSTEM_CHROMEDRIVER" "true")
@@ -283,9 +281,7 @@ proxies requests to some upstream")
         #:phases
         (modify-phases %standard-phases
           (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser)
-          (add-after 'install 'replace-database.yml
-            ,(use-blank-database.yml)))))
+            ,govuk-admin-template-initialiser))))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
      (license license:expat)
@@ -1515,9 +1511,7 @@ content, as well as broadcasting changes to a message queue.")
           (add-before 'install 'disable-google-analytics
             (lambda _
               (substitute* "config/initializers/govuk_admin_template.rb"
-                (("false") "true"))))
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+                (("false") "true")))))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1815,8 +1809,6 @@ content, as well as broadcasting changes to a message queue.")
           (delete 'reset-gzip-timestamps)
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
-          (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml))
           (add-after 'install 'create-data-directories
             (lambda* (#:key outputs #:allow-other-keys)
               (let ((out (assoc-ref outputs "out")))
