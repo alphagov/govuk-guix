@@ -1255,12 +1255,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "04c4ibwn5wr2b598n7lrghrp23f2ccrylsccsap5q9m6ygzzbmsl")))
    (package
      (name "release")
-     (version "release_602")
+     (version "release_603")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0h88a4vsasxq67h16wg2hbvpfbd2nannl05jr15vfbknlwv7ikv6")))
+       #:hash (base32 "1xpcx8ghh9h1651x4iis86mwn0z74plhnfqvvm5rpsls2pyzb8yi")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
