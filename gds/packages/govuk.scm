@@ -234,12 +234,12 @@ proxies requests to some upstream")
     (hash (base32 "0l3rbirm1smssha33vfw6arcwmjyiqlazqbmqfgri424kh7xcn3l")))
    (package
      (name "collections-publisher")
-     (version "release_881")
+     (version "release_882")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0wdw1c6j6bpa69h2jacjhk9lliskvih4rky8vgxjkakn495pzn54")))
+       #:hash (base32 "17m23wbpxfkm43xnnd1plny7rmxldhqgapykc76b1yq3qf87fq6q")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f   ; TODO yarn
