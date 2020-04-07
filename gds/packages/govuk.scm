@@ -1531,12 +1531,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0h8p5pjcsk78ym6nlghd7yym41bbssv3h215mlfj73ym1945gr1d")))
    (package
      (name "smart-answers")
-     (version "release_4660")
+     (version "release_4661")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0j9a8djw4nnxnqspd8ja6fszsz3qv3s4q3ap2fq86qha9k1xq7y6")))
+       #:hash (base32 "00qg4b9xip0i4q74bcly0xik1x0mnl4ayyb80qwj2z15rv81yfn4")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
