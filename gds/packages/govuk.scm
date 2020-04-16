@@ -906,12 +906,12 @@ service setup.")
     (hash (base32 "1a7q6hqb25pjz60a93chifks8xhm8sh7918al9ffj12i216djhhh")))
    (package
      (name "local-links-manager")
-     (version "release_525")
+     (version "release_526")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0dc4d38pfj6w5idw63g4b8ws2cdm9jxk7g4ccngri6k632p3m91z")))
+       #:hash (base32 "1p6plyx4k2yrrciz07swmrly7dhagr499qgp1a8vxaxazgafbzv6")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
