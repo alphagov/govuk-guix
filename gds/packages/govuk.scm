@@ -1397,15 +1397,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public service-manual-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0qib9ha3lzh7sw2v7pm6dzs8cmf12apvrkly39jk5wg6pwpxq4z1")))
+    (hash (base32 "0f9s4ckvbhnrx133cz66wmas9mfpgp0jqmjz5vnq048ikf6phrmx")))
    (package
      (name "service-manual-frontend")
-     (version "release_515")
+     (version "release_516")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "02fh6yivy9nygxi8r56s577i4mqn1g4l959ffh1kna13hrzsa2gm")))
+       #:hash (base32 "0rj7b27ibdiwn8jdl3mlb18ylxk1kazq0a22507ln5sh8fywk4fb")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
