@@ -879,15 +879,15 @@ service setup.")
 (define-public link-checker-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1pag7wgpib2sld7d1glhdas19jqdxmdcnrhz2z8wi7kvhwr3c5ry")))
+    (hash (base32 "08872y801y85wblzn1mzbj7lzfr9rpqak3fi0y43vswcimqi4m2k")))
    (package
      (name "link-checker-api")
-     (version "release_303")
+     (version "release_304")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "09q5vkjh2k8cnyr97cw0cffr4rsz642lqmag8q7nm0jxcpka9i2f")))
+       #:hash (base32 "1i3pk3rljnii7h29sh4hkwrp6lzgi0aydrb21lrpwm3a3b59wagg")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f))
