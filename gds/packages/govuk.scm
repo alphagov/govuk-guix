@@ -432,15 +432,15 @@ proxies requests to some upstream")
 (define-public email-alert-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0rd5hsxlf1ag0b9vgys2xabqfznydf2bb5f1ijf9hcxg07cgpm72")))
+    (hash (base32 "18cglpx156mlngi9fv75qfnvy505rn89qkfjpq9xsy8hf4mmkxc0")))
    (package
      (name "email-alert-api")
-     (version "release_1121")
+     (version "release_1122")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1d2zfg9qlzp7dx2s3q6pjscgd7hclw74xlf20yryw4lzhr6czvfa")))
+       #:hash (base32 "1ihjapc08lz0acyl67c826glcr28ms7dkw5d0nyghxp54zxwmnfj")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
