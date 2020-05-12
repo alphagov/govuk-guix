@@ -1387,7 +1387,11 @@ content, as well as broadcasting changes to a message queue.")
        #:commit-ish version
        #:hash (base32 "0iq3jx94vi72a3fqglsba7dv8dd4wl1kqhb8v97qalpdz19606cb")))
      (build-system rails-build-system)
-     (arguments '(#:precompile-rails-assets? #f))
+     (arguments
+      '(#:precompile-rails-assets? #f
+        #:phases
+        (modify-phases %standard-phases
+          (delete 'create-hosts-initializer)))) ; TODO This isn't a Rails app
      (synopsis "Search API for GOV.UK")
      (description "")
      (license license:expat)

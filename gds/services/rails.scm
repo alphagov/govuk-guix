@@ -55,6 +55,8 @@
 (define-record-type* <rails-app-config>
   rails-app-config make-rails-app-config
   rails-app-config?
+  (host        rails-app-config-host
+               (default #f))
   (port        rails-app-config-port
                (default #f))
   (environment rails-app-config-environment
@@ -100,6 +102,7 @@
    (list
     (cons "SSL_CERT_FILE" "/run/current-system/profile/etc/ssl/certs/ca-certificates.crt")
     (cons "RAILS_ENV" (rails-app-config-environment config))
+    (cons "RAILS_HOST" (rails-app-config-host config))
     (cons "SECRET_KEY_BASE" (rails-app-config-secret-key-base config))
     (cons "SECRET_TOKEN" (rails-app-config-secret-token config)))))
 

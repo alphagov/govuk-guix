@@ -9,6 +9,7 @@
   #:use-module (gnu services shepherd)
   #:use-module (gds services)
   #:use-module (gds services utils)
+  #:use-module (gds services rails)
   #:use-module (gds services utils databases)
   #:use-module (gds services govuk)
   #:use-module (gds services govuk plek)
@@ -221,10 +222,27 @@
                            (plek-config->domains plek-config))))
         services))
 
+  (define (set-rails-app-config-host services)
+    (map
+     (lambda (service)
+       (update-service-parameters
+        service
+        (list
+         (cons rails-app-config?
+               (lambda (config)
+                 (rails-app-config
+                  (inherit config)
+                  (host (service-host-from-plek-config
+                         plek-config
+                         (service-type-name
+                          (service-kind service))))))))))
+     services))
+
   (define service-setup-functions
     `(,update-services-plek-config
       ,(cut update-database-service-ports-for-services
          database-service-ports <>)
+      ,set-rails-app-config-host
       ,set-govuk-certificates-config))
 
   (define service-names

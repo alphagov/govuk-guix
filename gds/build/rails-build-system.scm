@@ -172,6 +172,17 @@ extended with definitions for VARS."
             (assoc-ref outputs "out")
             "/log")))
 
+(define* (create-hosts-initializer #:key outputs #:allow-other-keys)
+  (call-with-output-file (string-append
+                          (assoc-ref outputs "out")
+                          "/config/initializers/govuk_guix_hosts.rb")
+    (lambda (port)
+      (display "
+Rails.application.configure do
+  config.hosts << ENV['RAILS_HOST'] if config.respond_to? :hosts
+end
+" port))))
+
 (define* (precompile-rails-assets
           #:key inputs precompile-rails-assets?
           #:allow-other-keys)
@@ -251,6 +262,8 @@ extended with definitions for VARS."
                create-tmp-directory)
     (add-after 'create-tmp-directory 'create-log-directory
                create-log-directory)
+    (add-after 'create-tmp-directory 'create-hosts-initializer
+               create-hosts-initializer)
     (add-after 'create-log-directory 'patch-bin-files
                patch-bin-files)
     (add-after 'patch-bin-files 'wrap-with-relative-path
