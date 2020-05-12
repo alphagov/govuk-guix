@@ -27,6 +27,7 @@
             plek-config->/etc/hosts-string
             service-uri-from-plek-config
             service-port-from-plek-config
+            service-host-from-plek-config
             make-custom-plek-config
             filter-plek-config-service-ports
             update-service-extension-parameters-for-plek-config
@@ -81,6 +82,11 @@
   ((plek-config-service-uri-function plek-config)
    service
    (service-port-from-plek-config plek-config service)))
+
+(define (service-host-from-plek-config plek-config service)
+  (uri-host
+   (string->uri
+    (service-uri-from-plek-config plek-config service))))
 
 (define (service-name->environment-variable-string service)
   (string-map
