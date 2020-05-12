@@ -1062,7 +1062,7 @@ service setup.")
          (delete 'wrap-with-relative-path)
          (add-after 'install 'wrap-bin/rails
            (lambda* (#:key inputs outputs #:allow-other-keys)
-             ((@@ (guix build ruby-build-system) wrap-ruby-program)
+             (wrap-ruby-program
               (string-append (assoc-ref outputs "out") "/bin/rails")
               ;; Terraform doesn't support a search path for plugins,
               ;; and expects a single directory, so just lump together
