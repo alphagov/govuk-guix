@@ -585,15 +585,15 @@ proxies requests to some upstream")
 (define-public government-frontend
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ca9yvh1zg6xv5k3wsigx68qprgjh8053xg7k0c3hc1xfgcw71x7")))
+    (hash (base32 "15yf97v2a4f0r557yni51vcfk6rl396sd268saq99xpvkjy6j83k")))
    (package
      (name "government-frontend")
-     (version "release_1436")
+     (version "release_1437")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "15mcyp1l5cmri85dbrnv4j29186rjb6zkwvdladvrg16x80rm422")))
+       #:hash (base32 "106pcafkkk6xl3jr3by4kv92vh4fzsx5c2xfpz62yhw957di9xxh")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
