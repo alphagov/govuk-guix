@@ -322,15 +322,15 @@ proxies requests to some upstream")
 (define-public content-data-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ybb7acl9220nl3qkwh9jbasgq0blksr9sh8212m3flrr4n6zkpg")))
+    (hash (base32 "06fvvk0bgim7xc6b91mnzpads8fhhs2mk6r9rcb0dy80qd80ia36")))
    (package
      (name "content-data-api")
-     (version "release_1256")
+     (version "release_1257")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0cjqxwirfq21kklzrhvacxk4d813c70r0scwq1xvmhj2gq41j09k")))
+       #:hash (base32 "0c4yivbi3883xbw1bj943rnzns2ld1fqzmgab7jl0pfyrp6xq34w")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
