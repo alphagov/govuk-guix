@@ -211,12 +211,12 @@ proxies requests to some upstream")
     (hash (base32 "04wsxl60rv6s8rvn4lw0hadcjbmqcnix4r271czcjrqg6x7qg2rd")))
    (package
      (name "collections")
-     (version "release_1447")
+     (version "release_1448")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0fkrvpxb251i4p065sqhrz79q8fhf1zvwh31gry311gf7c5i8mcx")))
+       #:hash (base32 "11iz5gn49grgyjargaz9qvcvngzds2hr8mz8gh9g753z70dvpx4j")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
