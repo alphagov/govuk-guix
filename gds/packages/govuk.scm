@@ -856,12 +856,12 @@ service setup.")
     (hash (base32 "1akdadxiyhp0m1vpslsmv87n13y8hy00ak2arc46pwwlbix39l5l")))
    (package
      (name "licence-finder")
-     (version "release_758")
+     (version "release_759")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1cjic0v78r9xv0qsxpz3h08z9mllrvj7w9z7pc15ijhy33dyj9l9")))
+       #:hash (base32 "0wvjxbhzir3ci6g5mv0w5c0f0ykclgz2vh226pb8a1gl51jw00x3")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
