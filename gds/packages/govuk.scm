@@ -123,15 +123,15 @@ GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONME
 (define-public authenticating-proxy
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0wq0m83744s1j5l0112khh6bkj8abv14nyjbkw02y8gwnd9acxxb")))
+    (hash (base32 "0ig59p3a474526lhj9fgrf42wgysmrhdcp3rlna8gj5wfcqih6wh")))
    (package
      (name "authenticating-proxy")
-     (version "release_192")
+     (version "release_193")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0l191s4qg0c551vgrl5hhr0y3m20cbd2ghqwnbsxyn0q7a5c2y2s")))
+       #:hash (base32 "07hcj5r3vzwj4l0i04ydp541ikphk9pwq27rivbjq3js8n3hniqm")))
      (build-system rails-build-system)
      (arguments
       `(#:precompile-rails-assets? #f
