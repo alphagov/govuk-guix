@@ -66,9 +66,9 @@
                  (symlink #$package
                           "/var/apps/govuk-content-schemas")))
            #t))
-   (stop #~(lambda _
-             #f))
-   (respawn? #f)))))
+      (stop #~(lambda _
+                #f))
+      (respawn? #f)))))
 
 (define-public govuk-content-schemas-service
   (service govuk-content-schemas-service-type govuk-content-schemas))
@@ -1139,29 +1139,29 @@
    (string-append "start-smokey")
    (with-imported-modules '((guix build utils)
                             (gnu services herd))
-    #~(let ((bundle (string-append #$package "/bin/bundle")))
-        (use-modules (guix build utils)
-                     (gnu services herd)
-                     (srfi srfi-26)
-                     (ice-9 popen)
-                     (ice-9 rw)
-                     (ice-9 rdelim))
+     #~(let ((bundle (string-append #$package "/bin/bundle")))
+         (use-modules (guix build utils)
+                      (gnu services herd)
+                      (srfi srfi-26)
+                      (ice-9 popen)
+                      (ice-9 rw)
+                      (ice-9 rdelim))
 
-        (mkdir-p "/var/apps/smokey")
+         (mkdir-p "/var/apps/smokey")
 
-        (for-each
-         (lambda (env-var)
-           (setenv (car env-var) (cdr env-var)))
-         '#$environment-variables)
-        (chdir #$package)
-        (let
-            ((result
-              (zero? (system*
-                      bundle
-                      "exec"
-                      "rake"))))
+         (for-each
+          (lambda (env-var)
+            (setenv (car env-var) (cdr env-var)))
+          '#$environment-variables)
+         (chdir #$package)
+         (let
+             ((result
+               (zero? (system*
+                       bundle
+                       "exec"
+                       "rake"))))
 
-          result)))))
+           result)))))
 
 (define (smokey-activation environment-variables package)
   (with-imported-modules (source-module-closure

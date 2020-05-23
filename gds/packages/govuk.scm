@@ -109,11 +109,11 @@ GovukAdminTemplate.environment_label = ENV.fetch('GOVUK_ADMIN_TEMPLATE_ENVIRONME
       `(#:phases
         (modify-phases %standard-phases
           (add-after 'install 'create-uploads-and-fake-s3-directories
-                     (lambda* (#:key outputs #:allow-other-keys)
-                       (let ((out (assoc-ref outputs "out")))
-                         (mkdir-p (string-append out "/uploads"))
-                         (mkdir-p (string-append out "/fake-s3")))
-                       #t)))))
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let ((out (assoc-ref outputs "out")))
+                (mkdir-p (string-append out "/uploads"))
+                (mkdir-p (string-append out "/fake-s3")))
+              #t)))))
      (synopsis "Manages uploaded assets (e.g. PDFs, images, ...)")
      (description "The Asset Manager is used to manage assets for the GOV.UK Publishing Platform")
      (license license:expat)
@@ -279,10 +279,10 @@ proxies requests to some upstream")
       `(;; The mock_organisations_api, from the spec directory is used
         ;; in development
         #:exclude-files ("tmp")
-        #:phases
-        (modify-phases %standard-phases
-          (add-before 'install 'add-govuk-admin-template-initialiser
-            ,govuk-admin-template-initialiser))))
+                        #:phases
+                        (modify-phases %standard-phases
+                          (add-before 'install 'add-govuk-admin-template-initialiser
+                            ,govuk-admin-template-initialiser))))
      (synopsis "Used to publish organisation contact information to GOV.UK")
      (description "")
      (license license:expat)
@@ -337,7 +337,7 @@ proxies requests to some upstream")
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -361,19 +361,19 @@ proxies requests to some upstream")
       `(;; TODO: Asset precompilation is now failing, due to npm not
         ;; being used to download some JavaScript.
         #:precompile-rails-assets? #f
-        #:phases
-        (modify-phases %standard-phases
-         (add-before 'precompile-rails-assets 'set-fake-SECRET_KEY_BASE
-          (lambda _
-            ;; TODO: Active Storage seems to require the
-            ;; SECRET_KEY_BASE Not sure why, so set a fake one to make
-            ;; asset precompilation work
-            (setenv "SECRET_KEY_BASE" "fake")
-            ;; assets:precompile seems to fail without the
-            ;; JWT_AUTH_SECRET being set
-            (setenv "JWT_AUTH_SECRET" "fake")))
-         (add-after 'install 'replace-database.yml
-          ,(use-blank-database.yml)))))
+                                   #:phases
+                                   (modify-phases %standard-phases
+                                     (add-before 'precompile-rails-assets 'set-fake-SECRET_KEY_BASE
+                                       (lambda _
+                                         ;; TODO: Active Storage seems to require the
+                                         ;; SECRET_KEY_BASE Not sure why, so set a fake one to make
+                                         ;; asset precompilation work
+                                         (setenv "SECRET_KEY_BASE" "fake")
+                                         ;; assets:precompile seems to fail without the
+                                         ;; JWT_AUTH_SECRET being set
+                                         (setenv "JWT_AUTH_SECRET" "fake")))
+                                     (add-after 'install 'replace-database.yml
+                                       ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license license:expat)
@@ -420,7 +420,7 @@ proxies requests to some upstream")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml)))))
 
      (synopsis "")
      (description "")
@@ -447,7 +447,7 @@ proxies requests to some upstream")
         #:phases
         (modify-phases %standard-phases
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -495,19 +495,19 @@ proxies requests to some upstream")
           (replace 'build (lambda args #t))
           (replace 'check (lambda args #t))
           (replace 'install
-                   (lambda* (#:key inputs outputs #:allow-other-keys)
-                     (let* ((out (assoc-ref outputs "out")))
-                       (copy-recursively
-                        "."
-                        out
-                        #:log (%make-void-port "w")))))
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out")))
+                (copy-recursively
+                 "."
+                 out
+                 #:log (%make-void-port "w")))))
           (add-after 'patch-bin-files 'wrap-with-relative-path
-                     (lambda* (#:key outputs #:allow-other-keys)
-                       (let* ((out (assoc-ref outputs "out")))
-                         (substitute* (find-files
-                                       (string-append out "/bin"))
-                           (((string-append out "/bin"))
-                            "${BASH_SOURCE%/*}"))))))))
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out")))
+                (substitute* (find-files
+                              (string-append out "/bin"))
+                  (((string-append out "/bin"))
+                   "${BASH_SOURCE%/*}"))))))))
      (synopsis "")
      (description "")
      (license #f)
@@ -633,27 +633,27 @@ proxies requests to some upstream")
 
 (define-public govuk-setenv
   (package
-   (name "govuk-setenv")
-   (version "1")
-   (source #f)
-   (build-system trivial-build-system)
-   (arguments
-    `(#:modules ((guix build utils))
-      #:builder (begin
-                  (use-modules (guix build utils))
-                  (let
-                      ((bash (string-append
-                              (assoc-ref %build-inputs "bash")
-                              "/bin/bash"))
-                       (sudo (string-append
-                              (assoc-ref %build-inputs "sudo")
-                              "/bin/sudo")))
-                    (mkdir-p (string-append %output "/bin"))
-                    (call-with-output-file (string-append
-                                            %output
-                                            "/bin/govuk-setenv")
-                      (lambda (port)
-                        (simple-format port "#!~A
+    (name "govuk-setenv")
+    (version "1")
+    (source #f)
+    (build-system trivial-build-system)
+    (arguments
+     `(#:modules ((guix build utils))
+       #:builder (begin
+                   (use-modules (guix build utils))
+                   (let
+                       ((bash (string-append
+                               (assoc-ref %build-inputs "bash")
+                               "/bin/bash"))
+                        (sudo (string-append
+                               (assoc-ref %build-inputs "sudo")
+                               "/bin/sudo")))
+                     (mkdir-p (string-append %output "/bin"))
+                     (call-with-output-file (string-append
+                                             %output
+                                             "/bin/govuk-setenv")
+                       (lambda (port)
+                         (simple-format port "#!~A
 set -exu
 APP=\"$1\"
 shift
@@ -661,20 +661,20 @@ source \"/tmp/env.d/$APP\"
 cd \"/var/apps/$APP\"
 ~A --preserve-env -u \"$APP\" \"$@\"
 " bash sudo)))
-                    (chmod (string-append %output "/bin/govuk-setenv") #o555)
-                    #t))))
-   (native-inputs
-    `(("bash" ,bash)
-      ("sudo" ,sudo)))
-   (synopsis "govuk-setenv script for running commands in the service environment")
-   (description "This script runs the specified command in an
+                     (chmod (string-append %output "/bin/govuk-setenv") #o555)
+                     #t))))
+    (native-inputs
+     `(("bash" ,bash)
+       ("sudo" ,sudo)))
+    (synopsis "govuk-setenv script for running commands in the service environment")
+    (description "This script runs the specified command in an
 environment similar to that which the service is running. For example,
 running govuk-setenv @code{publishing-api rails console} runs the
 @code{rails console} command as the user associated with the
 Publishing API service, and with the environment variables for this
 service setup.")
-   (license #f)
-   (home-page #f)))
+    (license #f)
+    (home-page #f)))
 
 (define-public govuk-guix
   (package
@@ -823,8 +823,8 @@ service setup.")
      (arguments
       `(#:phases
         (modify-phases %standard-phases
-                       (add-after 'install 'replace-mongoid.yml
-                                  ,(replace-mongoid.yml)))))
+          (add-after 'install 'replace-mongoid.yml
+            ,(replace-mongoid.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1003,9 +1003,9 @@ service setup.")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml))
+            ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
-                     ,(replace-gds-sso-initializer)))))
+            ,(replace-gds-sso-initializer)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1167,9 +1167,9 @@ data to use can be selected, and multiple backends are supported.")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
-                     ,(replace-mongoid.yml))
+            ,(replace-mongoid.yml))
           (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
-                     ,(replace-gds-sso-initializer)))))
+            ,(replace-gds-sso-initializer)))))
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
@@ -1231,13 +1231,13 @@ content, as well as broadcasting changes to a message queue.")
           (replace 'build (lambda args #t))
           (replace 'check (lambda args #t))
           (replace 'install
-                   (lambda* (#:key inputs outputs #:allow-other-keys)
-                     (let* ((out (assoc-ref outputs "out")))
-                       (copy-recursively
-                        "."
-                        out
-                        #:log (%make-void-port "w"))
-                       (mkdir-p (string-append out "/tmp/results"))))))))
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out")))
+                (copy-recursively
+                 "."
+                 out
+                 #:log (%make-void-port "w"))
+                (mkdir-p (string-append out "/tmp/results"))))))))
      (synopsis "Suite of end-to-end tests for GOV.UK")
      (description "")
      (license license:expat)
@@ -1268,7 +1268,7 @@ content, as well as broadcasting changes to a message queue.")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-database.yml
-                     ,(use-blank-database.yml)))))
+            ,(use-blank-database.yml)))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1296,33 +1296,33 @@ content, as well as broadcasting changes to a message queue.")
          (delete 'install)
          (delete 'check)
          (replace 'build
-                  (lambda* (#:key inputs outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (cwd (getcwd)))
-                      (copy-recursively cwd "../router-copy")
-                      (mkdir-p "__build/src/github.com/alphagov")
-                      (mkdir-p "__build/bin")
-                      (setenv "HOME" "/tmp")
-                      (setenv "GOPATH" (string-append cwd "/__build"))
-                      (setenv "BINARY" (string-append cwd "/router"))
-                      (rename-file "../router-copy"
-                                   "__build/src/github.com/alphagov/router")
-                      (and
-                       (with-directory-excursion
-                           "__build/src/github.com/alphagov/router"
-                         (substitute* "Makefile"
-                           (("go build")
-                            "go build -mod vendor"))
-                         (and
-                          (zero? (system*
-                                  "make" "build"
-                                          (string-append "RELEASE_VERSION="
-                                                         ,version)))
-                          (mkdir-p (string-append out "/bin"))))
-                       (begin
-                         (copy-file "router"
-                                    (string-append out "/bin/router"))
-                         #t))))))))
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (cwd (getcwd)))
+               (copy-recursively cwd "../router-copy")
+               (mkdir-p "__build/src/github.com/alphagov")
+               (mkdir-p "__build/bin")
+               (setenv "HOME" "/tmp")
+               (setenv "GOPATH" (string-append cwd "/__build"))
+               (setenv "BINARY" (string-append cwd "/router"))
+               (rename-file "../router-copy"
+                            "__build/src/github.com/alphagov/router")
+               (and
+                (with-directory-excursion
+                    "__build/src/github.com/alphagov/router"
+                  (substitute* "Makefile"
+                    (("go build")
+                     "go build -mod vendor"))
+                  (and
+                   (zero? (system*
+                           "make" "build"
+                           (string-append "RELEASE_VERSION="
+                                          ,version)))
+                   (mkdir-p (string-append out "/bin"))))
+                (begin
+                  (copy-file "router"
+                             (string-append out "/bin/router"))
+                  #t))))))))
     (synopsis "")
     (description "")
     (license "")
@@ -1612,13 +1612,13 @@ production:
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after
-           'install 'alter-secrets.yml
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* (string-append
-                           (assoc-ref outputs "out")
-                           "/config/secrets.yml")
-               (("SECRET_TOKEN")
-                "SECRET_KEY_BASE")))))))
+              'install 'alter-secrets.yml
+            (lambda* (#:key outputs #:allow-other-keys)
+              (substitute* (string-append
+                            (assoc-ref outputs "out")
+                            "/config/secrets.yml")
+                (("SECRET_TOKEN")
+                 "SECRET_KEY_BASE")))))))
      (synopsis "")
      (description "")
      (license #f)
@@ -1648,19 +1648,19 @@ production:
           (replace 'build (lambda args #t))
           (replace 'check (lambda args #t))
           (replace 'install
-                   (lambda* (#:key inputs outputs #:allow-other-keys)
-                     (let* ((out (assoc-ref outputs "out")))
-                       (copy-recursively
-                        "."
-                        out
-                        #:log (%make-void-port "w")))))
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out")))
+                (copy-recursively
+                 "."
+                 out
+                 #:log (%make-void-port "w")))))
           (add-after 'patch-bin-files 'wrap-with-relative-path
-                     (lambda* (#:key outputs #:allow-other-keys)
-                       (let* ((out (assoc-ref outputs "out")))
-                         (substitute* (find-files
-                                       (string-append out "/bin"))
-                           (((string-append out "/bin"))
-                            "${BASH_SOURCE%/*}"))))))))
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out")))
+                (substitute* (find-files
+                              (string-append out "/bin"))
+                  (((string-append out "/bin"))
+                   "${BASH_SOURCE%/*}"))))))))
      (synopsis "")
      (description "")
      (license #f)
