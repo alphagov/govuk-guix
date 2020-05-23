@@ -1167,9 +1167,7 @@ data to use can be selected, and multiple backends are supported.")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
-            ,(replace-mongoid.yml))
-          (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
-            ,(replace-gds-sso-initializer)))))
+            ,(replace-mongoid.yml)))))
      (inputs
       `(;; hostname is needed by the redis-lock gem
         ("inetutils" ,inetutils)))
