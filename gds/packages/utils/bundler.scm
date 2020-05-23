@@ -349,13 +349,11 @@
                                     (member f '("." ".."))))))))
                  (for-each
                   (lambda (file)
-                    (peek "FILE" file)
                     (copy-recursively
                      (string-append prefix "/" ruby-version "/" file)
-                     (peek "DEST" (string-append
-                                   (assoc-ref outputs "out")
-                                   "/vendor/bundle/"
-                                   (basename file)))
+                     (string-append (assoc-ref outputs "out")
+                                    "/vendor/bundle/"
+                                    (basename file))
                      #:log (%make-void-port "w")))
                   (scandir (string-append prefix "/" ruby-version)
                            (negate
