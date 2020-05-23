@@ -42,9 +42,6 @@
 
 (define rabbitmqctl-list-users
   #~(lambda ()
-      (use-modules (ice-9 popen)
-                   (ice-9 rdelim)
-                   (ice-9 regex))
       ;; Set the correct value for the .erlang-cookie
       (copy-file "/var/lib/rabbitmq/.erlang.cookie" "/root/.erlang.cookie")
 
@@ -81,6 +78,10 @@
   (match connection-config
     (($ <rabbitmq-connection-config> hosts vhost user password)
      #~(lambda ()
+         (use-modules (ice-9 popen)
+                      (ice-9 rdelim)
+                      (ice-9 regex))
+
          (let* ((users (#$rabbitmqctl-list-users)))
            (simple-format #t "users ~A\n\n" users)
 
