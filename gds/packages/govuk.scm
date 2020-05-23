@@ -984,9 +984,7 @@ service setup.")
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
           (add-after 'install 'replace-mongoid.yml
-            ,(replace-mongoid.yml))
-          (add-after 'replace-mongoid.yml 'replace-gds-sso-initializer
-            ,(replace-gds-sso-initializer)))))
+            ,(replace-mongoid.yml)))))
      (synopsis "")
      (description "")
      (license #f)
