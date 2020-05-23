@@ -186,25 +186,6 @@ proxies requests to some upstream")
      (home-page "https://github.com/alphagov/calculators"))
    #:extra-inputs (list libffi)))
 
-(define-public calendars
-  (package-with-bundler
-   (bundle-package
-    (hash (base32 "1lnc9zsn9jv3r6fghkkyhk5ihqr5044bngxc9sjfkff8r12ri0s4")))
-   (package
-     (name "calendars")
-     (version "release_927")
-     (source
-      (github-archive
-       #:repository name
-       #:commit-ish version
-       #:hash (base32 "1rqzf7xs0xcbk7532i9flqxvzmg66gk38hfcpj5z6q3mjx8r3279")))
-     (build-system rails-build-system)
-     (synopsis "Serves calendars on GOV.UK")
-     (description "")
-     (license license:expat)
-     (home-page "https://github.com/alphagov/calendars"))
-   #:extra-inputs (list libffi)))
-
 (define-public collections
   (package-with-bundler
    (bundle-package

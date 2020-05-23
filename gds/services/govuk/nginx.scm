@@ -38,7 +38,6 @@
 (define %services-to-proxy-assets-for
   '(asset-manager
     calculators
-    calendars
     collections
     email-alert-frontend
     feedback

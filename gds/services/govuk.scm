@@ -180,27 +180,6 @@
            (service-startup-config)))))
 
 ;;;
-;;; Calendars
-;;;
-
-(define-public calendars-service-type
-  (service-type
-   (name 'calendars)
-   (extensions
-    (modify-service-extensions-for-signon-and-plek
-     name
-     (standard-rails-service-type-extensions name)))
-   (default-value
-     (list (shepherd-service
-            (inherit default-shepherd-service)
-            (provision '(calendars))
-            (requirement '(publishing-api signon)))
-           (plek-config)
-           (rails-app-config)
-           calendars
-           (service-startup-config)))))
-
-;;;
 ;;; Collections
 ;;;
 
@@ -1672,7 +1651,7 @@
             (inherit default-shepherd-service)
             (provision '(publisher))
             (requirement '(publishing-api frontend draft-frontend
-                                          asset-manager calendars signon)))
+                                          asset-manager signon)))
            (service-startup-config)
            (plek-config) (rails-app-config) publisher
            (redis-connection-config)
@@ -2121,7 +2100,6 @@
    "Frontend Services"
    "Services responsible for rendering GOV.UK"
    (list (service calculators-service-type)
-         (service calendars-service-type)
          (service collections-service-type)
          (service email-alert-frontend-service-type)
          (service feedback-service-type)
