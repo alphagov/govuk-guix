@@ -1514,6 +1514,39 @@ content, as well as broadcasting changes to a message queue.")
               #t))
           (add-before 'install 'add-govuk-admin-template-initialiser
             ,govuk-admin-template-initialiser)
+          (add-after 'install 'replace-database.yml
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let ((location
+                     (string-append
+                      (assoc-ref outputs "out")
+                      "/config/database.yml")))
+                (delete-file location)
+                (call-with-output-file location
+                  (lambda (port)
+                    (simple-format port "
+mysql_default: &mysql_default
+  adapter: mysql2
+  encoding: utf8
+  username: signon
+  password: signon
+  reconnect: true
+
+development:
+  <<: *mysql_default
+  database: signon_development
+  url: <%= ENV[\"DATABASE_URL\"] %>
+
+test: &test
+  <<: *mysql_default
+  database: signon_test
+  url: <%= ENV[\"TEST_DATABASE_URL\"] %>
+
+production:
+  <<: *mysql_default
+  database: signon_production
+  url: <%= ENV[\"DATABASE_URL\"] %>
+")))
+                #t)))
           ;; Ideally this would be configurable, but as it's not, lets
           ;; just disable it
           (add-before 'install 'disable-google-analytics
