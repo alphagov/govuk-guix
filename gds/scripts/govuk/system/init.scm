@@ -6,6 +6,8 @@
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix scripts build)
+  ;; TODO Ideally this functionality would be available outside of a script
+  #:use-module ((guix scripts system) #:prefix guix-scripts-system:)
   #:use-module (gnu system)
   #:use-module (gnu bootloader)
   #:use-module (gnu system vm)
@@ -14,9 +16,6 @@
   #:use-module (gds scripts utils)
   #:use-module (gds scripts govuk system)
   #:export (init))
-
-(define guix-system-perform-action
-  (@@ (guix scripts system) perform-action))
 
 (define (init opts)
   (let* ((target (assq-ref opts 'target))
@@ -38,7 +37,7 @@
       (run-with-store store
         (mbegin %store-monad
           (set-grafting #f)
-          (guix-system-perform-action
+          (guix-scripts-system:perform-action
            'init os
            #:dry-run? #f
            #:derivations-only? #f
