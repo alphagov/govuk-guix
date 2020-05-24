@@ -76,7 +76,7 @@
          (requirement '(mongodb))
          (respawn? #f)
          (start #~(make-forkexec-constructor
-                   (string-append #$package "/bin/router")
+                   (list (string-append #$package "/bin/router"))
                    #:user (passwd:uid (getpwnam "nobody"))
                    #:environment-variables '#$environment-variables
                    #:log-file (string-append "/var/log/" #$string-service-name)))
