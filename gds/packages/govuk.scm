@@ -498,15 +498,15 @@ proxies requests to some upstream")
 (define-public feedback
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1ki94a9d3ya0zy2zhj385bfl32nnlcfccj009vyy575r3nynr144")))
+    (hash (base32 "13nzhssvxp8psb9fkp4nj3y2jlq2znjx3sr2yjr6av8zdqqs4y7a")))
    (package
      (name "feedback")
-     (version "release_862")
+     (version "release_865")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1z5asagwgw7gh3vvxxr207j4daq4kcld80x91h9wnqlf5c6z1mn1")))
+       #:hash (base32 "1j4is4agxxf0dyizhdqlhy1p7s5wnm9lf27lgzpkvapcslx8vzvf")))
      (build-system rails-build-system)
      (arguments
       '(#:phases
