@@ -1354,15 +1354,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1p8kiqanqhbp3shkyz7ig7f4vghzwlp9wasyxifbfxbnxks68i96")))
+    (hash (base32 "1rfy7q70qlg6a170ynaa3qrdfmyqk6c4wfnz0ygfwd1gg4890dn8")))
    (package
      (name "search-api")
-     (version "release_2544")
+     (version "release_2545")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0ppbiq6n1g15bgj451l7vac06lrskj22p1yk35by7376cbn5xfxx")))
+       #:hash (base32 "06inyi2y1n2kb71avcq6ihjp5c9aha58q9kzvwxghk7axpn31kyd")))
      (build-system rails-build-system)
      (arguments
       '(#:precompile-rails-assets? #f
