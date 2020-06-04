@@ -1802,12 +1802,12 @@ production:
     (hash (base32 "1h34hyi1bd654gcfk811pwi1kax39g7nzqjn4bzl277wsbnc39g1")))
    (package
      (name "whitehall")
-     (version "release_14787")
+     (version "release_14788")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "14d1c6vyzfy9azjggkvbvif280hj0696p3xzia4cibm5nvnc2nwj")))
+       #:hash (base32 "0mlf20dgyr56n14w00k32rx49zl3bl6k2qrbphw5ljcb6sbds2xw")))
      (build-system rails-build-system)
      (inputs
       `(("node" ,node)
