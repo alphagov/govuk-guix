@@ -1721,15 +1721,15 @@ production:
 (define-public support-api
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1y2s3mbikhznikzpzxnwk9nzwyr04hl25gcwr903sqpq19786mxc")))
+    (hash (base32 "157429s5vmxin5f2ywz75hlr0pv6xk5lcl19frx0wzc03v9v9qw5")))
    (package
      (name "support-api")
-     (version "release_426")
+     (version "release_427")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0p27zw5w7s7kdsk30fb8z00ic026has5ldvx2jmqqpf4s7n3dhm6")))
+       #:hash (base32 "1c0jgzpzgi02m72k00bnk1nqrvv9d454wapak62vfgsissfwq9zx")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
