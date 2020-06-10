@@ -1545,12 +1545,12 @@ production:
     (hash (base32 "1dkmdsad8famyim14fwgd04qyngfpyg1191r9mal7khbd3448j76")))
    (package
      (name "smart-answers")
-     (version "release_4796")
+     (version "release_4797")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "102hkpsvjc1lfzbfawjsl5qp1xfaayp6d55vihm57l5avyrmks7q")))
+       #:hash (base32 "01zbxqmymm66g2y1zy8r1yps2yhj5qigxi7n89pi09xm291sh86k")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
