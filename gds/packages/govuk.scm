@@ -1773,15 +1773,15 @@ production:
 (define-public travel-advice-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1c1sv07lra9aipr5fyx01lif5av7nqmx3bf0dhwdbjld4s3gnd8l")))
+    (hash (base32 "1pv1dchlzp6xddd3jjaz5l9v9frf25v5vll6m7c88lxlcrldmjgl")))
    (package
      (name "travel-advice-publisher")
-     (version "release_794")
+     (version "release_795")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1v5ificlar70cdiq5ndjndxknkx01x9jbh68afy6dvvcmq5xg8bl")))
+       #:hash (base32 "0iczvacbwhxm4w5lyqy3nsg4qwg4b7arznasfhaqlqkl38b9kddk")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
