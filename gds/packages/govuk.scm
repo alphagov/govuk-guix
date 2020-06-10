@@ -1654,12 +1654,12 @@ production:
     (hash (base32 "0yvghafss7l433h8y5dlic49srj6x8bk302qk1zwb6grwfq711n1")))
    (package
      (name "static")
-     (version "release_3538")
+     (version "release_3539")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0lmp1i6y9gy32ykkgf1hw3xb3w8p81j6byfd3yg90d3ysnvfqk81")))
+       #:hash (base32 "1h77qv39lfbiqjgmb9vjs78ll5iyg0cwa7m81g19rm9vacnq4y1c")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
