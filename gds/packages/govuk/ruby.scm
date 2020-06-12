@@ -10,14 +10,14 @@
 (define-public ruby-gds-sso
   (package
     (name "ruby-gds-sso")
-    (version "14.3.0")
+    (version "15.0.0")
     (source
      (origin
        (method url-fetch)
        (uri (rubygems-uri "gds-sso" version))
        (sha256
         (base32
-         "0rxvvvm7xpgrk824ashmdw2ywmy97zkvzd57ycbg94ap41k02dqz"))))
+         "1yd5895ig6snlv62h39vxb1kr6vr9ni0fg1mdw1kpfiws1p59qbr"))))
     (build-system ruby-build-system)
     (arguments
      '(#:tests? #f))
