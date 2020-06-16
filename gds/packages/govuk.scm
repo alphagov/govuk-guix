@@ -1692,12 +1692,12 @@ production:
     (hash (base32 "1ic01cr57dl73c5w58j0nq8aip1vjywyr907ahs49hdjk8d541s8")))
    (package
      (name "support")
-     (version "release_998")
+     (version "release_999")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "04n6xdd7wc10r0zfdcxc7azk94zs69wc4waw17jj24190gn38gf6")))
+       #:hash (base32 "1brm4w0pw6sjfxgwjnx7a2jkvwfz4l7rpdfyy3x3xlb6i2zv32vm")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
