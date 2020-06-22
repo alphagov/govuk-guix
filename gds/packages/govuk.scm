@@ -1745,15 +1745,15 @@ production:
 (define-public transition
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0xxjip3bq4hlrcp1w9z8cjsxscmsa5hzjkq3n96h6djs87aa1pzi")))
+    (hash (base32 "1alxcvixx71ki43kc7gmfwk6gygbpc0ja3hazyp16mdxwfwj6nl5")))
    (package
      (name "transition")
-     (version "release_1126")
+     (version "release_1127")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1j3ripm26pgjih6a6v3gdmk9xybdz41wjsfz1pvwqq6pcx1mcwh5")))
+       #:hash (base32 "1mah56hjbri6g49fi3r70clp2hnk2h3fpvj751qgx6smjrb468yf")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
