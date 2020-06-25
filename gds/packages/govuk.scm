@@ -1651,15 +1651,15 @@ production:
 (define-public static
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0gf2rzbk8a896pl5fcg7f4v2387850pj85pc8nwi6sya9lvw88kq")))
+    (hash (base32 "0y5cvnx8lham5ynja8vq0ffxg2c710csc5s7cvirr61dvgy8n7v1")))
    (package
      (name "static")
-     (version "release_3553")
+     (version "release_3554")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "01bz92rb9vrfy8xssg1x74sk5l17bskkg2gkf4ayx4lr27qgif75")))
+       #:hash (base32 "1xqfq69agsz7smhxqrx5pqc12vxdj7r0hc5dvnvdnk5inb4y9v1r")))
      (build-system rails-build-system)
      (arguments
       '(;; jasmine-rails seems to get annoyed if it's configuration
