@@ -1542,15 +1542,15 @@ production:
 (define-public smart-answers
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0bgphmylwiy93lziikg2a8p2m8zmjq61bpvy4mf6bvjf7xz1bnb1")))
+    (hash (base32 "15025bw99cybc77vqnn24qf09r5pc6bwrdgskd9ybfwg60ix8dxc")))
    (package
      (name "smart-answers")
-     (version "release_4852")
+     (version "release_4853")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "18xm6ad9jc6vjpk9qx7gd97jz9703y58mk2vf050xnmkmryznvcf")))
+       #:hash (base32 "1qd2m4xvxyndfl0lrigwi4awy8rd3fq0bx2kpic66s3is64xi04i")))
      (build-system rails-build-system)
      ;; Asset precompilation fails due to the preload_working_days
      ;; initialiser
