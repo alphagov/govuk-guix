@@ -1799,15 +1799,15 @@ production:
 (define-public whitehall
   (package-with-bundler
    (bundle-package
-    (hash (base32 "111c1a9v0yzxinaxc6c5wjwkz1p8c3ypyicn310r7syylfddd8wr")))
+    (hash (base32 "1jx7sz3jh65ivyvrqglb6z73f590ldjjp4dqjiww23rhlcc4w26j")))
    (package
      (name "whitehall")
-     (version "release_14839")
+     (version "release_14840")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1is90c5q1g59ijjr66m74nnmjwz80rzs8dcxb909gqrqdkmfwnav")))
+       #:hash (base32 "0449wfjkcs90i4dzrv1y8sp5dnixjv6mghzjrjasndpkdjcas5c7")))
      (build-system rails-build-system)
      (inputs
       `(("node" ,node)
