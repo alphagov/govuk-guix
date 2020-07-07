@@ -917,12 +917,12 @@ service setup.")
     (hash (base32 "0z36ljpgl0ma98fqk9h8p8qkgxksj0p17lm4l4p1n6rasi77pp23")))
    (package
      (name "manuals-frontend")
-     (version "release_739")
+     (version "release_740")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1iz2bqj9r9nyrzz885lrhszzqap0rhkfqbycx304mf3dicgw7dik")))
+       #:hash (base32 "121kk8i771fl567r2vr2870bbnq80fg9szlzmf4q6b512zip4x5i")))
      (build-system rails-build-system)
      (synopsis "")
      (description "")
