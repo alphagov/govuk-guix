@@ -1328,15 +1328,15 @@ content, as well as broadcasting changes to a message queue.")
 (define-public search-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0yirzmrnr48k5xgd4mvda02gb6a9a2a81v4apwlywjvp3mx2wlg4")))
+    (hash (base32 "0j99n3y36xkinikvxbibriv0pjz8ij3skvmpsq9jd85vr0fjkf9k")))
    (package
      (name "search-admin")
-     (version "release_411")
+     (version "release_412")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1gzfpkfw5r0scmvn98rdy9y6r94p53ycj0kr2n77kb0js1pa9jyv")))
+       #:hash (base32 "1y25112x0rqrrr9450xn83zbsaf82f975w5wp32x178raq3wn15x")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
