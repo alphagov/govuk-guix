@@ -1357,12 +1357,12 @@ content, as well as broadcasting changes to a message queue.")
     (hash (base32 "0ix69p4xkbbwpzw8m1qm1zlqh1qs1sazinb745iyc8c4xcmsl3a2")))
    (package
      (name "search-api")
-     (version "release_2581")
+     (version "release_2582")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0mkva4wx5v8dp7qxwvldyn2v0gkvfa5jb2yab0c0gplf1yik7rpr")))
+       #:hash (base32 "1zm0dvwvmhyg128clxpas0aapq6r6qmd1rc777dwnf6pg6apg017")))
      (build-system rails-build-system)
      (arguments
       '(#:precompile-rails-assets? #f
