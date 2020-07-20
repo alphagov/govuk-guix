@@ -1724,12 +1724,12 @@ production:
     (hash (base32 "1j2dad95m3bcqyyx3w33jpa41j5i940jc2rq8dl6sw572yn1x47k")))
    (package
      (name "support-api")
-     (version "release_434")
+     (version "release_435")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1rn81i1i3pj5j3j9z9n9lqw210c7jr5zj9wrh139bngajxhlxi0h")))
+       #:hash (base32 "0dlk2xxcardcjkx03scmk5pdi30g0xlwqgjm7vsq967b55fymwwr")))
      (build-system rails-build-system)
      (inputs
       `(;; hostname is needed by the redis-lock gem
