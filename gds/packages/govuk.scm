@@ -1776,12 +1776,12 @@ production:
     (hash (base32 "19cgxzk72d525lljx6dvnzny2mkvc4i9rh4kfb5pgihws0q6zfhk")))
    (package
      (name "travel-advice-publisher")
-     (version "release_810")
+     (version "release_811")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1xhnax93kqsljbhw9hr3r37mws0vk9iwp3z8lcwilczzvynlpv81")))
+       #:hash (base32 "1x97y5v5d24fbsi1fbjzb5lgb9hrdygjfr3dfkrkmkkqfr80wm7a")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
