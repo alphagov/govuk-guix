@@ -1748,12 +1748,12 @@ production:
     (hash (base32 "1dk69rcdpijqv8hazsm84bnk6fcsicxvhfqy72f3g5lyfcx634sl")))
    (package
      (name "transition")
-     (version "release_1135")
+     (version "release_1136")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "186xzmz9vdiksn542hbq15ps1fcwrj2g4d6h5sqbihb6bmvgb74b")))
+       #:hash (base32 "0b3wyzyd2fi90gmmykp1mprgx19yhm6bg8n6r3q37rvinfgrx3rg")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
