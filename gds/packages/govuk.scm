@@ -1133,12 +1133,12 @@ data to use can be selected, and multiple backends are supported.")
     (hash (base32 "14qpc105s774mlz6ccczwwdc311vc9k3lq577k5a08165basj1sv")))
    (package
      (name "publisher")
-     (version "release_2344")
+     (version "release_2345")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0mqwzxrgzaid39f193xakm1cwizysjg7qblw50kpa88bwil2snch")))
+       #:hash (base32 "1bqhflh02qfbjg9zqy54g1pwf0s1a4bd9kdqzaj4mgfvy56yazp1")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
