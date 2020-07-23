@@ -1689,15 +1689,15 @@ production:
 (define-public support
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1mcyd95a91q2d2ryiq6z4i9s7vw4x91rd5b7hxwjqyj97xawcxfg")))
+    (hash (base32 "1py55vlplcksgdsn9aafznzz16vhmkwyrx4ci2bpav8k0sbvhzgb")))
    (package
      (name "support")
-     (version "release_1009")
+     (version "release_1010")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0j4jvs9mihpx1a2fvnh89byfikjm6piiqzzyxn6qazga2msag1qz")))
+       #:hash (base32 "0y82ssrkj5bkdhkwyy8d8bfijjqi2dx0vdxwpvdms3dk5jzzzqd4")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
