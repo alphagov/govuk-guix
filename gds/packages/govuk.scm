@@ -1576,12 +1576,12 @@ production:
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
-     (version "release_1384")
+     (version "release_1385")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1236h3893n88n9kmra08nr0pp2fxcdkaq7981vyld0cs5k9r4xkm")))
+       #:hash (base32 "0hvkji1nr63npjy2v8hh7avzwji4zwa4xz5vgrwfyfradw7d3i3q")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
