@@ -275,15 +275,15 @@ proxies requests to some upstream")
 (define-public content-data-admin
   (package-with-bundler
    (bundle-package
-    (hash (base32 "0pdxzy537adhc77a8j1a8dx82ny3vczgzvf8kz1j4f6hq3hyi5w4")))
+    (hash (base32 "0xznkhar0macmij7h4kh039xp9szv6jcvi7kqnhw0a2b035l7b4k")))
    (package
      (name "content-data-admin")
-     (version "release_700")
+     (version "release_701")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "1di8r0hfy4f7yh7mh18hmwh6yd7551frbaspx6yl6abhc5xmkw14")))
+       #:hash (base32 "1ly4mbszgaz3r259001sjdbnbppj4bpx5ylv9v994nk6c4aygam8")))
      (build-system rails-build-system)
      (native-inputs
       `(("chromium" ,ungoogled-chromium)))
