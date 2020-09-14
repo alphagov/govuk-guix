@@ -1572,16 +1572,16 @@ production:
 (define-public specialist-publisher
   (package-with-bundler
    (bundle-package
-    (hash (base32 "1l0p6vz0jdvjfg1hqlzi1vpcazw7g36alks88xnfas7bmpq1g880"))
+    (hash (base32 "1p9bfr88z3x6ss069jmsb3n66z93kg5d52fzabx9ssk2w442ndss"))
     (without '("development" "test")))
    (package
      (name "specialist-publisher")
-     (version "release_1391")
+     (version "release_1396")
      (source
       (github-archive
        #:repository name
        #:commit-ish version
-       #:hash (base32 "0hgd0zvsq9z0wbf6in7glgm4hfqqw21daa5xhjzd583pziaj1law")))
+       #:hash (base32 "13miyljff0gcjikw7lxpx811y9iy12cfnsa2x052lv8gm1zs8nf8")))
      (build-system rails-build-system)
      (arguments
       `(#:phases
