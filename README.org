@@ -1,5 +1,12 @@
-This repository contains Guix package, service and system definitions
-for software and systems specifically related to [[https://www.gov.uk/][GOV.UK]].
+#+BEGIN_QUOTE
+* 🚨 Deprecated
+
+*This repository is no longer maintained and should not be used.*
+
+We now [[https://github.com/alphagov/govuk-docker][use Docker for local development]]. For more context, see [[https://github.com/alphagov/govuk-rfcs/blob/main/rfc-106-docker-for-local-development.md][GOV.UK RFC-106]].
+#+END_QUOTE
+
+-----
 
 * Getting started
 
